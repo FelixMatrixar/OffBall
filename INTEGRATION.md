@@ -415,7 +415,7 @@ None of this is built, on purpose: the UI is finished against its stand-ins. Whe
 | --- | --- |
 | One module for calls, with each stand-in module calling it and falling back to its stand-in when the call fails, so components stay unchanged | New `web/src/lib/api.ts`; `pundit.ts`, `decisions.ts`, `recap.ts`, `content.ts`, `stats.ts` |
 | An API address setting, next to `VITE_FEED_URL` | `VITE_API_BASE` |
-| A Web PubSub connection that fetches its access URL first and refreshes it on reconnect, naming the viewer's mode and language so the backend makes only the variants someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` |
+| A Web PubSub connection that fetches its access URL first and refreshes it on reconnect, naming the viewer's language so the backend writes only the languages someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` |
 | Producer actions sent to the backend instead of other tabs, with the producer token of the live run being produced (PRD 11.7) | `publish()` in `web/src/lib/feed/store.ts` |
 | The producer console and phone companion reading the same `?feed=` as the match view. The broadcast output stays a static reference design; the partner template is its live version. | `web/src/screens/ProducerConsole.tsx`, `PhoneCompanion.tsx` |
 | Loading the match, roster, clubs, kits and moment window from the backend, so any match can be shown | `web/src/lib/match.ts` and the code that reads it |
