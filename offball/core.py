@@ -7,8 +7,6 @@ period's kick-off plus the period number; frame IDs count 25 Hz frames within a 
 
 from __future__ import annotations
 
-import re
-
 SCHEMA_VERSION = "2.0"
 GENERATOR_VERSION = "0.1.0"
 
@@ -93,22 +91,21 @@ def player_id(club_id: str, number: int) -> str:
     return f"{club_id}-{number:02d}"
 
 
-_FRAME_REF = re.compile(r"^(?P<match>.+)-f(?P<period>\d)-(?P<frame>\d+)$")
-_EVENT_REF = re.compile(r"^(?P<match>.+)-e(?P<n>\d{4,})$")
-
-
 def parse_frame_ref(ref: str) -> tuple[str, int, int] | None:
-    m = _FRAME_REF.match(ref)
-    if not m:
+    """`m07-f2-27000` -> ("m07", 2, 27000); None for anything else."""
+    head, sep, frame = ref.rpartition("-")
+    match, sep2, period = head.rpartition("-f")
+    if not (sep and sep2 and match and period.isdigit() and len(period) == 1 and frame.isdigit()):
         return None
-    return m["match"], int(m["period"]), int(m["frame"])
+    return match, int(period), int(frame)
 
 
 def parse_event_ref(ref: str) -> tuple[str, int] | None:
-    m = _EVENT_REF.match(ref)
-    if not m:
+    """`m07-e0912` -> ("m07", 912); None for anything else."""
+    match, sep, n = ref.rpartition("-e")
+    if not (sep and match and n.isdigit() and len(n) >= 4):
         return None
-    return m["match"], int(m["n"])
+    return match, int(n)
 
 
 def club_of(pid: str) -> str:

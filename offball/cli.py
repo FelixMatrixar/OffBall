@@ -5,6 +5,9 @@
     offball showcase                     Generate the showcase match, Kestrel Bay v Ashmoor
     offball match --home kes --away ash  Generate one emergent match from a seed
     offball smoke                        Generate the CI smoke set
+    offball serve api|mcp|all            Run the API (port 8000), the MCP server (port 8001), or both
+    offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000
+                                         Build a replay stream through the live pipeline and the crew
 """
 
 from __future__ import annotations
@@ -91,6 +94,60 @@ def cmd_smoke(args: argparse.Namespace) -> None:
         _write_directed(script, DATASETS / "smoke", TRUTH / "smoke", args.attempts, args.cf_runs)
 
 
+def cmd_serve(args: argparse.Namespace) -> None:
+    import asyncio
+    import logging
+
+    import uvicorn
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+
+    async def run() -> None:
+        servers = []
+        if args.what in ("api", "all"):
+            from offball.services.api import app
+
+            servers.append(uvicorn.Server(uvicorn.Config(app, host=args.host, port=args.port, log_level="info")))
+        if args.what in ("mcp", "all"):
+            from offball.mcp.server import build_server
+
+            mcp_app = build_server(args.host, args.mcp_port).streamable_http_app()
+            servers.append(uvicorn.Server(uvicorn.Config(mcp_app, host=args.host, port=args.mcp_port,
+                                                         log_level="info")))
+        await asyncio.gather(*(s.serve() for s in servers))
+
+    asyncio.run(run())
+
+
+def cmd_replay(args: argparse.Namespace) -> None:
+    import asyncio
+    import logging
+
+    from offball.agents.crew import Crew
+    from offball.agents.llm import model_configured
+    from offball.mcp.tools import REGISTRY
+    from offball.services.emitter import EmitterConfig
+    from offball.services.replay import build_replay
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    dirs = REGISTRY.match_dirs()
+    if args.match_id not in dirs:
+        sys.exit(f"Unknown match {args.match_id}; known: {', '.join(dirs)}")
+    if not model_configured():
+        print("No model is configured, so the crew is off and the replay has no graphics. See .env.example.")
+    crew = Crew.from_env() if model_configured() else None
+    out = Path(args.out) if args.out else ROOT / "replays" / f"{args.match_id}.jsonl"
+    config = EmitterConfig(period=args.period, from_ms=args.from_ms, to_ms=args.to_ms)
+    result = asyncio.run(build_replay(dirs[args.match_id], config, crew, out))
+    print(f"{result.messages} messages, {result.overlays} graphics -> {result.path}")
+    for o in result.outcomes:
+        print(f"  {o.candidate_id}: {o.status} {o.note}")
+    if result.invalid:
+        print(f"{len(result.invalid)} messages don't match the contracts:")
+        print("\n".join(result.invalid[:20]))
+        sys.exit(1)
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="offball", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -116,6 +173,19 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--attempts", type=int, default=40)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_smoke)
+    p = sub.add_parser("serve")
+    p.add_argument("what", choices=["api", "mcp", "all"], nargs="?", default="all")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8000)
+    p.add_argument("--mcp-port", type=int, default=8001)
+    p.set_defaults(fn=cmd_serve)
+    p = sub.add_parser("replay")
+    p.add_argument("match_id")
+    p.add_argument("--period", type=int)
+    p.add_argument("--from-ms", type=int, default=0)
+    p.add_argument("--to-ms", type=int)
+    p.add_argument("--out")
+    p.set_defaults(fn=cmd_replay)
     args = ap.parse_args(argv)
     args.fn(args)
 

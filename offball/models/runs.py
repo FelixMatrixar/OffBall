@@ -21,9 +21,7 @@ class Possession:
         self.clubs: dict[int, list[str]] = {}
         for e in md.events:
             club = None
-            if e.type in POSSESSING_TYPES:
-                club = e.team_id
-            elif e.type in WINNING_TYPES and e.outcome == "won":
+            if e.type in POSSESSING_TYPES or (e.type in WINNING_TYPES and e.outcome == "won"):
                 club = e.team_id
             if club is None:
                 continue

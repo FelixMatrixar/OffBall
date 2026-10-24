@@ -100,7 +100,7 @@ The frontend (`web/src/lib/feed/sources.ts`) and the partner template (`web/publ
 | Build setting | `VITE_FEED_URL=sse:https://…` | The same forms as `?feed=`. |
 | Nothing set | | The built-in replay, with precomputed output for every mode and language |
 
-A single event or frame may hold several messages, one per line. A malformed line is skipped, never fatal.
+The match view reads several messages per event or frame, one per line, but the partner template reads one message per event or frame, so send one at a time to reach both. A malformed line is skipped, never fatal.
 
 In production the stream goes through Azure Web PubSub (PRD 11), one group per match. Send to the group as JSON with no subprotocol, so each WebSocket frame the browser receives is one message.
 

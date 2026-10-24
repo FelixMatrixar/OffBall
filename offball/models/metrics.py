@@ -6,8 +6,9 @@ Fact-checker can recompute it exactly. Each result carries its unit and the evid
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 

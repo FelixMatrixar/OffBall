@@ -8,6 +8,7 @@ in Azure the same interface is backed by Cosmos DB (partitioned by match) and We
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import time
 from collections.abc import Callable
@@ -85,13 +86,13 @@ class MatchState:
         return [o for oid, o in self.overlays.items() if oid not in self.retracted]
 
     def publish(self, msg: dict) -> None:
-        self.partner_log.append(msg)
-        self._mirror("partner.jsonl", msg)
+        if msg.get("type") != "frame":  # frames are already in the feed; keep the log to what the crew adds
+            self.partner_log.append(msg)
+            self._mirror("partner.jsonl", msg)
         for q in list(self._subscribers):
-            try:
+            # A slow subscriber drops messages rather than stalling the show.
+            with contextlib.suppress(asyncio.QueueFull):
                 q.put_nowait(msg)
-            except asyncio.QueueFull:
-                pass  # a slow subscriber drops messages rather than stalling the show
 
     def subscribe(self, maxsize: int = 1000) -> asyncio.Queue:
         q: asyncio.Queue = asyncio.Queue(maxsize=maxsize)

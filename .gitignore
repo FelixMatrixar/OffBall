@@ -22,9 +22,13 @@ htmlcov/
 # Local settings and secrets
 .env
 .env.*
+!.env.example
 *.local
 .azure/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Generated replays
+replays/

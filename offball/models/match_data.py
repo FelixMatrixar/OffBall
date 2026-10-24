@@ -40,7 +40,9 @@ class PeriodFrames:
         return np.linalg.norm(self.vel, axis=2)
 
     def index_of(self, t_ms: int) -> int:
-        return int(np.clip(round(t_ms / FRAME_MS), 0, self.n - 1))
+        """Index of the frame nearest t_ms. Frames may start later than kick-off, as a live window does."""
+        t0 = int(self.t_ms[0]) if self.n else 0
+        return int(np.clip(round((t_ms - t0) / FRAME_MS), 0, max(self.n - 1, 0)))
 
 
 def smoothed_velocity(xy: np.ndarray, window: int = 5) -> np.ndarray:

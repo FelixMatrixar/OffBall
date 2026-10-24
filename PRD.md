@@ -221,7 +221,7 @@ Fans see the pass and the finish, not the gap that made both possible. Take a de
 | Every claim is traceable | Each number and statement cites event or frame IDs, and nothing unverified airs. |
 | Ground truth by construction | We generate the world, so we can grade the AI against what really happened, including what didn't happen. |
 | Deterministic where possible, agentic where judgement is needed | Physics, metrics and verification of numbers are code. Agents decide what matters, how to say it and to whom. |
-| Degrade, never lie | Every failure path falls back to something simpler that is still true: a template caption, a lower rendering tier, silence. Never an unchecked claim. |
+| Degrade, never lie | Every failure path ends in something simpler that is still true: a lower rendering tier, a graphic left off air, silence. Agents never fall back to templates or rules, and nothing unchecked airs. |
 | Graceful everywhere | Visuals hold their frame rate, stay in sync and stay legible from a phone on 4G to a 4K broadcast output, in light and dark themes, for colour-blind viewers and with reduced motion. |
 | One intelligence, many experiences | Casual, learner, analyst, player-focused, audio-described and broadcaster views are different products built on the same verified facts. |
 | Open by default | Data contracts, the benchmark, the MCP tools and the overlay protocol are public, so others can build on OffBall. |
@@ -583,7 +583,7 @@ The relay, the part of the `live` service that sends the stream, turns the pipel
 - **One writer per match.** Each match is sent by exactly one `live` replica, the owner of its Event Hubs partition, so revisions go out in order. A correction sends the replacement upsert first, then the retraction (`INTEGRATION.md` 4.3).
 - **The clock never stops.** `clock.sync` goes out every second for every live match, from kick-off until the last viewer leaves, including quiet spells and after full time, because to the frontend silence means a stall.
 - **Nothing late.** An upsert whose `t_end_ms` is already behind the viewers' 1.5 s buffer is counted as a late drop and not sent, since the frontend would drop it anyway. The late-drop rate is one of the Engineer's latency signals.
-- **Frames in batches.** Frames go out five at a time, every 200 ms, one message per line. That cuts the message count fivefold and stays well inside the 1.5 s buffer.
+- **Frames in batches on Web PubSub.** Over Web PubSub, frames go out five at a time, every 200 ms, one message per line, which cuts the message count fivefold. The match view reads several messages per line, but the partner template reads one message per WebSocket message or event, so batching starts once it reads lines as the match view does. Server-Sent Events always carry one message per event.
 - **Partners too.** The same messages are served as Server-Sent Events at `GET /api/matches/{match_id}/stream` for partners who prefer them, and as a JSONL file for replays.
 
 **Data rate.** JSON frames, as the frontend reads them today, measure about 740 bytes each: 1.1 MB a minute at 25 Hz, against the 0.5 MB budget in 16.7. Batching doesn't reduce the bytes, so contract 2.1 adds a compact binary frame, quantized and delta-encoded as 16.7 assumes, decoded in the frontend's worker. Until it lands, live viewing uses about twice its data budget (open question 15).
@@ -642,7 +642,7 @@ Cosmos DB uses session consistency and runs in its free tier: 1,000 RU/s of prov
 
 ### 11.9 Replays, live runs and the showcase
 
-**Replays are made by the real pipeline.** `offball replay build {match_id}` runs the whole live pipeline headless at 60x with demand-driven fan-out off, so every mode and language is produced, every counterfactual and changed-decision option is run, speech is synthesised and both recaps are built. It writes the stream to `feeds/{match_id}/replay.jsonl`, with the API's answers beside it. Then it checks the result the way the frontend would: every message against the contracts with the same check as `web/tests/unit/contracts.spec.ts`, and every item in the `INTEGRATION.md` section 10 checklist that a script can check. A replay that fails isn't published, and the web app's built-in replay stays the fallback.
+**Replays are made by the real pipeline.** `offball replay {match_id}` runs the whole live pipeline headless at 60x with demand-driven fan-out off, so every mode and language is produced, every counterfactual and changed-decision option is run, speech is synthesised and both recaps are built. It writes the stream to `feeds/{match_id}/replay.jsonl`, with the API's answers beside it. Then it checks the result the way the frontend would: every message against the contracts with the same check as `web/tests/unit/contracts.spec.ts`, and every item in the `INTEGRATION.md` section 10 checklist that a script can check. A replay that fails isn't published, and the web app's built-in replay stays the fallback.
 
 **Live runs draw on a pool.** Generating a directed match takes minutes: the showcase took 718 s with its retries and counterfactual runs. So a judge's live run doesn't generate a match on demand. The generator keeps a pool of matches and rounds made in advance, and a live run emits one at 1x through the real pipeline, with the agents working live. A new match is generated in the background to refill the pool.
 
@@ -675,7 +675,7 @@ The plan is to direct the generator to the frontend's showcase rather than chang
 | BE-12 | Costly public calls (questions, re-runs and live runs) queue with a place in line and a wait; they never fail silently. |
 | BE-13 | Every number in a response or overlay comes from the metric registry (`offball/models/metrics.py`) or a model in section 13, with its evidence IDs. |
 | BE-14 | No viewer data is stored or logged: no question text in telemetry, and client addresses only hashed, in memory. |
-| BE-15 | The whole backend runs locally with `docker compose up` and no Azure subscription, and the showcase plays end to end with no model at all (14.14, 18.15). |
+| BE-15 | The whole backend runs locally with `docker compose up` and no Azure subscription; with a model endpoint in `.env`, the crew runs too (14.14, 18.15). |
 
 ---
 
@@ -927,16 +927,16 @@ Eleven agents in three crews, hosted in Microsoft Foundry Agent Service, coordin
 
 | Crew | Agent | Role | Reads | Writes | Tools (via our MCP server) | When it fails |
 | --- | --- | --- | --- | --- | --- | --- |
-| Data | Match director | Turns a brief into a match script | Brief, league | Match script (JSON) | `league_lookup`, `run_simulator` (dry run), `validate_script` | Invalid script retried up to 3 times, then a template script; if the engine can't realise a moment, the director revises it |
+| Data | Match director | Turns a brief into a match script | Brief, league | Match script (JSON) | `league_lookup`, `run_simulator` (dry run), `validate_script` | Invalid script retried up to 3 times, then the brief goes back to the team; if the engine can't realise a moment, the director revises it |
 | Data | Tuner | Forms calibration hypotheses and steers the optimizer | Gate reports, fidelity charts | Hypotheses, search spaces | `compare_distributions`, `launch_calibration_job` | A hypothesis that doesn't improve the gates is logged as rejected; parameters only change when every gate passes |
 | Data | Validator | Runs the nine gates and explains failures | Generated files, gate results | Plain-language gate report on the data-quality dashboard | `run_gates`, `compare_distributions`; Azure MCP Server to inventory generated files and their content hashes in Storage | Report marked incomplete; CI still fails on the raw gate results |
-| Broadcast | Scout | Picks which candidate moments deserve airtime, given score, time, recent airtime, active modes and producer settings | Candidate moments, match state | Ranked moments | `list_candidates`, `query_match_state` | Falls back to a rule: highest signal strength, at most one graphic per 20 s |
+| Broadcast | Scout | Picks which candidate moments deserve airtime, given score, time, recent airtime, active modes and producer settings | Candidate moments, match state | Ranked moments | `list_candidates`, `query_match_state` | Asked once more; if it still fails, the moment doesn't air |
 | Broadcast | Tactician | Proves cause with counterfactual re-runs and ghosting, and re-runs a viewer's changed decision (10.10) | Moment, observed state, a changed decision | Counterfactual result and ghost tracks | `list_options`, `run_counterfactual`, `get_ghosts`, `compute_metric` | If a re-run times out, the explanation airs without a counterfactual, and the replay follows later or not at all |
-| Broadcast | Explainer | Writes why the moment matters as structured claims, each with evidence | Moment, evidence, counterfactual, season context | Draft of claims with evidence IDs | `get_evidence`, `compute_metric`, `search_moments` | Rewrites after a Fact-checker rejection; after 2 rejections, a template caption is used |
+| Broadcast | Explainer | Writes why the moment matters as structured claims, each with evidence | Moment, evidence, counterfactual, season context | Draft of claims with evidence IDs | `get_evidence`, `compute_metric`, `search_moments` | Rewrites after a Fact-checker rejection; after 2 rejections, nothing airs |
 | Broadcast | Fact-checker | Verifies every claim independently: recomputes every number, checks every statement against the moment's signals, and re-verifies aired claims after corrections | Draft, evidence | A verdict per claim | `get_evidence`, `compute_metric`, `recheck_overlay` | If it times out, the moment is held back; nothing unverified airs |
-| Broadcast | Persona | Re-voices and filters the verified claims per mode, club, player, metric and language; writes speech markup and audio descriptions | Verified claims, viewer settings | Overlay entries and speech | `glossary_lookup`, `translate` | Falls back to Translator output with the glossary, then to English analyst text with a translation notice |
-| Broadcast | Producer | Schedules graphics: timing, priority, collisions, density, human approvals, retractions, recaps and Space Centre jumps | Persona output, producer settings, screen state | Scheduled overlay feed, recap packages | `schedule_overlay`, `retract_overlay`, `request_approval`, `render_clip` | Falls back to a deterministic scheduler: first in, first out, at least 20 s between graphics |
-| Broadcast | Engineer | Watches the live system's health, diagnoses problems, applies pre-approved mitigations and explains incidents to the producer | Traces and metrics, ingest lag, service health, Activator alerts | Incident notes, degrade-flag changes | Azure MCP Server: Log Analytics and metrics queries, Cosmos DB queries, App Configuration get and set on the degrade-flag store; `query_match_state` | The fixed fallbacks in 14.5 keep working without it, and alerts go straight to the human producer |
+| Broadcast | Persona | Re-voices and filters the verified claims per mode, club, player, metric and language; writes speech markup and audio descriptions | Verified claims, viewer settings | Overlay entries and speech | `glossary_lookup`, `translate` | Asked once more; if it still fails, that mode shows nothing for the moment |
+| Broadcast | Producer | Schedules graphics: timing, priority, collisions, density, human approvals, retractions, recaps and Space Centre jumps | Persona output, producer settings, screen state | Scheduled overlay feed, recap packages | `schedule_overlay`, `retract_overlay`, `request_approval`, `render_clip` | Asked once more, with the reasons its schedule couldn't be published; if it still fails, nothing airs |
+| Broadcast | Engineer | Watches the live system's health, diagnoses problems, applies pre-approved mitigations and explains incidents to the producer | Traces and metrics, ingest lag, service health, Activator alerts | Incident notes, degrade-flag changes | Azure MCP Server: Log Analytics and metrics queries, Cosmos DB queries, App Configuration get and set on the degrade-flag store; `query_match_state` | Alerts go straight to the human producer, and the client still steps down its rendering tier on its own |
 | Fan | Pundit | Answers fans' questions by text or voice, grounded in match and season data, with charts where helpful | Question, match state, season, Fabric | Answer with claims, evidence and an optional chart spec | `query_match_state`, `run_kql`, `search_moments`, `run_sandboxed_analysis`, and the Fabric data agent on a paid capacity (17.4); hands off to the Tactician, Fact-checker and Persona | Says what it couldn't verify; declines out-of-scope questions; Content Safety blocks unsafe ones |
 
 ### 14.2 Orchestration patterns
@@ -1005,14 +1005,14 @@ Persona fan-out is demand-driven: in live mode it only produces the languages so
 
 | Failure | Detected by | Recovery | What viewers see |
 | --- | --- | --- | --- |
-| Model timeout or rate limit | Per-call deadline | One retry with backoff, then the fallback in 14.1 | A template caption, or nothing |
+| Model timeout or rate limit | Per-call deadline | One retry with backoff; then the step airs nothing (14.1) | Nothing for that moment |
 | Malformed agent output | Schema validation | Re-ask with the validation error, at most twice | Nothing, until valid |
-| Fact-check rejection | Verdict | Explainer rewrites twice, then a template | A simpler caption |
-| Tool failure | MCP error | Retry idempotent tools; a circuit breaker per tool | Nothing, or a simpler caption |
+| Fact-check rejection | Verdict | Explainer rewrites twice; then nothing airs | Nothing for that moment |
+| Tool failure | MCP error | Retry idempotent tools; a circuit breaker per tool | Nothing, or a caption with fewer claims |
 | Worker crash mid-workflow | Heartbeat | Resume from the Agent Framework checkpoint | A short delay, never a duplicate |
 | Feed gap, late or duplicate message | Sequence numbers | Deduplicate, reorder within 2 s, interpolate gaps up to 0.4 s, flag longer gaps | A "feed interrupted" chip after 2 s |
 | Feed correction | Correction message | Re-verify, then retract or patch | A "Correction" tag |
-| Token budget exhausted | Per-match token meter | Templates for low-priority moments | Fewer, simpler graphics |
+| Token budget exhausted | Per-match token meter | Low-priority moments are skipped | Fewer graphics |
 | Region outage | Health probes | Replay is static and keeps playing; live mode returns with the region | Replay keeps working |
 | Latency drifting toward its budget | The Engineer, from Azure Monitor through Azure MCP Server, or a Fabric Activator alert | The Engineer flips a degrade flag: a faster model for the Explainer, fewer live languages, or counterfactuals paused | Simpler graphics, still on time |
 | Client can't keep its frame rate | Frame-time monitor | Steps down a rendering tier (16.2) | Simpler visuals, never a frozen screen |
@@ -1123,23 +1123,23 @@ Agent versions are numbered, new seeded matches join the benchmark over time so 
 
 Each agent reads and writes published contracts (`contracts/agents/` and the additions in 11.3), runs on a model tier (14.13), and has a time and token budget per call that Agent Framework middleware enforces (14.7, 14.11). Budgets are starting values, set by measurement.
 
-| Agent | Runs when | Reads | Writes | Tier | Time, p95 | Tokens in / out | Without a model |
+| Agent | Runs when | Reads | Writes | Tier | Time, p95 | Tokens in / out | If it fails |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Scout | A candidate turns speculative or confirmed | `candidate`, match state | `moment` | Fast | 300 ms | 1,500 / 200 | Highest signal strength, at most one graphic per 20 s |
-| Tactician | A picked moment wants a counterfactual, or a viewer changes a decision | `moment`, the observed state, a changed decision | `counterfactual`, `decision-result` | Reasoning, for choosing options and wording the verdict; the numbers come from the workers | 15 s | 3,000 / 300 | The workers' results with template words |
-| Explainer | The Scout picks a moment | A moment card (14.12), evidence, the counterfactual if it's ready, season context | `draft` | Reasoning | 1,000 ms after confirmation | 6,000 / 800 | A template caption from `offball/agents/locales` |
-| Fact-checker | A draft arrives, or evidence behind an aired claim is corrected | `draft` | `verdict` | Reasoning, for statements; code recomputes the numbers | 600 ms | 5,000 / 400 | Code checks only; a statement it can't check is held back |
-| Persona | A draft passes | Verified claims, the modes and languages in demand | A `variant` per mode and language | Fast | 500 ms, in parallel | 2,000 / 600 per variant | Templates and the glossary; then Translator; then English with a translation notice |
-| Producer | Variants, a counterfactual or an approval arrives | Variants, screen state, producer settings | Overlays, `approval` requests | Fast | 200 ms | 2,000 / 300 | First in, first out, at least 20 s apart |
-| Engineer | An alert, or a latency or error signal crossing its threshold | Telemetry through Azure MCP Server | `incident` | Fast | Mitigated within 60 s | 8,000 / 600 per incident | The fixed rules in 14.5 |
-| Pundit | A fan asks a question | The question, match state, the season | `answer` | Reasoning, through the model router | 6 s | 12,000 / 1,200 | Precomputed answers to the suggested questions; anything else declined with the nearest suggestion |
-| Match director | A brief | The brief, the league | `match-script` | Reasoning | Offline | 8,000 / 2,000 | A template script |
+| Scout | A candidate turns speculative or confirmed | `candidate`, match state | `moment` | Fast | 300 ms | 1,500 / 200 | Asked once more; then the moment doesn't air |
+| Tactician | A picked moment wants a counterfactual, or a viewer changes a decision | `moment`, the observed state, a changed decision | `counterfactual`, `decision-result` | Reasoning, for choosing options and wording the verdict; the numbers come from the workers | 15 s | 3,000 / 300 | Asked once more; then the moment airs without a what-if |
+| Explainer | The Scout picks a moment | A moment card (14.12), evidence, the counterfactual if it's ready, season context | `draft` | Reasoning | 1,000 ms after confirmation | 6,000 / 800 | Rewrites after a rejection, at most twice; then nothing airs |
+| Fact-checker | A draft arrives, or evidence behind an aired claim is corrected | `draft` | `verdict` | Reasoning; it recomputes numbers with `compute_metric` | 600 ms | 5,000 / 400 | Asked once more; then the moment is held back |
+| Persona | A draft passes | Verified claims, the modes and languages in demand | A `variant` per mode and language | Fast | 500 ms, in parallel | 2,000 / 600 per variant | Asked once more; then that mode shows nothing for the moment |
+| Producer | Variants, a counterfactual or an approval arrives | Variants, screen state, producer settings | Overlays, `approval` requests | Fast | 200 ms | 2,000 / 300 | Asked once more, with the reasons; then nothing airs |
+| Engineer | An alert, or a latency or error signal crossing its threshold | Telemetry through Azure MCP Server | `incident` | Fast | Mitigated within 60 s | 8,000 / 600 per incident | Alerts go straight to the human producer |
+| Pundit | A fan asks a question | The question, match state, the season | `answer` | Reasoning, through the model router | 6 s | 12,000 / 1,200 | Asked once more; then the panel says it couldn't answer |
+| Match director | A brief | The brief, the league | `match-script` | Reasoning | Offline | 8,000 / 2,000 | Asked again, up to 3 times; then the brief goes back to the team |
 | Tuner | A gate report | Gate reports, fidelity charts | Hypotheses and search spaces | Reasoning | Offline | 10,000 / 1,500 | No change; the hypothesis is logged as not tried |
-| Validator | Generated files | Gate results | Gate report | Reasoning | Offline | 8,000 / 1,000 | The raw gate results |
+| Validator | Generated files | Gate results | Gate report | Reasoning | Offline | 8,000 / 1,000 | The report is marked incomplete; CI still fails on the raw gate results |
 
-The `decided_by`, `source`, `checked_by` and `translated_by` fields in the agent contracts record whether a model or a rule made each decision, so the trace always shows which path aired.
+Every decision in the trace is a model's: the `decided_by`, `source`, `checked_by` and `translated_by` fields in the agent contracts read `agent`.
 
-A token meter per match adds up every call. At 80% of the match's budget the Producer sends low-priority moments to templates; at 100% everything goes to templates (14.5).
+A token meter per match adds up every call. At 80% of the match's budget the Scout airs only high-priority moments; at 100% no new moments air until the next period (14.5).
 
 ### 14.11 Workflows
 
@@ -1160,12 +1160,12 @@ flowchart LR
   CI["Candidate intake: code"] --> SC{{"Scout"}}
   SC -- "airtime" --> EX{{"Explainer"}}
   SC -. "off the critical path" .-> TA{{"Tactician"}}
-  EX --> FC{{"Fact-checker: code checks first"}}
+  EX --> FC{{"Fact-checker"}}
   FC -- "rejected, at most twice" --> EX
-  FC -- "third rejection" --> TP["Template caption: code"]
-  FC -- "verified" --> PE{{"Persona: a variant per mode and language in demand"}}
-  PE --> PR{{"Producer"}}
-  TP --> PR
+  FC -- "third rejection" --> NO["Nothing airs"]
+  FC -- "verified" --> PE{{"Persona: a script per mode"}}
+  PE --> SK{{"Fact-checker: reads every script"}}
+  SK --> PR{{"Producer"}}
   TA --> PR
   PR --> AG["Approval gate: human-in-the-loop"]
   AG --> PB["Publish: code, to the relay"]
@@ -1187,12 +1187,14 @@ flowchart LR
 
 ```text
 offball/agents/
-  workflows/        broadcast.py, ask.py, decide.py, recap.py, engineer.py, direct.py, calibrate.py
-  <agent>/          one folder per agent, scaffolded with `azd ai agent init` (14.9)
-    instructions.md the agent's instructions, versioned with the agent
-    skills/         reusable skills, including those Agent Optimizer adds
-    evals/          its task set and evaluators (14.15)
-  locales/          template captions and the glossary in ten languages (exists today)
+  crew.py           the agents: instructions, tools and model tier for each
+  broadcast.py      the broadcast workflow, built with Agent Framework
+  pundit.py         Ask OffBall
+  publish.py        turns the Producer's plan into overlay messages
+  schemas.py        each agent's structured output
+  llm.py            the model clients
+  instructions/     one Markdown file per agent, versioned with the code
+  locales/          the glossary in ten languages, and earlier draft lines kept for reference
 ```
 
 **What an agent sees.** Code builds the context, keeps it small, and makes it the same every time for the same moment, so outputs can be compared across agent versions.
@@ -1206,38 +1208,28 @@ offball/agents/
 | Season context | From `search_moments`: the player's and club's earlier moments and records | Explainer, Pundit |
 | Producer settings | Density, approval mode and airtime spacing | Scout, Producer |
 
-**What an agent writes.** Every output is JSON in its contract's schema, passed to the model as its structured-output format. Claims are typed: a number claim names its metric and parameters, so the Fact-checker recomputes it with `compute_metric` instead of trusting it (14.7). A caption may contain only numbers from verified claims, plus the live placeholders `{pts}`, `{m}` and `{speed}` that the frontend fills from the current frame (`INTEGRATION.md` 4.5). A code check compares every number in every caption, in every language, with the verified claims, and rejects a caption that holds any other.
+**What an agent writes.** Every output is JSON in its contract's schema, passed to the model as its structured-output format. Claims are typed: a number claim names its metric and parameters, so the Fact-checker recomputes it with `compute_metric` instead of trusting it (14.7). A caption may contain only numbers from verified claims, plus the live placeholders `{pts}`, `{m}` and `{speed}` that the frontend fills from the current frame (`INTEGRATION.md` 4.5). Before anything airs, the Fact-checker reads every script and flags any line with a number or a fact the verified claims don't support, and flagged lines don't air.
 
-**Languages.** The Persona writes each language directly, with that language's glossary in context, rather than translating English. Azure AI Translator with the glossary is the fallback, and English is always produced. The language packs in `web/src/lib/i18n/` are drafts awaiting native review (15.3), and the same reviewers check the glossary the agents use.
+**Languages.** For now the agents write English only. When the other launch languages follow, the Persona will write each one directly, with that language's glossary in context, rather than translating English, and English will always be produced. The language packs in `web/src/lib/i18n/` are drafts awaiting native review (15.3), and the same reviewers will check the glossary the agents use.
 
 ### 14.13 Models and deployments
 
 | Tier | Agents | Deployed | If it fails | Locally |
 | --- | --- | --- | --- | --- |
-| Fast | Scout, Persona, Producer, Engineer | The Foundry project | One retry, then templates (14.14) | Foundry Local |
-| Reasoning | Explainer, Fact-checker, Tactician, Pundit, Match director, Tuner, Validator | The Foundry project | One retry, then the fast tier, with templates behind it | A Foundry endpoint if one is set, otherwise templates |
+| Fast | Scout, Persona, Producer, Engineer | The Foundry project | One retry; then the step airs nothing | Foundry Local or a Foundry endpoint |
+| Reasoning | Explainer, Fact-checker, Tactician, Pundit, Match director, Tuner, Validator | The Foundry project | One retry; then the step airs nothing | A Foundry endpoint |
 | Router | The Pundit's open-ended questions | Foundry model router | The reasoning tier | The reasoning tier |
 | Speech | Voice lines and audio description | Azure AI Speech neural voices through the Foundry resource, in every launch language (15.3) | The device's own voices, as today | The device's own voices |
 
 Each agent is evaluated on the models available in our regions, and the cheapest that meets its pass bar (14.15) is chosen. The model behind each agent version is recorded in its manifest, and the README's model table is generated from the manifests. Which models those are is open question 19, and quotas for every deployment are confirmed before the work that needs them (open question 2).
 
-### 14.14 Running without a model
+### 14.14 Without a model, no graphics
 
-The pipeline runs end to end with no model at all: on a laptop with no Foundry endpoint, in CI, and as the last fallback in production. This is the walking skeleton's exit criterion (M1), and it is why every failure in 14.5 can end without an unchecked claim.
+Every agent decision and every line an agent writes comes from a model. There are no templates, rules or code checks to fall back on: when an agent fails after its retry, that step airs nothing, and the outcome in the trace says why (14.5).
 
-| Agent | With no model |
-| --- | --- |
-| Scout | The airtime rule (14.10) |
-| Explainer | Template captions per moment type, mode and beat, in all ten languages (`offball/agents/locales`, which exists today) |
-| Fact-checker | Recomputes every number; template captions hold no statement it can't check |
-| Persona | The templates already cover every mode and language |
-| Producer | First in, first out, at least 20 s apart |
-| Tactician | Counterfactuals and changed decisions still run on the workers; their verdicts use template words |
-| Pundit | Precomputed answers to the suggested questions; anything else is declined with the nearest suggestion |
-| Engineer | The fixed rules in 14.5 |
-| Data crew | Template scripts, no new hypotheses, raw gate results |
+Without a configured model, the rest of the pipeline still runs: the feed, the live service, the stream, the moment detectors and the metric tools. Viewers then see the match, the clock and the score, but no captions or graphics, because only the agents may write them. The API says so when asked a question, and a replay build says so when it starts.
 
-Every output made this way carries `decided_by: "rule"` or `source: "template"`, and the trace shows the fallback.
+Data and plumbing stay deterministic, because they aren't decisions. The interpretation models and the metric registry are tools the agents call (section 13), and the publish step only turns the Producer's plan into contract messages, sending a plan it can't build back to the Producer (14.11).
 
 ### 14.15 Evaluating each agent
 
@@ -1265,7 +1257,7 @@ The Fact-checker's planted-mistake set matters most, because the promise that no
 | --- | --- |
 | AI-1 | No number reaches a viewer unless a tool computed it and the Fact-checker recomputed it, or it is a live placeholder filled from the current frame. |
 | AI-2 | Agents hand off only typed contracts; free text never crosses an agent boundary (14.3). |
-| AI-3 | Every agent has a deterministic fallback, and the pipeline runs end to end with no model (14.14). |
+| AI-3 | Every agent output comes from a model, with no template or rule fallback; an agent that fails after its retry airs nothing (14.14). |
 | AI-4 | No agent identity can read the truth account, and no truth reaches an agent's context (12.9). |
 | AI-5 | Every call stays within its agent's time and token budget, and every match within its token meter (14.10). |
 | AI-6 | Every agent call is traced and linked to its envelope and to any overlay it produced (14.3). |
@@ -1707,7 +1699,7 @@ These count toward "Azure app and AI services" and "Azure databases" in criterio
 | Azure Web PubSub | Real-time delivery to browsers, second screens and partners | No live overlays |
 | Azure App Configuration | The degrade-flag store the Engineer writes to | No safe runtime mitigation |
 | Azure AI Speech, including the Voice Live API | Voices in ten languages; speech input for Ask OffBall | No voice or audio description |
-| Azure AI Translator | Translation with a custom football glossary | Persona fallback lost |
+| Azure AI Translator | Drafts the glossary in other languages for native reviewers (15.3) | Slower glossary review |
 | Azure AI Content Safety | Prompt shields, content filters and groundedness detection | Pundit unsafe to expose |
 | Application Insights (Azure Monitor) | OpenTelemetry traces of every agent hop; latency, cost and frame-time metrics | No traces, and nothing for the Engineer to read |
 | Microsoft Entra managed identities | No secrets in code or settings; separate identities for the live pipeline, the truth store and Azure MCP Server, in one tenant with Fabric (18.11) | Weaker security |
@@ -1730,7 +1722,7 @@ Every service in this section is confirmed available in our subscription before 
 
 | Environment | For | Deployed by | AI | Data |
 | --- | --- | --- | --- | --- |
-| Local, offline | Development, and judges who run it themselves | `docker compose up` (18.15), with the Event Hubs emulator, the Cosmos DB emulator and Azurite | Templates, or Foundry Local on the host; with neither, the pipeline still runs end to end (14.14) | The showcase and smoke sets from the repo |
+| Local, offline | Development, and judges who run it themselves | `docker compose up` (18.15), with the Event Hubs emulator, the Cosmos DB emulator and Azurite | A Foundry endpoint in `.env`, or Foundry Local; with neither, the match streams with no graphics (14.14) | The showcase and smoke sets from the repo |
 | Local with cloud AI | Agent development | The same, pointed at a Foundry project | Foundry | As above |
 | Dev | Every merge to main, and the soak test before judging | `azd` from CI | Foundry | Generated in place from seeds |
 | Production | The hosted demo judges use (21.2) | `azd` from CI, on a release | Foundry | The showcase, matchday, benchmark and season sets |
@@ -1841,7 +1833,7 @@ This is the whole list:
 | Azure Managed Redis | The `live` service keeps the last minute of frames in memory, and the workers are called over HTTP (11.4) |
 | Azure AI Search | `search_moments` searches the season's moment file; KQL answers season-scale questions, and the Fabric data agent does too on a paid capacity |
 | Key Vault | There's nothing to keep in it: managed identities everywhere, producer tokens are random values stored with their run (11.7), and the one key, Fabric's listen-only Event Hubs key, lives only in Fabric's connection (18.12) |
-| A second region | Replay is static and keeps playing through an outage; live AI falls back to templates (14.14) |
+| A second region | Replay is static and keeps playing through an outage; live graphics pause until the region returns (14.14) |
 | A staging environment | Every change runs in dev first, and production gets the same images (18.13) |
 | A virtual network and private endpoints | Every data service accepts only Entra authentication from our identities (18.12) |
 | Azure Load Testing and Chaos Studio | A load-test script and our own fault injection (14.5, 18.3) |
@@ -1893,7 +1885,7 @@ Three user-assigned managed identities, plus the Foundry project's own, all in t
 
 | When | What runs |
 | --- | --- |
-| Every pull request | Python: ruff, pytest, the schema check (BE-1) and the truth-import check (BE-6). Web: `npm run check`. Data: the smoke set through gates 2, 3 and 9, and a 60x run of a smoke match through the pipeline with templates, checked like a replay (11.9). Agents: the fast evaluation of each agent changed (14.15). Infrastructure: Bicep build. Security: code, dependency and secret scans, and an SBOM. |
+| Every pull request | Python: ruff, pytest, the schema check (BE-1) and the truth-import check (BE-6). Web: `npm run check`. Data: the smoke set through gates 2, 3 and 9, and a 60x run of a smoke match through the pipeline and the crew on a CI model deployment, checked like a replay (11.9). Agents: the fast evaluation of each agent changed (14.15). Infrastructure: Bicep build. Security: code, dependency and secret scans, and an SBOM. |
 | Merge to main | The images are built once, tagged with the commit, deployed to dev with `azd deploy`, and checked by the post-deploy smoke test |
 | Nightly | The full dev split through Foundry evaluations; Agent Optimizer and the release gate (14.9); calibration runs with all nine gates; `npm run test:perf` |
 | Before judging | A soak test in dev: the load-test script at the targets in 18.3, with the emitter's fault modes and our own fault injection (14.5) |
@@ -1924,8 +1916,8 @@ A new setting rolls out as a new Container Apps revision. Degrade flags take eff
 | `offball` | The `offball` image: `live`, `api`, `mcp` and `cf-workers`, one container each, or all in one with `offball serve all` | API and stream 8000; MCP 8001 |
 | `web` | The frontend's dev server, `npm run dev` | 5173 |
 
-- `OFFBALL_AI` picks the agents' models: `none` for templates (the default), `local` for Foundry Local, or `foundry` for a Foundry project.
-- `uv sync` installs the Python side; `uv run offball showcase` regenerates the showcase, and `uv run offball replay build m07` builds its replay (11.9).
+- `.env` holds the model endpoint and deployment names, as `.env.example` shows; without them the match streams with no graphics (14.14).
+- `uv sync` installs the Python side; `uv run offball showcase` regenerates the showcase, and `uv run offball replay m07` builds its replay (11.9).
 - `http://localhost:5173/#/match?feed=sse:http://localhost:8000/api/matches/m07/stream` shows the local pipeline in the finished frontend. The frontend's own feed server (`npm run feed:serve`, port 8787) keeps working beside it.
 - Fabric, Azure MCP Server and the Engineer have no local stand-in. Locally, the fixed rules in 14.5 do the Engineer's job.
 
@@ -1956,7 +1948,7 @@ Targets: the replay back within 15 minutes of any failure, and live mode within 
 | ID | Requirement |
 | --- | --- |
 | OPS-1 | `azd up` succeeds in a clean subscription with only a location as input. Optional services (Fabric, GPU) are skipped cleanly when absent, and the app says what is off. |
-| OPS-2 | `docker compose up` plays the showcase end to end with no Azure subscription (BE-15). |
+| OPS-2 | `docker compose up` runs the whole pipeline with no Azure subscription; graphics air once a model endpoint is set (BE-15). |
 | OPS-3 | No secrets in code, CI or settings: managed identities and Microsoft Entra everywhere, and keys turned off, apart from Fabric's listen-only Event Hubs key (18.12). |
 | OPS-4 | Every resource is tagged and covered by a budget alert. |
 | OPS-5 | Every service has health and readiness endpoints and emits OpenTelemetry traces, metrics and logs. |
@@ -2129,7 +2121,7 @@ The roadmap is ordered by dependency, not by date. Every milestone ends with som
 | Milestone | Scope | Exit criteria | Depends on |
 | --- | --- | --- | --- |
 | M0 Foundations | Repo, contracts and schemas, Bicep and `azd`, CI, calibration fits, league and season builder, design tokens and themes | `azd up` provisions an empty environment; schemas published; calibration report in CI | None |
-| M1 Walking skeleton | Fast engine and showcase script; feed emitter, Event Hubs, ingest, basic interpret; template captions; overlay feed; Web PubSub; 2D view at tiers B and C with the match clock and interpolation; gates 2, 3 and 9 | The showcase match plays live and in replay on the hosted URL with no LLM, smoothly on a laptop and a phone | M0 |
+| M1 Walking skeleton | Fast engine and showcase script; feed emitter, Event Hubs, ingest, basic interpret; overlay feed; Web PubSub; 2D view at tiers B and C with the match clock and interpolation; gates 2, 3 and 9 | The showcase match plays live and in replay on the hosted URL, smoothly on a laptop and a phone; graphics arrive with the broadcast crew (M3) | M0 |
 | M2 Interpretation core | Space control, physical metrics, run detection, pass difficulty, xG, auto-eventing from tracking, candidate moments; the first 8 moment types and the null run; gates 1, 6 and 7; analyst charts in Vega-Lite; Fabric Eventstream and Eventhouse with the first KQL views | Candidate recall measured on the smoke set; analyst panel shows real metrics; KQL views update live | M1 |
 | M3 Broadcast crew | OffBall MCP server and the two hosted Azure MCP Server instances; Scout, Explainer, Fact-checker, Persona, Producer and Engineer, scaffolded with `azd ai agent init` and run as Foundry hosted agents on Agent Framework; Toolboxes per role; Foundry tracing, evaluations and the rubric evaluator in CI; Fabric Real-Time Dashboards, and Activator alerts through a User Data Function; the original four modes; three languages; corrections and retractions; producer console | Verified captions within 3 s; a traced rejection and retry; a correction retracts a graphic; the Engineer mitigates an injected latency fault | M2 |
 | M4 Emergent world | Emergent engine, oracle and counterfactual truth; Match director, Tuner and Validator; gates 4, 5 and 8; the full moment library; the season; OffBall-Bench and its evaluation endpoint | All nine gates pass; benchmark published with baselines | M2 |
@@ -2190,18 +2182,18 @@ As checked on 24 October 2026. The frontend is complete against its stand-ins; t
 | Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and 32-run counterfactual truth; the director; the writer with content hashes. The league and the showcase (`m07`) are generated. | The fast engine; plans for 14 of the 16 moment types (decoy run and null run exist); the feed emitter; the video renderer; the smoke set, whose command exists |
 | Calibration | Realism metrics and an Optuna tuner with a hypothesis log: 80 trials cut the loss from 80.8 to 6.9 (12.2 on confirmation) | `fit.py` and the downloads, so the targets are still placeholder norms. Tuned matches remain outside them on passes (1,402 a match against 850–1,050), long-pass share (0.26 against 0.08–0.15) and shots (37 against 22–30). The nine gates have no runner yet. |
 | Interpretation | Pitch control (fast and Spearman), 18 named metrics with evidence IDs, run detection and a decoy-run detector. On `m07` it finds both planted decoy runs, flags neither null run, and adds three candidates the answer key doesn't cover, which oracle labels will settle. | Space value, xG, pass difficulty, run classification, credit, ghosting, auto-eventing and vision; live (streaming) detection; the other 15 detectors |
-| Agents | Template captions and the glossary in ten languages (`offball/agents/locales`); the agent contracts; the event-sourced state store; Agent Framework, the MCP SDK and the Azure SDKs installed | Every agent, workflow, instruction set and evaluation, and the learning loop |
-| Services and MCP | The state store | Everything else in 11.4 |
+| Agents | The broadcast workflow in Agent Framework: Scout, Explainer, Fact-checker with up to two rewrites, a Persona script for each of the six modes, a Fact-checker read of every script, Producer and publish. Ask OffBall: the Pundit, then the Fact-checker. English instructions and structured output for each; model clients for a Foundry endpoint; the workflow tested with a stand-in model | Running on a real model, which waits for the Foundry endpoint; the Tactician, Engineer, recaps, the data crew, per-agent evaluations and the learning loop |
+| Services and MCP | The feed emitter with faults; the live service (ingest, gap filling, rolling detection, relay); the API with the live stream, Ask OffBall, approvals and traces; the OffBall MCP server with 11 read-only tools; replay builds checked against the contracts. The partner template plays the live stream. | Event Hubs and Web PubSub transports, the counterfactual workers, the recap, stats and decision endpoints, Docker images |
 | Platform and Fabric | Nothing yet | Everything in 18.9 to 18.18, and the Fabric items |
-| Repository | Nothing yet | The project isn't under version control yet. The public GitHub repository (rule 4.4) still has to be created, and the README is a title only; `LICENSE` and the other files in 22.2 don't exist yet. |
-| Code quality | Every Python module imports cleanly; lint has 5 small findings, 4 of them fixable automatically | Python tests: `tests/` doesn't exist yet |
+| Repository | A git repository with its history, `.gitignore` and `.env.example` | The public GitHub repository (rule 4.4); the README is a title only, and `LICENSE` and the other files in 22.2 don't exist yet |
+| Code quality | Lint is clean, and 17 Python tests pass: the emitter, the live service, the tools, the workflow's wiring and the API | Tests against a real model |
 
 **What comes next, by dependency.** The backend and AI work, in the order its dependencies allow. Each step ends with something the finished frontend can show.
 
 1. **Repository and CI.** Create the public repository and push everything (rule 4.4), then the pull-request checks in 18.13 that can run today: ruff, pytest, the schema sync, the truth-import check and `npm run check`.
 2. **Showcase alignment.** Direct the showcase to the frontend's moment, and add the parity check (11.9).
-3. **Walking skeleton, backend half (M1).** The emitter and the `live` service (ingest, interpret and relay), with the broadcast workflow on templates only (14.14), end to end into the finished frontend through `?feed=sse:`, then under `docker compose up` (18.15).
-4. **Replay build.** `offball replay build` makes a replay that passes the frontend's contract test (11.9).
+3. **Walking skeleton, backend half (M1).** The emitter and the `live` service (ingest, interpret and relay), with the broadcast crew, end to end into the finished frontend through `?feed=sse:`, then under `docker compose up` (18.15).
+4. **Replay build.** `offball replay` makes a replay that passes the frontend's contract test (11.9).
 5. **API, read side.** Matches, stats, recaps and decisions served from computed data, so the panels show real numbers (11.7).
 6. **Infrastructure and Fabric.** Bicep and `azd up` for dev, the post-deploy smoke test, and the hosted URL serving the replay; the Fabric Eventstream and the first KQL views (M2; 18.9 to 18.13).
 7. **MCP and the broadcast crew (M3).** The OffBall MCP server; the Scout, Explainer, Fact-checker, Persona and Producer in Foundry with their evaluations (14.15); then the Engineer with Azure MCP Server and Activator alerts.
@@ -2209,7 +2201,7 @@ As checked on 24 October 2026. The frontend is complete against its stand-ins; t
 9. **The emergent world (M4, M5).** `fit.py`, the gate runner, the remaining moment types and detectors, the models in section 13, and OffBall-Bench.
 10. **Production and learning (M7, M9).** Production, load and fault-injection tests, partner and public endpoints, and the learning loop.
 
-Steps 3 to 6 need only code that exists today. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
+Steps 3 and 4 are built and tested, apart from the Event Hubs and Web PubSub transports, and step 7's broadcast crew and MCP server are built and wait for a model endpoint. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
 
 ---
 
@@ -2220,7 +2212,7 @@ Steps 3 to 6 need only code that exists today. Steps 7 and 8 need the Foundry pr
 | Integration complexity across many components | High | Contracts first; a walking skeleton before depth; every milestone runs end to end; feature flags |
 | The emergent engine doesn't look realistic enough | High | Calibration by simulation with the Tuner; behaviour and discriminator gates; the fast engine stays as a fallback for any match |
 | Judges challenge the data as real (rule 4.7) | High | Novelty and discriminator gates, fictional names, `DATASHEET.md` and a "Data provenance" README section |
-| Agents state wrong facts on screen | High | Evidence IDs on every claim, the Fact-checker loop, numbers only from tools, templates after 2 failures, chaos tests |
+| Agents state wrong facts on screen | High | Evidence IDs on every claim, the Fact-checker loop, numbers only from tools, nothing airs after 2 failures, chaos tests |
 | Demo down or costly during judging (rule 4.8) | High | Replay mode from the CDN, scale to zero, fair-use limits, budget alerts, local and `azd` fallbacks |
 | Visuals stutter or break on judges' devices | High | Tiered rendering with automatic step-down, frame-time budgets in CI, a device matrix, tier D clips that play anywhere |
 | Counterfactuals are wrong or unconvincing | Medium | Estimated from observed state, validated against true counterfactuals, shown as distributions with intervals |

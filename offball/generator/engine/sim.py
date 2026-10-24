@@ -10,15 +10,15 @@ from __future__ import annotations
 
 import copy
 import math
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
 from offball.core import DT, HZ, frame_of
 from offball.generator.engine import policies
 from offball.generator.engine.geometry import L, W, pt_to_team
-from offball.generator.engine.params import EngineParams
 from offball.generator.engine.models import (
     BallFlight,
     PassAssessment,
@@ -35,6 +35,7 @@ from offball.generator.engine.models import (
     time_to_reach,
     xg_true,
 )
+from offball.generator.engine.params import EngineParams
 from offball.generator.engine.tactics import compute_anchors, offside_line_team
 from offball.generator.league import FORMATIONS, Club, ClubStyle, League, Player, Slot
 

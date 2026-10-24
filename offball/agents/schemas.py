@@ -1,0 +1,126 @@
+"""What each agent writes, as structured output (PRD 14.10, 14.12).
+
+These are the shapes the models fill in. They avoid open-ended objects so they work with strict JSON-schema
+output; anything open (a metric's parameters) travels as a JSON string. The crew turns them into the published
+hand-off contracts in `offball.contracts`.
+"""
+
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+Mode = Literal["casual", "learn", "analyst", "player", "audio", "broadcaster"]
+MODES: tuple[Mode, ...] = ("casual", "learn", "analyst", "player", "audio", "broadcaster")
+Beat = Literal["run_start", "defender_follows", "gap_opens", "pass_into_gap", "shot", "goal", "after"]
+# The Producer can also time a graphic from "now": the live clock plus the viewers' buffer.
+ScheduleBeat = Literal["run_start", "defender_follows", "gap_opens", "pass_into_gap", "shot", "goal", "after", "now"]
+
+
+class Strict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class ScoutDecision(Strict):
+    airtime: bool = Field(description="True if this moment should go on air now")
+    priority: int = Field(ge=0, le=5, description="0 is the most important")
+    want_counterfactual: bool = Field(description="True if a what-if replay would help viewers believe the cause")
+    reason: str = Field(description="One sentence on why, for the producer's trace")
+
+
+class ClaimOut(Strict):
+    claim_id: str = Field(description="c1, c2, ... unique within the draft")
+    kind: Literal["number", "statement"]
+    text: str = Field(description="The claim in plain English, with its number and unit if it has one")
+    metric: str | None = Field(description="For a number claim: the compute_metric name that produced it")
+    params_json: str | None = Field(description="For a number claim: the exact params given to compute_metric, as JSON")
+    value: float | None = Field(description="For a number claim: the value compute_metric returned")
+    unit: str | None = Field(description="For a number claim: the unit compute_metric returned")
+    subject_ids: list[str] = Field(description="Player or club IDs the claim is about")
+    evidence_ids: list[str] = Field(description="Event and frame IDs from the tool results that support it")
+
+
+class DraftOut(Strict):
+    headline: str = Field(description="Why the moment matters, in one sentence")
+    claims: list[ClaimOut] = Field(min_length=2, max_length=7)
+    confidence: float = Field(ge=0, le=1, description="How sure the evidence makes you, 0 to 1")
+
+
+class ClaimCheck(Strict):
+    claim_id: str
+    ok: bool
+    recomputed: float | None = Field(description="The value compute_metric gave when you checked, for number claims")
+    reason: str = Field(description="Why it passes or fails; for a failure, what the Explainer must change")
+
+
+class VerdictOut(Strict):
+    passed: bool = Field(description="True only if every claim is ok")
+    checks: list[ClaimCheck]
+
+
+class Line(Strict):
+    beat: Beat = Field(description="The beat of the play this line belongs to")
+    text: str = Field(description="What viewers read, and in audio mode what they hear")
+    a11y_text: str = Field(description="What a screen reader announces: describe the picture, don't repeat the line")
+    player_id: str | None = Field(description="Player focus only: the player this line follows; otherwise null")
+    claim_ids: list[str] = Field(description="The verified claims this line relies on")
+
+
+class ModeScript(Strict):
+    mode: Mode
+    lines: list[Line] = Field(min_length=1, max_length=12)
+    runner_tag: str = Field(description="Two to four words shown over the runner")
+    defender_tag: str = Field(description="Two to four words shown over the defender who was pulled away")
+    receiver_tag: str = Field(description="Two to four words shown over the player who received in the space")
+    ring_label: str = Field(description="Two to four words on the ring where space opens")
+    stat_title: str = Field(description="Broadcaster stat card title, in capitals; empty for other modes")
+    stat_claim_id: str | None = Field(description="Broadcaster: the verified number claim the stat card shows")
+    glossary_terms: list[str] = Field(description="Glossary terms this script uses")
+
+
+class LineFlag(Strict):
+    mode: Mode
+    line_index: int = Field(description="Index of the line in that mode's script, from 0")
+    reason: str
+
+
+class ScriptCheck(Strict):
+    flagged: list[LineFlag] = Field(description="Lines that state anything the verified claims don't support")
+
+
+TextRef = Literal["line", "runner_tag", "defender_tag", "receiver_tag", "ring_label", "stat_title", "none"]
+Anchor = Literal["none", "runner", "defender", "receiver", "passer", "run", "defender_move", "gap", "pass"]
+Kind = Literal["caption", "run_arrow", "gap_ring", "pass_line", "player_tag", "stat_card", "badge"]
+
+
+class PlannedOverlay(Strict):
+    mode: Mode
+    kind: Kind
+    anchor: Anchor = Field(description="What the graphic is attached to on the pitch")
+    text_ref: TextRef = Field(description="Which of the Persona's words it shows")
+    line_index: int | None = Field(description="For text_ref 'line': the index of the line in that mode's script")
+    start_beat: ScheduleBeat
+    start_offset_s: float = Field(description="Seconds after start_beat; may be negative to lead the action")
+    end_beat: ScheduleBeat
+    end_offset_s: float
+    priority: int = Field(ge=0, le=5, description="0 is the most important")
+    approval: Literal["auto", "pending"] = Field(description="pending sends it to the producer's queue first")
+
+
+class Schedule(Strict):
+    overlays: list[PlannedOverlay] = Field(min_length=1, max_length=60)
+    note: str = Field(description="One sentence for the producer's trace")
+
+
+class AnswerClaim(Strict):
+    text: str
+    verified: bool = Field(description="True only if a tool result you quote supports it")
+    evidence: list[str] = Field(description="Event and frame IDs, or metric names with their values")
+
+
+class AnswerOut(Strict):
+    state: Literal["ok", "partial", "declined", "unknown"]
+    claims: list[AnswerClaim]
+    alternative_label: str | None = Field(description="For a declined or unknown question: a better question, short")
+    alternative_question: str | None
