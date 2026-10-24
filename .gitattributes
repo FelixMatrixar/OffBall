@@ -1,0 +1,4 @@
+# Generated match data must stay byte-exact on every checkout: the determinism gate checks each file against
+# the hash written when it was generated (PRD 12.10, gate 9), so git never converts its line endings.
+datasets/** -text
+truth/** -text
