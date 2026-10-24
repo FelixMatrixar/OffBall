@@ -157,6 +157,9 @@ class Simulator:
         self.next_decision = np.zeros(22)
         self.stun_until = np.zeros(22)
         self.lock_until = np.zeros(22)
+        # Players who just knocked the ball loose can't play it again until it has left them.
+        self.loose_skip: list[int] = []
+        self.loose_skip_until = 0.0
         self.last_logged: list[str] = [""] * 22
 
         self.period = 1
@@ -474,7 +477,13 @@ class Simulator:
         else:
             self.set_intent(i, "anchor", None, 0.5)
 
+    def _pace(self, i: int, need: float, cap: float) -> float:
+        """The share of top speed that covers `need` m/s, from a walk up to `cap`."""
+        top = float(self.vmax[i]) * (0.8 + 0.2 * float(self.energy[i]))
+        return float(np.clip(need / max(top, 1e-6), 0.07, cap))
+
     def _update_targets(self) -> None:
+        P = self.params
         for i in range(22):
             if not self.active[i]:
                 continue
@@ -482,11 +491,15 @@ class Simulator:
             data = self.idata[i]
             if name == "anchor":
                 self.target[i] = self.anchor[i] + self.noise[i]
-                # Jog back into shape; only hurry when far out of position.
-                # Close enough is in shape: walk; only hurry when well out of position.
+                # Close enough is in shape: walk. Further out, jog back in over a few seconds; sprint back only
+                # in the transition after losing the ball, as real players do.
                 gap = float(np.linalg.norm(self.target[i] - self.pos[i]))
-                walk = self.params.walk_gap
-                self.speed_frac[i] = 0.07 if gap < walk else min(0.72, 0.14 + (gap - walk) / 22.0)
+                if gap < self.params.walk_gap:
+                    self.speed_frac[i] = self._pace(i, gap / 1.2, P.pace_walk_cap)
+                elif self.t < self.transition_until[self.team_of[i]] and gap > 15.0:
+                    self.speed_frac[i] = self._pace(i, gap / 3.0, P.pace_transition_cap)
+                else:
+                    self.speed_frac[i] = self._pace(i, gap / P.pace_shape_horizon, P.pace_shape_cap)
             elif name == "press":
                 if self.owner >= 0 and self.team_of[self.owner] != self.team_of[i]:
                     o = self.owner
@@ -508,6 +521,14 @@ class Simulator:
                 tgt = self.pos[who] + self.vel[who] * ahead + to_goal / n * gap
                 tgt += (self.ball_pos[:2] - tgt) * 0.06
                 self.target[i] = tgt
+                # Keep pace with the attacker and close any gap gradually. A marker doesn't sprint to hold an
+                # exact spot; a defender tracking a run does.
+                err = float(np.linalg.norm(tgt - self.pos[i]))
+                runner = float(np.linalg.norm(self.vel[who]))
+                if name == "mark":
+                    self.speed_frac[i] = self._pace(i, runner + max(0.0, err - 1.5) * P.pace_mark_gain, P.pace_mark_cap)
+                else:
+                    self.speed_frac[i] = self._pace(i, runner + max(0.0, err - 0.5) * 2.0, 0.97)
             elif name == "cover":
                 who = data.get("who", -1)
                 if who >= 0:
@@ -515,10 +536,17 @@ class Simulator:
                     v = goal - self.pos[who]
                     n = float(np.linalg.norm(v)) or 1.0
                     self.target[i] = self.pos[who] + v / n * 7.0
+                    err = float(np.linalg.norm(self.target[i] - self.pos[i]))
+                    self.speed_frac[i] = self._pace(i, float(np.linalg.norm(self.vel[who]))
+                                                    + max(0.0, err - 2.0) * P.pace_mark_gain, P.pace_mark_cap)
                 else:
                     self.target[i] = self.anchor[i]
             elif name == "chase":
                 self.target[i] = self.ball_pos[:2] + self.ball_vel[:2] * 0.35
+            elif name == "setpiece":
+                # Waiting for a restart, players mill about their spot rather than stand still; the taker doesn't.
+                taker = self.restart["taker"] if self.restart is not None else -1
+                self.target[i] = data["point"] + (0.0 if i == taker else self.noise[i])
             elif name == "keep":
                 self.target[i] = data.get("point", self.anchor[i])
             elif name == "receive":
@@ -526,14 +554,26 @@ class Simulator:
                     self.target[i] = self.ball_pos[:2]
                 else:
                     self.target[i] = data["point"]
+                    if self.ball_state == "flight" and self.flight_plan.get("receiver") == i:
+                        # Arrive with the ball, not long before it: nobody sprints to stand and wait.
+                        left = max(self.flight_t0 + self.flight_plan["end_time"] - self.t, 0.25)
+                        gap = float(np.linalg.norm(self.target[i] - self.pos[i]))
+                        self.speed_frac[i] = self._pace(i, gap / left * 1.15 + 0.5, 1.0)
             elif "point" in data:
                 self.target[i] = data["point"]
+                if name == "support":
+                    # Offering an angle is a jog to a spot a couple of seconds away, not a sprint.
+                    gap = float(np.linalg.norm(self.target[i] - self.pos[i]))
+                    self.speed_frac[i] = min(float(self.speed_frac[i]), self._pace(i, gap / 2.0, P.pace_support_cap))
                 if name in ("run", "support", "carry") and self.t > self.intent_until[i] + 0.01:
                     if name == "carry" and self.owner == i:
                         self.next_decision[i] = min(self.next_decision[i], self.t)
                     self.set_intent(i, "anchor", None, 0.55)
             else:
                 self.target[i] = self.anchor[i]
+        # Nobody aims beyond the touchline or the goal line, so players brake before it instead of being
+        # stopped dead at the edge.
+        np.clip(self.target, [-1.0, -1.0], [L + 1.0, W + 1.0], out=self.target)
 
     def _own_goal(self, team: int) -> np.ndarray:
         return np.array([0.0 if self.teams[team].direction > 0 else L, W / 2])
@@ -541,9 +581,9 @@ class Simulator:
     def _update_noise(self) -> None:
         # Each player drifts towards a personal offset from the anchor that changes every few seconds,
         # so shapes breathe smoothly instead of standing still or jittering.
-        due = self.rng.random(22) < DT / 6.0
+        due = self.rng.random(22) < DT / self.params.drift_period
         if due.any():
-            self.noise_goal[due] = self.rng.normal(0.0, 2.0, (int(due.sum()), 2))
+            self.noise_goal[due] = self.rng.normal(0.0, self.params.drift_sd, (int(due.sum()), 2))
         self.noise += (self.noise_goal - self.noise) * (DT / 2.5)
 
     # ------------------------------------------------------------------------------------------ motion
@@ -560,7 +600,9 @@ class Simulator:
             blocker = self._goal_side_blocker(self.owner)
             if blocker >= 0:
                 owner_cap[self.owner] = 0.55  # can't run through a defender standing in the way
-        desired = np.minimum(top * self.speed_frac * owner_cap, np.sqrt(2 * self.decel * 0.6 * np.maximum(dist - 0.15, 0)))
+        # Real players seldom reach their true top speed: even an all-out run tops out a little below it.
+        frac = np.minimum(self.speed_frac, self.params.pace_sprint_cap)
+        desired = np.minimum(top * frac * owner_cap, np.sqrt(2 * self.decel * 0.6 * np.maximum(dist - 0.15, 0)))
         with np.errstate(invalid="ignore", divide="ignore"):
             unit = np.where(dist[:, None] > 1e-6, to / dist[:, None], 0.0)
         v_des = unit * desired[:, None]
@@ -601,6 +643,8 @@ class Simulator:
         if not close.any():
             return out
         push = np.where(close, (radius - d) / radius, 0.0) * 2.4
+        # Bodies don't overlap: inside 0.6 m the push grows sharply.
+        push += np.where(d < 0.6, (0.6 - d) / 0.6, 0.0) * 6.0
         with np.errstate(invalid="ignore", divide="ignore"):
             dirs = np.where(d[..., None] > 1e-6, diff / d[..., None], 0.0)
         out[act_idx] = (dirs * push[..., None]).sum(axis=1)
@@ -728,7 +772,7 @@ class Simulator:
         keeper_idx = opp.index(gk) if gk in opp else -1
         goal_x = L if self.teams[team].direction > 0 else 0.0
         return assess_cross(flight.end, float(self.aerial[j]), self.pos[opp], self.aerial[opp], keeper_idx, goal_x,
-                            float(self.passing[i]), pressure_on(self.pos[i], self.pos[opp]))
+                            float(self.passing[i]), pressure_on(self.pos[i], self.pos[opp]), self.params)
 
     def _plan_cross_failure(self, plan: dict, flight: BallFlight, ca, team: int) -> None:
         """A failed cross: overhit, claimed by the keeper, or won in the air by a defender."""
@@ -772,6 +816,13 @@ class Simulator:
             d = opp[a.interceptor]
             t_end = max(float(a.intercept_time), 0.25)
             point = flight.position_at(t_end)[:2]
+            if min(float(point[1]), W - float(point[1])) < 8.0 and self.rng.random() < self.params.deflect_out:
+                # Got a touch to it, but only enough to turn it out of play.
+                out = np.array([point[0] + float(self.rng.normal(0, 3)), -2.0 if point[1] < W / 2 else W + 2.0])
+                new = plan_ground(flight.start, out, 3.0)
+                self.flight = new
+                plan.update(outcome="out", receiver=-1, end_time=new.duration, end_point=out, toucher=d)
+                return
             plan.update(outcome="intercepted", receiver=d, end_time=t_end, end_point=point)
             self.set_intent(d, "receive", point, 1.0, until=self.t + t_end + 2.0)
             self.lock_until[d] = self.t + t_end
@@ -780,6 +831,10 @@ class Simulator:
         err = self.rng.normal(0, 1, 2)
         err = err / (np.linalg.norm(err) or 1.0) * float(self.rng.uniform(5, 13))
         end = flight.end + err
+        edge = min(float(flight.end[1]), W - float(flight.end[1]))
+        if edge < 10.0 and self.rng.random() < self.params.touch_out:
+            # Overhit, or a heavy touch: near the line a loose ball usually runs out.
+            end[1] = -float(self.rng.uniform(1, 4)) if flight.end[1] < W / 2 else W + float(self.rng.uniform(1, 4))
         if not (0 <= end[0] <= L and 0 <= end[1] <= W):
             new = plan_aerial(flight.start, end) if flight.aerial else plan_ground(flight.start, end, 3.0)
             self.flight = new
@@ -810,7 +865,7 @@ class Simulator:
         line = self.offside_cache[team]
         return xj > L / 2 and xj > bx + 0.3 and xj > line + 0.3
 
-    def shoot(self, i: int, penalty: bool = False, header: bool = False) -> None:
+    def shoot(self, i: int, penalty: bool = False, header: bool = False, free_kick: bool = False) -> None:
         team = self.team_of[i]
         d = self.teams[team].direction
         self._log_carry(i)
@@ -857,7 +912,8 @@ class Simulator:
             end = np.array([goal_x + 1.5 * d, W / 2 + side * float(self.rng.uniform(4.0, 9.0))])
         flight = plan_shot(start[:2], end, speed)
         ev = self.add_event("shot", team, i, start=start[:2], end=end, outcome=outcome,
-                            subtype="penalty" if penalty else ("header" if header else "open_play"),
+                            subtype="penalty" if penalty else ("header" if header else
+                                                               ("free_kick" if free_kick else "open_play")),
                             body_part="head" if header else self._foot(i), ball_speed_mps=round(speed, 2),
                             under_pressure=pressure > 0.3)
         self.probabilities.append({"serial": ev["_serial"], "kind": "shot", "p_success": round(xg, 4), "features": {
@@ -883,6 +939,10 @@ class Simulator:
         xt, yt = self.team_frame(team, self.pos[i])
         tx = xt + float(self.rng.uniform(28, 48))
         ty = float(np.clip(yt + self.rng.normal(0, 14), -6, W + 6))
+        if min(yt, W - yt) < 24.0 and self.rng.random() < self.params.clear_to_touch:
+            # From a wide area, the safe clearance is into the stand.
+            tx = xt + float(self.rng.uniform(8, 30))
+            ty = -4.0 if yt < W / 2 else W + 4.0
         d = self.teams[team].direction
         end = np.array([tx, ty]) if d > 0 else np.array([L - tx, W - ty])
         flight = plan_aerial(self.pos[i].copy(), end, apex=float(self.rng.uniform(8, 15)))
@@ -961,8 +1021,14 @@ class Simulator:
             return
         d = np.linalg.norm(self.pos - self.ball_pos[:2], axis=1)
         d[~self.active] = 99.0
+        if self.t < self.loose_skip_until:
+            d[self.loose_skip] = 99.0
         k = int(np.argmin(d))
         if d[k] < 1.0:
+            # A fast ball is hard to stop: the faster it comes at a player, the likelier it runs past him.
+            rel = float(np.linalg.norm(self.ball_vel[:2] - self.vel[k]))
+            if rel > self.params.loose_control and self.rng.random() > (self.params.loose_control / rel) ** 2:
+                return
             regained = self.possession != self.team_of[k]
             self.give_ball(k)
             if regained:
@@ -1018,7 +1084,7 @@ class Simulator:
             self._finalise_pass(plan, outcome="complete", recipient=r)
             # A won header in the box is mostly a shot, sometimes a knock-down.
             header_finish = (plan.get("subtype") in ("cross", "corner") and self._in_box(r)
-                             and self.rng.random() < 0.65)
+                             and self.rng.random() < self.params.header_shot)
             self.give_ball(r, touch_delay=0.05 if header_finish else None)
             if header_finish:
                 self.ball_pos[2] = 1.6
@@ -1028,13 +1094,14 @@ class Simulator:
         else:
             self._finalise_pass(plan, outcome="incomplete", recipient=None)
             # Defenders who cut out a cross in their own box often head it behind.
-            if plan.get("header_clear") and self.rng.random() < 0.55:
+            behind = self.rng.random() < self.params.header_behind
+            if plan.get("header_clear") and not behind:
                 # Won in the air and cleared upfield.
                 self.give_ball(r, touch_delay=0.0)
                 self.clear(r)
                 return
-            if plan.get("header_clear") or (self._in_own_box(r) and plan.get("subtype") in ("cross", "corner", "lofted")
-                                            and self.rng.random() < 0.45):
+            if behind and (plan.get("header_clear") or (self._in_own_box(r)
+                                                        and plan.get("subtype") in ("cross", "corner", "lofted"))):
                 self.last_touch = r
                 self.add_event("clearance", self.team_of[r], r, start=self.pos[r], subtype="header",
                                body_part="head")
@@ -1119,6 +1186,8 @@ class Simulator:
         self._ball_out({"kind": "shot", "shooter": shooter})
 
     def _ball_out(self, plan: dict) -> None:
+        if plan.get("toucher", -1) >= 0:
+            self.last_touch = plan["toucher"]
         bx, by = float(self.ball_pos[0]), float(self.ball_pos[1])
         last = self.last_touch if self.last_touch >= 0 else 0
         last_team = self.team_of[last]
@@ -1170,7 +1239,17 @@ class Simulator:
             self.add_event("tackle", 1 - team, k, start=self.pos[k], outcome="won" if won else "lost",
                            related_player_id=self.pid(o))
             if won:
-                if self.rng.random() < 0.65:
+                edge = min(float(self.pos[o][1]), W - float(self.pos[o][1]))
+                if edge < 10.0 and self.rng.random() < self.params.wide_tackle_out * (1.2 - edge / 10.0):
+                    # Near the touchline the ball usually goes out: knocked off the attacker, or put out for safety.
+                    out = -1.0 if self.pos[o][1] < W / 2 else 1.0
+                    self.owner = -1
+                    self.ball_state = "loose"
+                    self.ball_vel = np.array([float(self.rng.normal(0, 2.0)), out * float(self.rng.uniform(5, 8)), 0.0])
+                    self.last_touch = k
+                    self.loose_skip, self.loose_skip_until = [k, o], self.t + 0.6
+                    self._assign_roles()
+                elif self.rng.random() < 0.65:
                     self.give_ball(k)
                 else:
                     self.owner = -1
@@ -1178,6 +1257,7 @@ class Simulator:
                     v = self.rng.normal(0, 1, 2)
                     self.ball_vel = np.array([v[0] * 4.0, v[1] * 4.0, 0.0])
                     self.last_touch = k
+                    self.loose_skip, self.loose_skip_until = [k, o], self.t + 0.25
                     self._assign_roles()
             else:
                 self.stun_until[k] = self.t + 0.9
@@ -1232,6 +1312,7 @@ class Simulator:
         if self.possession != team:
             self.possession = team
             self.possession_n += 1
+        delay *= self.params.restart_delay_scale
         self.restart = {"kind": kind, "team": team, "spot": np.asarray(spot, dtype=float), "ready": self.t + delay,
                         "taker": -1, "placed": True}
         self._restart_positions()
@@ -1257,10 +1338,14 @@ class Simulator:
         for i in range(22):
             if not self.active[i]:
                 continue
+            # Players walk or jog into position for a restart; only the taker and anyone far away hurry.
             if i == taker:
-                self.set_intent(i, "setpiece", spot, 0.6)
+                self.set_intent(i, "setpiece", spot, 0.45)
                 continue
-            self.set_intent(i, "setpiece", self._setpiece_spot(i, kind, team, spot), 0.5)
+            target = self._setpiece_spot(i, kind, team, spot)
+            far = float(np.linalg.norm(target - self.pos[i])) > 25.0
+            pace = self.params.setpiece_pace
+            self.set_intent(i, "setpiece", target, pace * 1.8 if far else pace)
 
     def _setpiece_spot(self, i: int, kind: str, team: int, spot: np.ndarray) -> np.ndarray:
         my = self.team_of[i]
@@ -1331,7 +1416,7 @@ class Simulator:
         if kind == "free_kick" and self._dangerous_fk(team, spot):
             xt, yt = self.team_frame(team, spot)
             if math.hypot(L - xt, W / 2 - yt) < 28 and self.rng.random() < 0.45:
-                self.shoot(taker)
+                self.shoot(taker, free_kick=True)
                 return
         self._restart_pass(taker, kind, team)
 

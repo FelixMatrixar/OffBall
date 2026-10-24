@@ -1,0 +1,408 @@
+{
+  "schema_version": "2.0",
+  "match_id": "smk2",
+  "seed": 102,
+  "engine": "emergent",
+  "generator_version": "0.1.0",
+  "competition": "OffBall League",
+  "season": "2026",
+  "round": null,
+  "home": {
+    "club_id": "bra",
+    "name": "Brackenford",
+    "short_name": "BRA",
+    "kit": {
+      "primary": "#706ede",
+      "secondary": "#ecedfc",
+      "pattern": "hoops"
+    },
+    "formation": "4-4-2",
+    "lineup": [
+      {
+        "player_id": "bra-01",
+        "name": "L. Morenko",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "bra-02",
+        "name": "D. Stavacenko",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "bra-05",
+        "name": "D. Samura",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "bra-06",
+        "name": "J. Janseord",
+        "number": 6,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "bra-03",
+        "name": "S. Holak",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "bra-07",
+        "name": "M. Morik",
+        "number": 7,
+        "role": "RM",
+        "starter": true
+      },
+      {
+        "player_id": "bra-04",
+        "name": "S. Kuta",
+        "number": 4,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "bra-08",
+        "name": "C. Mariwick",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "bra-11",
+        "name": "V. Novor",
+        "number": 11,
+        "role": "LM",
+        "starter": true
+      },
+      {
+        "player_id": "bra-09",
+        "name": "O. Pavan",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "bra-10",
+        "name": "A. Beliun",
+        "number": 10,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "bra-12",
+        "name": "O. Dvoreman",
+        "number": 12,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "bra-16",
+        "name": "S. Zelac",
+        "number": 16,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "bra-18",
+        "name": "T. Kraler",
+        "number": 18,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "bra-19",
+        "name": "H. Fjyrdal",
+        "number": 19,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "bra-20",
+        "name": "O. Skysen",
+        "number": 20,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "bra-21",
+        "name": "M. Radevic",
+        "number": 21,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "bra-22",
+        "name": "K. Nahara",
+        "number": 22,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "bra-25",
+        "name": "H. Hagirstrom",
+        "number": 25,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "bra-26",
+        "name": "M. Brzer",
+        "number": 26,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "bra-29",
+        "name": "R. Zeler",
+        "number": 29,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "bra-30",
+        "name": "T. Moren",
+        "number": 30,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "bra-32",
+        "name": "S. Dvorinko",
+        "number": 32,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "bra-36",
+        "name": "T. Akowa",
+        "number": 36,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "bra-39",
+        "name": "C. Orrurez",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "away": {
+    "club_id": "sal",
+    "name": "Saltmere",
+    "short_name": "SAL",
+    "kit": {
+      "primary": "#56f5ff",
+      "secondary": "#0f1d1f",
+      "pattern": "plain"
+    },
+    "formation": "3-5-2",
+    "lineup": [
+      {
+        "player_id": "sal-01",
+        "name": "T. Vosolstra",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "sal-04",
+        "name": "E. Brackowick",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "sal-05",
+        "name": "S. Ostaord",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "sal-06",
+        "name": "E. Yaroton",
+        "number": 6,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "sal-02",
+        "name": "M. Dekastra",
+        "number": 2,
+        "role": "RWB",
+        "starter": true
+      },
+      {
+        "player_id": "sal-08",
+        "name": "S. Rijkoekamp",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "sal-14",
+        "name": "R. Hendoex",
+        "number": 14,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "sal-10",
+        "name": "J. Wililijk",
+        "number": 10,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "sal-03",
+        "name": "T. Klaord",
+        "number": 3,
+        "role": "LWB",
+        "starter": true
+      },
+      {
+        "player_id": "sal-09",
+        "name": "D. Dekestra",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "sal-11",
+        "name": "T. Kloelema",
+        "number": 11,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "sal-13",
+        "name": "F. Adiwa",
+        "number": 13,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "sal-15",
+        "name": "R. Beronoord",
+        "number": 15,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "sal-17",
+        "name": "J. Klama",
+        "number": 17,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "sal-18",
+        "name": "S. Berekamp",
+        "number": 18,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "sal-19",
+        "name": "F. Temeko",
+        "number": 19,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "sal-21",
+        "name": "D. Rijkaord",
+        "number": 21,
+        "role": "RWB",
+        "starter": false
+      },
+      {
+        "player_id": "sal-22",
+        "name": "T. Hendedt",
+        "number": 22,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "sal-26",
+        "name": "M. Ostistra",
+        "number": 26,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "sal-27",
+        "name": "E. Cerollo",
+        "number": 27,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "sal-28",
+        "name": "T. Klodt",
+        "number": 28,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "sal-30",
+        "name": "W. Klekamp",
+        "number": 30,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "sal-32",
+        "name": "E. Storaberg",
+        "number": 32,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "sal-33",
+        "name": "S. Sashiro",
+        "number": 33,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "sal-39",
+        "name": "J. Vosoekamp",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "periods": [
+    {
+      "period": 1,
+      "duration_ms": 467000,
+      "attacks_left_to_right": "bra"
+    },
+    {
+      "period": 2,
+      "duration_ms": 598320,
+      "attacks_left_to_right": "sal"
+    }
+  ],
+  "final_score": {
+    "bra": 0,
+    "sal": 1
+  },
+  "frame_rate": 25,
+  "pitch": [
+    105.0,
+    68.0
+  ],
+  "synthetic": true
+}

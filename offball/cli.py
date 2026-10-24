@@ -83,15 +83,28 @@ def cmd_smoke(args: argparse.Namespace) -> None:
     from offball.generator.script import MatchScript, StoryMoment
 
     scripts = [
-        MatchScript(match_id="smk1", home="kes", away="ash", seed=101, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="decoy_run", team="kes", minute=2.0, outcome="chance")]),
+        MatchScript(match_id="smk1", home="dun", away="lar", seed=113, half_minutes=5,
+                    moments=[StoryMoment(key="k01", type="decoy_run", team="dun", minute=2.0, outcome="chance")]),
         MatchScript(match_id="smk2", home="bra", away="sal", seed=102, half_minutes=5,
                     moments=[StoryMoment(key="k01", type="null_run", team="bra", minute=6.0)]),
         MatchScript(match_id="smk3", home="nor", away="oak", seed=103, half_minutes=5,
                     moments=[StoryMoment(key="k01", type="decoy_run", team="nor", minute=2.0, outcome="chance")]),
+        MatchScript(match_id="smk4", home="kes", away="ash", seed=104, half_minutes=5,
+                    moments=[StoryMoment(key="k01", type="overlap", team="kes", minute=1.5, outcome="chance")]),
+        MatchScript(match_id="smk5", home="kes", away="ash", seed=125, half_minutes=5,
+                    moments=[StoryMoment(key="k01", type="null_overlap", team="kes", minute=1.5)]),
+        MatchScript(match_id="smk6", home="har", away="ive", seed=106, half_minutes=5,
+                    moments=[StoryMoment(key="k01", type="timed_run_in_behind", team="har", minute=1.5,
+                                         outcome="chance")]),
     ]
-    for script in scripts:
-        _write_directed(script, DATASETS / "smoke", TRUTH / "smoke", args.attempts, args.cf_runs)
+    # Each match is seeded on its own, so they can play in parallel and still come out the same.
+    from concurrent.futures import ProcessPoolExecutor
+
+    with ProcessPoolExecutor(max_workers=max(1, min(args.workers, len(scripts)))) as pool:
+        jobs = [pool.submit(_write_directed, script, DATASETS / "smoke", TRUTH / "smoke", args.attempts, args.cf_runs)
+                for script in scripts]
+        for job in jobs:
+            job.result()
 
 
 def cmd_serve(args: argparse.Namespace) -> None:
@@ -148,6 +161,37 @@ def cmd_replay(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def cmd_fit(args: argparse.Namespace) -> None:
+    from offball.calibration import fit
+
+    fit.main()
+
+
+def cmd_blocklist(args: argparse.Namespace) -> None:
+    from offball.calibration.blocklist import build
+    from offball.generator.names import BLOCKLIST_PATH
+
+    print(f"{build()} hashes -> {BLOCKLIST_PATH}")
+
+
+def cmd_gates(args: argparse.Namespace) -> None:
+    from offball.calibration import gates
+
+    results = gates.run(args.set)
+    n = len(gates.load_set(args.set))
+    text = gates.report(args.set, results, n)
+    gates.REPORTS.mkdir(parents=True, exist_ok=True)
+    name = Path(args.set).name
+    (gates.REPORTS / f"gates-{name}.md").write_text(text, encoding="utf-8")
+    if args.json:
+        rows = [{"gate": g.number, "name": g.name, "status": g.status, "summary": g.summary, "numbers": g.numbers}
+                for g in results]
+        (gates.REPORTS / f"gates-{name}.json").write_text(json.dumps(rows, indent=1, default=str), encoding="utf-8")
+    print(text)
+    if any(g.status == "fail" for g in results):
+        sys.exit(1)
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="offball", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -171,8 +215,15 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(fn=cmd_match)
     p = sub.add_parser("smoke")
     p.add_argument("--attempts", type=int, default=40)
+    p.add_argument("--workers", type=int, default=6)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_smoke)
+    sub.add_parser("fit").set_defaults(fn=cmd_fit)
+    sub.add_parser("blocklist").set_defaults(fn=cmd_blocklist)
+    p = sub.add_parser("gates")
+    p.add_argument("set", help="A dataset folder under datasets/ (showcase, smoke) or a match folder")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(fn=cmd_gates)
     p = sub.add_parser("serve")
     p.add_argument("what", choices=["api", "mcp", "all"], nargs="?", default="all")
     p.add_argument("--host", default="127.0.0.1")

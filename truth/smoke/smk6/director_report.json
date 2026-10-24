@@ -1,0 +1,22 @@
+{
+  "match_id": "smk6",
+  "seconds": 67.5,
+  "segment_retries": 0,
+  "score": {
+    "har": 1,
+    "ive": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "timed_run_in_behind",
+      "ok": true,
+      "attempts": 4,
+      "reasons": [
+        "the pass in behind didn't arrive (incomplete)",
+        "preconditions never arose",
+        "preconditions never arose"
+      ]
+    }
+  ]
+}

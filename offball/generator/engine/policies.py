@@ -89,7 +89,7 @@ def on_ball(sim: Simulator, i: int) -> None:
                 if aerial:
                     flight = plan_aerial(p.copy(), target, apex=directive.get("apex", 3.2))
                 else:
-                    flight = plan_ground(p.copy(), target, arrival_speed=P.pass_arrival)
+                    flight = plan_ground(p.copy(), target, arrival_speed=directive.get("arrival", P.pass_arrival))
                 sim.release_pass(i, j, flight, subtype=directive.get("subtype"))
                 sim.directives.pop(i, None)
                 return
@@ -120,7 +120,11 @@ def on_ball(sim: Simulator, i: int) -> None:
     if sim.role[i] != "GK" and xt > 70 and goal_distance(xt, yt) < 33:
         ctx = ShotContext(xt, yt, pressure, False, sim.finishing[i], sim.composure[i], keeper_cover(sim, i))
         xg = xg_true(ctx, P)
-        utilities.append(xg * P.shot_scale * (1.0 + 0.04 * style.directness))
+        u = xg * P.shot_scale * (1.0 + 0.04 * style.directness)
+        # Good finishers try their luck from outside the box when they have a sight of goal, as real players do.
+        if xt < L - 16.5 or abs(yt - W / 2) > 20.16:
+            u += P.long_shot_appeal * float(sim.finishing[i]) * (1.0 - pressure)
+        utilities.append(u)
         actions.append(("shot",))
 
     # Pass
@@ -346,7 +350,7 @@ def defend(sim: Simulator, i: int) -> None:
         keeper_position(sim, i)
         return
     if i in sim.pressers[team]:
-        sim.set_intent(i, "press", None, 0.82 + 0.15 * sim.style_of(team).press_intensity)
+        sim.set_intent(i, "press", None, sim.params.pace_press_base + 0.17 * sim.style_of(team).press_intensity)
         return
     if i in sim.covers[team]:
         sim.set_intent(i, "cover", None, 0.75, data={"who": sim.pressers[team][0] if sim.pressers[team] else -1})
@@ -428,6 +432,6 @@ def keeper_position(sim: Simulator, i: int) -> None:
 
 def loose_ball(sim: Simulator, i: int) -> None:
     if i in sim.chasers:
-        sim.set_intent(i, "chase", None, 0.97)
+        sim.set_intent(i, "chase", None, sim.params.pace_chase_cap)
     else:
         sim.set_intent(i, "anchor", None, 0.6)

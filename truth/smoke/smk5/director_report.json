@@ -1,0 +1,20 @@
+{
+  "match_id": "smk5",
+  "seconds": 48.6,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "null_overlap",
+      "ok": true,
+      "attempts": 2,
+      "reasons": [
+        "the flank opened anyway"
+      ]
+    }
+  ]
+}

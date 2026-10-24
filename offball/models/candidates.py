@@ -24,6 +24,7 @@ THRESHOLDS = {
 }
 SPECULATIVE_AT = 0.7
 WINDOW_FRAMES = 100  # 4 s after the run starts
+BASELINE_FRAMES = 15  # the "before" picture of a gap: 0.6 s before the run is detected
 
 
 def _rect(cx: float, cy: float, half_w: float, half_h: float) -> list[tuple[float, float]]:
@@ -55,6 +56,48 @@ class DecoyRunDetector:
         self.md = md
         self.possession = Possession(md)
 
+    def _judge(self, run: Run, i0: int, i_end: int, dcol: int, disp_max: float, follow: float, i_disp: int) -> dict:
+        """The signals of the gap one following defender leaves."""
+        md, period, club = self.md, run.period, run.club
+        pf = md.periods[period]
+        # A run is only detected once the runner has accelerated, and by then the defender may be moving too:
+        # take the gap and its control from a moment before, while he was still in place.
+        i_base = max(i0 - BASELINE_FRAMES, 0)
+        p0 = pf.xy[i_base, dcol].astype(float)
+        if np.isnan(p0).any():
+            p0 = pf.xy[i0, dcol].astype(float)
+        goal = np.array([105.0 if md.direction(period, club) > 0 else 0.0, 34.0])  # the goal the runner attacks
+        to_goal = (goal - p0) / (np.linalg.norm(goal - p0) or 1.0)
+        centre = p0 + to_goal * 1.5
+        zone = _rect(float(centre[0]), float(centre[1]), 4.5, 6.0)
+        cells = _zone_cells(zone)
+        c_start = zone_control_at(md, club, period, i_base, cells).mean()
+        gain_open_idx, gain_max = None, -1.0
+        for i in range(i0, i_end + 1, 5):
+            g = zone_control_at(md, club, period, i, cells).mean() - c_start
+            gain_max = max(gain_max, g)
+            if gain_open_idx is None and g >= 0.40:
+                gain_open_idx = i
+        # A pass by the same club into the gap, within 2 s of it opening (or anticipating it).
+        t_open = int(pf.t_ms[gain_open_idx]) if gain_open_idx is not None else None
+        t_hi = (t_open + 2000) if t_open is not None else int(pf.t_ms[i_end])
+        passes = [e for e in md.events_between(period, run.t0_ms, t_hi)
+                  if e.type == "pass" and e.team_id == club and e.end_xy and _inside(e.end_xy, zone, 3.0)]
+        pass_ev = passes[0] if passes else None
+        signals = [
+            Signal(name="defender_displacement_m", value=round(disp_max, 1), threshold=8.0, unit="m",
+                   evidence_ids=[md.frame_id(period, run.t0_ms), md.frame_id(period, int(pf.t_ms[i_disp]))]),
+            Signal(name="defender_follow_cosine", value=round(follow, 2), threshold=0.6, unit="cos",
+                   evidence_ids=[md.frame_id(period, int(pf.t_ms[i_disp]))]),
+            Signal(name="zone_control_gain_pts", value=round(gain_max * 100, 0), threshold=40.0, unit="pts",
+                   evidence_ids=[md.frame_id(period, int(pf.t_ms[gain_open_idx]))] if gain_open_idx else []),
+            Signal(name="pass_into_gap", value=1.0 if pass_ev else 0.0, threshold=1.0, unit="bool",
+                   evidence_ids=[pass_ev.event_id] if pass_ev else []),
+        ]
+        strength = float(np.mean([min(sg.value / sg.threshold, 1.25) if sg.threshold else 1.0 for sg in signals]))
+        return {"signals": signals, "strength": strength, "dcol": dcol, "zone": zone, "cells": cells, "p0": p0,
+                "pass_ev": pass_ev, "gain_open_idx": gain_open_idx}
+
     def evaluate(self, run: Run, now_idx: int | None = None) -> Candidate | None:
         md, period = self.md, run.period
         pf = md.periods[period]
@@ -70,7 +113,7 @@ class DecoyRunDetector:
         runner_col = md.players.index(run.player_id)
         opp_cols = md.columns_of(md.other(club))
         start = pf.xy[i0].astype(float)
-        best = None
+        followers = []
         for col in opp_cols:
             p = start[col]
             if np.isnan(p).any() or float(np.linalg.norm(p - start[runner_col])) > 9.0:
@@ -84,46 +127,18 @@ class DecoyRunDetector:
             disp = np.linalg.norm(seg - p, axis=1)
             k = int(np.nanargmax(disp))
             follow = _cosine(seg[k] - p, pf.xy[i0 + k, runner_col].astype(float) - start[runner_col])
-            score = float(np.nanmax(disp)) * max(follow, 0.0)
-            if best is None or score > best[0]:
-                best = (score, col, float(np.nanmax(disp)), follow, i0 + k)
-        if best is None:
+            followers.append((float(np.nanmax(disp)) * max(follow, 0.0), int(col), float(np.nanmax(disp)), follow, i0 + k))
+        if not followers:
             return None
-        _, dcol, disp_max, follow, i_disp = best
+        # More than one defender may go with the runner (a midfielder as well as the centre-back): judge the gap
+        # each would leave, and keep the strongest.
+        judged = [self._judge(run, i0, i_end, *f[1:]) for f in sorted(followers, reverse=True)[:3]]
+        judged.sort(key=lambda j: (all(sg.value >= sg.threshold for sg in j["signals"]), j["strength"]), reverse=True)
+        j = judged[0]
+        signals, strength, dcol, zone, cells, p0 = j["signals"], j["strength"], j["dcol"], j["zone"], j["cells"], j["p0"]
+        pass_ev, gain_open_idx = j["pass_ev"], j["gain_open_idx"]
         defender = md.players[dcol]
-        p0 = start[dcol]
-        goal = np.array([105.0 if md.direction(period, club) > 0 else 0.0, 34.0])  # the goal the runner attacks
-        to_goal = (goal - p0) / (np.linalg.norm(goal - p0) or 1.0)
-        centre = p0 + to_goal * 1.5
-        zone = _rect(float(centre[0]), float(centre[1]), 4.5, 6.0)
-        cells = _zone_cells(zone)
-        c_start = zone_control_at(md, club, period, i0, cells).mean()
-        gain_open_idx, gain_max = None, -1.0
-        for i in range(i0, i_end + 1, 5):
-            g = zone_control_at(md, club, period, i, cells).mean() - c_start
-            gain_max = max(gain_max, g)
-            if gain_open_idx is None and g >= 0.40:
-                gain_open_idx = i
-        # A pass by the same club into the gap, within 2 s of it opening (or anticipating it).
-        t_open = int(pf.t_ms[gain_open_idx]) if gain_open_idx is not None else None
-        t_lo = run.t0_ms
-        t_hi = (t_open + 2000) if t_open is not None else int(pf.t_ms[i_end])
-        passes = [e for e in md.events_between(period, t_lo, t_hi)
-                  if e.type == "pass" and e.team_id == club and e.end_xy and _inside(e.end_xy, zone, 3.0)]
-        pass_ev = passes[0] if passes else None
-        signals = [
-            Signal(name="defender_displacement_m", value=round(disp_max, 1), threshold=8.0, unit="m",
-                   evidence_ids=[md.frame_id(period, run.t0_ms), md.frame_id(period, int(pf.t_ms[i_disp]))]),
-            Signal(name="defender_follow_cosine", value=round(follow, 2), threshold=0.6, unit="cos",
-                   evidence_ids=[md.frame_id(period, int(pf.t_ms[i_disp]))]),
-            Signal(name="zone_control_gain_pts", value=round(gain_max * 100, 0), threshold=40.0, unit="pts",
-                   evidence_ids=[md.frame_id(period, int(pf.t_ms[gain_open_idx]))] if gain_open_idx else []),
-            Signal(name="pass_into_gap", value=1.0 if pass_ev else 0.0, threshold=1.0, unit="bool",
-                   evidence_ids=[pass_ev.event_id] if pass_ev else []),
-        ]
-        ratios = [min(s.value / s.threshold, 1.25) if s.threshold else 1.0 for s in signals]
-        strength = float(np.mean(ratios))
-        all_pass = all(s.value >= s.threshold for s in signals)
+        all_pass = all(sg.value >= sg.threshold for sg in signals)
         window_closed = now_idx is None or now_idx >= min(i0 + WINDOW_FRAMES, pf.n - 1)
         if all_pass:
             status = "confirmed"
@@ -159,7 +174,241 @@ class DecoyRunDetector:
         )
 
 
-DETECTORS = {"decoy_run": DecoyRunDetector}
+def _finish(signals: list[Signal], window_closed: bool) -> tuple[float, str] | None:
+    """Strength and status from signals: confirmed when every threshold is met, speculative while the window
+    is open and the signals are most of the way there."""
+    ratios = [min(s.value / s.threshold, 1.25) if s.threshold else 1.0 for s in signals]
+    strength = float(np.mean(ratios))
+    if all(s.value >= s.threshold for s in signals):
+        return strength, "confirmed"
+    if strength >= SPECULATIVE_AT and not window_closed:
+        return strength, "speculative"
+    return None
+
+
+def _second_last_x(md: MatchData, period: int, club: str, i: int) -> float:
+    """The offside line for `club` at frame i: x' of the opponents' second-last player, in club's frame."""
+    pf = md.periods[period]
+    xy = pf.xy[i, md.columns_of(md.other(club))].astype(float)
+    xy = xy[~np.isnan(xy[:, 0])]
+    xs = sorted(md.to_team(period, club, xy)[:, 0], reverse=True)
+    return max(float(xs[1]), 52.5) if len(xs) >= 2 else 52.5
+
+
+OVERLAP_WINDOW = 250  # 10 s after the run starts: the overlap, the pass down the line and the delivery
+
+
+class OverlapDetector:
+    """A runner goes round the outside of a teammate on the ball out wide, making two against one on the flank,
+    and a cross or cut-back follows (PRD 12.7, Overlap)."""
+
+    type = "overlap"
+
+    def __init__(self, md: MatchData) -> None:
+        self.md = md
+        self.possession = Possession(md)
+
+    def evaluate(self, run: Run, now_idx: int | None = None) -> Candidate | None:
+        md, period, club = self.md, run.period, run.club
+        pf = md.periods[period]
+        if self.possession.at(period, run.t0_ms) != club:
+            return None
+        i0 = run.i0
+        i_end = min(i0 + OVERLAP_WINDOW, pf.n - 1)
+        if now_idx is not None:
+            i_end = min(i_end, now_idx)
+        if i_end - i0 < 10:
+            return None
+        cols = md.columns_of(club)
+        rcol = md.players.index(run.player_id)
+        # The teammate with the ball at his feet as the run begins, or just after (a pass may be on its way):
+        # the ball on the ground within reach of him for a fifth of a second, not a ball leaving his foot.
+        carrier, held, last = None, 0, -1
+        for i in range(i0, min(i0 + 75, i_end)):
+            d = np.linalg.norm(pf.xy[i, cols].astype(float) - pf.ball[i, :2], axis=1)
+            if np.isnan(d).all():
+                continue
+            k = int(np.nanargmin(d))
+            at_feet = d[k] < 1.5 and pf.ball[i, 2] < 1.0 and cols[k] != rcol
+            held = held + 1 if at_feet and int(cols[k]) == last else int(at_feet)
+            last = int(cols[k]) if at_feet else -1
+            if held >= 5:
+                carrier = (last, i)
+                break
+        if carrier is None:
+            return None
+        ccol, ic = carrier
+
+        def team_xy(i: int, col: int) -> np.ndarray:
+            return md.to_team(period, club, pf.xy[i, col].astype(float))
+
+        c_t, r_t = team_xy(ic, ccol), team_xy(ic, rcol)
+        if not (48 <= c_t[0] <= 84 and abs(c_t[1] - 34) > 11):
+            return None  # a wide player on the ball in the attacking half
+        side = -1.0 if c_t[1] < 34 else 1.0
+        if not (c_t[0] - 26 <= r_t[0] <= c_t[0] - 1 and abs(r_t[1] - c_t[1]) < 18):
+            return None  # the runner comes from behind, on the same flank
+        rounded = next((i for i in range(ic, i_end + 1)
+                        if team_xy(i, rcol)[0] >= team_xy(i, ccol)[0] - 1.0
+                        and (team_xy(i, rcol)[1] - 34) * side >= (team_xy(i, ccol)[1] - 34) * side - 1.0), None)
+        if rounded is None:
+            return None  # never got round the outside
+        # The flank channel ahead of the carrier, and who controlled it when the run began.
+        centre = md.to_team(period, club, np.array([min(c_t[0] + 12.0, 98.0), 34 + side * 28.0]))
+        zone = _rect(float(centre[0]), float(centre[1]), 8.0, 6.0)
+        cells = _zone_cells(zone)
+        c_start = float(zone_control_at(md, club, period, i0, cells).mean())
+        if c_start >= 0.6:
+            return None  # the flank was already the attackers'
+        # The delivery: a cross or cut-back by the club from the flank, whether or not it reached the box.
+        def is_delivery(e) -> bool:
+            if e.type != "pass" or e.team_id != club or not e.start_xy or not e.end_xy:
+                return False
+            start, end = md.to_team(period, club, np.array(e.start_xy)), md.to_team(period, club, np.array(e.end_xy))
+            from_flank = abs(start[1] - 34) > 12 and start[0] > 55
+            into_box = end[0] > 83 and abs(end[1] - 34) < 20.16
+            return from_flank and (into_box or e.subtype in ("cross", "cutback"))
+
+        deliveries = [e for e in md.events_between(period, int(pf.t_ms[rounded]) - 1000, int(pf.t_ms[i_end]))
+                      if is_delivery(e)]
+        delivery = deliveries[0] if deliveries else None
+        i_stop = pf.index_of(delivery.t_ms) if delivery else i_end
+        opp = md.columns_of(md.other(club))
+        peak, peak_idx, run_s, best_s = c_start, ic, 0.0, 0.0
+        for i in range(ic, i_stop + 1, 5):
+            ctrl = float(zone_control_at(md, club, period, i, cells).mean())
+            if ctrl > peak:
+                peak, peak_idx = ctrl, i
+            a, b = pf.xy[i, ccol].astype(float), pf.xy[i, rcol].astype(float)
+            gap = float(np.linalg.norm(a - b))
+            mid = (a + b) / 2
+            near = np.linalg.norm(pf.xy[i, opp].astype(float) - mid, axis=1)
+            two_v_one = gap <= 18.0 and int(np.nansum(near < max(6.0, gap / 2 + 3.0))) <= 1
+            run_s = run_s + 0.2 if two_v_one else 0.0
+            best_s = max(best_s, run_s)
+        if peak - c_start < 0.15:
+            return None  # the flank never turned
+        signals = [
+            Signal(name="wide_zone_control_pct", value=round(peak * 100, 0), threshold=60.0, unit="pct",
+                   evidence_ids=[md.frame_id(period, int(pf.t_ms[ic])), md.frame_id(period, int(pf.t_ms[peak_idx]))]),
+            Signal(name="two_v_one_s", value=round(best_s, 1), threshold=1.5, unit="s",
+                   evidence_ids=[md.frame_id(period, int(pf.t_ms[rounded]))]),
+            Signal(name="delivery_follows", value=1.0 if delivery else 0.0, threshold=1.0, unit="bool",
+                   evidence_ids=[delivery.event_id] if delivery else []),
+        ]
+        window_closed = now_idx is None or now_idx >= min(i0 + OVERLAP_WINDOW, pf.n - 1)
+        verdict = _finish(signals, window_closed)
+        if verdict is None:
+            return None
+        strength, status = verdict
+        # The defender facing the ball: the nearest opponent to the carrier as the run began.
+        d_opp = np.linalg.norm(pf.xy[ic, opp].astype(float) - pf.xy[ic, ccol].astype(float), axis=1)
+        dragged = [md.players[int(opp[int(np.nanargmin(d_opp))])]] if not np.isnan(d_opp).all() else []
+        # Space estimate: the zone's controlled area at its peak, against the runner left where he started.
+        actual = zone_control_at(md, club, period, peak_idx, cells)
+        ghost = zone_control_at(md, club, period, peak_idx, cells, override={rcol: pf.xy[ic, rcol].astype(float)})
+        return Candidate(
+            candidate_id="pending",
+            match_id=md.match_id,
+            period=period,
+            t_start_ms=run.t0_ms,
+            t_end_ms=int(pf.t_ms[i_stop]),
+            type="overlap",
+            team_id=club,
+            creator_id=run.player_id,
+            dragged_ids=dragged,
+            receiver_id=delivery.recipient_id if delivery else None,
+            gap_zone=zone,
+            run_from=(round(float(run.start_xy[0]), 1), round(float(run.start_xy[1]), 1)),
+            run_to=(round(float(run.end_xy[0]), 1), round(float(run.end_xy[1]), 1)),
+            signals=signals,
+            strength=round(strength, 3),
+            status=status,
+            space_created_m2=round(float(max((actual - ghost).sum(), 0.0)), 0),
+            evidence_ids=sorted({eid for s in signals for eid in s.evidence_ids}),
+        )
+
+
+TIMED_RUN_WINDOW = 150  # 6 s after the run starts
+
+
+class TimedRunDetector:
+    """A runner is found in behind: onside as the pass is played, clear of the line when it arrives
+    (PRD 12.7, Timed run in behind)."""
+
+    type = "timed_run_in_behind"
+    # A run timed onto a through ball is often a short burst: the ball reaches the runner within a second.
+    run_args = {"min_frames": 20, "min_disp": 6.0}
+
+    def __init__(self, md: MatchData) -> None:
+        self.md = md
+        self.possession = Possession(md)
+
+    def evaluate(self, run: Run, now_idx: int | None = None) -> Candidate | None:
+        md, period, club = self.md, run.period, run.club
+        pf = md.periods[period]
+        if self.possession.at(period, run.t0_ms) != club:
+            return None
+        forward = md.to_team(period, club, run.end_xy)[0] - md.to_team(period, club, run.start_xy)[0]
+        if forward < 5.0:
+            return None  # a run in behind goes forward
+        i_end = min(run.i0 + TIMED_RUN_WINDOW, pf.n - 1)
+        if now_idx is not None:
+            i_end = min(i_end, now_idx)
+        passes = [e for e in md.events_between(period, run.t0_ms - 500, int(pf.t_ms[i_end]))
+                  if e.type == "pass" and e.team_id == club and e.recipient_id == run.player_id]
+        if not passes:
+            return None
+        ev = passes[0]
+        rcol = md.players.index(run.player_id)
+        i_rel = pf.index_of(ev.t_ms)
+        margin = _second_last_x(md, period, club, i_rel) - md.to_team(period, club, pf.xy[i_rel, rcol].astype(float))[0]
+        i_rec = None
+        for i in range(i_rel + 3, min(i_rel + 100, pf.n)):
+            if float(np.linalg.norm(pf.ball[i, :2] - pf.xy[i, rcol])) < 1.5 and pf.ball[i, 2] < 1.5:
+                i_rec = i
+                break
+        if i_rec is None:
+            return None
+        beyond = md.to_team(period, club, pf.xy[i_rec, rcol].astype(float))[0] - _second_last_x(md, period, club, i_rec)
+        signals = [
+            Signal(name="onside_at_release", value=1.0 if margin >= -0.3 else 0.0, threshold=1.0, unit="bool",
+                   evidence_ids=[ev.event_id, md.frame_id(period, int(pf.t_ms[i_rel]))]),
+            Signal(name="beyond_line_on_receipt_m", value=round(beyond, 1), threshold=3.0, unit="m",
+                   evidence_ids=[md.frame_id(period, int(pf.t_ms[i_rec]))]),
+        ]
+        window_closed = now_idx is None or now_idx >= min(run.i0 + TIMED_RUN_WINDOW, pf.n - 1)
+        verdict = _finish(signals, window_closed)
+        if verdict is None:
+            return None
+        strength, status = verdict
+        receipt = pf.xy[i_rec, rcol].astype(float)
+        zone = _rect(float(receipt[0]), float(receipt[1]), 7.0, 6.0)
+        opp = md.columns_of(md.other(club))
+        d_opp = np.linalg.norm(pf.xy[i_rel, opp].astype(float) - pf.xy[i_rel, rcol].astype(float), axis=1)
+        dragged = [md.players[int(opp[int(np.nanargmin(d_opp))])]] if not np.isnan(d_opp).all() else []
+        return Candidate(
+            candidate_id="pending",
+            match_id=md.match_id,
+            period=period,
+            t_start_ms=run.t0_ms,
+            t_end_ms=int(pf.t_ms[i_rec]),
+            type="timed_run_in_behind",
+            team_id=club,
+            creator_id=run.player_id,
+            dragged_ids=dragged,
+            receiver_id=run.player_id,
+            gap_zone=zone,
+            run_from=(round(float(run.start_xy[0]), 1), round(float(run.start_xy[1]), 1)),
+            run_to=(round(float(run.end_xy[0]), 1), round(float(run.end_xy[1]), 1)),
+            signals=signals,
+            strength=round(strength, 3),
+            status=status,
+            evidence_ids=sorted({eid for s in signals for eid in s.evidence_ids}),
+        )
+
+
+DETECTORS = {"decoy_run": DecoyRunDetector, "overlap": OverlapDetector, "timed_run_in_behind": TimedRunDetector}
 
 
 def detect(md: MatchData, period: int | None = None, t_from_ms: int = 0, t_to_ms: int | None = None,
@@ -173,8 +422,13 @@ def detect(md: MatchData, period: int | None = None, t_from_ms: int = 0, t_to_ms
         i_from = pf.index_of(t_from_ms)
         i_to = pf.n if t_to_ms is None else pf.index_of(t_to_ms) + 1
         now_idx = pf.index_of(now_ms) if now_ms is not None else None
-        for run in detect_runs(md, p, i_from, i_to):
-            for det in detectors:
+        runs: dict[tuple, list[Run]] = {}
+        for det in detectors:
+            args = getattr(det, "run_args", {})
+            key = tuple(sorted(args.items()))
+            if key not in runs:
+                runs[key] = detect_runs(md, p, i_from, i_to, **args)
+            for run in runs[key]:
                 cand = det.evaluate(run, now_idx)
                 if cand is not None:
                     out.append(cand)

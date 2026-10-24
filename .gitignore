@@ -32,3 +32,10 @@ Thumbs.db
 
 # Generated replays
 replays/
+
+# Raw calibration data: never committed (PRD 12.2)
+calibration/raw/
+
+# Calibration runs: regenerated on demand, only their gate reports are kept (PRD 12.11)
+datasets/calib/
+truth/calib/

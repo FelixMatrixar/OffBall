@@ -1,0 +1,26 @@
+{
+  "match_id": "smk2",
+  "seconds": 116.3,
+  "segment_retries": 0,
+  "score": {
+    "bra": 0,
+    "sal": 1
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "null_run",
+      "ok": true,
+      "attempts": 8,
+      "reasons": [
+        "preconditions never arose",
+        "preconditions never arose",
+        "preconditions never arose",
+        "preconditions never arose",
+        "the defender followed the runner",
+        "preconditions never arose",
+        "preconditions never arose"
+      ]
+    }
+  ]
+}

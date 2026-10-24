@@ -29,6 +29,19 @@ class EngineParams:
     # Shots.
     xg_bias: float = tunable(-0.25, -0.8, 0.5, "Logit offset of the true xG model")
     shot_scale: float = tunable(1.0, 0.6, 1.3, "How much players value a shot against its xG")
+    long_shot_appeal: float = tunable(0.006, 0.0, 0.02, "Extra appeal of a shot from outside the box for a good finisher")
+    # Crosses and headers.
+    cross_delivery: float = tunable(0.66, 0.5, 0.85, "Chance an average crosser beats the first man and finds the box")
+    cross_free: float = tunable(0.6, 0.35, 0.85, "Chance an uncontested target wins the ball in the air")
+    cross_contest: float = tunable(4.5, 3.0, 6.0, "Distance within which defenders contest a cross, m")
+    header_shot: float = tunable(0.5, 0.3, 0.7, "Chance a won header in the box goes at goal")
+    header_behind: float = tunable(0.3, 0.15, 0.5, "Chance a defender's header from a cross goes behind")
+    # Balls out of play.
+    wide_tackle_out: float = tunable(0.45, 0.1, 0.8, "Chance a tackle won near the touchline puts the ball out")
+    clear_to_touch: float = tunable(0.55, 0.2, 0.85, "Chance a clearance from a wide area goes out of touch")
+    deflect_out: float = tunable(0.4, 0.1, 0.7, "Chance a pass cut out near the touchline is deflected out")
+    touch_out: float = tunable(0.5, 0.2, 0.8, "Chance a misplaced ball near the touchline runs out of play")
+    loose_control: float = tunable(4.0, 2.5, 6.0, "Ball speed a player stops cleanly in one touch, m/s")
     # Passing physics.
     intercept_tau: float = tunable(0.16, 0.1, 0.3, "Spread of the interception race, s")
     intercept_lead: float = tunable(0.2, 0.05, 0.35, "How early a defender must arrive to cut a pass out, s")
@@ -71,6 +84,23 @@ class EngineParams:
     support_base: float = tunable(0.006, 0.002, 0.012, "Structural value of offering support")
     decoy_scale: float = tunable(0.18, 0.08, 0.35, "Value players see in decoy runs")
     anchor_value: float = tunable(0.010, 0.006, 0.016, "Structural value of holding position")
+    # Movement pace: how fast players choose to move, as a share of their top speed (fitted against real
+    # distance, high-intensity running and peak speeds).
+    pace_walk_cap: float = tunable(0.18, 0.1, 0.35, "Fastest walk while in position")
+    pace_shape_horizon: float = tunable(3.5, 2.0, 5.0, "Seconds a player takes to jog back into shape")
+    pace_shape_cap: float = tunable(0.5, 0.35, 0.65, "Fastest jog back into shape")
+    pace_transition_cap: float = tunable(0.75, 0.6, 0.92, "Fastest recovery run after losing the ball")
+    pace_mark_gain: float = tunable(0.5, 0.2, 1.0, "How hard a marker closes a gap, m/s per m")
+    pace_mark_cap: float = tunable(0.65, 0.5, 0.8, "Fastest pace while marking")
+    pace_press_base: float = tunable(0.68, 0.55, 0.85, "Pace of a pressing run before the club's intensity")
+    pace_support_cap: float = tunable(0.6, 0.4, 0.75, "Fastest pace offering support")
+    pace_sprint_cap: float = tunable(0.92, 0.75, 1.0, "Share of top speed even an all-out sprint reaches")
+    pace_chase_cap: float = tunable(0.9, 0.65, 1.0, "Fastest pace chasing a loose ball")
+    drift_sd: float = tunable(2.0, 1.0, 6.0, "How far players drift around their spot in the shape, m")
+    drift_period: float = tunable(6.0, 2.0, 10.0, "How often a player picks a new spot to drift to, s")
+    # Stoppages: the ball is out of play for about 44% of a real match.
+    restart_delay_scale: float = tunable(1.0, 0.8, 2.0, "How long restarts take, against the base delays")
+    setpiece_pace: float = tunable(0.17, 0.1, 0.3, "Pace players walk into position at a restart")
     # Movement and fatigue.
     anchor_lag: float = tunable(0.9, 0.4, 1.6, "Reaction lag of the team shape, s")
     walk_gap: float = tunable(2.5, 1.0, 4.0, "Distance from position within which players walk, m")

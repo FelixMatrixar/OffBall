@@ -18,36 +18,50 @@ from pathlib import Path
 
 import optuna
 
-from offball.calibration.metrics import DEFAULT_TARGETS, deviation, loss, match_metrics, summarise
+from offball.calibration.metrics import deviation, loss, match_metrics, summarise, targets
 from offball.generator.engine.params import PARAMS_PATH, EngineParams
 
 PAIRINGS = [("kes", "ash"), ("bra", "sal"), ("mor", "qua"), ("nor", "oak"), ("fen", "gle"), ("cor", "wre"),
             ("dun", "lar"), ("har", "ive"), ("jun", "low"), ("pel", "riv")]
 
-# The Tuner's first hypothesis: chances come too easily (shots about 2x the norm), because the ball is too
-# easy to keep near goal and defenders engage too late. Search what governs chance creation and turnovers.
+# The Tuner's current hypothesis, against targets fitted to real matches: shots still come about twice as
+# often as in real football, possessions last too long, and players cover too little ground at a jog while
+# running too much of it at high speed. Search chance creation, turnovers, balls out of play and pace.
+HYPOTHESIS = ("Shots about 2x real, possessions too long, too little jogging and too much high-speed running: "
+              "search chance creation, turnovers, balls out of play and movement pace together.")
 DEFAULT_SEARCH = [
-    "shot_scale", "value_progress", "value_xg_weight", "xg_bias", "box_engage", "def_width", "def_depth",
-    "box_squeeze_depth", "zone_radius_deep", "carry_beat", "carry_lead", "tackle_hazard", "goal_side_boost",
-    "foul_base", "intercept_lead", "exec_long", "control_base", "temperature", "hold_risk", "walk_gap",
-    "anchor_lag", "run_rate",
+    # Chances and shots.
+    "shot_scale", "value_progress", "value_xg_weight", "xg_bias", "long_shot_appeal", "cross_delivery",
+    "cross_free", "header_shot",
+    # Defending the box and winning the ball.
+    "box_engage", "def_width", "def_depth", "box_squeeze_depth", "zone_radius_deep", "carry_beat", "carry_lead",
+    "tackle_hazard", "goal_side_boost", "foul_base",
+    # Turnovers and balls out of play.
+    "intercept_lead", "exec_long", "control_base", "temperature", "hold_risk", "run_rate", "wide_tackle_out",
+    "clear_to_touch", "deflect_out", "touch_out", "header_behind",
+    # Movement pace.
+    "walk_gap", "anchor_lag", "pace_walk_cap", "pace_shape_horizon", "pace_shape_cap", "pace_transition_cap",
+    "pace_mark_gain", "pace_mark_cap", "pace_press_base", "pace_support_cap", "drift_sd", "drift_period",
 ]
 
 
 def play_one(args: tuple[dict, int, float]) -> dict[str, float]:
-    overrides, seed, half = args
+    values, seed, half = args
     from offball.generator.engine.sim import Simulator
     from offball.generator.league import build_league
 
     league = build_league(2026)
     home, away = PAIRINGS[seed % len(PAIRINGS)]
-    params = EngineParams().with_overrides(**overrides)
-    sim = Simulator(league, home, away, f"cal{seed}", seed=seed, half_minutes=half, params=params)
+    sim = Simulator(league, home, away, f"cal{seed}", seed=seed, half_minutes=half, params=EngineParams(**values))
     return match_metrics(sim.play())
 
 
-def evaluate(overrides: dict, matches: int, half: float, pool: ProcessPoolExecutor, seed0: int = 100) -> dict:
-    rows = list(pool.map(play_one, [(overrides, seed0 + k, half) for k in range(matches)]))
+def evaluate(overrides: dict, matches: int, half: float, pool: ProcessPoolExecutor, seed0: int = 100,
+             base: EngineParams | None = None) -> dict:
+    """Average metrics of fresh matches, playing `overrides` on top of `base` (the calibrated parameters the
+    generator uses, unless given)."""
+    values = asdict((base or EngineParams.load()).with_overrides(**overrides))
+    rows = list(pool.map(play_one, [(values, seed0 + k, half) for k in range(matches)]))
     return summarise(rows)
 
 
@@ -67,13 +81,13 @@ def main() -> None:
     args.log.parent.mkdir(parents=True, exist_ok=True)
     pool = ProcessPoolExecutor(max_workers=args.workers)
 
-    baseline = evaluate({}, args.matches, args.half, pool)
+    baseline = evaluate({}, args.matches, args.half, pool, base=base)
     print(f"baseline loss {loss(baseline):.3f}", flush=True)
 
     def objective(trial: optuna.Trial) -> float:
         overrides = {name: trial.suggest_float(name, bounds[name][0], bounds[name][1]) for name in args.search}
         t0 = time.time()
-        metrics = evaluate(overrides, args.matches, args.half, pool)
+        metrics = evaluate(overrides, args.matches, args.half, pool, base=base)
         value = loss(metrics)
         record = {"trial": trial.number, "loss": value, "secs": round(time.time() - t0, 1),
                   "metrics": {k: round(v, 3) for k, v in metrics.items()}, "params": overrides}
@@ -88,17 +102,17 @@ def main() -> None:
     study.optimize(objective, n_trials=args.trials)
 
     best = base.with_overrides(**study.best_params)
-    confirm = evaluate(study.best_params, args.matches * 2, args.half, pool, seed0=900)
+    confirm = evaluate(study.best_params, args.matches * 2, args.half, pool, seed0=900, base=base)
     pool.shutdown()
     report = {
         "best_loss": study.best_value,
         "confirm_loss": loss(confirm),
         "baseline_loss": loss(baseline),
         "trials": len(study.trials),
-        "hypothesis": "Chances came too easily: ball too easy to keep near goal, defenders engaging too late.",
+        "hypothesis": HYPOTHESIS,
         "searched": args.search,
         "metrics": {k: round(v, 3) for k, v in confirm.items()},
-        "outside_band": {k: round(deviation(confirm[k], t), 3) for k, t in DEFAULT_TARGETS.items()
+        "outside_band": {k: round(deviation(confirm[k], t), 3) for k, t in targets().items()
                          if deviation(confirm[k], t) > 0},
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

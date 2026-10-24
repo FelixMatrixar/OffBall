@@ -1,0 +1,408 @@
+{
+  "schema_version": "2.0",
+  "match_id": "smk6",
+  "seed": 106,
+  "engine": "emergent",
+  "generator_version": "0.1.0",
+  "competition": "OffBall League",
+  "season": "2026",
+  "round": null,
+  "home": {
+    "club_id": "har",
+    "name": "Harbourne",
+    "short_name": "HAR",
+    "kit": {
+      "primary": "#445c00",
+      "secondary": "#ebf1e3",
+      "pattern": "halves"
+    },
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "har-01",
+        "name": "A. Djoudi",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "har-02",
+        "name": "E. Vikovik",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "har-04",
+        "name": "R. Hamich",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "har-05",
+        "name": "A. Abara",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "har-03",
+        "name": "F. Adewa",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "har-06",
+        "name": "D. Mamura",
+        "number": 6,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "har-08",
+        "name": "K. Abourari",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "har-10",
+        "name": "T. Moravenko",
+        "number": 10,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "har-07",
+        "name": "K. Kadimami",
+        "number": 7,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "har-09",
+        "name": "A. Djounari",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "har-11",
+        "name": "K. Nasami",
+        "number": 11,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "har-13",
+        "name": "K. Salourari",
+        "number": 13,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "har-14",
+        "name": "K. Mahami",
+        "number": 14,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "har-15",
+        "name": "H. Rahinoun",
+        "number": 15,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "har-17",
+        "name": "W. Nasach",
+        "number": 17,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "har-19",
+        "name": "W. Fadari",
+        "number": 19,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "har-23",
+        "name": "K. Nasanira",
+        "number": 23,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "har-24",
+        "name": "A. Rahoumi",
+        "number": 24,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "har-26",
+        "name": "H. Bjyheim",
+        "number": 26,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "har-28",
+        "name": "C. Kwako",
+        "number": 28,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "har-30",
+        "name": "A. Fadouri",
+        "number": 30,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "har-33",
+        "name": "I. Mahioui",
+        "number": 33,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "har-34",
+        "name": "Y. Djara",
+        "number": 34,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "har-36",
+        "name": "I. Zahimari",
+        "number": 36,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "har-39",
+        "name": "I. Saloura",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "away": {
+    "club_id": "ive",
+    "name": "Ivelmouth",
+    "short_name": "IVE",
+    "kit": {
+      "primary": "#fbb34c",
+      "secondary": "#201910",
+      "pattern": "hoops"
+    },
+    "formation": "3-4-3",
+    "lineup": [
+      {
+        "player_id": "ive-01",
+        "name": "T. Smahuis",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "ive-04",
+        "name": "R. Tomura",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-05",
+        "name": "R. Tozaki",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-06",
+        "name": "T. Nazaki",
+        "number": 6,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-02",
+        "name": "D. Tonaga",
+        "number": 2,
+        "role": "RWB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-08",
+        "name": "E. Hageheim",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "ive-10",
+        "name": "H. Kata",
+        "number": 10,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "ive-03",
+        "name": "Y. Yonaga",
+        "number": 3,
+        "role": "LWB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-07",
+        "name": "K. Kizaki",
+        "number": 7,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "ive-09",
+        "name": "R. Hata",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "ive-11",
+        "name": "H. Tamoto",
+        "number": 11,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "ive-12",
+        "name": "H. Nakawa",
+        "number": 12,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "ive-14",
+        "name": "R. Mamoto",
+        "number": 14,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "ive-15",
+        "name": "Y. Rihara",
+        "number": 15,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "ive-16",
+        "name": "D. Janacan",
+        "number": 16,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "ive-21",
+        "name": "W. Rahoudi",
+        "number": 21,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "ive-23",
+        "name": "T. Kita",
+        "number": 23,
+        "role": "RWB",
+        "starter": false
+      },
+      {
+        "player_id": "ive-25",
+        "name": "J. Dekohuis",
+        "number": 25,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "ive-28",
+        "name": "K. Yorazaki",
+        "number": 28,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "ive-31",
+        "name": "Y. Rimura",
+        "number": 31,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "ive-35",
+        "name": "S. Managa",
+        "number": 35,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "ive-36",
+        "name": "R. Yorakawa",
+        "number": 36,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "ive-37",
+        "name": "S. Lundevik",
+        "number": 37,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "ive-38",
+        "name": "S. Tatota",
+        "number": 38,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "ive-39",
+        "name": "D. Mihara",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "periods": [
+    {
+      "period": 1,
+      "duration_ms": 399080,
+      "attacks_left_to_right": "har"
+    },
+    {
+      "period": 2,
+      "duration_ms": 460480,
+      "attacks_left_to_right": "ive"
+    }
+  ],
+  "final_score": {
+    "har": 1,
+    "ive": 0
+  },
+  "frame_rate": 25,
+  "pitch": [
+    105.0,
+    68.0
+  ],
+  "synthetic": true
+}

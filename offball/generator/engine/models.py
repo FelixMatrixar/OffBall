@@ -286,9 +286,10 @@ def assess_cross(
     goal_x: float,
     passing: float,
     passer_pressure: float,
+    p: EngineParams = DEFAULT,
 ) -> CrossAssessment:
     """True probability that a cross or corner finds its target: delivery, keeper claim, then the header."""
-    p_delivery = float(np.clip(0.78 + 0.25 * (passing - 0.6) - 0.15 * passer_pressure, 0.4, 0.95))
+    p_delivery = float(np.clip(p.cross_delivery + 0.25 * (passing - 0.6) - 0.15 * passer_pressure, 0.3, 0.95))
     near_goal = abs(goal_x - float(end[0])) < 7.0 and abs(float(end[1]) - W / 2) < 10.0
     p_claim = 0.0
     if keeper_idx >= 0:
@@ -296,14 +297,15 @@ def assess_cross(
         p_claim = float(np.clip((0.38 if near_goal else 0.08) * (1.2 - k_dist / 12.0), 0.0, 0.45))
     outfield = [k for k in range(len(def_pos)) if k != keeper_idx]
     dists = np.array([float(np.linalg.norm(def_pos[k] - end)) for k in outfield]) if outfield else np.array([])
-    contest = [outfield[k] for k in np.argsort(dists)[:2] if dists[k] < 3.5] if len(dists) else []
+    contest = [outfield[k] for k in np.argsort(dists)[:2] if dists[k] < p.cross_contest] if len(dists) else []
     if contest:
         best = max(contest, key=lambda k: def_aerial[k])
         sep = float(min(dists[outfield.index(k)] for k in contest))
         p_duel = float(sigmoid(2.5 * (receiver_aerial - def_aerial[best]) + 0.9 * (sep - 1.8) - 0.35))
+        p_duel *= p.cross_free / 0.8  # defending the box is never as easy as an open aerial duel suggests
         winner = best
     else:
-        p_duel, winner = 0.8, -1
+        p_duel, winner = p.cross_free, -1
     p = p_delivery * (1 - p_claim) * p_duel
     return CrossAssessment(float(np.clip(p, 0.01, 0.95)), p_delivery, p_claim, p_duel, winner)
 

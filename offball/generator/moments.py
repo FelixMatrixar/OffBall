@@ -18,6 +18,7 @@ import numpy as np
 
 from offball.generator.engine.geometry import L, W, rect
 from offball.generator.engine.models import location_value, plan_aerial, plan_ground, pressure_on
+from offball.generator.engine.tactics import offside_line_team
 from offball.models.pitch_control import control_fast
 
 if TYPE_CHECKING:
@@ -79,6 +80,7 @@ class MomentPlan:
     max_wait_s = 180.0
     max_run_s = 12.0
     is_null = False
+    gap_threshold = 0.40  # zone control gain that counts as the gap opening, in the counterfactual re-runs
 
     def __init__(self, spec: StoryMoment, sim: Simulator, mode: CounterfactualMode = "actual",
                  timing: dict[str, float] | None = None) -> None:
@@ -295,6 +297,7 @@ class DecoyRun(MomentPlan):
         # The defender decides now, as the run starts: follow or pass the runner on. The director's soft
         # constraint is only a bias on his discipline; the draw is still random.
         sim.bias[(d, "discipline")] = (self.cb_discipline, sim.t + 8.0)
+        self._cover_watches(sim)
         P = sim.params
         p_track = P.track_base + P.track_discipline * (1 - self.cb_discipline) - 0.06
         if self.mode == "without" or sim.rng.random() >= float(np.clip(p_track + 0.1, 0.02, 0.98)):
@@ -318,6 +321,21 @@ class DecoyRun(MomentPlan):
                 "action": "pass", "to": r, "hold": True, "subtype": "through",
                 "when": self._pass_when, "point_fn": lambda s: self.gap_point,
             }
+
+    cover_hold_s = 2.8  # soft constraint: the nearest cover is caught watching the ball for this long
+
+    def _cover_watches(self, sim: Simulator) -> None:
+        """The defender best placed to cover the gap is caught watching the ball and holds his spot for a moment,
+        as real covers often are. In every mode, so the counterfactual compares like with like."""
+        opp = [k for k in sim.active_of(1 - self.team) if k != self.dragged and sim.role[k] != "GK"]
+        if not opp or self.cover_hold_s <= 0:
+            return
+        k = min(opp, key=lambda k: float(np.linalg.norm(sim.pos[k] - self.gap_point)))
+        if float(np.linalg.norm(sim.pos[k] - self.gap_point)) > 15.0:
+            return
+        sim.set_intent(k, "watch", sim.pos[k].copy(), 0.3, until=sim.t + self.cover_hold_s)
+        sim.lock_until[k] = sim.t + self.cover_hold_s
+        sim.log_intent(k, "ball_watching", 0.0)
 
     def _gain(self, sim: Simulator) -> float:
         return float(team_control(sim, self.team, self.cells).mean()) - self.control_start
@@ -451,6 +469,7 @@ class NullRun(DecoyRun):
     kind = "null_run"
     is_null = True
     cb_discipline = 0.97
+    cover_hold_s = 0.0  # the defence is switched on: nobody is caught watching
 
     def start(self, sim: Simulator) -> None:
         super().start(sim)
@@ -480,6 +499,577 @@ class NullRun(DecoyRun):
         return True, "ok"
 
 
+FULL_BACK_ROLES = ("RB", "LB", "RWB", "LWB")
+THROUGH_ARRIVAL = 13.0  # a driven through ball still runs at this speed when it reaches the runner, m/s
+FORWARD_ROLES = ("ST", "RW", "LW", "AM")
+
+
+def _holder(sim: Simulator, t: int) -> int:
+    """Whoever has the ball for team t, or whoever a completed pass in flight is going to; -1 otherwise."""
+    owner = sim.owner
+    if owner < 0 and sim.ball_state == "flight" and sim.flight_plan.get("outcome") == "complete":
+        owner = sim.flight_plan.get("receiver", -1)
+    return owner if owner >= 0 and sim.team_of[owner] == t else -1
+
+
+def _dist(sim: Simulator, a: int, b: int) -> float:
+    return float(np.linalg.norm(sim.pos[a] - sim.pos[b]))
+
+
+class _Finish:
+    """Shared ending for plans that set up a final ball: wait for the shot, or for the move to break down."""
+
+    def _await_finish(self: MomentPlan, sim: Simulator, since: float, holder: int) -> bool:
+        shots = [e for e in sim.events if e["type"] == "shot" and e.get("t_ms", 0) >= int(since * 1000)
+                 and e["period"] == sim.period]
+        if shots:
+            if sim.ball_state != "flight" or sim.flight_plan.get("kind") != "shot":
+                self.result.outcome = "goal" if shots[0]["outcome"] == "goal" else "shot"
+                return self.finish(sim)
+            return False
+        if sim.possession != self.team or sim.t - since > 4.5:
+            self.result.outcome = "chance" if sim.owner == holder else "none"
+            return self.finish(sim)
+        return False
+
+    def _check_outcome(self: MomentPlan) -> tuple[bool, str]:
+        if self.spec.outcome == "goal" and self.result.outcome != "goal":
+            return False, "no goal"
+        if self.spec.outcome == "shot" and self.result.outcome not in ("goal", "shot"):
+            return False, "no shot"
+        return True, "ok"
+
+
+class Overlap(_Finish, MomentPlan):
+    """A full-back runs round the outside of the wide player on the ball, the defender facing them has to
+    choose, and a cross or cut-back follows (PRD 12.7, Overlap)."""
+
+    kind = "overlap"
+    max_wait_s = 240.0
+    max_run_s = 11.0
+    gap_threshold = 0.30  # the wide zone turning this much more ours without the run means it wasn't the run
+    tracked = False  # the null version: a second defender tracks the overlap
+
+    # ------------------------------------------------------------------ setup
+    def _side(self, sim: Simulator, owner: int) -> float:
+        """-1 when the ball is on the flank at y' = 0 in the team's frame, +1 on the flank at y' = W."""
+        return -1.0 if tx(sim, self.team, sim.pos[owner])[1] < W / 2 else 1.0
+
+    def _zone(self, sim: Simulator, owner: int) -> list[tuple[float, float]]:
+        """The flank channel ahead of the wide player that the overlap attacks."""
+        ox, _ = tx(sim, self.team, sim.pos[owner])
+        side = self._side(sim, owner)
+        centre = to_abs(sim, self.team, min(ox + 12.0, L - 7.0), W / 2 + side * (W / 2 - 6.0))
+        return rect(float(centre[0]), float(centre[1]), 8.0, 6.0)
+
+    def _full_back(self, sim: Simulator, owner: int) -> int:
+        t = self.team
+        c = self.slot(sim, self.spec.creator_id, t)
+        if c >= 0:
+            return c
+        side = self._side(sim, owner)
+        cands = [i for i in sim.active_of(t) if sim.role[i] in FULL_BACK_ROLES and i != owner
+                 and (tx(sim, t, sim.pos[i])[1] - W / 2) * side > 0]
+        return min(cands, key=lambda i: _dist(sim, i, owner)) if cands else -1
+
+    def ready(self, sim: Simulator) -> bool:
+        t = self.team
+        if sim.possession != t:
+            return False
+        owner = _holder(sim, t)
+        if owner < 0 or sim.role[owner] in ("GK", *FULL_BACK_ROLES):
+            return False
+        ox, oy = tx(sim, t, sim.pos[owner])
+        if not (50 <= ox <= 80 and abs(oy - W / 2) > 12):
+            return False  # a wide player on the ball in the attacking half
+        c = self._full_back(sim, owner)
+        if c < 0 or c == owner:
+            return False
+        cx, cy = tx(sim, t, sim.pos[c])
+        if not (ox - 24 <= cx <= ox - 2 and abs(cy - oy) < 16):
+            return False  # the full-back is behind the ball on the same flank, with ground to make up
+        opp = [k for k in sim.active_of(1 - t) if sim.role[k] != "GK"]
+        if pressure_on(sim.pos[owner], sim.pos[opp]) > 0.6:
+            return False
+        wanted = self.slot(sim, self.spec.dragged_id, 1 - t)
+        cands = [k for k in opp if sim._is_goal_side(k, owner)] if wanted < 0 else [wanted]
+        if not cands:
+            return False
+        d = min(cands, key=lambda k: _dist(sim, k, owner))
+        if _dist(sim, d, owner) > 10.0:
+            return False
+        if not self._defence_ready(sim, owner, d, opp):
+            return False
+        self.creator, self.dragged, self.receiver, self.passer = c, d, c, owner
+        return True
+
+    def _defence_ready(self, sim: Simulator, owner: int, d: int, opp: list[int]) -> bool:
+        """One defender facing the ball on that flank, so the overlap can make it two against one, and the
+        channel ahead still the defence's."""
+        if any(_dist(sim, k, owner) < 12.0 for k in opp if k != d):
+            return False
+        return float(team_control(sim, self.team, zone_cells(self._zone(sim, owner))).mean()) < 0.45
+
+    def steer(self, sim: Simulator) -> None:
+        """While waiting, the full-back pushes on behind the play down his flank, as attacking full-backs do."""
+        t = self.team
+        if sim.possession != t or sim.frame % 25:
+            return
+        owner = _holder(sim, t)
+        if owner < 0 or sim.role[owner] in ("GK", *FULL_BACK_ROLES):
+            return
+        ox, oy = tx(sim, t, sim.pos[owner])
+        if ox < 42 or abs(oy - W / 2) < 8:
+            return
+        c = self._full_back(sim, owner)
+        if c < 0 or c == owner or sim.lock_until[c] > sim.t:
+            return
+        side = self._side(sim, owner)
+        spot = to_abs(sim, t, max(ox - 11.0, 30.0), W / 2 + side * (W / 2 - 7.0))
+        sim.set_intent(c, "support", spot, 0.6, until=sim.t + 1.1)
+        sim.lock_until[c] = sim.t + 1.0
+
+    def start(self, sim: Simulator) -> None:
+        t, c, d, o = self.team, self.creator, self.dragged, self.passer
+        ox, oy = tx(sim, t, sim.pos[o])
+        side = self._side(sim, o)
+        self.zone = self._zone(sim, o)
+        self.cells = zone_cells(self.zone)
+        self.control_start = float(team_control(sim, t, self.cells).mean())
+        self.control_max = self.control_start
+        self.two_v_one = self.two_v_one_max = 0.0
+        self.pass_t: float | None = None
+        self.pass_event: dict | None = None
+        self.received_t: float | None = None
+        self.delivery_t: float | None = None
+        self.delivery_event: dict | None = None
+        self.target = -1
+        self.best_lane_p = 0.0
+        self.overlap_point = sim.pos[c].copy()
+        self.run_target = to_abs(sim, t, min(ox + 15.0, L - 6.0), W / 2 + side * (W / 2 - 3.0))
+        self.result.creator = sim.pid(c)
+        self.result.dragged = [sim.pid(d)]
+        self.result.receiver = sim.pid(c)
+        self.result.gap_zone = self.zone
+        if self.mode == "without":
+            # The counterfactual: the full-back stays in the team's shape.
+            sim.set_intent(c, "anchor", None, 0.5)
+            sim.lock_until[c] = sim.t + self.max_run_s
+            sim.log_intent(c, "hold_position", 0.0)
+        else:
+            sim.set_intent(c, "run", self.run_target, 0.95, until=sim.t + 4.2, data={"kind": "overlap"})
+            sim.lock_until[c] = sim.t + 3.6
+            sim.log_intent(c, "overlap", 0.02)
+        # The wide player holds it up and shapes inside, which commits the defender facing him.
+        if sim.owner == o:
+            sim.set_intent(o, "carry", to_abs(sim, t, ox + 2.0, oy - side * 4.0), 0.4, until=sim.t + 1.0)
+            sim.lock_until[o] = sim.t + 0.9
+        self._attack_box(sim)
+        if self.tracked:
+            self._track_overlap(sim)
+        elif self.mode == "actual":
+            sim.directives[o] = {"action": "pass", "to": c, "hold": True, "when": self._pass_when,
+                                 "point_fn": lambda s: self.overlap_point}
+
+    def _track_overlap(self, sim: Simulator) -> None:
+        """The null version: the nearest free defender tracks the overlapping run, so no 2 v 1 forms."""
+
+    # ------------------------------------------------------------------ play
+    def _pair_is_two_v_one(self, sim: Simulator) -> bool:
+        o, c = self.passer, self.creator
+        gap = _dist(sim, o, c)
+        if gap > 18.0:
+            return False
+        mid = (sim.pos[o] + sim.pos[c]) / 2
+        radius = max(6.0, gap / 2 + 3.0)
+        defenders = sum(float(np.linalg.norm(sim.pos[k] - mid)) < radius for k in sim.active_of(1 - self.team))
+        return defenders <= 1
+
+    def _pass_when(self, sim: Simulator) -> bool:
+        o, c = sim.owner, self.creator
+        if o < 0:
+            return False
+        ox, _ = tx(sim, self.team, sim.pos[o])
+        cx, _ = tx(sim, self.team, sim.pos[c])
+        if cx < ox - 1.0 or (self.two_v_one < 0.4 and self.two_v_one_max < 1.5):
+            return False  # wait until he is round the outside and the 2 v 1 has been made
+        lead = tx(sim, self.team, sim.pos[c] + sim.vel[c] * 0.7)
+        pt = to_abs(sim, self.team, min(lead[0], L - 4.0), float(np.clip(lead[1], 2.0, W - 2.0)))
+        flight = plan_ground(sim.pos[o].copy(), pt, arrival_speed=sim.params.pass_arrival)
+        p = sim.assess(o, c, flight).p_success
+        self.best_lane_p = max(self.best_lane_p, p)
+        if p < 0.45:
+            return False
+        self.overlap_point = pt
+        return True
+
+    def _attack_box(self, sim: Simulator) -> None:
+        """As the overlap goes on, the forwards attack the near post and the penalty spot."""
+        t = self.team
+        side = self._side(sim, self.passer)
+        line = sim.offside_cache[t] - 0.8  # arriving, not waiting offside
+        spots = [(min(L - 7.0, line), W / 2 + side * 5.0), (min(L - 12.0, line - 3.0), W / 2 - side * 2.0)]
+        fwd = sorted([i for i in sim.active_of(t) if sim.role[i] in FORWARD_ROLES and i not in (self.creator, self.passer)],
+                     key=lambda i: -tx(sim, t, sim.pos[i])[0])
+        for i, (sx, sy) in zip(fwd, spots, strict=False):
+            sim.set_intent(i, "run", to_abs(sim, t, sx, sy), 0.85, until=sim.t + 5.0, data={"kind": "box_run"})
+            sim.lock_until[i] = sim.t + 4.0
+
+    def _set_delivery(self, sim: Simulator) -> bool:
+        """Pick the cross or cut-back: the teammate in or arriving at the box with the best ball to him."""
+        t, c = self.team, self.creator
+        best = None
+        for j in sim.active_of(t):
+            if j == c or sim.role[j] == "GK" or sim._is_offside(j):
+                continue
+            jx, jy = tx(sim, t, sim.pos[j])
+            if jx < L - 35.0 or abs(jy - W / 2) > 22.0:
+                continue
+            target = np.clip(sim.pos[j] + sim.vel[j] * 0.5, [1.0, 1.0], [L - 1.0, W - 1.0])
+            ground = plan_ground(sim.pos[c].copy(), target.copy(), arrival_speed=sim.params.pass_arrival)
+            p_ground = sim.assess(c, j, ground).p_success
+            aerial = plan_aerial(sim.pos[c].copy(), target.copy(), apex=3.5)
+            p_air = sim._assess_cross(c, j, aerial).p_success
+            value = location_value(*tx(sim, t, target), sim.params)
+            for p, air in ((p_ground, False), (p_air, True)):
+                if best is None or p * value > best[0]:
+                    best = (p * value, j, air)
+        if best is None:
+            return False
+        _, j, air = best
+        self.target = j
+        sim.directives[c] = {"action": "pass", "to": j, "hold": False, "aerial": air,
+                             "subtype": "cross" if air else "cutback", "apex": 3.5}
+        return True
+
+    def step(self, sim: Simulator) -> bool:
+        t, c = self.team, self.creator
+        elapsed = sim.t - self.t_start
+        if sim.frame % 5 == 0 and self.delivery_t is None:
+            self.control_max = max(self.control_max, float(team_control(sim, t, self.cells).mean()))
+            self.two_v_one = self.two_v_one + 0.2 if self._pair_is_two_v_one(sim) else 0.0
+            self.two_v_one_max = max(self.two_v_one_max, self.two_v_one)
+        if self.mode != "actual" or self.tracked:
+            if elapsed >= self.timing.get("measure_at", 2.6):
+                self._measure(sim)
+                return self.finish(sim) if self.tracked else self._end(sim, True, "counterfactual measured")
+            return False
+        if self.pass_t is None:
+            if sim.ball_state == "flight" and sim.flight_plan.get("passer") == self.passer:
+                self.pass_t = sim.t
+                self.timing["measure_at"] = elapsed
+                self._measure(sim)
+                self.pass_event = sim.flight_plan.get("event")
+                self._attack_box(sim)  # the line has moved: time the runs again
+            elif sim.possession != t:
+                return self._end(sim, False, "lost the ball before the overlap pass")
+            elif elapsed > 6.5:
+                return self._end(sim, False, f"the overlap was never found (2 v 1 for {self.two_v_one_max:.1f} s, "
+                                             f"best lane {self.best_lane_p:.2f})")
+            elif sim.owner == self.passer:
+                sim.next_decision[self.passer] = min(sim.next_decision[self.passer], sim.t)  # watch for the moment
+            return False
+        if self.received_t is None:
+            if sim.owner == c:
+                self.received_t = sim.t
+                if not self._set_delivery(sim):
+                    return self._end(sim, False, "nobody in the box to cross to")
+            elif sim.possession != t or sim.t - self.pass_t > 4.0:
+                outcome = (self.pass_event or {}).get("outcome")
+                return self._end(sim, False, f"the overlap pass didn't arrive ({outcome})")
+            return False
+        if self.delivery_t is None:
+            if sim.ball_state == "flight" and sim.flight_plan.get("passer") == c:
+                self.delivery_t = sim.t
+                self.delivery_event = sim.flight_plan.get("event")
+                if self.spec.outcome in ("goal", "shot"):
+                    sim.directives[self.target] = {"action": "shoot_on_receive"}
+            elif sim.possession != t or sim.t - self.received_t > 3.0:
+                return self._end(sim, False, "no cross or cut-back followed")
+            return False
+        return self._await_finish(sim, self.delivery_t, self.target)
+
+    def release(self, sim: Simulator) -> None:
+        super().release(sim)
+        if getattr(self, "target", -1) >= 0:
+            sim.directives.pop(self.target, None)
+
+    def _measure(self, sim: Simulator) -> None:
+        ctrl = team_control(sim, self.team, self.cells)
+        values = np.array([location_value(*tx(sim, self.team, c)) for c in self.cells])
+        self.result.area_m2 = float(ctrl.sum() * ZONE_STEP * ZONE_STEP)
+        self.result.zone_value = float((ctrl * values).mean())
+        self.result.control_gain = float(ctrl.mean()) - self.control_start
+        self.result.ghost_track = [(sim.t, float(sim.pos[self.creator][0]), float(sim.pos[self.creator][1]))]
+
+    def causal_check(self, space_created_m2: float, gap_opens_without: bool) -> tuple[bool, str]:
+        if gap_opens_without:
+            return False, "the flank would have opened without the overlap"
+        if space_created_m2 < 15.0:
+            return False, "the overlap created too little space"
+        return True, "ok"
+
+    def verify(self, sim: Simulator) -> tuple[bool, str]:
+        s = self.result.signals
+        s["wide_zone_control_start_pct"] = round(100 * self.control_start, 1)
+        s["wide_zone_control_pct"] = round(100 * self.control_max, 1)
+        s["two_v_one_s"] = round(self.two_v_one_max, 2)
+        s["delivery_follows"] = 1.0 if self.delivery_event is not None else 0.0
+        if self.control_start >= 0.5:
+            return False, "the flank was already ours"
+        if self.control_max < 0.6:
+            return False, "the wide zone never turned"
+        if self.two_v_one_max < 1.5:
+            return False, "no 2 v 1 formed"
+        if self.delivery_event is None:
+            return False, "no cross or cut-back followed"
+        if self.delivery_event.get("outcome") == "offside":
+            return False, "the cross found a man offside"
+        if self.spec.outcome in ("chance", "shot", "goal") and (self.pass_event or {}).get("outcome") != "complete":
+            return False, "the overlap pass didn't arrive"
+        return self._check_outcome()
+
+
+class NullOverlap(Overlap):
+    """An overlap the defence handles: a second defender tracks the run, no 2 v 1 forms, and any credit given
+    is invented."""
+
+    kind = "null_overlap"
+    is_null = True
+    tracked = True
+
+    def _helpers(self, sim: Simulator, owner: int, d: int) -> list[int]:
+        """Defenders other than the one facing the ball who are already near the flank channel."""
+        zone = np.array(self._zone(sim, owner))
+        centre = zone.mean(axis=0)
+        return [k for k in sim.active_of(1 - self.team) if sim.role[k] != "GK" and k != d
+                and float(np.linalg.norm(sim.pos[k] - centre)) < 15.0]
+
+    def _defence_ready(self, sim: Simulator, owner: int, d: int, opp: list[int]) -> bool:
+        """A defence set up to handle it: a second defender is already near the channel the overlap attacks."""
+        if not self._helpers(sim, owner, d):
+            return False
+        return float(team_control(sim, self.team, zone_cells(self._zone(sim, owner))).mean()) < 0.5
+
+    def _track_overlap(self, sim: Simulator) -> None:
+        c = self.creator
+        helpers = self._helpers(sim, self.passer, self.dragged)
+        if not helpers:
+            return
+        centre = np.array(self.zone).mean(axis=0)
+        k = min(helpers, key=lambda k: float(np.linalg.norm(sim.pos[k] - centre)))
+        sim.bias[(k, "discipline")] = (0.95, sim.t + 8.0)
+        sim.set_intent(k, "track", None, 0.97, data={"who": c, "since": sim.t, "decided": True})
+        sim.lock_until[k] = sim.t + 3.0
+        sim.log_intent(k, "track_runner", 0.9)
+
+    def causal_check(self, space_created_m2: float, gap_opens_without: bool) -> tuple[bool, str]:
+        return True, "ok"  # nothing is created by construction; verify() checked that
+
+    def verify(self, sim: Simulator) -> tuple[bool, str]:
+        s = self.result.signals
+        s["wide_zone_control_gain_pts"] = round(100 * (self.control_max - self.control_start), 1)
+        s["two_v_one_s"] = round(self.two_v_one_max, 2)
+        if self.control_max - self.control_start >= 0.15:
+            return False, "the flank opened anyway"
+        if self.two_v_one_max > 0.5:
+            return False, "a 2 v 1 formed"
+        return True, "ok"
+
+
+class TimedRunInBehind(_Finish, MomentPlan):
+    """A runner on the last defender's shoulder times his run to beat the offside line and is found in behind
+    (PRD 12.7, Timed run in behind)."""
+
+    kind = "timed_run_in_behind"
+    max_wait_s = 240.0
+    max_run_s = 10.0
+    gap_threshold = 0.40
+
+    def _runner(self, sim: Simulator, owner: int) -> int:
+        t = self.team
+        c = self.slot(sim, self.spec.creator_id, t)
+        if c >= 0:
+            return c
+        cands = [i for i in sim.active_of(t) if sim.role[i] in FORWARD_ROLES and i != owner]
+        return max(cands, key=lambda i: tx(sim, t, sim.pos[i])[0]) if cands else -1
+
+    def ready(self, sim: Simulator) -> bool:
+        t = self.team
+        if sim.possession != t or sim.owner < 0 or sim.team_of[sim.owner] != t:
+            return False
+        o = sim.owner
+        ox, _ = tx(sim, t, sim.pos[o])
+        if not (35 <= ox <= 78) or sim.role[o] == "GK":
+            return False
+        opp = [k for k in sim.active_of(1 - t) if sim.role[k] != "GK"]
+        if pressure_on(sim.pos[o], sim.pos[opp]) > 0.45:
+            return False
+        line = sim.offside_cache[t]
+        if line > 84.0:
+            return False  # no room in behind
+        c = self._runner(sim, o)
+        if c < 0 or c == o:
+            return False
+        cx, cy = tx(sim, t, sim.pos[c])
+        if not (line - 6.0 <= cx <= line - 1.5) or abs(cy - W / 2) > 24 or not (12.0 <= _dist(sim, o, c) <= 40.0):
+            return False  # onside, a few metres off the line, and within range of the passer
+        wanted = self.slot(sim, self.spec.dragged_id, 1 - t)
+        line_men = [k for k in opp if tx(sim, t, sim.pos[k])[0] >= line - 3.0] if wanted < 0 else [wanted]
+        if not line_men:
+            return False
+        self.creator, self.receiver, self.passer = c, c, o
+        self.dragged = min(line_men, key=lambda k: _dist(sim, k, c))
+        return True
+
+    def steer(self, sim: Simulator) -> None:
+        """While waiting, the runner plays on the last defender's shoulder, as strikers do."""
+        t = self.team
+        if sim.possession != t or sim.frame % 25:
+            return
+        c = self._runner(sim, sim.owner)
+        if c < 0 or sim.owner == c or sim.lock_until[c] > sim.t:
+            return
+        _, cy = tx(sim, t, sim.pos[c])
+        spot = to_abs(sim, t, sim.offside_cache[t] - 3.0, float(np.clip(cy, 10, W - 10)))
+        sim.set_intent(c, "support", spot, 0.6, until=sim.t + 1.1)
+        sim.lock_until[c] = sim.t + 1.0
+
+    def start(self, sim: Simulator) -> None:
+        t, c, d, o = self.team, self.creator, self.dragged, self.passer
+        line = sim.offside_cache[t]
+        _, cy = tx(sim, t, sim.pos[c])
+        ty = float(np.clip(cy + (W / 2 - cy) * 0.3, 6, W - 6))
+        self.run_target = to_abs(sim, t, min(line + 15.0, L - 7.0), ty)
+        centre = to_abs(sim, t, min(line + 7.0, L - 8.0), ty)
+        self.zone = rect(float(centre[0]), float(centre[1]), 7.0, 6.0)
+        self.cells = zone_cells(self.zone)
+        self.control_start = float(team_control(sim, t, self.cells).mean())
+        self.ball_point = self.run_target.copy()
+        self.closest, self.best_lane_p = 99.0, 0.0
+        self.release_margin: float | None = None
+        self.beyond: float | None = None
+        self.pass_t: float | None = None
+        self.pass_event: dict | None = None
+        self.received_t: float | None = None
+        self.result.creator = sim.pid(c)
+        self.result.dragged = [sim.pid(d)]
+        self.result.receiver = sim.pid(c)
+        self.result.gap_zone = self.zone
+        if self.mode == "without":
+            sim.set_intent(c, "anchor", None, 0.5)
+            sim.lock_until[c] = sim.t + self.max_run_s
+            sim.log_intent(c, "hold_position", 0.0)
+        else:
+            sim.set_intent(c, "run", self.run_target, 0.98, until=sim.t + 3.6, data={"kind": "timed_run"})
+            sim.lock_until[c] = sim.t + 3.2
+            sim.log_intent(c, "timed_run_in_behind", 0.02)
+        if self.mode == "actual":
+            sim.directives[o] = {"action": "pass", "to": c, "hold": True, "subtype": "through",
+                                 "when": self._pass_when, "point_fn": lambda s: self.ball_point}
+
+    def _pass_when(self, sim: Simulator) -> bool:
+        # Release as he reaches the line at speed: still level, about to be clean through.
+        t, o, c = self.team, sim.owner, self.creator
+        if o < 0:
+            return False
+        line = offside_line_team(sim, t)
+        cx, _ = tx(sim, t, sim.pos[c])
+        forward = float(sim.vel[c][0]) * sim.teams[t].direction
+        self.closest = min(self.closest, abs(cx - line))
+        if not (line - 3.0 <= cx <= line + 0.25) or forward < 2.5:
+            return False
+        # Into his path: a driven ball along the ground or a chip over the line, into the channel either side
+        # of the nearest centre-back, at a few leads; whichever beats the defence.
+        heading = self.run_target - sim.pos[c]
+        heading = heading / (float(np.linalg.norm(heading)) or 1.0)
+        pace = max(float(np.linalg.norm(sim.vel[c])), 5.0)
+        best_p, best_air, pt = 0.0, False, None
+        for lead_s in (0.6, 1.1, 1.6):
+            for lateral in (-5.0, 0.0, 5.0):
+                lead = tx(sim, t, sim.pos[c] + heading * pace * (lead_s + _dist(sim, o, c) / 25.0))
+                cand = to_abs(sim, t, min(lead[0], L - 9.0), float(np.clip(lead[1] + lateral, 4.0, W - 4.0)))
+                for air in (False, True):
+                    flight = (plan_aerial(sim.pos[o].copy(), cand.copy(), apex=3.6) if air
+                              else plan_ground(sim.pos[o].copy(), cand.copy(), arrival_speed=THROUGH_ARRIVAL))
+                    p = sim.assess(o, c, flight).p_success
+                    if p > best_p:
+                        best_p, best_air, pt = p, air, cand
+        self.best_lane_p = max(self.best_lane_p, best_p)
+        if pt is None or best_p < 0.3:
+            return False
+        self.ball_point = pt
+        self.release_margin = line - cx
+        sim.idata[c]["point"] = pt  # the runner bends his run onto the ball
+        if o in sim.directives:
+            sim.directives[o].update(aerial=best_air, apex=3.6, arrival=THROUGH_ARRIVAL)
+        return True
+
+    def step(self, sim: Simulator) -> bool:
+        t, c = self.team, self.creator
+        elapsed = sim.t - self.t_start
+        if self.mode != "actual":
+            if elapsed >= self.timing.get("measure_at", 2.0):
+                self._measure(sim)
+                return self._end(sim, True, "counterfactual measured")
+            return False
+        if self.pass_t is None:
+            if sim.ball_state == "flight" and sim.flight_plan.get("passer") == self.passer:
+                self.pass_t = sim.t
+                self.timing["measure_at"] = elapsed
+                self._measure(sim)
+                self.pass_event = sim.flight_plan.get("event")
+                if self.spec.outcome in ("goal", "shot"):
+                    sim.directives[c] = {"action": "shoot_on_receive"}
+            elif sim.possession != t:
+                return self._end(sim, False, "lost the ball before the pass")
+            elif elapsed > 5.0:
+                return self._end(sim, False, f"the pass never came while he was onside (best lane "
+                                             f"{self.best_lane_p:.2f}, closest to the line {self.closest:.1f} m)")
+            elif sim.owner == self.passer:
+                sim.next_decision[self.passer] = min(sim.next_decision[self.passer], sim.t)  # watch for the moment
+            return False
+        if self.received_t is None:
+            if sim.owner == c:
+                self.received_t = sim.t
+                self.beyond = tx(sim, t, sim.pos[c])[0] - offside_line_team(sim, t)
+            elif sim.possession != t or sim.t - self.pass_t > 4.0:
+                return self.finish(sim)
+            return False
+        return self._await_finish(sim, self.received_t, c)
+
+    def _measure(self, sim: Simulator) -> None:
+        ctrl = team_control(sim, self.team, self.cells)
+        values = np.array([location_value(*tx(sim, self.team, p)) for p in self.cells])
+        self.result.area_m2 = float(ctrl.sum() * ZONE_STEP * ZONE_STEP)
+        self.result.zone_value = float((ctrl * values).mean())
+        self.result.control_gain = float(ctrl.mean()) - self.control_start
+        self.result.ghost_track = [(sim.t, float(sim.pos[self.creator][0]), float(sim.pos[self.creator][1]))]
+
+    def causal_check(self, space_created_m2: float, gap_opens_without: bool) -> tuple[bool, str]:
+        if gap_opens_without:
+            return False, "the space in behind was there without the run"
+        if space_created_m2 < 15.0:
+            return False, "the run won too little space in behind"
+        return True, "ok"
+
+    def verify(self, sim: Simulator) -> tuple[bool, str]:
+        s = self.result.signals
+        margin = self.release_margin if self.release_margin is not None else -99.0
+        s["onside_margin_m"] = round(margin, 2)
+        s["onside_at_release"] = 1.0 if margin >= -0.3 else 0.0
+        s["beyond_line_on_receipt_m"] = round(self.beyond, 2) if self.beyond is not None else 0.0
+        if self.pass_event is None:
+            return False, "no pass"
+        if margin < -0.3 or self.pass_event.get("outcome") == "offside":
+            return False, "offside at release"
+        if self.beyond is None or self.pass_event.get("outcome") != "complete":
+            return False, f"the pass in behind didn't arrive ({self.pass_event.get('outcome')})"
+        if self.beyond < 3.0:
+            return False, "not clear of the line on receipt"
+        return self._check_outcome()
+
+
 def _cosine(a: np.ndarray, b: np.ndarray) -> float:
     na, nb = float(np.linalg.norm(a)), float(np.linalg.norm(b))
     if na < 1e-6 or nb < 1e-6:
@@ -496,6 +1086,9 @@ def _inside(point: np.ndarray, polygon: list[tuple[float, float]], pad: float = 
 PLANS: dict[str, type[MomentPlan]] = {
     "decoy_run": DecoyRun,
     "null_run": NullRun,
+    "overlap": Overlap,
+    "null_overlap": NullOverlap,
+    "timed_run_in_behind": TimedRunInBehind,
 }
 
 

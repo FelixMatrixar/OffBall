@@ -1,0 +1,53 @@
+[
+ {
+  "schema_version": "2.0",
+  "moment_id": "smk5-k01",
+  "match_id": "smk5",
+  "source": "planted",
+  "type": "null_overlap",
+  "period": 1,
+  "t_start_ms": 186120,
+  "t_end_ms": 188760,
+  "team_id": "kes",
+  "creator_id": "kes-03",
+  "dragged_ids": [
+   "ash-06"
+  ],
+  "receiver_id": "kes-03",
+  "gap_zone": [
+   [
+    65.6,
+    56.0
+   ],
+   [
+    81.6,
+    56.0
+   ],
+   [
+    81.6,
+    68.0
+   ],
+   [
+    65.6,
+    68.0
+   ]
+  ],
+  "expected": {
+   "wide_zone_control_gain_pts_max": 15.0,
+   "two_v_one_s_max": 0.5
+  },
+  "observed": {
+   "wide_zone_control_gain_pts": 10.1,
+   "two_v_one_s": 0.4
+  },
+  "counterfactual": {
+   "space_created_m2": 0.0,
+   "epv_gain": 0.0,
+   "gap_opens_without_run": false,
+   "runs": 0
+  },
+  "is_null": true,
+  "outcome": "none",
+  "attempts": 2
+ }
+]

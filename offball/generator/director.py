@@ -27,6 +27,9 @@ EXPECTED: dict[str, dict[str, float]] = {
     "decoy_run": {"defender_displacement_m_min": 8, "zone_control_gain_pts_min": 40, "pass_after_gap_s_max": 2,
                   "defender_follow_cosine_min": 0.6},
     "null_run": {"defender_displacement_m_max": 5, "zone_control_gain_pts_max": 15},
+    "overlap": {"wide_zone_control_pct_min": 60, "two_v_one_s_min": 1.5, "delivery_follows": 1},
+    "null_overlap": {"wide_zone_control_gain_pts_max": 15, "two_v_one_s_max": 0.5},
+    "timed_run_in_behind": {"onside_at_release": 1, "beyond_line_on_receipt_m_min": 3},
 }
 
 
@@ -168,7 +171,7 @@ def _counterfactual(sim: Simulator, plan: MomentPlan, runs: int) -> Counterfactu
     area_wo = np.median([r.area_m2 for r in rows["without"]]) if rows["without"] else 0.0
     val_w = np.median([r.zone_value for r in rows["with"]]) if rows["with"] else plan.result.zone_value
     val_wo = np.median([r.zone_value for r in rows["without"]]) if rows["without"] else 0.0
-    opens = [r.control_gain >= 0.40 for r in rows["without"]]
+    opens = [r.control_gain >= plan.gap_threshold for r in rows["without"]]
     return CounterfactualTruth(
         space_created_m2=round(float(area_w - area_wo), 1),
         epv_gain=round(float(val_w - val_wo), 4),

@@ -1,0 +1,318 @@
+[
+ {
+  "gate": 1,
+  "name": "Realism",
+  "status": "fail",
+  "summary": "Outside: median_pass_m 16.1 (real 5th\u201395th: 15.9817\u201319.7506); long_pass_share 0.178 (real 5th\u201395th: 0.1429\u20130.2675); goals 3.57 (real 5th\u201395th: 0\u20135.0424); shots_in_box_share 0.546 (real 5th\u201395th: 0.387\u20130.75); possessions 218 (real 5th\u201395th: 211.502\u2013309.004); offsides 0.791 (real 5th\u201395th: 0.9747\u20137.9918); corners 7.83 (real 5th\u201395th: 4.9905\u201315.8026); throw_ins 44.7 (real 5th\u201395th: 29.0156\u201362.9388); running_share 0.192 (real 5th\u201395th: 0.1091\u20130.183); KS shot_distance_m 0.201 (at most 0.1); KS player_peak_speed_kmh 0.127 (at most 0.1)",
+  "numbers": {
+   "per_metric": {
+    "passes": {
+     "share_inside_p5_p95": 0.9,
+     "mean": 1025.765,
+     "real_p5": 765.8392,
+     "real_p95": 1174.8291,
+     "compared": "each match against real matches"
+    },
+    "completion": {
+     "share_inside_p5_p95": 1.0,
+     "mean": 0.805,
+     "real_p5": 0.7437,
+     "real_p95": 0.8634,
+     "compared": "each match against real matches"
+    },
+    "median_pass_m": {
+     "share_inside_p5_p95": 0.5,
+     "mean": 16.061,
+     "real_p5": 15.9817,
+     "real_p95": 19.7506,
+     "compared": "each match against real matches"
+    },
+    "long_pass_share": {
+     "share_inside_p5_p95": 0.7,
+     "mean": 0.178,
+     "real_p5": 0.1429,
+     "real_p95": 0.2675,
+     "compared": "each match against real matches"
+    },
+    "shots": {
+     "share_inside_p5_p95": 0.9,
+     "mean": 22.734,
+     "real_p5": 14.8808,
+     "real_p95": 31.2604,
+     "compared": "each match against real matches"
+    },
+    "goals": {
+     "share_inside_p5_p95": 0.8,
+     "mean": 3.575,
+     "real_p5": 0.0,
+     "real_p95": 5.0424,
+     "compared": "each match against real matches"
+    },
+    "shots_in_box_share": {
+     "share_inside_p5_p95": 0.7,
+     "mean": 0.546,
+     "real_p5": 0.387,
+     "real_p95": 0.75,
+     "compared": "each match against real matches"
+    },
+    "possessions": {
+     "share_inside_p5_p95": 0.8,
+     "mean": 218.41,
+     "real_p5": 211.5022,
+     "real_p95": 309.0039,
+     "compared": "each match against real matches"
+    },
+    "fouls": {
+     "share_inside_p5_p95": 1.0,
+     "mean": 16.739,
+     "real_p5": 13.5196,
+     "real_p95": 29.007,
+     "compared": "each match against real matches"
+    },
+    "offsides": {
+     "share_inside_p5_p95": 0.6,
+     "mean": 0.791,
+     "real_p5": 0.9747,
+     "real_p95": 7.9918,
+     "compared": "each match against real matches"
+    },
+    "corners": {
+     "share_inside_p5_p95": 0.7,
+     "mean": 7.832,
+     "real_p5": 4.9905,
+     "real_p95": 15.8026,
+     "compared": "each match against real matches"
+    },
+    "throw_ins": {
+     "share_inside_p5_p95": 0.8,
+     "mean": 44.727,
+     "real_p5": 29.0156,
+     "real_p95": 62.9388,
+     "compared": "each match against real matches"
+    },
+    "km_per_outfield": {
+     "mean_inside_p5_p95": true,
+     "mean": 10.915,
+     "real_p5": 9.58,
+     "real_p95": 12.2488,
+     "compared": "set average against season averages"
+    },
+    "hsr_share": {
+     "mean_inside_p5_p95": true,
+     "mean": 0.046,
+     "real_p5": 0.0428,
+     "real_p95": 0.0973,
+     "compared": "set average against season averages"
+    },
+    "running_share": {
+     "mean_inside_p5_p95": false,
+     "mean": 0.192,
+     "real_p5": 0.1091,
+     "real_p95": 0.183,
+     "compared": "set average against season averages"
+    },
+    "sprint_share": {
+     "mean_inside_p5_p95": true,
+     "mean": 0.023,
+     "real_p5": 0.0059,
+     "real_p95": 0.0282,
+     "compared": "set average against season averages"
+    },
+    "in_play_share": {
+     "mean_inside_p5_p95": true,
+     "mean": 0.546,
+     "real_p5": 0.5091,
+     "real_p95": 0.5992,
+     "compared": "set average against season averages"
+    }
+   },
+   "ks": {
+    "pass_length_m": 0.078,
+    "shot_distance_m": 0.201,
+    "player_km_per95": 0.065,
+    "player_peak_speed_kmh": 0.127
+   }
+  }
+ },
+ {
+  "gate": 2,
+  "name": "Physics",
+  "status": "fail",
+  "summary": "Over the limits: accel (563 times), separation (3630 times)",
+  "numbers": {
+   "worst": {
+    "speed": 9.06,
+    "accel": 7.56,
+    "decel": 10.23,
+    "turn": 13.0,
+    "pass_ball": 25.85,
+    "shot_ball": 36.0
+   },
+   "limits": {
+    "speed": 10.5,
+    "accel": 7.0,
+    "decel": 9.0,
+    "turn": 15.0,
+    "pass_ball": 35.0,
+    "shot_ball": 40.0,
+    "separation": 0.5
+   },
+   "violations": {
+    "speed": 0,
+    "accel": 563,
+    "decel": 10,
+    "turn": 0,
+    "off_pitch": 0,
+    "separation": 3630,
+    "pass_ball": 0,
+    "shot_ball": 0
+   },
+   "frames": 1438193
+  }
+ },
+ {
+  "gate": 3,
+  "name": "Consistency",
+  "status": "pass",
+  "summary": "Events, tracking and the score agree.",
+  "numbers": {
+   "c01": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c02": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c03": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c04": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c05": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c06": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c07": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c08": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c09": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   },
+   "c10": {
+    "passer_at_ball": 1.0,
+    "receiver_at_ball": 1.0,
+    "score_matches_goals": true,
+    "player_count_problems": 0
+   }
+  }
+ },
+ {
+  "gate": 4,
+  "name": "Behaviour",
+  "status": "fail",
+  "summary": "behindrun 1.14 per 30 min on average (real average 2.426)",
+  "numbers": {
+   "behindrun": {
+    "mean": 1.14,
+    "real_mean": 2.426,
+    "real_median": 1.13
+   },
+   "overlaprun": {
+    "mean": 0.56,
+    "real_mean": 0.7908,
+    "real_median": 0.3
+   }
+  }
+ },
+ {
+  "gate": 5,
+  "name": "Discriminator",
+  "status": "not run",
+  "summary": "Needs SkillCorner's tracking files (about 89 MB a match, in Git LFS), not downloaded yet.",
+  "numbers": {}
+ },
+ {
+  "gate": 6,
+  "name": "Detectability",
+  "status": "not run",
+  "summary": "No answer keys with detectable moments.",
+  "numbers": {}
+ },
+ {
+  "gate": 7,
+  "name": "Novelty",
+  "status": "pass",
+  "summary": "No real names, and no possession closer than 3.4 m on average to any of 20000 real ones.",
+  "numbers": {
+   "blocklist_size": 728,
+   "real_names_found": 0,
+   "possessions_checked": 1044,
+   "real_possessions": 20000,
+   "closest_mean_m": 3.36,
+   "copies": 0
+  }
+ },
+ {
+  "gate": 8,
+  "name": "Diversity",
+  "status": "pass",
+  "summary": "Closest pair of matches 1.03 interquartile ranges apart; 10 different scorelines.",
+  "numbers": {
+   "closest_pair": 1.033,
+   "scorelines": [
+    "{'bra': 0, 'sal': 3}",
+    "{'cor': 0, 'wre': 6}",
+    "{'dun': 1, 'lar': 1}",
+    "{'fen': 3, 'gle': 1}",
+    "{'har': 1, 'ive': 2}",
+    "{'jun': 0, 'low': 0}",
+    "{'kes': 6, 'ash': 1}",
+    "{'mor': 1, 'qua': 2}",
+    "{'nor': 2, 'oak': 1}",
+    "{'pel': 4, 'riv': 1}"
+   ]
+  }
+ },
+ {
+  "gate": 9,
+  "name": "Determinism",
+  "status": "pass",
+  "summary": "70 files match their generation hashes.",
+  "numbers": {
+   "files": 70,
+   "changed": []
+  }
+ }
+]
