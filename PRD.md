@@ -357,7 +357,7 @@ Every player gets **Space Created** (m²) and **Threat Created** (gain in space 
 
 ### 10.4 Ask OffBall
 
-Fans ask questions by text or voice ("Why does Ashmoor's left side keep getting overloaded?"). The Pundit plans queries, runs them through MCP tools and the Fabric data agent, may hand off to the Tactician for a what-if, has every claim fact-checked, and answers in the viewer's mode and language, often with a chart.
+Fans ask questions by text or voice ("Why does Ashmoor's left side keep getting overloaded?"). The Pundit plans queries, runs them through MCP tools, including KQL over the Fabric Eventhouse (and the Fabric data agent on a paid Fabric capacity, 17.4), may hand off to the Tactician for a what-if, has every claim fact-checked, and answers in the viewer's mode and language, often with a chart.
 
 - Every answer cites evidence; anything it couldn't verify is labelled as such.
 - Out-of-scope or unsafe requests are declined.
@@ -485,8 +485,8 @@ Hexagons are AI agents in Microsoft Foundry; everything else is deterministic co
 | OffBall MCP server | Azure Container Apps | Match-data tools for agents; a public read-only subset for developers |
 | Azure MCP Server | Azure Container Apps, from Microsoft's `azmcp-foundry-aca-mi` template | Azure operations for the Engineer and Validator; its identity can read telemetry and write only the degrade flags (14.8) |
 | Match state | Azure Cosmos DB; the last minute of frames in the live service's memory | Partitioned by match; events, metrics, agent messages, workflow checkpoints |
-| Analytics | Microsoft Fabric: Eventstream, Eventhouse, Real-Time Dashboards, Activator, data agent, OneLake, notebooks, Power BI | KQL views of possession, territory, momentum, pressure and agent latency; alerts; season-scale questions (17.4) |
-| Season search | The OffBall MCP server, over the season's moment file | Season moments and explanations for the Pundit and season context; KQL and the Fabric data agent answer season-scale questions |
+| Analytics | Microsoft Fabric: Eventstream, Eventhouse, Real-Time Dashboards, Activator, OneLake, notebooks, Power BI, and the data agent on a paid capacity (18.9) | KQL views of possession, territory, momentum, pressure and agent latency; alerts; season-scale questions (17.4) |
+| Season search | The OffBall MCP server, over the season's moment file | Season moments and explanations for the Pundit and season context; KQL answers season-scale questions, and the Fabric data agent does too on a paid capacity |
 | Real-time delivery | Azure Web PubSub, fed by the live service's relay | Overlay feed and frames to browsers, second screens and partners (11.6) |
 | API | Azure Container Apps | Python (FastAPI); the calls the frontend makes (11.7) |
 | Counterfactual workers | Azure Container Apps | Python; run the emergent engine from the observed state for the Tactician, 32 re-runs in parallel |
@@ -638,7 +638,7 @@ The public MCP endpoint is the `mcp` service's own, and Foundry serves the A2A a
 | Fabric | Eventhouse and OneLake | KQL tables from `feed` and `insights`; shortcuts to the datasets (17.4) | By match and time | 30 days in the hot cache |
 | App Configuration | One store | The degrade flags, and nothing else (14.7) | A label per environment | Current values |
 
-Cosmos DB uses session consistency and serverless capacity. Frames aren't stored anywhere new: `live` keeps each match's last minute in memory, and Event Hubs and the match files hold the rest. Nothing in any store identifies a viewer (18.6).
+Cosmos DB uses session consistency and runs in its free tier: 1,000 RU/s of provisioned throughput shared by the database's containers (18.9). The load test (18.3) shows whether 10 live matches at once need more. Frames aren't stored anywhere new: `live` keeps each match's last minute in memory, and Event Hubs and the match files hold the rest. Nothing in any store identifies a viewer (18.6).
 
 ### 11.9 Replays, live runs and the showcase
 
@@ -937,7 +937,7 @@ Eleven agents in three crews, hosted in Microsoft Foundry Agent Service, coordin
 | Broadcast | Persona | Re-voices and filters the verified claims per mode, club, player, metric and language; writes speech markup and audio descriptions | Verified claims, viewer settings | Overlay entries and speech | `glossary_lookup`, `translate` | Falls back to Translator output with the glossary, then to English analyst text with a translation notice |
 | Broadcast | Producer | Schedules graphics: timing, priority, collisions, density, human approvals, retractions, recaps and Space Centre jumps | Persona output, producer settings, screen state | Scheduled overlay feed, recap packages | `schedule_overlay`, `retract_overlay`, `request_approval`, `render_clip` | Falls back to a deterministic scheduler: first in, first out, at least 20 s between graphics |
 | Broadcast | Engineer | Watches the live system's health, diagnoses problems, applies pre-approved mitigations and explains incidents to the producer | Traces and metrics, ingest lag, service health, Activator alerts | Incident notes, degrade-flag changes | Azure MCP Server: Log Analytics and metrics queries, Cosmos DB queries, App Configuration get and set on the degrade-flag store; `query_match_state` | The fixed fallbacks in 14.5 keep working without it, and alerts go straight to the human producer |
-| Fan | Pundit | Answers fans' questions by text or voice, grounded in match and season data, with charts where helpful | Question, match state, season, Fabric | Answer with claims, evidence and an optional chart spec | `query_match_state`, `run_kql`, `search_moments`, `run_sandboxed_analysis`, the Fabric data agent; hands off to the Tactician, Fact-checker and Persona | Says what it couldn't verify; declines out-of-scope questions; Content Safety blocks unsafe ones |
+| Fan | Pundit | Answers fans' questions by text or voice, grounded in match and season data, with charts where helpful | Question, match state, season, Fabric | Answer with claims, evidence and an optional chart spec | `query_match_state`, `run_kql`, `search_moments`, `run_sandboxed_analysis`, and the Fabric data agent on a paid capacity (17.4); hands off to the Tactician, Fact-checker and Persona | Says what it couldn't verify; declines out-of-scope questions; Content Safety blocks unsafe ones |
 
 ### 14.2 Orchestration patterns
 
@@ -1681,11 +1681,11 @@ Statuses are as Microsoft's Foundry blog gave them up to 7 July 2026. Each is ch
 
 | Capability | How OffBall uses it | Where judges see it |
 | --- | --- | --- |
-| Eventstream | Takes events, metrics, overlays and agent hops from Event Hubs | Architecture slide |
+| Eventstream | Takes events, metrics, overlays and agent hops from Event Hubs, with a listen-only key (18.12) | Architecture slide |
 | Eventhouse (KQL) | Tables and materialized views for possession, territory, momentum, pressure, physical load and agent latency | KQL in `fabric/` |
 | Real-Time Dashboards | A producer operations dashboard, an analyst dashboard, and a data-quality and benchmark dashboard | The dashboard at 1:04 in the video; README |
 | Activator | Rules for patterns that build over minutes: a fatigue gap forming, a momentum swing, latency trending toward its budget. Each alert reaches the producer console and the Engineer through a User Data Function (below). | The alert at 1:04 in the video |
-| Fabric data agent | Answers the Pundit's season-scale questions, connected as a tool in Foundry Agent Service | Ask OffBall at 1:04 in the video |
+| Fabric data agent | Answers the Pundit's season-scale questions, connected as a tool in Foundry Agent Service. It needs a paid F capacity, because trial capacities don't support it; on the trial, the Pundit asks the Eventhouse directly with parameterised KQL through `run_kql` (14.8, 18.9). | README; Ask OffBall at 1:04 in the video, through KQL on the trial |
 | OneLake | Home of the benchmark, season and video sets, through shortcuts to Blob Storage | `DATASHEET.md` |
 | Notebooks | Calibration fits and benchmark analysis | `fabric/` in the repo |
 | Power BI | Post-match and benchmark reports, with Vega-Lite visuals through Deneb | README |
@@ -1710,7 +1710,7 @@ These count toward "Azure app and AI services" and "Azure databases" in criterio
 | Azure AI Translator | Translation with a custom football glossary | Persona fallback lost |
 | Azure AI Content Safety | Prompt shields, content filters and groundedness detection | Pundit unsafe to expose |
 | Application Insights (Azure Monitor) | OpenTelemetry traces of every agent hop; latency, cost and frame-time metrics | No traces, and nothing for the Engineer to read |
-| Microsoft Entra managed identities | No secrets anywhere; separate identities for the live pipeline, the truth store and Azure MCP Server (18.11) | Weaker security |
+| Microsoft Entra managed identities | No secrets in code or settings; separate identities for the live pipeline, the truth store and Azure MCP Server, in one tenant with Fabric (18.11) | Weaker security |
 | Azure Developer CLI (azd) and Bicep | `azd up` deploys everything to any subscription | Hard to reproduce |
 | Babylon.js and Playwright (Microsoft-led open source) | 3D views and the headless video renderer; end-to-end tests, visual regression and clip capture | No 3D, weaker tests |
 
@@ -1769,7 +1769,7 @@ Every cloud environment is deployed from CI using workload identity federation, 
 
 ### 18.5 Security
 
-- Managed identities everywhere and no secrets: keys and connection strings are turned off wherever Azure allows it.
+- Managed identities everywhere and no secrets: keys and connection strings are turned off wherever Azure allows it. The one exception is a listen-only Event Hubs key that Fabric's Eventstream needs (18.12).
 - Every data service accepts only Microsoft Entra authentication from our own identities (18.11, 18.12).
 - The public endpoints are the web app, the API, the public MCP endpoint and Web PubSub; the API rate-limits its costly calls (11.7).
 - Code, dependency, secret and container image scanning in CI, plus an SBOM.
@@ -1805,22 +1805,32 @@ Every cloud environment is deployed from CI using workload identity federation, 
 
 ### 18.9 Azure resources
 
-The deployment uses the essential Azure services and nothing more. Each environment is one resource group, `rg-offball-{env}`, in one region chosen for the Foundry models we need, Container Apps and Fabric (open question 2), and every resource is tagged with its environment. This is the whole list:
+The deployment uses the essential Azure services and nothing more. Each environment is one resource group, `rg-offball-{env}`, in one region chosen for the Foundry models we need, Container Apps and Fabric (open question 2), and every resource is tagged with its environment.
+
+**The subscription.** A new Azure free account gives $200 of credit to use within 30 days, but it doesn't suit OffBall as it stands. Free-trial subscriptions reportedly start with no Foundry model quota, and when the credit or the 30 days run out, the account and its services are disabled, which could take the demo down during judging (rule 4.8). So the subscription moves to pay-as-you-go as soon as it is created. Upgrading within the 30 days keeps the unused credit. Where a model still shows no quota after the upgrade, we request it on the Foundry quota page before the work that needs it (open question 2). Budget alerts limit what can be spent (18.16).
+
+**One tenant.** The subscription is created with the team's business account, the same account that starts the Fabric trial, so Azure and Fabric share one Microsoft Entra tenant. Our managed identities, the Foundry project and the Fabric workspace can then grant each other access directly, and no connection has to cross tenants, which is where Fabric links tend to fail.
+
+This is the whole list:
 
 | Resource | Tier | What it's for |
 | --- | --- | --- |
-| Microsoft Foundry: a resource and a project | Pay as you go | The agents, models, evaluations and tracing; Speech, Translator and Content Safety come with the resource |
-| Container Apps environment | Consumption | Every service, both MCP servers and the jobs (11.4); scales to zero |
+| Microsoft Foundry: a resource and a project | Pay as you go, on the upgraded subscription | The agents, models, evaluations and tracing; Speech, Translator and Content Safety come with the resource |
+| Container Apps environment | Consumption; the first 180,000 vCPU-seconds, 360,000 GiB-seconds and 2 million requests each month are free | Every service, both MCP servers and the jobs (11.4); scales to zero |
 | Container Registry | Basic | The images azd builds |
 | Event Hubs | Standard, one throughput unit | The live feed, alerts, and Fabric's input (11.5) |
-| Cosmos DB | Serverless | Match state, the agent log and workflow checkpoints (11.8) |
+| Cosmos DB | Free tier in production: 1,000 RU/s of provisioned throughput shared by the database, and 25 GB. Only one account per subscription gets the free tier, so dev runs serverless and pays by use. | Match state, the agent log and workflow checkpoints (11.8) |
 | Storage: the main account and the truth account | Standard | Datasets, replays and clips; truth that only the `truth` identity can read (12.9) |
-| Web PubSub | Free in dev, Standard in production | The live stream and second-screen pairing (11.6) |
+| Web PubSub | Standard, one unit; more only if the load test needs them (18.3) | The live stream and second-screen pairing (11.6) |
 | Static Web Apps | Free in dev, Standard in production | The web app, served from a global edge |
-| App Configuration | Free in dev, Standard in production | The degrade flags, and nothing else (14.7) |
+| App Configuration | Standard | The degrade flags, and nothing else (14.7) |
 | Application Insights, with a Log Analytics workspace | Pay as you go | Traces of every agent hop, the Engineer's telemetry, availability probes |
 | Managed identities | Three, user-assigned | 18.11 |
-| Fabric capacity | The smallest F SKU that runs Real-Time Intelligence; optional | Eventstream, Eventhouse, dashboards, Activator and the data agent (17.4) |
+| Fabric capacity | The free 60-day Fabric trial (F4, or F64 where the trial can be raised); a paid F capacity only if the data agent is wanted; optional | Eventstream, Eventhouse, dashboards and Activator; the data agent on a paid capacity only (17.4) |
+
+**Why not the free tiers.** Web PubSub's Free tier allows 20 connections and 20,000 messages a day. Frame batches are over 2 KB, so each counts as two messages, and one person watching live would use up the day in about half an hour. Replay doesn't use Web PubSub at all. App Configuration's Free tier allows 1,000 requests a day and then refuses every request until midnight UTC, which services watching the flags would soon hit.
+
+**Fabric on the trial capacity.** Fabric's trial is free, separate from the Azure credit, and lasts 60 days, so starting it before submission covers judging. It has to be started by a work or school account, so we start it with the team's business account, in the same tenant as the Azure subscription; the tenant's setting that lets users try Fabric's paid features must be on (open question 17). The trial runs every Real-Time Intelligence workload, but not the Fabric data agent or the other AI features. So on the trial, the Pundit answers season-scale questions with parameterised KQL through `run_kql` (14.8), and the data agent joins as a tool only on a paid F capacity (17.4). When the trial ends, Fabric items stop until a paid capacity takes over, and the show keeps running without them (section 24).
 
 **Left out on purpose.** Each of these adds cost and moving parts the product doesn't need. Any of them can be added later without changing how OffBall works.
 
@@ -1829,8 +1839,8 @@ The deployment uses the essential Azure services and nothing more. Each environm
 | API Management | The API keeps its own rate limits (11.7), and Agent Framework middleware enforces token and time budgets (14.10) |
 | Front Door and a web application firewall | Static Web Apps already serves from a global edge |
 | Azure Managed Redis | The `live` service keeps the last minute of frames in memory, and the workers are called over HTTP (11.4) |
-| Azure AI Search | `search_moments` searches the season's moment file; KQL and the Fabric data agent answer season-scale questions |
-| Key Vault | There are no secrets: managed identities everywhere, and producer tokens are random values stored with their run (11.7) |
+| Azure AI Search | `search_moments` searches the season's moment file; KQL answers season-scale questions, and the Fabric data agent does too on a paid capacity |
+| Key Vault | There's nothing to keep in it: managed identities everywhere, producer tokens are random values stored with their run (11.7), and the one key, Fabric's listen-only Event Hubs key, lives only in Fabric's connection (18.12) |
 | A second region | Replay is static and keeps playing through an outage; live AI falls back to templates (14.14) |
 | A staging environment | Every change runs in dev first, and production gets the same images (18.13) |
 | A virtual network and private endpoints | Every data service accepts only Entra authentication from our identities (18.12) |
@@ -1852,7 +1862,7 @@ The deployment uses the essential Azure services and nothing more. Each environm
 
 | azd hook | What it does |
 | --- | --- |
-| `postprovision` | Uploads the showcase and smoke sets, registers each agent version in Foundry from its manifest, and deploys the Fabric items in `fabric/` when a capacity is given |
+| `postprovision` | Uploads the showcase and smoke sets, registers each agent version in Foundry from its manifest, and, when a capacity is given, deploys the Fabric items in `fabric/` and gives Eventstream its listen-only Event Hubs key (18.12) |
 | `predeploy` | Builds the web app with the environment's API and feed addresses |
 | `postdeploy` | The smoke test: the replay loads, the API answers, and a 60x run of a smoke match puts a verified caption on the stream |
 
@@ -1860,7 +1870,7 @@ The only required input is `AZURE_LOCATION`; `FABRIC_CAPACITY_ID` and `ENABLE_GP
 
 ### 18.11 Identities and access
 
-Three user-assigned managed identities, plus the Foundry project's own. Keys and connection strings are turned off on every resource that allows it.
+Three user-assigned managed identities, plus the Foundry project's own, all in the one tenant Azure and Fabric share (18.9). Keys and connection strings are turned off on every resource that allows it, with one exception for Fabric (18.12).
 
 | Identity | Used by | Roles |
 | --- | --- | --- |
@@ -1868,11 +1878,13 @@ Three user-assigned managed identities, plus the Foundry project's own. Keys and
 | `truth` | `generator`, `evaluator` | Blob data contributor on the truth account, the only role anyone holds there; blob data contributor on the main account |
 | `azmcp` | Azure MCP Server | As in 14.8 |
 | Foundry project | The agents | The app roles of both MCP servers (14.8); Cosmos DB data contributor, for workflow checkpoints |
+| Fabric Eventstream | Reading the live data into Fabric | A shared access policy with Listen rights only, on the `feed` and `insights` hubs: the only key in the system (18.12) |
 | CI | Deployments | Federated credentials for the main branch and release tags; contributor on its environment's resource group, and permission to assign only the roles above |
 
 ### 18.12 Network
 
 - **No virtual network.** Each data service accepts only Microsoft Entra tokens from our identities, with keys turned off. Storage refuses anonymous access except on the main account's public containers, and the truth account has none.
+- **One key, for Fabric.** Fabric's Eventstream reads Event Hubs with a shared access key, so Event Hubs keeps local authentication on for a single policy with Listen rights on `feed` and `insights`. The key lives only in Fabric's connection, is never written to code or settings, and can be rotated at any time. If we'd rather have no key at all, the live service pushes to an Eventstream custom endpoint instead, signing in with its managed identity; that works because Azure and Fabric share a tenant (18.9).
 - **Public endpoints.** Static Web Apps (the web app); the `api` and `mcp` services' HTTPS ingress; Web PubSub client connections, with tokens from negotiate; the public containers for replays, clips and datasets; and the Azure MCP Server's ingress, which accepts only tokens for its own app registration (14.8).
 - **Internal only.** `live`, `cf-workers` and `evaluator` have internal ingress, reached by the other services inside the Container Apps environment.
 - A virtual network, private endpoints or a firewall can be added later without changing any service.
@@ -1896,7 +1908,7 @@ Three user-assigned managed identities, plus the Foundry project's own. Keys and
 | Service settings and switches | Container Apps environment variables, set in Bicep per environment | `STREAM_FRAME_BATCH=5`, `LIVE_MAX_MATCHES=10`, `TOKENS_PER_MATCH`, `LIVE_RUNS_ENABLED`, `FAULTS` (dev only) |
 | Degrade flags | App Configuration, which holds nothing else | `explainer.model_tier`, `persona.live_languages`, `producer.density`, `tactician.enabled`, `voice.enabled`: changed by the Engineer or the producer, and reverted after 10 minutes unless kept (14.7) |
 | Web build settings | Set by `predeploy` | `VITE_FEED_URL` and `VITE_FABRIC_DASHBOARD_URL`, which exist; `VITE_API_BASE`, to add (`INTEGRATION.md` section 9) |
-| Secrets | None | Managed identities replace every key |
+| Secrets | None in code, CI or settings | Managed identities replace every key except Fabric's listen-only Event Hubs key, which lives only in Fabric's connection (18.12) |
 
 A new setting rolls out as a new Container Apps revision. Degrade flags take effect at once, because services watch the store.
 
@@ -1924,7 +1936,7 @@ The hosted demo must stay free, unrestricted and working from submission until 1
 - **Frozen after submission.** Production is treated as final at the end of the submission period (rule 5). Until judging ends, only operational changes reach it: scaling, restarts, and switching degrade flags and settings. No code, agent version or infrastructure change is deployed, and the learning loop runs in dev only.
 - **Replay first.** The judges' default path is the web app and the replay, both from Static Web Apps. They don't depend on any backend service, and with the backend down the built-in replay still plays (OPS-9).
 - **Probes.** Application Insights availability tests from several locations every 5 minutes check that the web app, the replay feed and the API answer; once an hour, a live run of a smoke match must put a verified caption on the stream. Any failure alerts the team.
-- **Cost.** Budget alerts at 50%, 80% and 100% of the subscription's budget, the fair-use limits in 11.7, token meters per match, and everything except the web app scaled to zero between runs.
+- **Cost.** The subscription is pay-as-you-go (18.9), so running out of free credit can't switch the demo off. Budget alerts go out at 50%, 80% and 100% of the subscription's budget, the fair-use limits in 11.7 and the token meters per match cap spending, and everything except the web app scales to zero between runs.
 - **On call.** The team keeps a rota through judging, with a short runbook for each alert, written from the Engineer's playbooks.
 - **After judging.** Production scales down once the winners are announced. The benchmark's evaluation endpoint stays up or comes down as open question 10 decides, and `azd down` removes the rest.
 
@@ -1945,7 +1957,7 @@ Targets: the replay back within 15 minutes of any failure, and live mode within 
 | --- | --- |
 | OPS-1 | `azd up` succeeds in a clean subscription with only a location as input. Optional services (Fabric, GPU) are skipped cleanly when absent, and the app says what is off. |
 | OPS-2 | `docker compose up` plays the showcase end to end with no Azure subscription (BE-15). |
-| OPS-3 | No secrets in code, CI or settings: managed identities and Microsoft Entra everywhere, and keys turned off. |
+| OPS-3 | No secrets in code, CI or settings: managed identities and Microsoft Entra everywhere, and keys turned off, apart from Fabric's listen-only Event Hubs key (18.12). |
 | OPS-4 | Every resource is tagged and covered by a budget alert. |
 | OPS-5 | Every service has health and readiness endpoints and emits OpenTelemetry traces, metrics and logs. |
 | OPS-6 | Any release can be rolled back in under 5 minutes, by redeploying a known image digest, agent version and web build. |
@@ -2044,7 +2056,7 @@ All footage is screen capture of the deployed app playing the showcase match, sc
 | 0:28–0:40 | "What if they hadn't run?": ghost players replay the moment, and the gap never opens | Counterfactual proof |
 | 0:40–0:52 | Analyst mode in 2D: control field, space value, off-ball credit with an interval, the Space Created leaderboard | Interpretation and personalization |
 | 0:52–1:04 | Player focus with club colours; the caption and voice switch to Arabic, right to left; a few seconds of the audio-described mode; the same view on a phone at tier C | Personalization, languages, accessibility, graceful rendering |
-| 1:04–1:16 | Ask OffBall by voice, answered with a chart from the Fabric data agent; an Activator alert on the Fabric Real-Time Dashboard flags a fatigue gap forming; a feed correction retracts a graphic in the producer console | Fan Q&A, Fabric, live corrections |
+| 1:04–1:16 | Ask OffBall by voice, answered with a chart from a KQL query on the Fabric Eventhouse; an Activator alert on the Fabric Real-Time Dashboard flags a fatigue gap forming; a feed correction retracts a graphic in the producer console | Fan Q&A, Fabric, live corrections |
 | 1:16–1:26 | Fidelity charts, then OffBall-Bench scores from Foundry evaluations: the single-agent baseline, the first crew, and the latest crew after Agent Optimizer | Data quality, AI accuracy and learning, with numbers |
 | 1:26–1:43 | The trace in Foundry: Scout, Tactician, Explainer, a Fact-checker rejection and retry; then an injected latency fault, which the Engineer diagnoses through Azure MCP Server and mitigates with a degrade flag | Multi-agent design, MCP and recovery |
 | 1:43–1:55 | Architecture with the four hero technologies highlighted, `azd up`, and the repo link | Technology and openness |
@@ -2122,7 +2134,7 @@ The roadmap is ordered by dependency, not by date. Every milestone ends with som
 | M3 Broadcast crew | OffBall MCP server and the two hosted Azure MCP Server instances; Scout, Explainer, Fact-checker, Persona, Producer and Engineer, scaffolded with `azd ai agent init` and run as Foundry hosted agents on Agent Framework; Toolboxes per role; Foundry tracing, evaluations and the rubric evaluator in CI; Fabric Real-Time Dashboards, and Activator alerts through a User Data Function; the original four modes; three languages; corrections and retractions; producer console | Verified captions within 3 s; a traced rejection and retry; a correction retracts a graphic; the Engineer mitigates an injected latency fault | M2 |
 | M4 Emergent world | Emergent engine, oracle and counterfactual truth; Match director, Tuner and Validator; gates 4, 5 and 8; the full moment library; the season; OffBall-Bench and its evaluation endpoint | All nine gates pass; benchmark published with baselines | M2 |
 | M5 Advanced intelligence | Space value, off-ball scoring opportunity, off-ball credit, run classifier, ghosting; the Tactician and counterfactual replays; Change one decision | Counterfactual credit error within target; ghost replay on screen within 15 s; a viewer's changed decision re-runs within 15 s | M3, M4 |
-| M6 Full experience | 3D views with Babylon.js at tiers A and B, adaptive tier switching, tier D clips; Learn and Audio-described modes; ten languages and voice; second screen; Space Centre; Pundit with the Fabric data agent; recaps, share cards and vertical clips; first run, the Personalize drawer, every system state and the full motion system | Every mode and view works across the device matrix within its frame-time budget | M3, M5 |
+| M6 Full experience | 3D views with Babylon.js at tiers A and B, adaptive tier switching, tier D clips; Learn and Audio-described modes; ten languages and voice; second screen; Space Centre; Pundit with KQL over the Fabric Eventhouse, and the data agent on a paid capacity; recaps, share cards and vertical clips; first run, the Personalize drawer, every system state and the full motion system | Every mode and view works across the device matrix within its frame-time budget | M3, M5 |
 | M7 Production and partners | Public API and MCP; native A2A endpoints in Foundry; Content Safety; ASSERT adversarial tests; OBS and CasparCG templates; load, fault-injection and red-team runs; SLO dashboards; human studies | All section 18 targets met; partner template runs in OBS | M3 |
 | M8 Synthetic video and vision | Video renderer on serverless GPU; annotations; vision tracker; auto-eventing from video; video set published | Video auto-eventing scored against truth; video set public | M4, M6 |
 | M9 Learning loop | Agent Optimizer on the dev split, run nightly by a Foundry Routine; procedural memory for the Engineer, Producer and Tuner; the release gate; the optional reinforcement-learning track for the Scout | A released agent version beats the first one on the held-out test split with no safety, latency or cost regression | M3, M4 |
@@ -2223,7 +2235,9 @@ Steps 3 to 6 need only code that exists today. Steps 7 and 8 need the Foundry pr
 | A Foundry preview feature changes, slips or isn't available to us | Medium | Each has a fallback: Container Apps workers for hosted agents, direct MCP connections for Toolboxes, CI schedules for Routines, hand-tuned prompts for Agent Optimizer, no memory, the framework's own A2A; statuses checked before dependent work (open question 13) |
 | The learning loop overfits the benchmark | Medium | Tune on the dev split only; release only on held-out test gains; test keys stay private; new seeded matches join the benchmark over time; rubric scores and human review alongside |
 | Hosted-agent session start-up adds latency to live moments | Medium | One warm session per live match, started at kick-off; Container Apps workers as the fallback |
-| Fabric capacity or a Real-Time Intelligence feature isn't available | Medium | Confirm capacity early (open question 2); the live view reads core metrics from the interpret service, so the show runs without Fabric |
+| Fabric capacity or a Real-Time Intelligence feature isn't available | Medium | Start the Fabric trial early (open question 17); the live view reads core metrics from the interpret service, so the show runs without Fabric |
+| A free-trial subscription has no model quota, and switches everything off when its credit or 30 days run out | High | Move to pay-as-you-go as soon as the subscription exists, keeping the credit; request quota where it's still zero; budget alerts (18.9, 18.16) |
+| The Fabric trial has no data agent, our tenant may not allow trials, and Eventstream reads Event Hubs only with a key | Medium | The Pundit uses KQL through `run_kql` on the trial, with a paid F capacity only if the data agent is wanted; the team's business account starts the trial in the same tenant as Azure, and an admin turns trials on if they're off; one listen-only key for Eventstream, or a push to its custom endpoint with Entra ID (18.9, 18.12) |
 | The video fails to land in two minutes | Medium | Built around one goal; scripted capture with Playwright so revisions are cheap; storyboard reviewed at each milestone |
 | The project isn't under version control, and rule 4.4 needs a public GitHub repository created after 29 Sep 2026 | High | Create the repository before any other backend work, push everything and keep its history (23.4) |
 | The generated showcase and the frontend's showcase disagree on time, direction, names and numbers | High | Direct the generator to the frontend's moment, and fail CI if they drift apart (11.9) |
@@ -2260,7 +2274,7 @@ Steps 3 to 6 need only code that exists today. Steps 7 and 8 need the Foundry pr
 ## 26. Open questions
 
 1. Who are the team members (up to 4), who is the Representative, and who owns each workstream?
-2. Do we have an Azure subscription with enough credit and quota, including Microsoft Foundry, Container Apps serverless GPU and Fabric capacity, on standard terms open to all entrants (rule 4.12)?
+2. Once the subscription is pay-as-you-go (18.9), on standard terms open to all entrants (rule 4.12), does it have Foundry model quota in our region for each agent's tier, or do we need quota requests? And is Container Apps serverless GPU available to us?
 3. Category: Best Multi-Agent System, or Best Use of Microsoft Foundry Project?
 4. Are the ten launch languages right for the audience, and who reviews each glossary?
 5. Is "OffBall" free to use as a product name?
@@ -2270,12 +2284,12 @@ Steps 3 to 6 need only code that exists today. Steps 7 and 8 need the Foundry pr
 9. Can we recruit blind or low-vision testers, coaches or analysts, and casual fans for the human studies, and on what consent terms?
 10. Should the OffBall-Bench evaluation endpoint stay up after judging, and who pays for it?
 11. What are the exact start-option spelling for the namespace filter and the transport for the hosted Azure MCP Server, and does its Log Analytics query reach our Application Insights tables? Hosting, Foundry managed-identity auth and the needed tools are already confirmed (14.8).
-12. How should the User Data Function authenticate to our `alerts` hub in Event Hubs, and how long does an Activator alert take end to end? The route itself is settled (17.4).
+12. How should the User Data Function authenticate to our `alerts` hub in Event Hubs, and how long does an Activator alert take end to end? The route itself is settled (17.4). If the function can't sign in through the tenant Azure and Fabric share, it needs a send-only key on `alerts`, a second exception to 18.12, unless the Power Automate route is used instead.
 13. Which Foundry previews are available to our tenant and region today: hosted agents (and have they reached general availability), Agent Optimizer, procedural memory, Toolboxes, Routines, the rubric evaluator and incoming A2A?
 14. Is Foundry's managed post-training available to us, for which models, and at what cost for the Scout's reinforcement-learning track?
 15. Does Web PubSub offer per-message compression to browser clients, and when does the binary frame in contract 2.1 replace JSON frames to meet the 0.5 MB a minute budget (11.6)?
 16. Do we confirm directing the generator to the frontend's showcase (11.9), rather than changing the finished frontend to fit the generated match?
-17. Which Fabric capacity size runs Eventstream, Eventhouse, Activator and the data agent for 10 live matches, and is a trial capacity enough through judging (18.9)?
+17. Does our business tenant let us start a Fabric trial (the setting that lets users try Fabric's paid features), and does the trial capacity (F4, or F64 if it can be raised) carry Eventstream, Eventhouse, Activator and its User Data Function for 10 live matches through judging? And do we keep the listen-only Event Hubs key, or have the live service push to an Eventstream custom endpoint with its managed identity (18.9, 18.12)?
 18. In a broadcaster's own deployment, do producers sign in with Microsoft Entra ID in our tenant, or with their own organisation's accounts (11.7)?
 19. Which models in our regions meet each agent's pass bar at the lowest cost, and with what quota (14.13)?
 
