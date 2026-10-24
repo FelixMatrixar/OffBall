@@ -1,0 +1,137 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+/* Keeps a focused control clear of the fixed screen switcher and bottom sheet (WCAG 2.4.11). */
+html {
+  scroll-padding-bottom: 96px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color var(--dur-smooth),
+    color var(--dur-smooth);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--kes);
+}
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* The 10-foot layout for TVs (PRD 16.5): everything larger, with heavier focus rings for a remote. */
+[data-layout='tv'] .screen {
+  zoom: 1.5;
+}
+[data-layout='tv'] {
+  --focus-width: 4px;
+}
+[data-layout='tv'] :focus-visible {
+  outline-offset: 4px;
+}
+
+/* Windows high-contrast and other forced-colour modes: keep every control outlined and the pitch readable. */
+@media (forced-colors: active) {
+  .btn,
+  .chip,
+  .pill,
+  .seg,
+  .switch,
+  .card,
+  .tile,
+  .map-chip,
+  .choice,
+  .toast {
+    border: 1px solid CanvasText;
+  }
+  .seg-indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .seg-btn[aria-pressed='true'] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+  .switch[aria-checked='true'] .switch-track {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .pitch,
+  .pitch * {
+    forced-color-adjust: none;
+  }
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+@media print {
+  .dev-nav,
+  .toast-stack,
+  .sheet,
+  .replay-bar {
+    display: none !important;
+  }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

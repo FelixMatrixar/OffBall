@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall visual language</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+</style>
+</helmet>
+<div style="width: 1440px; height: 2200px; box-sizing: border-box; overflow: hidden; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 56px 64px; display: flex; flex-direction: column; gap: 28px">
+
+  <header>
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 56px; font-weight: 700; line-height: 1">OffBall visual language</h1>
+    <p style="margin: 10px 0 0; font-size: 17px; color: #9EB0A6; max-width: 880px">One grammar for every surface: the app, the phone, the broadcast output and the partner feed. Colour is never the only cue, lime always means space, and every visual has a text equivalent.</p>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px">
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Colour tokens</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px">
+        <sc-for list="{{palettes}}" as="pal" hint-placeholder-count="2">
+          <div>
+            <h3 style="margin: 0 0 8px; font-size: 14px; color: #9EB0A6">{{pal.name}}</h3>
+            <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+              <sc-for list="{{pal.items}}" as="sw" hint-placeholder-count="9">
+                <li style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+                  <span style="{{sw.swatch}}"></span>
+                  <span style="flex: 1; min-width: 0">{{sw.name}}</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #9EB0A6">{{sw.hex}}</span>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Team pair under colour-vision deficiency</h2>
+      <p style="margin: 0 0 14px; font-size: 13px; color: #9EB0A6">Simulated from the dark-theme tokens (Machado et al., full severity). Blue and orange stay apart, and Kestrel is lighter than Ashmoor, so they also separate in greyscale.</p>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+        <sc-for list="{{cvd}}" as="cv" hint-placeholder-count="5">
+          <li style="display: grid; grid-template-columns: 130px minmax(0, 1fr); align-items: center; gap: 12px">
+            <span style="font-size: 13px; font-weight: 600">{{cv.name}}</span>
+            <span style="display: flex; align-items: center; gap: 18px; background: {{cv.pitch}}; border-radius: 8px; padding: 8px 14px">
+              <span style="{{cv.k}}"></span><span style="{{cv.a}}"></span><span style="{{cv.s}}"></span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #ECF1EC; margin-left: auto">{{cv.note}}</span>
+            </span>
+          </li>
+        </sc-for>
+      </ul>
+      <p style="margin: 12px 0 0; font-size: 12px; color: #9EB0A6">Dots, left to right: Kestrel Bay, Ashmoor, space.</p>
+    </section>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px">
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Field ramps</h2>
+      <h3 style="margin: 0 0 8px; font-size: 14px">Space control · diverging, neutral midpoint</h3>
+      <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; background: #14301F">
+        <sc-for list="{{controlRamp}}" as="cr" hint-placeholder-count="21">
+          <span style="{{cr.style}}"></span>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9EB0A6; margin: 6px 0 18px"><span>Ashmoor controls</span><span>25%</span><span>Contested · dotted</span><span>75%</span><span>Kestrel controls</span></div>
+      <h3 style="margin: 0 0 8px; font-size: 14px">Space value · sequential, one hue</h3>
+      <div style="display: flex; height: 40px; border-radius: 8px; overflow: hidden; background: #14301F">
+        <sc-for list="{{valueRamp}}" as="vr" hint-placeholder-count="11">
+          <span style="{{vr.style}}"></span>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9EB0A6; margin-top: 6px"><span>Low value</span><span>High value · near goal</span></div>
+    </section>
+
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Type</h2>
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <div>
+          <div style="font-size: 12px; color: #9EB0A6; margin-bottom: 2px">Barlow Condensed · scores, headings, big numbers · tabular figures</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums">KES 1–0 ASH · 63:04 · 10.8 m</div>
+        </div>
+        <div>
+          <div style="font-size: 12px; color: #9EB0A6; margin-bottom: 2px">Inter · captions, UI, audio-description transcripts</div>
+          <div style="font-size: 22px; font-weight: 500; line-height: 1.35">Watch No. 9. This run isn’t to get the ball. It’s to pull a defender away.</div>
+        </div>
+        <div>
+          <div style="font-size: 12px; color: #9EB0A6; margin-bottom: 2px">JetBrains Mono · evidence IDs, overlay feed, flags</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 17px">m07-e0912 · overlay.upsert gap_ring · explainer.model_tier</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Overlay grammar</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">control_field</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Control field example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <rect x="0" y="0" width="80" height="140" style="fill: rgba(226,115,58,0.45)"></rect>
+          <rect x="80" y="0" width="40" height="140" style="fill: rgba(226,115,58,0.15)"></rect>
+          <rect x="120" y="0" width="40" height="140" style="fill: rgba(124,192,255,0.15)"></rect>
+          <rect x="160" y="0" width="80" height="140" style="fill: rgba(124,192,255,0.45)"></rect>
+          <g style="fill: #ECF1EC; opacity: 0.55"><circle cx="112" cy="20" r="2.5"></circle><circle cx="128" cy="44" r="2.5"></circle><circle cx="112" cy="68" r="2.5"></circle><circle cx="128" cy="92" r="2.5"></circle><circle cx="112" cy="116" r="2.5"></circle></g>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Team colours over a neutral midpoint, blurred. Contested space also gets dots, so hue is never the only cue.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">gap_ring</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Gap ring example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <ellipse cx="120" cy="78" rx="46" ry="36" style="fill: rgba(215,242,92,0.12); stroke: #D7F25C; stroke-width: 3px"></ellipse>
+          <text x="120" y="30" style="font-family: Inter, sans-serif; font-size: 14px; font-weight: 700; fill: #D7F25C; text-anchor: middle">Space opens here</text>
+          <circle cx="40" cy="110" r="8" style="fill: #E2733A"></circle><circle cx="200" cy="40" r="8" style="fill: #E2733A"></circle>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Lime is reserved for space. One ring at a time; it pulses once on entry.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">run_arrow</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Run arrow example, solid for an actual run and dashed for a planned one" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <line x1="40" y1="110" x2="150" y2="40" style="stroke: #7CC0FF; stroke-width: 4px; stroke-linecap: round"></line>
+          <polygon points="160,34 141,37 151,52" style="fill: #7CC0FF"></polygon>
+          <line x1="40" y1="110" x2="200" y2="110" style="stroke: #7CC0FF; stroke-width: 3px; stroke-dasharray: 8 7"></line>
+          <circle cx="40" cy="110" r="9" style="fill: #7CC0FF"></circle>
+          <text x="196" y="98" style="font-family: Inter, sans-serif; font-size: 12px; fill: #9EB0A6; text-anchor: end">planned</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Solid is the actual run; dashed is planned or counterfactual. Draws slightly ahead of the runner.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">pass_line</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Pass lines of difficulty 2, 5 and 9 drawn with increasing weight" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <line x1="30" y1="34" x2="200" y2="34" style="stroke: #ECF1EC; stroke-width: 2px"></line>
+          <line x1="30" y1="70" x2="200" y2="70" style="stroke: #ECF1EC; stroke-width: 5px"></line>
+          <line x1="30" y1="106" x2="200" y2="106" style="stroke: #ECF1EC; stroke-width: 9px"></line>
+          <text x="214" y="38" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #9EB0A6">2</text>
+          <text x="214" y="74" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #9EB0A6">5</text>
+          <text x="214" y="110" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #9EB0A6">9</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Line weight carries pass difficulty. Dashed ahead of the ball, solid behind it.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">ghost</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Ghost player example: a dashed outline where the player would have been" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <circle cx="180" cy="40" r="10" style="fill: #7CC0FF"></circle>
+          <circle cx="70" cy="96" r="10" style="fill: none; stroke: #7CC0FF; stroke-width: 2.5px; stroke-dasharray: 5 4"></circle>
+          <line x1="80" y1="90" x2="168" y2="46" style="stroke: #9EB0A6; stroke-width: 1.5px; stroke-dasharray: 4 5"></line>
+          <text x="70" y="128" style="font-family: Inter, sans-serif; font-size: 12px; fill: #ECF1EC; text-anchor: middle">without the run</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">What would have happened: a dashed outline, never filled, always labelled.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">offside_line</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Defensive line example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <line x1="150" y1="0" x2="150" y2="140" style="stroke: #ECF1EC; stroke-width: 2px; stroke-dasharray: 9 7; opacity: 0.7"></line>
+          <circle cx="150" cy="24" r="8" style="fill: #E2733A"></circle><circle cx="144" cy="58" r="8" style="fill: #E2733A"></circle><circle cx="147" cy="92" r="8" style="fill: #E2733A"></circle><circle cx="140" cy="122" r="8" style="fill: #E2733A"></circle>
+          <circle cx="118" cy="74" r="8" style="fill: #7CC0FF"></circle>
+          <text x="156" y="136" style="font-family: Inter, sans-serif; font-size: 12px; fill: #9EB0A6">13.5 m</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Analyst view. The defending team’s last line, with its distance from goal.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">player_tag</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Player tag example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <circle cx="120" cy="86" r="11" style="fill: #7CC0FF"></circle>
+          <text x="120" y="91" style="font-family: Inter, sans-serif; font-size: 12px; font-weight: 700; fill: #06121F; text-anchor: middle">9</text>
+          <text x="120" y="60" style="font-family: Inter, sans-serif; font-size: 16px; font-weight: 700; fill: #ECF1EC; text-anchor: middle; paint-order: stroke; stroke: rgba(9,16,13,0.88); stroke-width: 5px; stroke-linejoin: round">No. 9 Velmar</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Text on a halo so it reads over any field colour. Rendered as DOM text in the app.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">badge</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Sprint badge example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #14301F"></rect>
+          <circle cx="120" cy="60" r="11" style="fill: #7CC0FF"></circle>
+          <text x="120" y="100" style="font-family: Inter, sans-serif; font-size: 16px; font-weight: 700; fill: #D7F25C; text-anchor: middle; paint-order: stroke; stroke: rgba(9,16,13,0.88); stroke-width: 5px; stroke-linejoin: round">Sprint 31.2 km/h</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Threshold badges: sprints above 25.2 km/h and each kilometre covered.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">caption</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Caption bar example" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #0B1110"></rect>
+          <rect x="12" y="34" width="216" height="72" rx="8" style="fill: #121B18; stroke: #27362F"></rect>
+          <rect x="24" y="48" width="150" height="9" rx="4" style="fill: #ECF1EC"></rect>
+          <rect x="24" y="64" width="118" height="9" rx="4" style="fill: #ECF1EC"></rect>
+          <rect x="24" y="84" width="96" height="6" rx="3" style="fill: #4A5B53"></rect>
+          <rect x="166" y="80" width="52" height="16" rx="8" style="fill: none; stroke: #D7F25C"></rect>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">Plain words first; evidence one tap away. Always labelled AI-generated and fact-checked.</p>
+      </div>
+
+      <div style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-bottom: 8px">correction</div>
+        <svg viewBox="0 0 240 140" role="img" aria-label="Correction example: a struck-through graphic with a Correction tag" style="width: 100%; height: auto; display: block; border-radius: 8px">
+          <rect x="0" y="0" width="240" height="140" style="fill: #0B1110"></rect>
+          <rect x="12" y="40" width="216" height="56" rx="8" style="fill: #121B18; stroke: #27362F"></rect>
+          <rect x="24" y="62" width="150" height="9" rx="4" style="fill: #4A5B53"></rect>
+          <line x1="20" y1="66" x2="182" y2="66" style="stroke: #FF9A9A; stroke-width: 2px"></line>
+          <rect x="146" y="18" width="82" height="22" rx="11" style="fill: #FF7A7A"></rect>
+          <text x="187" y="33" style="font-family: Inter, sans-serif; font-size: 12px; font-weight: 700; fill: #1E0505; text-anchor: middle">Correction</text>
+        </svg>
+        <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">A retracted graphic stays visible for 3 s with a Correction tag, then its patch replaces it.</p>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px">
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Motion</h2>
+      <div style="display: flex; height: 44px; border-radius: 8px; overflow: hidden; font-size: 12px; font-weight: 600">
+        <span style="flex: 2; background: #7CC0FF; color: #06121F; display: flex; align-items: center; justify-content: center">Enter 200 ms</span>
+        <span style="flex: 25; background: #19251F; display: flex; align-items: center; justify-content: center">Dwell 2.5 s or longer</span>
+        <span style="flex: 1.5; background: #E2733A; color: #1E0C02; display: flex; align-items: center; justify-content: center">150</span>
+      </div>
+      <ul style="margin: 14px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.6">
+        <li>Ease out on entry, ease in on exit. Nothing moves faster than the play it describes.</li>
+        <li>A gap ring pulses once, over 1.6 s. Nothing else loops.</li>
+        <li>Players glide between 25 Hz samples; the renderer never extrapolates more than 200 ms.</li>
+        <li>Reduced motion: fades only, no pulses, no gliding.</li>
+      </ul>
+    </section>
+
+    <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+      <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Rendering tiers</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{tiers}}" as="ti" hint-placeholder-count="4">
+          <div style="background: #19251F; border-radius: 10px; padding: 12px">
+            <div style="display: flex; align-items: baseline; gap: 8px">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: #D7F25C">{{ti.id}}</span>
+              <span style="font-size: 14px; font-weight: 600">{{ti.name}}</span>
+            </div>
+            <p style="margin: 4px 0 0; font-size: 12px; line-height: 1.45; color: #9EB0A6">{{ti.what}}</p>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin: 12px 0 0; font-size: 13px; color: #9EB0A6">Steps down after 2 s over its frame budget; steps back up after 10 s of headroom. Viewers can lock a tier.</p>
+    </section>
+  </div>
+
+  <section style="background: #121B18; border: 1px solid #27362F; border-radius: 16px; padding: 22px">
+    <h2 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Density by mode</h2>
+    <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{density}}" as="dn" hint-placeholder-count="6">
+        <div style="background: #19251F; border-radius: 10px; padding: 12px">
+          <div style="font-size: 14px; font-weight: 600">{{dn.mode}}</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">{{dn.max}}</div>
+          <div style="font-size: 12px; line-height: 1.4; color: #9EB0A6">{{dn.note}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  lin(c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  enc(v) { v = Math.max(0, Math.min(1, v)); return Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055)); }
+  hex2(hex) { return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)]; }
+  sim(hex, m) {
+    const c = this.hex2(hex).map((v) => this.lin(v));
+    const o = [0, 1, 2].map((i) => m[i][0] * c[0] + m[i][1] * c[1] + m[i][2] * c[2]);
+    return 'rgb(' + o.map((v) => this.enc(v)).join(',') + ')';
+  }
+  lum(hex) { const c = this.hex2(hex).map((v) => this.lin(v)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  grey(hex) { const g = this.enc(this.lum(hex)); return 'rgb(' + g + ',' + g + ',' + g + ')'; }
+  renderVals() {
+    const dot = (fill) => 'width: 26px; height: 26px; border-radius: 13px; display: inline-block; background: ' + fill + '; box-shadow: 0 0 0 2px rgba(9,16,13,0.88)';
+    const K = '#7CC0FF', A = '#E2733A', S = '#D7F25C', PITCH = '#14301F';
+    const I = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    const M = {
+      deut: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
+      prot: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
+      trit: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.303900]]
+    };
+    const row = (name, m) => ({ name: name, pitch: this.sim(PITCH, m), k: dot(this.sim(K, m)), a: dot(this.sim(A, m)), s: dot(this.sim(S, m)), note: '' });
+    const cvd = [row('Typical vision', I), row('Deuteranopia', M.deut), row('Protanopia', M.prot), row('Tritanopia', M.trit)];
+    cvd.push({ name: 'Greyscale', pitch: this.grey(PITCH), k: dot(this.grey(K)), a: dot(this.grey(A)), s: dot(this.grey(S)),
+      note: 'L ' + this.lum(K).toFixed(2) + ' · ' + this.lum(A).toFixed(2) + ' · ' + this.lum(S).toFixed(2) });
+
+    const sw = (name, hex, border) => ({ name: name, hex: hex, swatch: 'width: 28px; height: 28px; flex: none; border-radius: 6px; background: ' + hex + '; border: 1px solid ' + (border || 'rgba(236,241,236,0.18)') });
+    const palettes = [
+      { name: 'Dark · default, broadcast', items: [sw('Ground', '#0B1110'), sw('Surface', '#121B18'), sw('Line', '#27362F'), sw('Text', '#ECF1EC'), sw('Muted text', '#9EB0A6'), sw('Pitch', '#14301F'), sw('Kestrel Bay', '#7CC0FF'), sw('Ashmoor', '#E2733A'), sw('Space', '#D7F25C')] },
+      { name: 'Light', items: [sw('Ground', '#EEF2EE'), sw('Surface', '#FFFFFF'), sw('Line', '#D3DDD6'), sw('Text', '#0F1A16'), sw('Muted text', '#4A5B53'), sw('Pitch', '#DCEDE0'), sw('Kestrel Bay', '#1A5DB8'), sw('Ashmoor', '#D2652A'), sw('Space', '#5E7F00')] }
+    ];
+
+    const controlRamp = [];
+    for (let i = 0; i <= 20; i++) {
+      const p = i / 20, rgb = p >= 0.5 ? [124, 192, 255] : [226, 115, 58], a = Math.abs(p - 0.5) * 2 * 0.6;
+      const contested = Math.abs(p - 0.5) < 0.1;
+      controlRamp.push({ style: 'flex: 1; background-color: rgba(' + rgb.join(',') + ',' + a.toFixed(2) + ')' + (contested ? '; background-image: radial-gradient(circle, rgba(236,241,236,0.6) 1.5px, transparent 2px); background-size: 8px 8px' : '') });
+    }
+    const valueRamp = [];
+    for (let i = 0; i <= 10; i++) valueRamp.push({ style: 'flex: 1; background: rgba(215,242,92,' + (i / 10 * 0.6).toFixed(2) + ')' });
+
+    const tiers = [
+      { id: 'A', name: 'WebGPU', what: '3D views with Babylon.js, GPU control field at 0.5 m, ghosts. 60–120 fps.' },
+      { id: 'B', name: 'WebGL2', what: '3D views, control field as a texture, every overlay. 60 fps.' },
+      { id: 'C', name: 'Canvas 2D', what: '2D view only, 2 m field, every overlay. 30 fps or better.' },
+      { id: 'D', name: 'Video', what: 'Pre-rendered clips with overlays burned in and a live caption track. Plays anywhere.' }
+    ];
+    const density = [
+      { mode: 'Casual', max: '1', note: 'One pitch overlay at a time; no numbers it doesn’t need.' },
+      { mode: 'Learn', max: '1 + card', note: 'Casual, plus a definition the first time an idea appears.' },
+      { mode: 'Analyst', max: 'Up to 4', note: 'Field, line, displacement and evidence together.' },
+      { mode: 'Player focus', max: '2', note: 'The followed player plus the moment’s key overlay; others dimmed.' },
+      { mode: 'Audio-described', max: 'Voice', note: 'Visuals optional; spoken lines and a stereo cue carry it.' },
+      { mode: 'Broadcaster', max: 'Producer', note: 'Whatever the producer approves; EBU R 95 safe areas.' }
+    ];
+    return { palettes: palettes, cvd: cvd, controlRamp: controlRamp, valueRamp: valueRamp, tiers: tiers, density: density };
+  }
+}
+</script>
+</body>
+</html>

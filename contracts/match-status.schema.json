@@ -1,0 +1,57 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "const": "match.status",
+      "default": "match.status",
+      "title": "Type",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "pre_match",
+        "in_play",
+        "half_time",
+        "full_time",
+        "interrupted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_ms": {
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "score": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Score",
+      "type": "object"
+    },
+    "sent_at": {
+      "title": "Sent At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "match_id",
+    "status",
+    "period",
+    "t_ms",
+    "score",
+    "sent_at"
+  ],
+  "title": "MatchStatusMessage",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/match-status.schema.json"
+}

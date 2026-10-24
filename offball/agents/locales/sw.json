@@ -1,0 +1,40 @@
+{
+  "meta": {"code": "sw", "name": "Kiswahili", "direction": "ltr", "decimal": ".", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "mbio za chambo", "gap": "pengo", "space": "nafasi", "half_space": "nusu-nafasi",
+    "run_in_behind": "mbio nyuma ya mabeki", "overlap": "kupita nje", "underlap": "kupita ndani",
+    "third_man_run": "mbio za mchezaji wa tatu", "blind_side_run": "mbio za upande usioonekana",
+    "centre_back": "beki wa kati", "full_back": "beki wa pembeni", "winger": "winga", "striker": "mshambuliaji wa kati",
+    "midfielder": "kiungo", "goalkeeper": "kipa", "through_ball": "pasi ya kupenyeza", "press": "kubana",
+    "counter_attack": "shambulizi la kushtukiza", "offside": "kuotea", "cover_shadow": "kivuli cha ulinzi",
+    "pinning": "kuwafunga mabeki", "switch_of_play": "kubadilisha upande wa shambulizi",
+    "pitch_control": "udhibiti wa nafasi", "space_created": "nafasi iliyotengenezwa", "null_run": "mbio zilizozimwa"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Mtazame namba {creator_no}. Mbio hizi si za kupata mpira, bali ni za kumvuta beki mbali.",
+    "decoy_run.casual.gap": "Namba {dragged_no} wa {dragged_club} anamfuata. Pengo linafunguka katikati.",
+    "decoy_run.casual.finish.goal": "Goli! Limetengenezwa na mbio za namba {creator_no}, limefungwa na namba {receiver_no}.",
+    "decoy_run.casual.finish.shot": "Namba {receiver_no} anapiga shuti kupitia pengo alilofungua namba {creator_no}.",
+    "decoy_run.casual.finish.chance": "Namba {receiver_no} anaingia kwenye nafasi iliyotengenezwa na mbio za namba {creator_no}.",
+    "decoy_run.learn.define": "Hizo zilikuwa {term:decoy_run}: mbio za kumpa mwenzako nafasi.",
+    "decoy_run.analyst": "{Term:decoy_run}: namba {creator_no} anamvuta namba {dragged_no} mita {displacement} kutoka nafasi yake. Udhibiti wa {club} kwenye pengo: +{gain}; nafasi iliyotengenezwa m² {space}.",
+    "decoy_run.analyst.cf": "Bila mbio hizo, pengo linabaki limefungwa katika majaribio {shut} kati ya {runs}.",
+    "decoy_run.player": "{player} amewavuta mabeki {dragged_count} leo na kutengeneza nafasi ya m² {space_total}.",
+    "decoy_run.audio": "{club} wanashambulia. Namba {creator_no} anakimbia {direction} na namba {dragged_no} wa {dragged_club} anamfuata. Pengo linafunguka {gap_where}. Namba {receiver_no} anaingia ndani yake.",
+    "decoy_run.broadcaster": "MBIO ZA CHAMBO · Namba {creator_no} amvuta namba {dragged_no} · nafasi m² {space}",
+    "decoy_run.a11y.run_arrow": "Namba {creator_no} anakimbia {direction}.",
+    "decoy_run.a11y.gap_ring": "Nafasi inafunguka {gap_where}.",
+    "decoy_run.a11y.pass_line": "Namba {passer_no} anapiga pasi kwenye pengo.",
+    "ghost.offer": "Je, kama namba {creator_no} asingekimbia? Vivuli vinarudia mchezo bila mbio hizo.",
+    "direction.left": "kuelekea upande wa kushoto",
+    "direction.right": "kuelekea upande wa kulia",
+    "gap_where.centre_edge": "katikati, nje kidogo ya eneo la hatari",
+    "gap_where.centre": "katikati",
+    "gap_where.left_half": "kwenye nusu-nafasi ya kushoto",
+    "gap_where.right_half": "kwenye nusu-nafasi ya kulia",
+    "label.correction": "Marekebisho",
+    "label.synthetic": "Data bandia",
+    "label.ai": "Imetengenezwa na AI",
+    "notice.translation": "Kwa Kiingereza: tafsiri haikuwa tayari kwa wakati."
+  }
+}

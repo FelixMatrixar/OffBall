@@ -1,0 +1,25 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-21T18:00:00Z"},
+  "title": "OffBall output visualization",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 1240, "title": "Match view · interactive", "expand": "fill", "is_interactive": true},
+    "Phone.dc.html": {"x": 1520, "y": 0, "w": 390, "h": 844, "title": "Second screen · phone", "is_interactive": true},
+    "Onboarding.dc.html": {"x": 1990, "y": 0, "w": 1440, "h": 900, "title": "First run · onboarding", "expand": "fill", "is_interactive": true},
+    "SpaceCentre.dc.html": {"x": 3510, "y": 0, "w": 1440, "h": 900, "title": "Space Centre · matchday", "expand": "fill", "is_interactive": true},
+    "Broadcast.dc.html": {"x": 0, "y": 1660, "w": 1920, "h": 1080, "title": "Broadcast output · 1080p"},
+    "Producer.dc.html": {"x": 2000, "y": 1660, "w": 1440, "h": 900, "title": "Producer console", "expand": "fill", "is_interactive": true},
+    "VisualLanguage.dc.html": {"x": 0, "y": 3160, "w": 1440, "h": 2200, "title": "Visual language"},
+    "Motion.dc.html": {"x": 1520, "y": 3160, "w": 1440, "h": 1700, "title": "Motion and micro-interactions"},
+    "States.dc.html": {"x": 3040, "y": 3160, "w": 1440, "h": 1300, "title": "System states"}
+  },
+  "order": ["Main.dc.html", "Phone.dc.html", "Onboarding.dc.html", "SpaceCentre.dc.html", "Broadcast.dc.html", "Producer.dc.html", "VisualLanguage.dc.html", "Motion.dc.html", "States.dc.html"],
+  "notes": {
+    "row1": {"x": 0, "y": -300, "text": "Viewer surfaces", "kind": "title1", "maxW": 4950},
+    "row2": {"x": 0, "y": 1360, "text": "Broadcast and production", "kind": "title1", "maxW": 3440},
+    "row3": {"x": 0, "y": 2860, "text": "Design system and states", "kind": "title1", "maxW": 4480}
+  },
+  "designSystems": []
+}

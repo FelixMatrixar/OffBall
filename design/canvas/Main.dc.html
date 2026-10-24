@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall match view</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.ob-root{--eo:cubic-bezier(.2,0,0,1);--ei:cubic-bezier(.3,0,1,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes obRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes obFade{from{opacity:0}to{opacity:1}}
+@keyframes obPopA{0%{opacity:0;transform:scale(.55)}60%{opacity:1;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+@keyframes obPopB{0%{opacity:0;transform:scale(.55)}60%{opacity:1;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+@keyframes obDraw{to{stroke-dashoffset:0}}
+@keyframes obPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes obBeat{0%{box-shadow:0 0 0 0 rgba(215,242,92,.6)}100%{box-shadow:0 0 0 10px rgba(215,242,92,0)}}
+@keyframes obBlink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes obGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes obWipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes obShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes obWordA{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes obWordB{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes obCheckA{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}
+@keyframes obCheckB{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}
+@keyframes obBurst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+@keyframes obShimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes obEq{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes obSpin{to{transform:rotate(360deg)}}
+@keyframes obDrawer{from{transform:translateX(100%)}to{transform:none}}
+@keyframes obToast{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes obRing{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.7)}}
+.ob-rise{animation:obRise .42s var(--eo) both}
+.ob-fade{animation:obFade .3s var(--eo) both}
+.ob-pop-a{animation:obPopA .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.ob-pop-b{animation:obPopB .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.ob-btn{transition:transform 80ms var(--eo),background-color .15s,color .15s,border-color .15s,box-shadow .15s;cursor:pointer}
+.ob-btn:hover{transform:translateY(-1px)}
+.ob-btn:active{transform:translateY(0) scale(.96)}
+.ob-card{transition:border-color .2s var(--eo)}
+.ob-card:hover{border-color:var(--muted)!important}
+.ob-blink{animation:obBlink 1.4s ease-in-out infinite}
+.ob-player{cursor:pointer}
+.ob-player .ob-dot{transform-box:fill-box;transform-origin:center;transition:transform .15s var(--eo)}
+.ob-player:hover .ob-dot{transform:scale(1.32)}
+.ob-ripple{transform-box:fill-box;transform-origin:center;animation:obRing 1.6s var(--eo) infinite}
+.ob-ring{stroke-dasharray:400;stroke-dashoffset:400;transform-box:fill-box;transform-origin:center;animation:obDraw .6s var(--eo) forwards,obPulse 1.6s ease-in-out .6s 1}
+.ob-shake{animation:obShake .5s var(--eo) both}
+.ob-wipe{animation:obWipe 1.1s var(--eo) both}
+.ob-burst{animation:obBurst .9s var(--eo) both}
+.ob-w{display:inline-block;margin-inline-end:.28em}
+.ob-cap-a .ob-w{animation:obWordA .34s var(--eo) both}
+.ob-cap-b .ob-w{animation:obWordB .34s var(--eo) both}
+.ob-cap-a .ob-check{stroke-dasharray:16;animation:obCheckA .45s var(--eo) .25s both}
+.ob-cap-b .ob-check{stroke-dasharray:16;animation:obCheckB .45s var(--eo) .25s both}
+.ob-grow{transform-origin:left center;animation:obGrow .7s var(--eo) both}
+.ob-shimmer{background:linear-gradient(90deg,var(--surface2) 25%,var(--line) 50%,var(--surface2) 75%);background-size:200% 100%;animation:obShimmer 1.4s linear infinite}
+.ob-eq{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.ob-eq span{display:inline-block;width:3px;height:14px;border-radius:2px;background:var(--space);transform-origin:bottom;animation:obEq .9s ease-in-out infinite}
+.ob-eq-off span{animation-play-state:paused}
+.ob-spin{animation:obSpin .9s linear infinite}
+.ob-drawer{animation:obDrawer .34s var(--eo) both}
+.ob-toast{animation:obToast .34s var(--ep) both}
+.ob-beat{animation:obBeat 1.6s var(--eo) infinite}
+.ob-scrub{width:100%;accent-color:#D7F25C;height:28px;margin:0;cursor:pointer}
+.ob-root button:focus-visible,.ob-root select:focus-visible,.ob-root input:focus-visible,.ob-root a:focus-visible{outline:2px solid #D7F25C;outline-offset:2px}
+.ob-rm *,.ob-rm *::before,.ob-rm *::after{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}
+@media (prefers-reduced-motion: reduce){.ob-root *,.ob-root *::before,.ob-root *::after{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div class="{{rootClass}}" style="{{rootVars}} min-height: 1240px; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; padding: 20px 24px 28px; box-sizing: border-box; transition: background-color .3s, color .3s">
+
+<header class="ob-rise" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; max-width: 1440px; margin: 0 auto 12px">
+  <div style="display: flex; align-items: center; gap: 10px">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: var(--text); stroke-width: 1.8px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: var(--text); stroke-width: 1.8px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: var(--space); stroke-width: 2px"></circle></svg>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: 0.3px">OffBall</span>
+  </div>
+
+  <div aria-label="Score" style="display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">
+    <span style="width: 10px; height: 10px; border-radius: 2px; background: var(--kes)"></span>
+    <span style="{{kesLabelStyle}}">KES</span>
+    <span style="display: inline-flex; font-size: 28px; font-variant-numeric: tabular-nums"><span class="{{scoreClass}}" style="display: inline-block">{{scoreK}}</span>–<span>{{scoreA}}</span></span>
+    <span style="{{ashLabelStyle}}">ASH</span>
+    <span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ash)"></span>
+    <span style="color: var(--muted); font-size: 20px; font-variant-numeric: tabular-nums; margin-left: 4px">{{clock}}</span>
+    <span style="display: inline-flex; align-items: center; gap: 5px; font-family: Inter, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 4px; background: var(--space); color: var(--onSpace)"><span class="ob-blink" style="width: 6px; height: 6px; border-radius: 3px; background: var(--onSpace)"></span>LIVE</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-left: auto">
+    <a href="SpaceCentre.dc.html" class="ob-btn" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 600 14px Inter, sans-serif; text-decoration: none">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.2" style="fill: none; stroke: currentColor; stroke-width: 1.5px"></rect><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.2" style="fill: none; stroke: currentColor; stroke-width: 1.5px"></rect><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.2" style="fill: none; stroke: currentColor; stroke-width: 1.5px"></rect><rect x="9" y="9" width="5.5" height="5.5" rx="1.2" style="fill: var(--space); stroke: var(--space); stroke-width: 1.5px"></rect></svg>
+      Space Centre
+    </a>
+    <label for="ob-lang" style="font-size: 13px; color: var(--muted)">Language</label>
+    <select id="ob-lang" value="{{lang}}" onChange="{{onLang}}" class="ob-btn" style="min-height: 44px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 500 14px Inter, sans-serif">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="ar">العربية</option>
+    </select>
+    <button type="button" role="switch" aria-checked="{{whatIf}}" onClick="{{toggleWhatIf}}" class="ob-btn" style="min-height: 44px; display: inline-flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 600 14px Inter, sans-serif">
+      <span style="{{whatIfTrack}}"><span style="{{whatIfKnob}}"></span></span>
+      What if no run?
+    </button>
+    <button type="button" aria-label="Personalize" onClick="{{openDrawer}}" class="ob-btn" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); display: inline-flex; align-items: center; justify-content: center">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 5 H15 M3 9 H15 M3 13 H15" style="fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linecap: round"></path><circle cx="6" cy="5" r="2" style="fill: var(--surface); stroke: currentColor; stroke-width: 1.6px"></circle><circle cx="12" cy="9" r="2" style="fill: var(--surface); stroke: currentColor; stroke-width: 1.6px"></circle><circle cx="8" cy="13" r="2" style="fill: var(--surface); stroke: currentColor; stroke-width: 1.6px"></circle></svg>
+    </button>
+  </div>
+</header>
+
+<nav aria-label="Viewing mode" class="ob-rise" style="max-width: 1440px; margin: 0 auto 16px; overflow-x: auto; animation-delay: 60ms">
+  <div style="position: relative; display: grid; grid-template-columns: repeat(6, minmax(132px, 1fr)); max-width: 960px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-sizing: border-box">
+    <span aria-hidden="true" style="{{modeIndicator}}"></span>
+    <sc-for list="{{modes}}" as="m" hint-placeholder-count="6">
+      <button type="button" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="{{m.style}}">
+        <span style="{{m.iconStyle}}"></span>{{m.label}}
+      </button>
+    </sc-for>
+  </div>
+</nav>
+
+<main style="display: flex; flex-wrap: wrap; gap: 20px; max-width: 1440px; margin: 0 auto; align-items: flex-start">
+
+  <section aria-label="Match" style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+
+    <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px; animation-delay: 100ms">
+      <div style="position: relative; width: 100%; aspect-ratio: 1110 / 740">
+        <svg viewBox="-30 -30 1110 740" role="img" aria-label="{{pitchLabel}}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block">
+          <rect x="-30" y="-30" width="1110" height="740" rx="10" style="fill: var(--edge); transition: fill .3s"></rect>
+          <sc-for list="{{stripes}}" as="sp" hint-placeholder-count="10">
+            <rect x="{{sp.x}}" y="0" width="105" height="680" style="{{sp.style}}"></rect>
+          </sc-for>
+          <g style="fill: none; stroke: var(--chalk); stroke-width: 2px">
+            <rect x="0" y="0" width="1050" height="680"></rect>
+            <line x1="525" y1="0" x2="525" y2="680"></line>
+            <circle cx="525" cy="340" r="91.5"></circle>
+            <rect x="0" y="138.4" width="165" height="403.2"></rect>
+            <rect x="0" y="248.4" width="55" height="183.2"></rect>
+            <rect x="885" y="138.4" width="165" height="403.2"></rect>
+            <rect x="995" y="248.4" width="55" height="183.2"></rect>
+            <path d="M165 266.87 A91.5 91.5 0 0 1 165 413.13"></path>
+            <path d="M885 266.87 A91.5 91.5 0 0 0 885 413.13"></path>
+            <rect x="-20" y="303.4" width="20" height="73.2"></rect>
+            <rect x="1050" y="303.4" width="20" height="73.2"></rect>
+          </g>
+          <g style="fill: var(--chalk)">
+            <circle cx="525" cy="340" r="3.5"></circle>
+            <circle cx="110" cy="340" r="3.5"></circle>
+            <circle cx="940" cy="340" r="3.5"></circle>
+          </g>
+        </svg>
+
+        <div aria-hidden="true" style="position: absolute; left: 2.7027%; top: 4.0541%; width: 94.5946%; height: 91.8919%; overflow: hidden; border-radius: 2px">
+          <div style="{{fieldStyle}}">
+            <sc-for list="{{cells}}" as="cell" hint-placeholder-count="294">
+              <div style="{{cell.style}}"></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <svg viewBox="-30 -30 1110 740" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block">
+          <sc-if value="{{showContested}}" hint-placeholder-val="{{false}}">
+            <g class="ob-fade">
+              <sc-for list="{{contested}}" as="cd" hint-placeholder-count="20">
+                <circle cx="{{cd.cx}}" cy="{{cd.cy}}" r="2.8" style="fill: var(--text); opacity: 0.5"></circle>
+              </sc-for>
+            </g>
+          </sc-if>
+
+          <sc-if value="{{showLine}}" hint-placeholder-val="{{false}}">
+            <g class="ob-fade">
+              <line x1="{{lineX}}" y1="0" x2="{{lineX}}" y2="680" style="stroke: var(--text); stroke-width: 2px; stroke-dasharray: 10 8; opacity: 0.6"></line>
+              <text x="{{lineX}}" y="-8" style="font-family: Inter, sans-serif; font-size: 18px; font-weight: 600; fill: var(--muted); text-anchor: middle">{{lineLabel}}</text>
+            </g>
+          </sc-if>
+
+          <sc-if value="{{showGap}}" hint-placeholder-val="{{false}}">
+            <ellipse class="ob-fade" cx="885" cy="280" rx="54" ry="68" style="fill: var(--spaceFill); stroke: none"></ellipse>
+            <ellipse class="ob-ring" cx="885" cy="280" rx="54" ry="68" style="fill: none; stroke: var(--space); stroke-width: 4px"></ellipse>
+            <text class="ob-pop-a" x="885" y="196" style="font-family: Inter, sans-serif; font-size: 21px; font-weight: 700; fill: var(--space); text-anchor: middle; paint-order: stroke; stroke: var(--halo); stroke-width: 6px; stroke-linejoin: round; animation-delay: .35s">{{gapLabel}}</text>
+          </sc-if>
+
+          <sc-if value="{{showShut}}" hint-placeholder-val="{{false}}">
+            <g class="ob-shake">
+              <ellipse cx="885" cy="280" rx="54" ry="68" style="fill: none; stroke: var(--muted); stroke-width: 3px; stroke-dasharray: 8 7"></ellipse>
+              <line x1="845" y1="240" x2="925" y2="320" style="stroke: var(--muted); stroke-width: 3px; stroke-linecap: round"></line>
+              <text x="885" y="196" style="font-family: Inter, sans-serif; font-size: 21px; font-weight: 700; fill: var(--text); text-anchor: middle; paint-order: stroke; stroke: var(--halo); stroke-width: 6px; stroke-linejoin: round">Gap stays shut</text>
+            </g>
+          </sc-if>
+
+          <sc-if value="{{showRun}}" hint-placeholder-val="{{false}}">
+            <g class="ob-fade">
+              <line x1="840" y1="340" x2="{{run.x2}}" y2="{{run.y2}}" style="stroke: var(--kes); stroke-width: 5px; stroke-linecap: round; opacity: 0.95"></line>
+              <polygon points="{{run.head}}" style="fill: var(--kes)"></polygon>
+            </g>
+          </sc-if>
+
+          <sc-if value="{{showPass}}" hint-placeholder-val="{{false}}">
+            <line x1="606" y1="276" x2="{{pass.bx}}" y2="{{pass.by}}" style="stroke: var(--text); stroke-width: 5px; stroke-linecap: round"></line>
+            <line x1="{{pass.bx}}" y1="{{pass.by}}" x2="880" y2="277" style="stroke: var(--text); stroke-width: 3px; stroke-dasharray: 9 8; opacity: 0.8"></line>
+            <polygon class="ob-pop-a" points="{{pass.head}}" style="fill: var(--text)"></polygon>
+          </sc-if>
+
+          <sc-if value="{{showDisp}}" hint-placeholder-val="{{false}}">
+            <g class="ob-fade">
+              <line x1="900" y1="310" x2="{{disp.x2}}" y2="{{disp.y2}}" style="stroke: var(--ash); stroke-width: 3px; stroke-dasharray: 6 6"></line>
+              <circle cx="900" cy="310" r="5" style="fill: var(--ash)"></circle>
+              <text x="{{disp.tx}}" y="{{disp.ty}}" style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; fill: var(--text); paint-order: stroke; stroke: var(--halo); stroke-width: 6px; stroke-linejoin: round">{{disp.label}}</text>
+            </g>
+          </sc-if>
+
+          <sc-for list="{{ghosts}}" as="gh" hint-placeholder-count="2">
+            <g style="{{gh.gStyle}}">
+              <g class="ob-pop-a">
+                <circle r="13" style="{{gh.dotStyle}}"></circle>
+                <text y="-24" style="font-family: Inter, sans-serif; font-size: 17px; font-weight: 600; fill: var(--text); text-anchor: middle; paint-order: stroke; stroke: var(--halo); stroke-width: 5px; stroke-linejoin: round">{{gh.label}}</text>
+              </g>
+            </g>
+          </sc-for>
+
+          <sc-for list="{{trail}}" as="tr" hint-placeholder-count="4">
+            <circle cx="{{tr.x}}" cy="{{tr.y}}" r="{{tr.r}}" style="{{tr.style}}"></circle>
+          </sc-for>
+
+          <sc-for list="{{players}}" as="p" hint-placeholder-count="22">
+            <g class="ob-player" style="{{p.gStyle}}">
+              <title>{{p.title}}</title>
+              <sc-if value="{{p.focus}}" hint-placeholder-val="{{false}}">
+                <circle class="ob-ripple" r="22" style="fill: none; stroke: var(--space); stroke-width: 3px"></circle>
+                <circle r="22" style="fill: none; stroke: var(--space); stroke-width: 3px"></circle>
+              </sc-if>
+              <circle class="ob-dot" r="13" style="{{p.dotStyle}}"></circle>
+              <text y="4.5" style="{{p.numStyle}}">{{p.num}}</text>
+            </g>
+          </sc-for>
+
+          <g style="{{ballStyle}}">
+            <circle r="6.5" style="fill: #FFFFFF; stroke: #0B1110; stroke-width: 2px"></circle>
+          </g>
+
+          <sc-for list="{{tags}}" as="tg" hint-placeholder-count="3">
+            <text class="ob-pop-a" x="{{tg.x}}" y="{{tg.y}}" style="{{tg.style}}">{{tg.text}}</text>
+          </sc-for>
+
+          <sc-if value="{{showGoal}}" hint-placeholder-val="{{false}}">
+            <sc-for list="{{burst}}" as="bs" hint-placeholder-count="14">
+              <circle class="ob-burst" cx="1053" cy="318" r="{{bs.r}}" style="{{bs.style}}"></circle>
+            </sc-for>
+            <g class="ob-pop-a">
+              <rect x="335" y="14" width="380" height="58" rx="8" style="fill: var(--space)"></rect>
+              <text x="525" y="55" style="font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 700; fill: var(--onSpace); text-anchor: middle; letter-spacing: 1px">GOAL · KESTREL BAY 1–0</text>
+            </g>
+          </sc-if>
+        </svg>
+
+        <sc-if value="{{stalled}}" hint-placeholder-val="{{false}}">
+          <div class="ob-fade" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(9,16,13,0.35); border-radius: 6px">
+            <span style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; font-weight: 600">
+              <span class="ob-spin" style="width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--space); border-radius: 50%; display: inline-block"></span>
+              Feed interrupted · holding the last frame
+            </span>
+          </div>
+        </sc-if>
+
+        <div style="position: absolute; left: 12px; top: 10px; display: flex; gap: 6px; flex-wrap: wrap">
+          <span style="{{tierChip}}"><span class="ob-blink" style="{{tierDot}}"></span>{{tierText}}</span>
+          <span class="{{chipClass}}" style="font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--chip); color: var(--text); border: 1px solid var(--line)">{{fieldChip}}</span>
+        </div>
+
+        <div style="position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+          <sc-for list="{{toasts}}" as="ts" hint-placeholder-count="1">
+            <div class="ob-toast" role="status" style="display: flex; align-items: center; gap: 10px; max-width: 340px; padding: 10px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 13px; line-height: 1.4">
+              <span style="{{ts.dot}}"></span><span>{{ts.text}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div class="{{capWrapClass}}" aria-live="polite" style="display: flex; align-items: flex-start; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-height: 84px; box-sizing: border-box; animation-delay: 160ms">
+      <div style="flex: 1; min-width: 0">
+        <p dir="{{capDir}}" lang="{{capLang}}" style="{{capStyle}}"><sc-for list="{{words}}" as="w" hint-placeholder-count="10"><span class="ob-w" style="{{w.style}}">{{w.text}}</span></sc-for></p>
+        <p style="margin: 6px 0 0; font-size: 12px; color: var(--muted)">{{capMeta}}</p>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--text)">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path class="ob-check" d="M2.5 7.5 L5.5 10.5 L11.5 3.5" style="fill: none; stroke: var(--space); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+          Fact-checked
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted)">
+          <span class="{{eqClass}}" aria-hidden="true"><span></span><span style="animation-delay: .15s"></span><span style="animation-delay: .3s"></span><span style="animation-delay: .45s"></span></span>
+          {{voiceText}}
+        </span>
+      </div>
+    </div>
+
+    <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; animation-delay: 200ms">
+      <button type="button" aria-label="{{playLabel}}" onClick="{{togglePlay}}" class="ob-btn" style="width: 44px; height: 44px; border-radius: 22px; border: 0; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; flex: none">
+        <sc-if value="{{playing}}" hint-placeholder-val="{{true}}">
+          <svg class="ob-pop-a" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" style="fill: currentColor"></rect><rect x="9.5" y="2" width="3.5" height="12" rx="1" style="fill: currentColor"></rect></svg>
+        </sc-if>
+        <sc-if value="{{paused}}" hint-placeholder-val="{{false}}">
+          <svg class="ob-pop-b" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L14 8 L4 14 Z" style="fill: currentColor"></path></svg>
+        </sc-if>
+      </button>
+      <div style="flex: 1; min-width: 0; position: relative; padding-top: 34px">
+        <sc-for list="{{markers}}" as="mk" hint-placeholder-count="5">
+          <span style="{{mk.style}}">
+            <sc-if value="{{mk.reached}}" hint-placeholder-val="{{false}}">
+              <span class="ob-pop-a" style="width: 7px; height: 7px; border-radius: 4px; background: var(--space); display: inline-block"></span>
+            </sc-if>
+            <sc-if value="{{mk.ahead}}" hint-placeholder-val="{{true}}">
+              <span style="width: 7px; height: 7px; border-radius: 4px; border: 1px solid var(--muted); box-sizing: border-box; display: inline-block"></span>
+            </sc-if>
+            {{mk.label}}
+          </span>
+        </sc-for>
+        <label for="ob-scrub" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Moment time</label>
+        <input id="ob-scrub" class="ob-scrub" type="range" min="0" max="90" step="1" value="{{scrub}}" onChange="{{onScrub}}">
+      </div>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-variant-numeric: tabular-nums; flex: none">{{clockFine}}</span>
+    </div>
+
+    <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; animation-delay: 240ms">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 8px">
+        <span style="font-weight: 600; color: var(--text)">Momentum · space value per minute</span>
+        <span>Kestrel Bay above the line · Ashmoor below</span>
+      </div>
+      <svg viewBox="0 0 900 96" role="img" aria-label="Momentum ribbon for the first 63 minutes. Kestrel Bay have had the better of the last ten minutes." style="width: 100%; height: auto; display: block">
+        <line x1="0" y1="44" x2="900" y2="44" style="stroke: var(--line); stroke-width: 1.5px"></line>
+        <g class="ob-wipe" style="animation-delay: .3s">
+          <path d="{{ribbonK}}" style="fill: var(--kes); opacity: 0.85"></path>
+          <path d="{{ribbonA}}" style="fill: var(--ash); opacity: 0.85"></path>
+        </g>
+        <line x1="450" y1="4" x2="450" y2="84" style="stroke: var(--muted); stroke-width: 1px; stroke-dasharray: 4 4"></line>
+        <text x="454" y="14" style="font-family: Inter, sans-serif; font-size: 11px; fill: var(--muted)">HT</text>
+        <sc-for list="{{ribbonEvents}}" as="ev" hint-placeholder-count="4">
+          <circle class="ob-pop-a" cx="{{ev.x}}" cy="{{ev.y}}" r="5" style="{{ev.style}}"></circle>
+        </sc-for>
+        <line x1="630" y1="2" x2="630" y2="86" style="stroke: var(--space); stroke-width: 2px"></line>
+        <circle class="ob-ripple" cx="630" cy="44" r="5" style="fill: none; stroke: var(--space); stroke-width: 2px"></circle>
+        <circle cx="630" cy="44" r="4" style="fill: var(--space)"></circle>
+        <text x="630" y="95" style="font-family: Inter, sans-serif; font-size: 11px; font-weight: 700; fill: var(--text); text-anchor: middle">63'</text>
+        <text x="0" y="95" style="font-family: Inter, sans-serif; font-size: 11px; fill: var(--muted)">0'</text>
+        <text x="900" y="95" style="font-family: Inter, sans-serif; font-size: 11px; fill: var(--muted); text-anchor: end">90'</text>
+      </svg>
+    </div>
+
+    <p style="margin: 0; font-size: 12px; color: var(--muted)">All match data is synthetic. Captions and answers are AI-generated and fact-checked against event and frame data. Hover a player for their name.</p>
+  </section>
+
+  <aside aria-label="{{panelLabel}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+
+    <sc-if value="{{isCasual}}" hint-placeholder-val="{{true}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <h2 style="margin: 0 0 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">How the goal was made</h2>
+        <p style="margin: 0 0 14px; color: var(--muted); font-size: 14px">The steps light up as they happen.</p>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{steps}}" as="st" hint-placeholder-count="5">
+            <li class="ob-rise" style="{{st.style}}"><span class="{{st.badgeClass}}" style="{{st.badge}}">{{st.n}}</span><span>{{st.text}}</span></li>
+          </sc-for>
+        </ol>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isLearn}}" hint-placeholder-val="{{false}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted)">NEW IDEA</p>
+        <h2 style="margin: 0 0 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">Decoy run</h2>
+        <p style="margin: 0 0 12px; font-size: 16px; line-height: 1.5">A run made so a teammate gets space, not to get the ball.</p>
+        <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--muted)">Defenders are taught to follow runners into dangerous areas. When one does, the space they leave behind is the real target.</p>
+        <button type="button" onClick="{{pauseExplain}}" class="ob-btn" style="min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface2); color: var(--text); font: 600 14px Inter, sans-serif">Pause and explain</button>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 80ms">
+        <h3 style="margin: 0 0 10px; font-size: 15px">Your glossary today</h3>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px">
+          <li class="ob-pop-a" style="padding: 6px 10px; border-radius: 999px; background: var(--space); color: var(--onSpace); font-size: 13px; font-weight: 600; animation-delay: 120ms">Decoy run · seen 2</li>
+          <li class="ob-pop-a" style="padding: 6px 10px; border-radius: 999px; background: var(--space); color: var(--onSpace); font-size: 13px; font-weight: 600; animation-delay: 180ms">Gap · seen 4</li>
+          <li class="ob-pop-a" style="padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; animation-delay: 240ms">Overlap · next</li>
+          <li class="ob-pop-a" style="padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; animation-delay: 300ms">Pressing · next</li>
+        </ul>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isAnalyst}}" hint-placeholder-val="{{false}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <h2 style="margin: 0 0 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">Decoy run · live metrics</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <sc-for list="{{metrics}}" as="mt" hint-placeholder-count="8">
+            <div class="ob-rise" style="{{mt.boxStyle}}">
+              <div style="font-size: 12px; color: var(--muted)">{{mt.label}}</div>
+              <sc-if value="{{mt.ready}}" hint-placeholder-val="{{true}}">
+                <div class="ob-pop-a" style="transform-origin: left center; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums">{{mt.value}} <span style="font-family: Inter, sans-serif; font-size: 13px; font-weight: 500; color: var(--muted)">{{mt.unit}}</span></div>
+              </sc-if>
+              <sc-if value="{{mt.waiting}}" hint-placeholder-val="{{false}}">
+                <div class="ob-shimmer" style="height: 22px; width: 70%; border-radius: 6px; margin-top: 8px"></div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 60ms">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+          <h3 style="margin: 0; font-size: 15px">Space created by No. 9</h3>
+          <span style="font-size: 12px; color: var(--muted)">Tactician · 32 re-runs each way</span>
+        </div>
+        <sc-if value="{{spaceReady}}" hint-placeholder-val="{{false}}">
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; margin: 6px 0 8px; font-variant-numeric: tabular-nums">{{spaceVal}} m²</div>
+          <div style="position: relative; height: 14px; border-radius: 7px; background: var(--surface2)">
+            <div class="ob-grow" style="position: absolute; top: 0; bottom: 0; border-radius: 7px; left: 55%; width: 25%; background: var(--kes); opacity: .5"></div>
+            <div class="ob-pop-a" style="position: absolute; top: -3px; bottom: -3px; width: 4px; border-radius: 2px; left: 68.3%; background: var(--text); animation-delay: .4s"></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{spaceWaiting}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; align-items: center; gap: 10px; margin: 12px 0 10px; font-size: 14px; color: var(--muted)">
+            <span class="ob-spin" style="width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--kes); border-radius: 50%; display: inline-block"></span>
+            Re-running the moment without the run…
+          </div>
+          <div class="ob-shimmer" style="height: 14px; border-radius: 7px"></div>
+        </sc-if>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px"><span>0 m²</span><span>90% interval 33–48 m²</span><span>60 m²</span></div>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 120ms">
+        <h3 style="margin: 0 0 10px; font-size: 15px">Evidence</h3>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{evidence}}" as="evd" hint-placeholder-count="5">
+            <li style="display: flex; align-items: center; gap: 10px; font-size: 13px; min-height: 26px">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); min-width: 92px">{{evd.id}}</span>
+              <span style="{{evd.labelStyle}}">{{evd.label}}</span>
+              <sc-if value="{{evd.verified}}" hint-placeholder-val="{{false}}">
+                <span class="ob-pop-a" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 999px; background: var(--space); color: var(--onSpace)">
+                  <svg width="10" height="10" viewBox="0 0 14 14" aria-hidden="true"><path class="ob-check" d="M2.5 7.5 L5.5 10.5 L11.5 3.5" style="fill: none; stroke: currentColor; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 16; animation: obCheckA .45s var(--eo) .15s both"></path></svg>
+                  Verified
+                </span>
+              </sc-if>
+              <sc-if value="{{evd.pending}}" hint-placeholder-val="{{true}}">
+                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted)"><span class="ob-blink" style="width: 6px; height: 6px; border-radius: 3px; background: var(--muted)"></span>Pending</span>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 180ms">
+        <h3 style="margin: 0 0 12px; font-size: 15px">Space Created · this match</h3>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+          <sc-for list="{{leaders}}" as="ld" hint-placeholder-count="4">
+            <li>
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px"><span>{{ld.name}}</span><span style="font-variant-numeric: tabular-nums; font-weight: 600">{{ld.v}} m²</span></div>
+              <div style="position: relative; height: 10px; border-radius: 5px; background: var(--surface2)">
+                <div class="ob-grow" style="{{ld.bar}}"></div>
+                <div class="ob-fade" style="{{ld.whisker}}"></div>
+              </div>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isPlayer}}" hint-placeholder-val="{{false}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px">
+          <span class="ob-beat" style="width: 48px; height: 48px; border-radius: 24px; background: var(--kes); color: var(--onKes); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">9</span>
+          <div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">J. Velmar</div>
+            <div style="font-size: 13px; color: var(--muted)">Striker · Kestrel Bay · following</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <sc-for list="{{tallies}}" as="ty" hint-placeholder-count="6">
+            <div class="ob-rise" style="{{ty.boxStyle}}">
+              <div style="font-size: 12px; color: var(--muted)">{{ty.label}}</div>
+              <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums">{{ty.value}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 80ms">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <h3 style="margin: 0; font-size: 15px">Speed, this move</h3>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums">{{spd}} km/h</span>
+        </div>
+        <svg viewBox="0 0 200 52" role="img" aria-label="No. 9 speed over this move, crossing the sprint line." style="width: 100%; height: auto; display: block; margin-top: 8px">
+          <line x1="0" y1="17" x2="200" y2="17" style="stroke: var(--space); stroke-width: 1px; stroke-dasharray: 3 3"></line>
+          <text x="200" y="13" style="font-family: Inter, sans-serif; font-size: 8px; fill: var(--muted); text-anchor: end">sprint 25.2</text>
+          <polyline points="{{spark}}" style="fill: none; stroke: var(--kes); stroke-width: 2.5px; stroke-linejoin: round"></polyline>
+          <circle cx="{{sparkEnd.x}}" cy="{{sparkEnd.y}}" r="3.5" style="fill: var(--kes)"></circle>
+          <circle class="ob-ripple" cx="{{sparkEnd.x}}" cy="{{sparkEnd.y}}" r="3.5" style="fill: none; stroke: var(--kes); stroke-width: 1.5px"></circle>
+        </svg>
+        <p style="margin: 10px 0 0; font-size: 13px; color: var(--muted)">{{milestone}}</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isAudio}}" hint-placeholder-val="{{false}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px">
+          <span class="{{eqClass}}" aria-hidden="true" style="height: 20px"><span style="height: 20px"></span><span style="height: 20px; animation-delay: .15s"></span><span style="height: 20px; animation-delay: .3s"></span><span style="height: 20px; animation-delay: .45s"></span><span style="height: 20px; animation-delay: .6s"></span></span>
+          <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">Describing the shape of play</h2>
+        </div>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{transcript}}" as="tr" hint-placeholder-count="6">
+            <li style="{{tr.style}}"><span style="{{tr.bar}}"></span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); flex: none; padding-top: 3px">{{tr.time}}</span><span>{{tr.text}}</span></li>
+          </sc-for>
+        </ol>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 80ms">
+        <h3 style="margin: 0 0 4px; font-size: 15px">Stereo cue</h3>
+        <p style="margin: 0 0 12px; font-size: 13px; color: var(--muted)">A soft tone, panned to where space is opening on screen.</p>
+        <div style="position: relative; height: 12px; border-radius: 6px; background: var(--surface2)">
+          <div style="{{cueStyle}}"></div>
+          <div class="ob-ripple" style="{{cueRipple}}"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 6px"><span>Left</span><span style="color: var(--text); font-weight: 600">{{cueLabel}}</span><span>Right</span></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isBroadcaster}}" hint-placeholder-val="{{false}}">
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px">
+        <h2 style="margin: 0 0 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">Graphics queue</h2>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{queue}}" as="q" hint-placeholder-count="5">
+            <li class="ob-rise" style="{{q.boxStyle}}">
+              <div style="display: flex; justify-content: space-between; gap: 8px; align-items: center">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">{{q.kind}}</span>
+                <span style="{{q.chip}}">{{q.state}}</span>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 4px">{{q.meta}}</div>
+              <sc-if value="{{q.waiting}}" hint-placeholder-val="{{false}}">
+                <div class="ob-fade" style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap">
+                  <button type="button" onClick="{{approve}}" class="ob-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; background: var(--space); color: var(--onSpace); font: 600 13px Inter, sans-serif">Approve</button>
+                  <button type="button" class="ob-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); font: 600 13px Inter, sans-serif">Hold</button>
+                  <button type="button" class="ob-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); font: 600 13px Inter, sans-serif">Skip</button>
+                </div>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+      <div class="ob-card ob-rise" style="background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; animation-delay: 80ms">
+        <h3 style="margin: 0 0 6px; font-size: 15px">Engineer</h3>
+        <p style="margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--muted)">Explainer p95 at 1.9 s, inside its 3 s budget. Ingest lag 140 ms. No degrade flags changed.</p>
+        <a href="Producer.dc.html" style="color: var(--kes); font-weight: 600; font-size: 14px">Open the producer console</a>
+      </div>
+    </sc-if>
+  </aside>
+</main>
+
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+  <button type="button" aria-label="Close personalization" onClick="{{closeDrawer}}" class="ob-fade" style="position: fixed; inset: 0; border: 0; padding: 0; margin: 0; background: rgba(0,0,0,0.5); cursor: pointer"></button>
+  <div role="dialog" aria-modal="true" aria-labelledby="ob-drawer-title" class="ob-drawer" style="position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -16px 0 48px rgba(0,0,0,0.35); padding: 22px; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <h2 id="ob-drawer-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">Personalize</h2>
+      <button type="button" aria-label="Close" onClick="{{closeDrawer}}" class="ob-btn" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid var(--line); background: transparent; color: var(--text); display: inline-flex; align-items: center; justify-content: center">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2 L12 12 M12 2 L2 12" style="stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"></path></svg>
+      </button>
+    </div>
+
+    <section class="ob-rise" style="animation-delay: 80ms">
+      <h3 style="margin: 0 0 10px; font-size: 14px; color: var(--muted)">Your club</h3>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{clubs}}" as="cl" hint-placeholder-count="2">
+          <button type="button" aria-pressed="{{cl.pressed}}" onClick="{{cl.pick}}" class="ob-btn" style="{{cl.style}}">
+            <span style="{{cl.badge}}"></span>
+            <span style="font-weight: 600">{{cl.name}}</span>
+            <sc-if value="{{cl.pressed}}" hint-placeholder-val="{{false}}">
+              <svg class="ob-pop-a" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="margin-left: auto"><circle cx="9" cy="9" r="8" style="fill: var(--space)"></circle><path d="M5 9.5 L7.8 12 L13 6.5" style="fill: none; stroke: var(--onSpace); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="ob-rise" style="animation-delay: 130ms">
+      <label for="ob-fav" style="display: block; margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted)">Favourite player</label>
+      <select id="ob-fav" value="{{fav}}" onChange="{{onFav}}" style="width: 100%; min-height: 44px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface2); color: var(--text); font: 500 14px Inter, sans-serif">
+        <option value="9">No. 9 · J. Velmar</option>
+        <option value="10">No. 10 · T. Arkwell</option>
+        <option value="7">No. 7 · P. Quillan</option>
+      </select>
+    </section>
+
+    <section class="ob-rise" style="animation-delay: 180ms">
+      <h3 style="margin: 0 0 10px; font-size: 14px; color: var(--muted)">The number you care about</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{metricChips}}" as="mc" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{mc.pressed}}" onClick="{{mc.pick}}" class="ob-btn" style="{{mc.style}}">{{mc.label}}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="ob-rise" style="animation-delay: 230ms">
+      <h3 style="margin: 0 0 10px; font-size: 14px; color: var(--muted)">Overlay density</h3>
+      <div style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--line)">
+        <span aria-hidden="true" style="{{densityIndicator}}"></span>
+        <sc-for list="{{densities}}" as="dn" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{dn.pressed}}" onClick="{{dn.pick}}" style="{{dn.style}}">{{dn.label}}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="ob-rise" style="animation-delay: 280ms; display: flex; flex-direction: column; gap: 12px">
+      <sc-for list="{{switches}}" as="sw" hint-placeholder-count="2">
+        <button type="button" role="switch" aria-checked="{{sw.on}}" onClick="{{sw.toggle}}" class="ob-btn" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface2); color: var(--text); font: 600 14px Inter, sans-serif; text-align: left">
+          <span>{{sw.label}}<span style="display: block; font-weight: 400; font-size: 12px; color: var(--muted)">{{sw.hint}}</span></span>
+          <span style="{{sw.track}}"><span style="{{sw.knob}}"></span></span>
+        </button>
+      </sc-for>
+    </section>
+
+    <section class="ob-rise" style="animation-delay: 330ms">
+      <label for="ob-capsize" style="display: flex; justify-content: space-between; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--muted)"><span>Caption size</span><span style="color: var(--text); font-variant-numeric: tabular-nums">{{capSize}} px</span></label>
+      <input id="ob-capsize" type="range" min="16" max="28" step="1" value="{{capSize}}" onChange="{{onCapSize}}" class="ob-scrub">
+    </section>
+
+    <p style="margin: auto 0 0; font-size: 12px; color: var(--muted)">Saved on this device only. No account needed.</p>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"reducedMotion":{"editor":"boolean","default":false},"simulateFeedStall":{"editor":"boolean","default":false},"simulateSlowDevice":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.last = Date.now();
+    this.timer = setInterval(() => this.tick(), 66);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  st() {
+    return Object.assign({ tRaw: 0, playing: true, mode: 'casual', lang: 'en', whatIf: false, approved: false,
+      drawer: false, club: 'kes', fav: '9', metric: 'space', density: 'standard', voice: true, rm: false, capSize: 20 }, this.state || {});
+  }
+  tick() {
+    const now = Date.now();
+    const dt = Math.min(0.2, (now - this.last) / 1000);
+    this.last = now;
+    const s = this.st();
+    if (!s.playing) return;
+    let tRaw = s.tRaw + dt;
+    const end = this.props.simulateFeedStall ? 12.5 : 11.5;
+    if (tRaw > end) tRaw = 0;
+    this.setState({ tRaw: tRaw });
+  }
+  at(keys, t, ease) {
+    if (t <= keys[0][0]) return [keys[0][1], keys[0][2]];
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i], b = keys[i + 1];
+      if (t <= b[0]) {
+        let u = (t - a[0]) / (b[0] - a[0]);
+        if (ease) u = u * u * (3 - 2 * u);
+        return [a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
+      }
+    }
+    const l = keys[keys.length - 1];
+    return [l[1], l[2]];
+  }
+  control(list, x, y) {
+    let tk = 99, ta = 99;
+    for (let i = 0; i < list.length; i++) {
+      const p = list[i];
+      const tt = 0.7 + Math.hypot(p.x - x, p.y - y) / 7;
+      if (p.team === 'kes') { if (tt < tk) tk = tt; } else if (tt < ta) ta = tt;
+    }
+    return 1 / (1 + Math.exp(-(ta - tk) / 0.35));
+  }
+  tokens(theme) {
+    if (theme === 'light') {
+      return { bg: '#EEF2EE', surface: '#FFFFFF', surface2: '#F1F5F2', line: '#D3DDD6', text: '#0F1A16', muted: '#4A5B53',
+        pitch: '#DCEDE0', stripe: '#D3E8D8', edge: '#C5DFCB', chalk: 'rgba(20,60,40,0.38)', halo: 'rgba(255,255,255,0.92)',
+        kes: '#1A5DB8', ash: '#D2652A', onKes: '#FFFFFF', onAsh: '#1E0C02', space: '#5E7F00', onSpace: '#FFFFFF',
+        spaceFill: 'rgba(94,127,0,0.12)', chip: 'rgba(255,255,255,0.9)', kesRGB: [26, 93, 184], ashRGB: [210, 101, 42], fieldMax: 0.5 };
+    }
+    return { bg: '#0B1110', surface: '#121B18', surface2: '#19251F', line: '#27362F', text: '#ECF1EC', muted: '#9EB0A6',
+      pitch: '#14301F', stripe: '#173624', edge: '#0F2419', chalk: 'rgba(236,241,236,0.45)', halo: 'rgba(9,16,13,0.88)',
+      kes: '#7CC0FF', ash: '#E2733A', onKes: '#06121F', onAsh: '#1E0C02', space: '#D7F25C', onSpace: '#0B1110',
+      spaceFill: 'rgba(215,242,92,0.12)', chip: 'rgba(18,27,24,0.85)', kesRGB: [124, 192, 255], ashRGB: [226, 115, 58], fieldMax: 0.55 };
+  }
+  D() {
+    if (this._d) return this._d;
+    const K = 'kes', A = 'ash';
+    this._d = {
+      players: [
+        { id: 'k1', team: K, num: 1, name: 'Kestrel Bay No. 1', keys: [[0, 6, 34]] },
+        { id: 'k2', team: K, num: 2, name: 'Kestrel Bay No. 2', keys: [[0, 62, 10], [9, 66, 10]] },
+        { id: 'k3', team: K, num: 3, name: 'Kestrel Bay No. 3', keys: [[0, 58, 60], [9, 62, 61]] },
+        { id: 'k4', team: K, num: 4, name: 'Kestrel Bay No. 4', keys: [[0, 42, 26], [9, 46, 26]] },
+        { id: 'k5', team: K, num: 5, name: 'Kestrel Bay No. 5', keys: [[0, 42, 44], [9, 46, 44]] },
+        { id: 'k6', team: K, num: 6, name: 'Kestrel Bay No. 6', keys: [[0, 50, 34], [9, 54, 35]] },
+        { id: 'k7', team: K, num: 7, name: 'Kestrel Bay No. 7 · P. Quillan', keys: [[0, 86, 13], [4, 88, 14], [9, 90, 15]] },
+        { id: 'k8', team: K, num: 8, name: 'Kestrel Bay No. 8', keys: [[0, 55, 39.5], [4.2, 60, 40.4], [6, 63, 41], [9, 66, 41]] },
+        { id: 'k9', team: K, num: 9, name: 'Kestrel Bay No. 9 · J. Velmar', keys: [[0, 84, 34], [1, 84, 34], [4.6, 91, 53], [9, 92, 54]] },
+        { id: 'k10', team: K, num: 10, name: 'Kestrel Bay No. 10 · T. Arkwell', keys: [[0, 73, 44], [3.8, 76, 42], [5.6, 88, 40.3], [6.4, 89, 40], [9, 92, 39]] },
+        { id: 'k11', team: K, num: 11, name: 'Kestrel Bay No. 11', keys: [[0, 82, 58], [4, 84, 60], [9, 86, 60]] },
+        { id: 'a1', team: A, num: 1, name: 'Ashmoor No. 1', keys: [[0, 101, 34], [6.4, 101.5, 36], [9, 101, 35]] },
+        { id: 'a2', team: A, num: 2, name: 'Ashmoor No. 2', keys: [[0, 89, 58], [9, 90, 59]] },
+        { id: 'a3', team: A, num: 3, name: 'Ashmoor No. 3', keys: [[0, 88, 13], [9, 88, 14]] },
+        { id: 'a4', team: A, num: 4, name: 'Ashmoor No. 4', keys: [[0, 91, 29], [9, 92, 30]] },
+        { id: 'a5', team: A, num: 5, name: 'Ashmoor No. 5 · L. Hendricx', keys: [[0, 90, 37], [1.5, 90, 37], [4.6, 93.5, 47.2], [9, 93.7, 47]] },
+        { id: 'a6', team: A, num: 6, name: 'Ashmoor No. 6', keys: [[0, 79, 37], [3.5, 74, 39], [9, 75, 39]] },
+        { id: 'a7', team: A, num: 7, name: 'Ashmoor No. 7', keys: [[0, 70, 14], [9, 71, 15]] },
+        { id: 'a8', team: A, num: 8, name: 'Ashmoor No. 8', keys: [[0, 78, 26], [9, 79, 27]] },
+        { id: 'a9', team: A, num: 9, name: 'Ashmoor No. 9', keys: [[0, 60, 30], [9, 61, 31]] },
+        { id: 'a10', team: A, num: 10, name: 'Ashmoor No. 10 · S. Moravec', keys: [[0, 77, 49], [9, 79, 50]] },
+        { id: 'a11', team: A, num: 11, name: 'Ashmoor No. 11', keys: [[0, 69, 57], [9, 70, 57]] }
+      ],
+      cf: { k9: [[0, 84, 34], [9, 85, 35]], a5: [[0, 90, 37], [9, 90.5, 37.5]] },
+      ball: [[0, 55.8, 39.3], [4.2, 60.6, 40.4], [5.6, 88, 40.3], [6.4, 89.4, 40], [6.9, 105.3, 36.2], [9, 105.3, 36.2]],
+      casual: {
+        en: ['Kestrel Bay on the ball in midfield.', 'Watch No. 9. This run isn’t to get the ball. It’s to pull a defender away.', 'Ashmoor’s No. 5 follows. That’s exactly the point.', 'A gap opens in the centre, just outside the box.', 'No. 10 runs into the gap. The pass arrives.', 'Goal. Made by No. 9’s run, finished by No. 10.'],
+        es: ['Kestrel Bay tiene el balón en el centro del campo.', 'Mira al 9. Esta carrera no es para recibir el balón: es para arrastrar a un defensor.', 'El 5 de Ashmoor lo sigue. Eso es justo lo que se buscaba.', 'Se abre un hueco en el centro, justo fuera del área.', 'El 10 entra en el hueco. Llega el pase.', 'Gol. Lo creó la carrera del 9 y lo remató el 10.'],
+        ar: ['كيستريل باي تستحوذ على الكرة في وسط الملعب.', 'راقب رقم 9. هذا الركض ليس لاستلام الكرة، بل لسحب مدافع بعيدًا.', 'رقم 5 في أشمور يتبعه. وهذا هو المطلوب تمامًا.', 'تنفتح مساحة في العمق، خارج منطقة الجزاء مباشرة.', 'رقم 10 يدخل المساحة. وتصله التمريرة.', 'هدف. صنعه ركض رقم 9، وأنهاه رقم 10.']
+      },
+      learn: ['Kestrel Bay on the ball. Watch the players without the ball.', 'No. 9 is making a decoy run: a run made so a teammate gets space.', 'Defenders are taught to follow runners. No. 5 follows and leaves the middle.', 'That empty area is a gap: space nobody is guarding.', 'No. 10 times a run into the gap. The pass arrives.', 'Goal. That’s 2 decoy runs you’ve spotted today.'],
+      whatIf: {
+        en: ['What if No. 9 hadn’t run? The ghosts replay the move without the run.', 'Without the run, No. 5 stays central and the gap stays shut in 29 of 32 re-runs.'],
+        es: ['¿Y si el 9 no hubiera corrido? Los fantasmas repiten la jugada sin la carrera.', 'Sin la carrera, el 5 se queda en el centro y el hueco no se abre en 29 de 32 simulaciones.'],
+        ar: ['ماذا لو لم يركض رقم 9؟ الأشباح تعيد اللعبة من دون الركض.', 'من دون هذا الركض، يبقى رقم 5 في العمق وتبقى المساحة مغلقة في 29 من 32 محاكاة.']
+      },
+      transcript: [
+        { t: 0, text: 'Kestrel attack left to right. Ball with No. 8 in midfield.' },
+        { t: 1, text: 'No. 9 sprints diagonally towards the left wing.' },
+        { t: 2.5, text: 'Ashmoor’s No. 5 follows the run, out of the middle.' },
+        { t: 3.8, text: 'A gap opens in the centre, just outside the box.' },
+        { t: 4.2, text: 'No. 8 passes into the gap. No. 10 arrives on it.' },
+        { t: 6.4, text: 'No. 10 shoots low. Goal. Kestrel lead 1–0.' }
+      ],
+      feed: ['match.status · in_play · 63:00', 'overlay.upsert · run_arrow · m07-o0041 · auto', 'overlay.upsert · player_tag · m07-o0042 · auto', 'overlay.upsert · gap_ring · m07-o0043 · approved', 'overlay.upsert · pass_line · m07-o0044 · auto', 'overlay.upsert · caption · m07-o0045 · ghost replay queued'],
+      evidence: [
+        { t: 1, id: 'm07-f27525', label: 'Run starts' },
+        { t: 2.5, id: 'm07-f27562', label: 'No. 5 follows' },
+        { t: 3.8, id: 'm07-f27595', label: 'Gap opens' },
+        { t: 4.2, id: 'm07-e0912', label: 'Pass No. 8 to No. 10' },
+        { t: 6.4, id: 'm07-e0918', label: 'Shot and goal' }
+      ],
+      leaders: [
+        { name: 'No. 9 Velmar · KES', v: 118, lo: 96, hi: 137, team: K },
+        { name: 'No. 7 Quillan · KES', v: 64, lo: 51, hi: 79, team: K },
+        { name: 'No. 10 Moravec · ASH', v: 52, lo: 40, hi: 66, team: A },
+        { name: 'No. 5 Hendricx · ASH', v: 31, lo: 22, hi: 40, team: A }
+      ],
+      modes: [
+        { id: 'casual', label: 'Casual' }, { id: 'learn', label: 'Learn' }, { id: 'analyst', label: 'Analyst' },
+        { id: 'player', label: 'Player focus' }, { id: 'audio', label: 'Audio-described' }, { id: 'broadcaster', label: 'Broadcaster' }
+      ],
+      stepText: ['No. 9 makes a run', 'A defender follows', 'A gap opens', 'No. 10 runs in, the pass arrives', 'Goal']
+    };
+    return this._d;
+  }
+  base() {
+    if (this._base != null) return this._base;
+    const D = this.D();
+    const list = D.players.map((p) => ({ team: p.team, x: p.keys[0][1], y: p.keys[0][2] }));
+    let sum = 0, n = 0;
+    for (let r = 0; r < 14; r++) for (let c = 0; c < 21; c++) {
+      const cx = (c + 0.5) * 5, cy = 68 - (r + 0.5) * (68 / 14);
+      if (cx >= 84 && cx <= 93 && cy >= 34 && cy <= 46) { sum += this.control(list, cx, cy); n++; }
+    }
+    this._base = sum / n;
+    return this._base;
+  }
+  head(x1, y1, x2, y2, size) {
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, px = -uy, py = ux;
+    const bx = x2 - ux * size, by = y2 - uy * size;
+    return x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' + (bx + px * size * 0.5).toFixed(1) + ',' + (by + py * size * 0.5).toFixed(1) + ' ' + (bx - px * size * 0.5).toFixed(1) + ',' + (by - py * size * 0.5).toFixed(1);
+  }
+  switchParts(on) {
+    return {
+      track: 'position: relative; display: inline-block; width: 40px; height: 24px; flex: none; border-radius: 12px; transition: background-color .22s; background: ' + (on ? 'var(--space)' : 'var(--line)'),
+      knob: 'position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 9px; background: ' + (on ? 'var(--onSpace)' : 'var(--text)') + '; transition: transform .26s var(--ep), background-color .22s; transform: translateX(' + (on ? 16 : 0) + 'px)'
+    };
+  }
+  renderVals() {
+    const s = this.st();
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const rm = !!this.props.reducedMotion || s.rm;
+    const stallOn = !!this.props.simulateFeedStall;
+    const slow = !!this.props.simulateSlowDevice;
+    const T = this.tokens(theme);
+    const D = this.D();
+    let tMap = s.tRaw;
+    if (stallOn) tMap = s.tRaw < 2 ? s.tRaw : s.tRaw < 3 ? 2 : s.tRaw - 1;
+    const stalled = stallOn && s.tRaw >= 2 && s.tRaw < 3;
+    const t = Math.min(tMap, 9);
+    const mode = s.mode, lang = s.lang, whatIf = !!s.whatIf;
+    const step = t < 1 ? 0 : t < 2.5 ? 1 : t < 3.8 ? 2 : t < 4.2 ? 3 : t < 6.4 ? 4 : 5;
+    const SX = (x) => x * 10, SY = (y) => (68 - y) * 10;
+    const trans = ' transition: transform 80ms linear;';
+    const density = s.density;
+
+    const pos = {};
+    D.players.forEach((p) => { pos[p.id] = this.at(p.keys, t, true); });
+    const world = Object.assign({}, pos);
+    if (whatIf) { world.k9 = this.at(D.cf.k9, t, true); world.a5 = this.at(D.cf.a5, t, true); }
+    const ball = this.at(D.ball, t, false);
+
+    const list = D.players.map((p) => ({ team: p.team, x: world[p.id][0], y: world[p.id][1] }));
+    const modeWeight = mode === 'analyst' ? 1 : mode === 'broadcaster' ? 0.8 : mode === 'player' ? 0.7 : 0.45;
+    const densityWeight = density === 'minimal' ? 0.5 : density === 'rich' ? 1.35 : 1;
+    const maxA = T.fieldMax * Math.min(1, (whatIf ? 1 : modeWeight) * densityWeight);
+    const cells = [], contested = [];
+    let gapSum = 0, gapN = 0;
+    for (let r = 0; r < 14; r++) {
+      for (let c = 0; c < 21; c++) {
+        const cx = (c + 0.5) * 5, cy = 68 - (r + 0.5) * (68 / 14);
+        const pk = this.control(list, cx, cy);
+        const rgb = pk >= 0.5 ? T.kesRGB : T.ashRGB;
+        const a = Math.abs(pk - 0.5) * 2 * maxA;
+        cells.push({ style: 'background-color: rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + a.toFixed(3) + '); transition: background-color 120ms linear' });
+        if (Math.abs(pk - 0.5) < 0.1) contested.push({ cx: SX(cx).toFixed(1), cy: SY(cy).toFixed(1) });
+        if (cx >= 84 && cx <= 93 && cy >= 34 && cy <= 46) { gapSum += pk; gapN++; }
+      }
+    }
+    const gain = Math.round((gapSum / gapN - this.base()) * 100);
+    const gainStr = (gain >= 0 ? '+' : '−') + Math.abs(gain);
+
+    const k9 = pos.k9, a5 = pos.a5;
+    const runLen = Math.hypot(k9[0] - 84, k9[1] - 34);
+    const disp = Math.hypot(a5[0] - 90, a5[1] - 37);
+    const speedAt = (tt) => {
+      if (tt < 0.2) return 0;
+      const p1 = this.at(D.players[8].keys, tt, true), p0 = this.at(D.players[8].keys, tt - 0.2, true);
+      return Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 0.2 * 3.6;
+    };
+    const spd = speedAt(t);
+    let maxX = 0;
+    D.players.forEach((p) => { if (p.team === 'ash' && p.id !== 'a1' && pos[p.id][0] > maxX) maxX = pos[p.id][0]; });
+
+    const favId = 'k' + s.fav;
+    const focusIds = { a5: 1, k10: 1 };
+    focusIds[favId] = 1;
+    const players = D.players.map((p) => {
+      const xy = pos[p.id];
+      const dim = mode === 'player' && !focusIds[p.id];
+      return {
+        num: p.num, title: p.name,
+        focus: mode === 'player' && p.id === favId,
+        gStyle: 'transform: translate(' + SX(xy[0]).toFixed(1) + 'px, ' + SY(xy[1]).toFixed(1) + 'px);' + trans + ' opacity: ' + (dim ? 0.4 : 1) + '; transition: transform 80ms linear, opacity .3s',
+        dotStyle: 'fill: var(--' + p.team + '); stroke: var(--halo); stroke-width: 2.5px',
+        numStyle: 'fill: var(--' + (p.team === 'kes' ? 'onKes' : 'onAsh') + '); font-family: Inter, sans-serif; font-weight: 700; font-size: 13px; text-anchor: middle; pointer-events: none'
+      };
+    });
+
+    const ghosts = whatIf ? [
+      { label: '9 · no run', team: 'kes', xy: world.k9 },
+      { label: '5 · stays', team: 'ash', xy: world.a5 }
+    ].map((g) => ({
+      label: g.label,
+      gStyle: 'transform: translate(' + SX(g.xy[0]).toFixed(1) + 'px, ' + SY(g.xy[1]).toFixed(1) + 'px);' + trans,
+      dotStyle: 'fill: none; stroke: var(--' + g.team + '); stroke-width: 3px; stroke-dasharray: 5 4'
+    })) : [];
+
+    const trail = [];
+    if (t > 4.2 && t < 7) {
+      for (let i = 1; i <= 4; i++) {
+        const bp = this.at(D.ball, Math.max(0, t - i * 0.07), false);
+        trail.push({ x: SX(bp[0]).toFixed(1), y: SY(bp[1]).toFixed(1), r: (6 - i).toFixed(1), style: 'fill: #FFFFFF; opacity: ' + (0.42 - i * 0.09).toFixed(2) });
+      }
+    }
+
+    const tagStyle = (color) => 'font-family: Inter, sans-serif; font-size: 20px; font-weight: 700; fill: ' + color + '; text-anchor: middle; paint-order: stroke; stroke: var(--halo); stroke-width: 6px; stroke-linejoin: round';
+    const tags = [];
+    const named = mode === 'analyst' || mode === 'broadcaster';
+    if (t >= 0.8 && t < 6.4) tags.push({ x: SX(k9[0]).toFixed(1), y: (SY(k9[1]) - 26).toFixed(1), text: named ? 'No. 9 Velmar' : (mode === 'learn' ? '9 · decoy run' : 'No. 9'), style: tagStyle('var(--text)') });
+    if (density !== 'minimal') {
+      if (spd > 25.2 && mode !== 'audio') tags.push({ x: SX(k9[0]).toFixed(1), y: (SY(k9[1]) + 40).toFixed(1), text: 'Sprint ' + spd.toFixed(1) + ' km/h', style: tagStyle('var(--space)') });
+      if (t >= 2.5 && t < 6.4) tags.push({ x: SX(a5[0]).toFixed(1), y: (SY(a5[1]) - 26).toFixed(1), text: named ? 'No. 5 Hendricx' : 'No. 5 follows', style: tagStyle('var(--text)') });
+      if (t >= 4.2 && t < 7.5) tags.push({ x: SX(pos.k10[0]).toFixed(1), y: (SY(pos.k10[1]) + 40).toFixed(1), text: named ? 'No. 10 Arkwell' : 'No. 10', style: tagStyle('var(--text)') });
+    }
+
+    const lead = this.at(D.players[8].keys, Math.min(4.6, t + 0.8), true);
+    const run = { x2: SX(lead[0]).toFixed(1), y2: SY(lead[1]).toFixed(1), head: this.head(840, 340, SX(lead[0]), SY(lead[1]), 20) };
+    const pass = { bx: SX(ball[0]).toFixed(1), by: SY(ball[1]).toFixed(1), head: this.head(606, 276, 880, 277, 20) };
+    const dispObj = { x2: SX(a5[0]).toFixed(1), y2: SY(a5[1]).toFixed(1), tx: (SX((90 + a5[0]) / 2) + 14).toFixed(1), ty: SY((37 + a5[1]) / 2).toFixed(1), label: disp.toFixed(1) + ' m' };
+
+    const burst = [];
+    for (let i = 0; i < 14; i++) {
+      const ang = (i / 14) * Math.PI * 2, dist = 70 + (i % 3) * 26;
+      burst.push({ r: (3 + (i % 3)).toFixed(0), style: 'fill: ' + (i % 2 ? 'var(--space)' : 'var(--kes)') + '; --dx: ' + (Math.cos(ang) * dist).toFixed(0) + 'px; --dy: ' + (Math.sin(ang) * dist).toFixed(0) + 'px; animation-delay: ' + (i % 4) * 30 + 'ms' });
+    }
+
+    let caption, capLang = 'en';
+    if (whatIf) { caption = D.whatIf[lang][t >= 3.8 ? 1 : 0]; capLang = lang; }
+    else if (mode === 'casual') { caption = D.casual[lang][step]; capLang = lang; }
+    else if (mode === 'learn') { caption = lang === 'en' ? D.learn[step] : D.casual[lang][step]; capLang = lang; }
+    else if (mode === 'analyst') {
+      caption = [
+        'Kestrel build-up. Ashmoor back line ' + (105 - maxX).toFixed(1) + ' m from goal.',
+        'Decoy run: No. 9 on a diagonal, gaining speed.',
+        'CB No. 5 tracks the run and leaves the centre.',
+        'Gap-zone control is swinging to Kestrel.',
+        'Pass No. 8 to No. 10: 28.0 m, difficulty 6.1 of 10.',
+        'Shot xG 0.31. Space created by No. 9: 41 m² (90% interval 33–48).'
+      ][step];
+    } else if (mode === 'player') {
+      caption = [
+        'Following No. 9. Off-ball runs today: 6.',
+        'Run 7 starts, at full sprint.',
+        'Defender dragged: No. 5. That’s 3 today.',
+        'Space opening behind the run.',
+        'No. 9 hasn’t touched the ball in this move, and made it happen.',
+        'Credit: 41 m² of space created. 118 m² this match.'
+      ][step];
+    } else if (mode === 'audio') {
+      let line = D.transcript[0].text;
+      D.transcript.forEach((tr) => { if (t >= tr.t) line = tr.text; });
+      caption = line;
+    } else {
+      caption = D.feed[step];
+    }
+    const capKey = caption + '|' + mode;
+    if (capKey !== this._capKey) { this._capKey = capKey; this._capFlip = !this._capFlip; }
+    const capDir = capLang === 'ar' ? 'rtl' : 'ltr';
+    const mono = mode === 'broadcaster' && !whatIf;
+    const capStyle = mono
+      ? 'margin: 0; font-family: \'JetBrains Mono\', monospace; font-size: ' + Math.max(15, s.capSize - 3) + 'px; line-height: 1.45'
+      : 'margin: 0; font-size: ' + (mode === 'audio' ? s.capSize + 2 : s.capSize) + 'px; line-height: 1.4; font-weight: 500';
+    const words = caption.split(' ').map((w, i) => ({ text: w, style: 'animation-delay: ' + Math.min(i * 35, 700) + 'ms' }));
+    const yours = s.club === 'kes' ? 'Your team is attacking · ' : s.club === 'ash' ? 'Your team is defending · ' : '';
+    const capMeta = yours + {
+      casual: 'AI-generated caption · fact-checked against 3 data points',
+      learn: 'AI-generated caption · Learn mode explains each new idea once',
+      analyst: 'Evidence: ' + D.evidence.filter((e) => t >= e.t).map((e) => e.id).join(' · '),
+      player: 'AI-generated · following No. ' + s.fav + ' · season context from the Pundit’s search',
+      audio: 'Spoken by narrator 1 · English · paced so lines never overlap',
+      broadcaster: 'Overlay feed · partner protocol 2.0 · WebSocket'
+    }[mode];
+
+    const modeIdx = Math.max(0, D.modes.map((m) => m.id).indexOf(mode));
+    const pick = (id) => () => this.setState({ mode: id });
+    const modes = D.modes.map((m, i) => ({
+      label: m.label,
+      pressed: m.id === mode,
+      pick: pick(m.id),
+      iconStyle: 'display: inline-block; width: 6px; height: 6px; border-radius: 3px; margin-right: 8px; vertical-align: middle; transition: transform .3s var(--ep), background-color .2s; background: ' + (m.id === mode ? 'var(--space)' : 'var(--line)') + '; transform: scale(' + (m.id === mode ? 1.3 : 1) + ')',
+      style: 'position: relative; z-index: 1; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 0; background: transparent; font: 600 14px Inter, sans-serif; cursor: pointer; white-space: nowrap; transition: color .22s var(--eo); color: ' + (m.id === mode ? 'var(--bg)' : 'var(--muted)')
+    }));
+    const modeIndicator = 'position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 6); border-radius: 8px; background: var(--text); transition: transform .34s var(--eo); transform: translateX(' + (modeIdx * 100) + '%)';
+
+    const steps = D.stepText.map((txt, i) => {
+      const n = i + 1, cur = step === n, done = step > n;
+      return {
+        n: n, text: txt,
+        style: 'display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 15px; transition: background-color .3s var(--eo), color .3s, box-shadow .3s; animation-delay: ' + i * 50 + 'ms; ' +
+          (cur ? 'background: var(--surface2); box-shadow: inset 0 0 0 2px var(--space); font-weight: 600' : done ? 'color: var(--text)' : 'color: var(--muted)'),
+        badgeClass: cur ? 'ob-beat' : '',
+        badge: 'width: 28px; height: 28px; flex: none; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; transition: background-color .3s, color .3s, transform .35s var(--ep); transform: scale(' + (cur ? 1.12 : 1) + '); ' +
+          (cur ? 'background: var(--space); color: var(--onSpace)' : done ? 'background: var(--text); color: var(--bg)' : 'box-shadow: inset 0 0 0 1px var(--line); color: var(--muted)')
+      };
+    });
+
+    const box = (i) => 'background: var(--surface2); border-radius: 10px; padding: 10px 12px; min-height: 64px; box-sizing: border-box; animation-delay: ' + i * 40 + 'ms';
+    const metrics = [
+      { label: 'Run length', value: runLen.toFixed(1), unit: 'm', ready: true },
+      { label: 'No. 9 speed', value: spd.toFixed(1), unit: 'km/h', ready: true },
+      { label: 'No. 5 displaced', value: disp.toFixed(1), unit: 'm', ready: true },
+      { label: 'Gap-zone control', value: gainStr, unit: 'pts', ready: true },
+      { label: 'Pass distance', value: '28.0', unit: 'm', ready: t >= 4.2 },
+      { label: 'Pass difficulty', value: '6.1', unit: 'of 10', ready: t >= 4.2 },
+      { label: 'Shot xG', value: '0.31', unit: '', ready: t >= 6.4 },
+      { label: 'Ashmoor line', value: (105 - maxX).toFixed(1), unit: 'm from goal', ready: true }
+    ].map((m, i) => Object.assign(m, { waiting: !m.ready, boxStyle: box(i) }));
+    const evidence = D.evidence.map((e) => ({
+      id: e.id, label: e.label, verified: t >= e.t, pending: t < e.t,
+      labelStyle: 'flex: 1; min-width: 0; transition: color .3s; color: ' + (t >= e.t ? 'var(--text)' : 'var(--muted)')
+    }));
+    const leaders = D.leaders.map((l, i) => ({
+      name: l.name, v: l.v,
+      bar: 'position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; width: ' + (l.v / 140 * 100).toFixed(1) + '%; background: var(--' + l.team + '); animation-delay: ' + (200 + i * 90) + 'ms',
+      whisker: 'position: absolute; top: 4px; height: 2px; background: var(--text); left: ' + (l.lo / 140 * 100).toFixed(1) + '%; width: ' + ((l.hi - l.lo) / 140 * 100).toFixed(1) + '%; animation-delay: ' + (700 + i * 90) + 'ms'
+    }));
+    const ready = t >= 6.4;
+    const cu = Math.min(1, Math.max(0, (t - 6.4) / 0.9));
+    const spaceVal = Math.round(41 * (1 - Math.pow(1 - cu, 3)));
+
+    const dragged = t >= 2.5 ? 3 : 2;
+    const tallies = [
+      { label: 'Off-ball runs', value: String(t >= 1 ? 7 : 6) },
+      { label: 'Defenders dragged', value: String(dragged) },
+      { label: 'Space created', value: (ready ? 77 + spaceVal : 77) + ' m²' },
+      { label: 'Sprints', value: String(spd > 25.2 || t >= 4.6 ? 14 : 13) },
+      { label: 'Distance', value: (8.68 + t * 0.002).toFixed(2) + ' km' },
+      { label: 'Top speed', value: '33.4 km/h' }
+    ].map((ty, i) => Object.assign(ty, { boxStyle: box(i) }));
+    const spark = [];
+    let sparkEnd = { x: '0', y: '48' };
+    for (let tt = 0; tt <= t + 0.001; tt += 0.25) {
+      const x = (tt / 9 * 200).toFixed(1), y = (48 - Math.min(36, speedAt(tt)) / 36 * 44).toFixed(1);
+      spark.push(x + ',' + y);
+      sparkEnd = { x: x, y: y };
+    }
+    const milestone = dragged === 3 ? 'Three defenders dragged ties No. 9’s season high for one match.' : 'Two defenders dragged so far today.';
+
+    let active = 0;
+    D.transcript.forEach((tr, i) => { if (t >= tr.t) active = i; });
+    const transcript = D.transcript.map((tr, i) => ({
+      time: '63:' + (tr.t < 10 ? '0' : '') + tr.t.toFixed(1),
+      text: tr.text,
+      bar: 'width: 3px; flex: none; align-self: stretch; border-radius: 2px; transition: transform .35s var(--eo), background-color .3s; transform-origin: top; background: var(--space); transform: scaleY(' + (i === active ? 1 : 0) + ')',
+      style: 'display: flex; gap: 12px; padding: 10px 12px; border-radius: 10px; line-height: 1.45; transition: background-color .3s, color .3s, font-size .3s; font-size: ' + (i === active ? 17 : 15) + 'px; ' +
+        (i === active ? 'background: var(--surface2)' : i < active ? 'color: var(--text)' : 'color: var(--muted)')
+    }));
+    const cueX = step >= 3 ? 88.5 : k9[0];
+    const pan = (cueX - 52.5) / 52.5;
+    const cueLeft = (50 + pan * 50).toFixed(1);
+    const cueStyle = 'position: absolute; top: -4px; width: 20px; height: 20px; border-radius: 10px; background: var(--space); transform: translateX(-50%); transition: left .25s var(--eo); left: ' + cueLeft + '%';
+    const cueRipple = 'position: absolute; top: -4px; width: 20px; height: 20px; border-radius: 10px; border: 2px solid var(--space); box-sizing: border-box; margin-left: -10px; transition: left .25s var(--eo); left: ' + cueLeft + '%';
+    const cueLabel = pan > 0.55 ? 'Right' : pan > 0.15 ? 'Right of centre' : pan < -0.15 ? 'Left of centre' : 'Centre';
+
+    const approved = s.approved || t >= 3.8;
+    const chipBase = 'font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; flex: none; transition: background-color .3s, color .3s, box-shadow .3s; ';
+    const qChip = (on) => chipBase + (on ? 'background: var(--space); color: var(--onSpace)' : 'box-shadow: inset 0 0 0 1px var(--line); color: var(--text)');
+    const queue = [
+      { kind: 'run_arrow', meta: 'casual + analyst · confidence 0.91', state: t >= 0.8 ? 'Aired · auto' : 'Queued', on: t >= 0.8, waiting: false },
+      { kind: 'player_tag', meta: 'No. 5 dragged · confidence 0.89', state: t >= 2.5 ? 'Aired · auto' : 'Queued', on: t >= 2.5, waiting: false },
+      { kind: 'gap_ring', meta: 'needs producer approval · confidence 0.88', state: approved ? 'Aired · approved' : 'Waiting', on: approved, waiting: !approved },
+      { kind: 'pass_line', meta: 'difficulty 6.1 · confidence 0.93', state: t >= 4.2 ? 'Aired · auto' : 'Queued', on: t >= 4.2, waiting: false },
+      { kind: 'ghost_replay', meta: 'Tactician counterfactual · 32 re-runs', state: ready ? 'Ready' : 'Computing', on: ready, waiting: false }
+    ].map((q, i) => Object.assign(q, {
+      chip: qChip(q.on),
+      boxStyle: 'background: var(--surface2); border-radius: 10px; padding: 10px 12px; transition: box-shadow .3s; animation-delay: ' + i * 50 + 'ms; ' + (q.waiting ? 'box-shadow: inset 0 0 0 1px var(--space)' : '')
+    }));
+
+    const stripes = [];
+    for (let i = 0; i < 10; i++) stripes.push({ x: i * 105, style: 'fill: var(--' + (i % 2 ? 'stripe' : 'pitch') + '); transition: fill .3s' });
+
+    const mom = (m) => Math.max(-1, Math.min(1, 0.5 * Math.sin(m / 6.5) + 0.28 * Math.sin(m / 2.7 + 1.3) + 0.16 * Math.sin(m / 1.1 + 0.4) + (m > 54 ? 0.3 : 0)));
+    let pk = 'M0 44', pa = 'M0 44';
+    for (let m = 0; m <= 63; m++) {
+      const v = mom(m);
+      pk += ' L' + (m * 10) + ' ' + (44 - Math.max(0, v) * 38).toFixed(1);
+      pa += ' L' + (m * 10) + ' ' + (44 - Math.min(0, v) * 38).toFixed(1);
+    }
+    pk += ' L630 44 Z'; pa += ' L630 44 Z';
+    const ribbonEvents = [{ m: 12, team: 'kes' }, { m: 27, team: 'ash' }, { m: 41, team: 'kes' }, { m: 63, team: 'kes' }].map((e, i) => ({
+      x: e.m * 10, y: e.team === 'kes' ? 6 : 82, style: 'fill: var(--' + e.team + '); stroke: var(--surface); stroke-width: 2px; animation-delay: ' + (600 + i * 120) + 'ms'
+    }));
+
+    const markers = [{ t: 1, l: 'Run' }, { t: 2.5, l: 'Follow' }, { t: 3.8, l: 'Gap' }, { t: 4.2, l: 'Pass' }, { t: 6.4, l: 'Shot' }].map((mk, i) => ({
+      label: mk.l, reached: t >= mk.t, ahead: t < mk.t,
+      style: 'position: absolute; top: ' + (i % 2 ? 16 : 0) + 'px; left: ' + (mk.t / 9 * 100).toFixed(1) + '%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; transition: color .25s; color: ' + (t >= mk.t ? 'var(--text)' : 'var(--muted)')
+    }));
+
+    const toasts = [];
+    const tierB = slow && t >= 5 && t < 8.6;
+    if (tierB) toasts.push({ text: 'Holding 60 fps: switched to Tier B (WebGL2). Back to Tier A after 10 s of headroom.', dot: 'width: 8px; height: 8px; flex: none; border-radius: 4px; background: var(--kes)' });
+    if (stallOn && s.tRaw >= 3 && s.tRaw < 4.2) toasts.push({ text: 'Back in sync. Nothing was missed.', dot: 'width: 8px; height: 8px; flex: none; border-radius: 4px; background: var(--space)' });
+
+    const clubDefs = [{ id: 'kes', name: 'Kestrel Bay' }, { id: 'ash', name: 'Ashmoor' }];
+    const clubs = clubDefs.map((c) => ({
+      name: c.name, pressed: s.club === c.id,
+      pick: () => this.setState({ club: c.id }),
+      style: 'display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 14px; border-radius: 12px; background: var(--surface2); color: var(--text); font: 500 14px Inter, sans-serif; text-align: left; transition: box-shadow .25s var(--eo), transform 80ms; border: 0; box-shadow: inset 0 0 0 ' + (s.club === c.id ? '2px var(--space)' : '1px var(--line)'),
+      badge: 'width: 22px; height: 26px; flex: none; border-radius: 4px 4px 11px 11px; background: var(--' + c.id + ')'
+    }));
+    const metricDefs = [{ id: 'space', label: 'Space created' }, { id: 'pass', label: 'Pass difficulty' }, { id: 'sprint', label: 'Sprint speed' }];
+    const metricChips = metricDefs.map((m) => ({
+      label: m.label, pressed: s.metric === m.id,
+      pick: () => this.setState({ metric: m.id }),
+      style: 'min-height: 44px; padding: 0 14px; border-radius: 999px; border: 0; font: 600 13px Inter, sans-serif; transition: background-color .2s, color .2s, box-shadow .2s, transform 80ms; ' +
+        (s.metric === m.id ? 'background: var(--space); color: var(--onSpace)' : 'background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line)')
+    }));
+    const densityDefs = [{ id: 'minimal', label: 'Minimal' }, { id: 'standard', label: 'Standard' }, { id: 'rich', label: 'Rich' }];
+    const dIdx = Math.max(0, densityDefs.map((d) => d.id).indexOf(density));
+    const densities = densityDefs.map((d) => ({
+      label: d.label, pressed: density === d.id,
+      pick: () => this.setState({ density: d.id }),
+      style: 'position: relative; z-index: 1; min-height: 40px; border: 0; background: transparent; font: 600 13px Inter, sans-serif; cursor: pointer; transition: color .22s; color: ' + (density === d.id ? 'var(--bg)' : 'var(--muted)')
+    }));
+    const densityIndicator = 'position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 3); border-radius: 8px; background: var(--text); transition: transform .34s var(--eo); transform: translateX(' + (dIdx * 100) + '%)';
+    const sv = this.switchParts(s.voice), sr = this.switchParts(rm);
+    const switches = [
+      { label: 'Voice commentary', hint: 'Spoken lines in your language', on: s.voice, toggle: () => this.setState({ voice: !s.voice }), track: sv.track, knob: sv.knob },
+      { label: 'Reduced motion', hint: 'Fades instead of movement; no pulses', on: rm, toggle: () => this.setState({ rm: !s.rm }), track: sr.track, knob: sr.knob }
+    ];
+    const wf = this.switchParts(whatIf);
+
+    const fmt = (v) => (v < 10 ? '0' : '') + v.toFixed(1);
+    const vars = '--bg: ' + T.bg + '; --surface: ' + T.surface + '; --surface2: ' + T.surface2 + '; --line: ' + T.line + '; --text: ' + T.text + '; --muted: ' + T.muted +
+      '; --pitch: ' + T.pitch + '; --stripe: ' + T.stripe + '; --edge: ' + T.edge + '; --chalk: ' + T.chalk + '; --halo: ' + T.halo +
+      '; --kes: ' + T.kes + '; --ash: ' + T.ash + '; --onKes: ' + T.onKes + '; --onAsh: ' + T.onAsh + '; --space: ' + T.space + '; --onSpace: ' + T.onSpace +
+      '; --spaceFill: ' + T.spaceFill + '; --chip: ' + T.chip + ';';
+    const scoreK = t >= 6.9 ? 1 : 0;
+    const yourStyle = (on) => 'transition: box-shadow .3s; ' + (on ? 'box-shadow: inset 0 -3px 0 var(--space)' : '');
+
+    return {
+      rootClass: 'ob-root' + (rm ? ' ob-rm' : ''),
+      rootVars: vars,
+      scoreK: scoreK, scoreA: 0,
+      scoreClass: scoreK ? 'ob-pop-a' : 'ob-pop-b',
+      kesLabelStyle: yourStyle(s.club === 'kes'), ashLabelStyle: yourStyle(s.club === 'ash'),
+      clock: '63:' + (t < 10 ? '0' : '') + Math.floor(t),
+      clockFine: '63:' + fmt(t),
+      modes: modes, modeIndicator: modeIndicator,
+      lang: lang,
+      onLang: (e) => this.setState({ lang: e.target.value }),
+      whatIf: whatIf,
+      toggleWhatIf: () => this.setState({ whatIf: !whatIf }),
+      whatIfTrack: wf.track, whatIfKnob: wf.knob,
+      openDrawer: () => this.setState({ drawer: true }),
+      closeDrawer: () => this.setState({ drawer: false }),
+      drawerOpen: s.drawer,
+      pitchLabel: '2D pitch, Kestrel Bay attacking left to right. ' + caption,
+      stripes: stripes,
+      fieldStyle: 'position: absolute; inset: 0; display: grid; grid-template-columns: repeat(21, minmax(0, 1fr)); grid-template-rows: repeat(14, minmax(0, 1fr)); filter: blur(' + (mode === 'analyst' ? 10 : 14) + 'px)',
+      cells: cells,
+      showContested: mode === 'analyst' || density === 'rich',
+      contested: contested,
+      showLine: mode === 'analyst',
+      lineX: (maxX * 10).toFixed(1),
+      lineLabel: 'Ashmoor line · ' + (105 - maxX).toFixed(1) + ' m',
+      showGap: !whatIf && mode !== 'audio' && t >= 3.8 && t < 7.5,
+      gapLabel: mode === 'analyst' ? 'Gap zone · ' + gainStr + ' pts' : 'Space opens here',
+      showShut: whatIf && t >= 3.8,
+      showRun: t >= 0.8 && t < 6.4,
+      run: run,
+      showPass: t >= 4.2 && t < 6.2,
+      pass: pass,
+      showDisp: mode === 'analyst' && t >= 1.5,
+      disp: dispObj,
+      ghosts: ghosts, trail: trail,
+      players: players,
+      ballStyle: 'transform: translate(' + SX(ball[0]).toFixed(1) + 'px, ' + SY(ball[1]).toFixed(1) + 'px);' + trans,
+      tags: tags,
+      showGoal: t >= 6.9, burst: burst,
+      stalled: stalled,
+      tierChip: 'display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--chip); color: var(--text); border: 1px solid var(--line); transition: border-color .3s',
+      tierDot: 'width: 6px; height: 6px; border-radius: 3px; background: ' + (tierB ? 'var(--kes)' : 'var(--space)'),
+      tierText: tierB ? 'Tier B · WebGL2 · 60 fps' : 'Tier A · WebGPU · 60 fps',
+      chipClass: whatIf ? 'ob-pop-a' : 'ob-pop-b',
+      fieldChip: whatIf ? 'Field: without No. 9’s run' : 'Field: live space control',
+      toasts: toasts,
+      capWrapClass: 'ob-card ' + (this._capFlip ? 'ob-cap-a' : 'ob-cap-b'),
+      words: words, capDir: capDir, capLang: capLang, capStyle: capStyle, capMeta: capMeta,
+      eqClass: 'ob-eq' + (s.playing && s.voice ? '' : ' ob-eq-off'),
+      voiceText: s.voice ? 'Voice on' : 'Voice off',
+      playing: s.playing, paused: !s.playing,
+      playLabel: s.playing ? 'Pause' : 'Play',
+      togglePlay: () => this.setState({ playing: !s.playing, tRaw: !s.playing && t >= 9 ? 0 : s.tRaw }),
+      scrub: Math.round(t * 10),
+      onScrub: (e) => this.setState({ tRaw: Number(e.target.value) / 10, playing: false }),
+      markers: markers,
+      ribbonK: pk, ribbonA: pa, ribbonEvents: ribbonEvents,
+      panelLabel: D.modes[modeIdx].label + ' panel',
+      isCasual: mode === 'casual', isLearn: mode === 'learn', isAnalyst: mode === 'analyst',
+      isPlayer: mode === 'player', isAudio: mode === 'audio', isBroadcaster: mode === 'broadcaster',
+      steps: steps,
+      pauseExplain: () => this.setState({ playing: false }),
+      metrics: metrics,
+      spaceReady: ready, spaceWaiting: !ready, spaceVal: spaceVal,
+      evidence: evidence, leaders: leaders,
+      tallies: tallies, spd: spd.toFixed(1), spark: spark.join(' '), sparkEnd: sparkEnd, milestone: milestone,
+      transcript: transcript, cueStyle: cueStyle, cueRipple: cueRipple, cueLabel: cueLabel,
+      queue: queue,
+      approve: () => this.setState({ approved: true }),
+      clubs: clubs, fav: s.fav, onFav: (e) => this.setState({ fav: e.target.value }),
+      metricChips: metricChips, densities: densities, densityIndicator: densityIndicator,
+      switches: switches,
+      capSize: s.capSize, onCapSize: (e) => this.setState({ capSize: Number(e.target.value) })
+    };
+  }
+}
+</script>
+</body>
+</html>

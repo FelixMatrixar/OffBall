@@ -1,0 +1,615 @@
+<!doctype html>
+<!--
+  OffBall partner graphics template (PRD 15.7). One file, no build step: copy it, restyle the tokens below, ship it.
+
+  Runs as an OBS Browser Source (1920 × 1080, transparent) and as a CasparCG HTML template. It reads the OffBall
+  overlay protocol, schema 2.0: overlay.upsert, overlay.retract, clock.sync and match.status, plus frame messages for
+  the tactical radar.
+
+  URL options
+    feed=jsonl:<url> | sse:<url> | wss://…    Where the protocol comes from. Default: the showcase replay next door.
+    lang=en                                   Caption language; any of the ten in the feed, English when missing.
+    approvals=feed | all                      Honour producer approvals (live default) or show pending graphics too
+                                              (the default for a JSONL replay, which has no producer behind it).
+    speed=1, loop=1                           Replay speed, and whether a replay starts again when it ends.
+    autoplay=1                                0 waits for play(), as CasparCG does after loading a template.
+    safe=1                                    Draw EBU R 95 action-safe (93%) and graphics-safe (90%) guides.
+    key=1                                     The key signal: every graphic white on black, alpha as luminance.
+
+  CasparCG calls play(), stop(), next() and update(data). update takes JSON, such as {"lang":"es"}, or CasparCG's
+  <templateData> XML, with the same names as the URL options.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OffBall partner graphics</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      /* Design tokens: restyle here. The values match OffBall's broadcast theme. */
+      :root {
+        --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+        --font-body: Inter, system-ui, 'Segoe UI', sans-serif;
+        --text: #ecf1ec;
+        --muted: #9eb0a6;
+        --panel: rgb(11 17 16 / 0.92);
+        --surface: #121b18;
+        --score: #ecf1ec;
+        --on-score: #0b1110;
+        --clock: #19251f;
+        --kes: #7cc0ff;
+        --ash: #e2733a;
+        --space: #d7f25c;
+        --on-space: #0b1110;
+        --space-fill: rgb(215 242 92 / 0.16);
+        --pitch: #1b3a2c;
+        --stripe: #1f4232;
+        --chalk: rgb(236 241 236 / 0.55);
+        --ghost: rgb(236 241 236 / 0.55);
+        --shut: #ff8a7a;
+        --safe-action: #ff5c8a;
+        --safe-graphics: #5cd6ff;
+        --in: 450ms;
+        --out: 220ms;
+        --ease: cubic-bezier(0.2, 0, 0, 1);
+        --ease-out: cubic-bezier(0.3, 0, 1, 1);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        :root { --in: 150ms; --out: 150ms; }
+      }
+
+      html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+      body.key { background: #000; }
+      body.key #stage { filter: brightness(0) invert(1); }
+      #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: top left; font-family: var(--font-body); color: var(--text); }
+      p { margin: 0; }
+
+      /* Everything enters and leaves by opacity and transform only, so it never drops a frame on air. */
+      .gfx { opacity: 0; transition: opacity var(--out) var(--ease-out), transform var(--out) var(--ease-out), clip-path var(--out) var(--ease-out); }
+      .gfx.on { opacity: 1; transition-duration: var(--in); transition-timing-function: var(--ease); }
+
+      .bug { position: absolute; left: 96px; top: 54px; display: flex; height: 64px; font-family: var(--font-display); font-weight: 700; border-radius: 6px; overflow: hidden; transform: translateX(-40px); }
+      .bug.on { transform: none; }
+      .bug span { display: flex; align-items: center; padding: 0 18px; }
+      .bug .team { background: var(--surface); font-size: 36px; letter-spacing: 1px; }
+      .bug .edge { width: 10px; padding: 0; }
+      .bug .score { background: var(--score); color: var(--on-score); font-size: 40px; font-variant-numeric: tabular-nums; }
+      .bug .score.flash { animation: flash 900ms var(--ease) 2; }
+      .bug .clock { background: var(--clock); font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      @keyframes flash { 50% { background: var(--space); } }
+
+      .brand { position: absolute; right: 96px; top: 54px; display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 18px; border-radius: 6px; background: var(--panel); font-family: var(--font-display); font-size: 30px; font-weight: 700; transform: translateX(40px); }
+      .brand.on { transform: none; }
+
+      .radar { position: absolute; right: 96px; top: 138px; width: 480px; padding: 10px; border-radius: 8px; background: var(--panel); transform: translateY(-16px); }
+      .radar.on { transform: none; }
+      .radar svg { display: block; width: 100%; height: auto; border-radius: 4px; }
+      .radar-head { display: flex; justify-content: space-between; align-items: baseline; margin: 2px 4px 8px; font-size: 16px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); }
+      .radar-head b { color: var(--space); font-weight: 700; }
+      .radar-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 4px 2px; font-size: 20px; font-weight: 600; }
+      .radar-legend:empty { display: none; }
+      .radar-story { margin: 10px 4px 2px; font-size: 22px; line-height: 1.35; font-weight: 600; transition: opacity var(--out) var(--ease-out); }
+      .radar-story:empty { display: none; }
+      .radar-story.swap { opacity: 0; }
+      .radar-legend span { display: inline-flex; align-items: center; gap: 8px; animation: fade var(--in) var(--ease) both; }
+      .radar-legend i { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+      .radar-legend i.ghost { background: var(--ghost); outline: 2px dashed var(--text); outline-offset: -2px; }
+      .draw { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 600ms var(--ease) forwards; }
+      @keyframes draw { to { stroke-dashoffset: 0; } }
+      .pop { animation: pop var(--in) var(--ease) both; transform-box: fill-box; transform-origin: center; }
+      @keyframes pop { from { opacity: 0; transform: scale(0.6); } }
+      @media (prefers-reduced-motion: reduce) {
+        .draw { stroke-dashoffset: 0; animation: fade 150ms linear both; }
+        .pop { animation: fade 150ms linear both; }
+        .bug .score.flash { animation: none; }
+      }
+      @keyframes fade { from { opacity: 0; } }
+
+      .lower { position: absolute; left: 96px; bottom: 54px; width: 1220px; display: flex; border-radius: 8px; overflow: hidden; background: var(--panel); clip-path: inset(0 100% 0 0); }
+      .lower.on { clip-path: inset(0 0 0 0); }
+      .lower-bar { width: 12px; flex: none; background: var(--space); }
+      .lower-body { padding: 22px 28px; }
+      .lower-text { font-size: 38px; line-height: 1.25; font-weight: 600; min-height: 1.25em; transition: opacity var(--out) var(--ease-out); }
+      .lower-text.swap { opacity: 0; }
+      .lower-meta { margin-top: 10px; font-size: 20px; color: var(--muted); }
+
+      .stat { position: absolute; right: 96px; bottom: 54px; width: 420px; padding: 22px 26px; border-radius: 8px; background: var(--panel); transform: translateY(40px); }
+      .stat.on { transform: none; }
+      .stat-title { font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); }
+      .stat-row { display: flex; align-items: baseline; gap: 14px; margin-top: 6px; }
+      .stat-value { font-family: var(--font-display); font-size: 76px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+      .stat-who { font-size: 20px; font-weight: 600; }
+
+      .safe { position: absolute; pointer-events: none; border: 2px dashed; }
+      .safe-action { left: 67.2px; top: 37.8px; width: 1785.6px; height: 1004.4px; border-color: var(--safe-action); }
+      .safe-graphics { left: 96px; top: 54px; width: 1728px; height: 972px; border-color: var(--safe-graphics); }
+      .status { position: absolute; left: 96px; top: 1050px; margin: 0; font-size: 14px; color: var(--muted); }
+      [dir='rtl'] .lower-body, [dir='rtl'] .stat { direction: rtl; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div class="bug gfx" id="bug">
+        <span class="edge" style="background: var(--kes)"></span>
+        <span class="team">KES</span>
+        <span class="score" id="score">0–0</span>
+        <span class="team">ASH</span>
+        <span class="edge" style="background: var(--ash)"></span>
+        <span class="clock" id="clock">--:--</span>
+      </div>
+
+      <div class="brand gfx" id="brand">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <rect x="2" y="6" width="26" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <line x1="15" y1="6" x2="15" y2="24" stroke="currentColor" stroke-width="1.8" />
+          <circle cx="21" cy="13" r="3.4" fill="none" stroke="var(--space)" stroke-width="2" />
+        </svg>
+        OffBall · space view
+      </div>
+
+      <div class="radar gfx" id="radar">
+        <div class="radar-head"><span>SPACE VIEW</span><b id="radar-note"></b></div>
+        <svg viewBox="-30 -30 1110 740" aria-hidden="true">
+          <rect x="-30" y="-30" width="1110" height="740" rx="10" fill="var(--pitch)" />
+          <g id="stripes"></g>
+          <g fill="none" stroke="var(--chalk)" stroke-width="3">
+            <rect x="0" y="0" width="1050" height="680" />
+            <line x1="525" y1="0" x2="525" y2="680" />
+            <circle cx="525" cy="340" r="91.5" />
+            <rect x="0" y="138.4" width="165" height="403.2" />
+            <rect x="885" y="138.4" width="165" height="403.2" />
+            <rect x="0" y="248.4" width="55" height="183.2" />
+            <rect x="995" y="248.4" width="55" height="183.2" />
+          </g>
+          <g id="under"></g>
+          <g id="players"></g>
+          <g id="over"></g>
+        </svg>
+        <div class="radar-legend" id="legend"></div>
+        <p class="radar-story" id="story"></p>
+      </div>
+
+      <div class="lower gfx" id="lower">
+        <span class="lower-bar"></span>
+        <div class="lower-body">
+          <p class="lower-text" id="caption"></p>
+          <p class="lower-meta" id="meta">OffBall · AI-generated · fact-checked · synthetic match</p>
+        </div>
+      </div>
+
+      <div class="stat gfx" id="stat">
+        <div class="stat-title" id="stat-title"></div>
+        <div class="stat-row"><span class="stat-value" id="stat-value"></span><span class="stat-who" id="stat-who"></span></div>
+      </div>
+
+      <div id="guides" hidden>
+        <div class="safe safe-action"></div>
+        <div class="safe safe-graphics"></div>
+      </div>
+      <p class="status" id="status" hidden></p>
+    </div>
+
+    <script>
+      'use strict';
+      (() => {
+        const NS = 'http://www.w3.org/2000/svg';
+        const $ = (id) => document.getElementById(id);
+        const params = new URLSearchParams(location.search);
+        const opt = {
+          feed: params.get('feed') || `jsonl:${new URL('../feeds/showcase.jsonl', location.href)}`,
+          lang: params.get('lang') || 'en',
+          approvals: params.get('approvals'),
+          speed: Math.max(0.25, Math.min(60, Number(params.get('speed')) || 1)),
+          loop: params.get('loop') !== '0',
+          autoplay: params.get('autoplay') !== '0',
+          safe: params.get('safe') === '1',
+          key: params.get('key') === '1',
+        };
+        const MIN_HOLD = 2500; // Every graphic stays up at least this long (PRD 15.2).
+        const MIN_READ = 1500; // A caption line stays up at least this long, so a quick one can still be read.
+        const SHOWN = new Set(['auto', 'approved']);
+
+        // ---- State -------------------------------------------------------------------------------------------
+        const overlays = new Map(); // overlay_id -> overlay, latest rev
+        const frames = []; // [t_ms, players, ball], sorted
+        let statuses = []; // match.status, sorted by t_ms
+        let replay = null; // { start, end, messages } for a JSONL file
+        let clock = { t: 0, at: performance.now(), speed: 1, running: false };
+        let source = null; // closes the live connection
+        let playing = false;
+
+        const now = () => (clock.running ? clock.t + (performance.now() - clock.at) * clock.speed : clock.t);
+        const setClock = (t, speed = clock.speed) => (clock = { t, at: performance.now(), speed, running: clock.running });
+        const textOf = (o) => (o.text && (o.text[opt.lang] || o.text.en)) || '';
+        const approved = (o) => SHOWN.has(o.approval) || ((opt.approvals ?? (replay ? 'all' : 'feed')) === 'all' && o.approval === 'pending');
+        const forBroadcast = (o) => o.mode === 'broadcaster' || (Array.isArray(o.modes) && o.modes.includes('broadcaster'));
+
+        function receive(m) {
+          if (!m || typeof m !== 'object') return;
+          if (m.type === 'overlay.upsert' && m.overlay) {
+            const prev = overlays.get(m.overlay.overlay_id);
+            if (!prev || (m.overlay.rev ?? 0) >= (prev.rev ?? 0)) overlays.set(m.overlay.overlay_id, m.overlay);
+          } else if (m.type === 'overlay.retract') {
+            overlays.delete(m.overlay_id);
+          } else if (m.type === 'match.status') {
+            statuses = [...statuses.filter((s) => s.t_ms !== m.t_ms), m].sort((a, b) => a.t_ms - b.t_ms);
+          } else if (m.type === 'frame' && m.frame) {
+            frames.push([m.frame.t_ms, m.frame.players, m.frame.ball]);
+            if (frames.length > 1 && frames[frames.length - 2][0] > m.frame.t_ms) frames.sort((a, b) => a[0] - b[0]);
+            if (!replay) {
+              if (frames.length > 2000) frames.splice(0, frames.length - 2000);
+              if (Math.abs(m.frame.t_ms - now()) > 1000) setClock(m.frame.t_ms);
+            }
+          } else if (m.type === 'clock.sync' && !replay) {
+            setClock(m.t_ms, m.speed ?? 1);
+          }
+        }
+
+        // ---- Sources -----------------------------------------------------------------------------------------
+        async function connect(spec) {
+          if (source) source();
+          source = null;
+          overlays.clear();
+          frames.length = 0;
+          statuses = [];
+          replay = null;
+          // The same spellings as the app's ?feed=: sse:<url>, jsonl:<url>, or a ws:// or wss:// URL as it is.
+          const [, kind, url] = /^wss?:\/\//.test(spec) ? [spec, 'ws', spec] : /^(jsonl|sse|ws):(.*)$/.exec(spec) || [];
+          status(`Connecting: ${spec}`);
+          if (kind === 'jsonl') {
+            const body = await (await fetch(url)).text();
+            const messages = body.split('\n').filter(Boolean).map((l) => JSON.parse(l));
+            messages.forEach(receive);
+            const times = frames.map((f) => f[0]);
+            replay = { start: Math.min(...times), end: Math.max(...[...overlays.values()].map((o) => o.t_end_ms), ...times) };
+            setClock(replay.start, opt.speed);
+            status(`Replay · ${messages.length} messages`);
+          } else if (kind === 'sse') {
+            const es = new EventSource(url);
+            es.onmessage = (e) => receive(JSON.parse(e.data));
+            es.onopen = () => status('Live · SSE');
+            es.onerror = () => status('Reconnecting…');
+            source = () => es.close();
+          } else if (kind === 'ws') {
+            let closed = false;
+            let ws;
+            const open = () => {
+              ws = new WebSocket(url);
+              ws.onmessage = (e) => receive(JSON.parse(e.data));
+              ws.onopen = () => status('Live · WebSocket');
+              ws.onclose = () => !closed && (status('Reconnecting…'), setTimeout(open, 2000));
+            };
+            open();
+            source = () => ((closed = true), ws.close());
+          } else {
+            status(`Unknown feed: ${spec}`);
+          }
+        }
+
+        function status(text) {
+          $('status').textContent = text;
+        }
+
+        // ---- Drawing -----------------------------------------------------------------------------------------
+        const P = ([x, y]) => [x * 10, (68 - y) * 10];
+        const el = (name, attrs, parent) => {
+          const n = document.createElementNS(NS, name);
+          for (const [k, v] of Object.entries(attrs)) if (v != null) n.setAttribute(k, String(v));
+          if (parent) parent.appendChild(n);
+          return n;
+        };
+        for (let i = 0; i < 10; i++) el('rect', { x: i * 105, y: 0, width: 105, height: 680, fill: i % 2 ? 'var(--stripe)' : 'var(--pitch)' }, $('stripes'));
+
+        /** Players and ball at time t, between the two nearest frames. */
+        function positions(t) {
+          if (!frames.length) return null;
+          let lo = 0;
+          let hi = frames.length - 1;
+          if (t <= frames[0][0]) return { players: frames[0][1], ball: frames[0][2] };
+          if (t >= frames[hi][0]) return { players: frames[hi][1], ball: frames[hi][2] };
+          while (hi - lo > 1) {
+            const mid = (lo + hi) >> 1;
+            if (frames[mid][0] <= t) lo = mid;
+            else hi = mid;
+          }
+          const [ta, pa, ba] = frames[lo];
+          const [tb, pb, bb] = frames[hi];
+          const u = (t - ta) / Math.max(1, tb - ta);
+          const mix = (a, b) => (b ? [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u] : a);
+          const players = {};
+          for (const id of Object.keys(pa)) players[id] = mix(pa[id], pb[id]);
+          return { players, ball: mix(ba, bb) };
+        }
+
+        /** Where a ghost stands: its track is [seconds from the graphic's start, x, y]. */
+        function ghostAt(o, t) {
+          const track = (o.data && o.data.track) || [];
+          if (!track.length) return null;
+          const s = (t - o.t_start_ms) / 1000;
+          let i = 0;
+          while (i < track.length - 2 && track[i + 1][0] <= s) i++;
+          const a = track[i];
+          const b = track[Math.min(i + 1, track.length - 1)];
+          const u = b[0] === a[0] ? 0 : Math.max(0, Math.min(1, (s - a[0]) / (b[0] - a[0])));
+          return [a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
+        }
+
+        const drawn = new Map(); // overlay_id -> SVG group on the radar
+        const queued = new Set(); // captions already lined up for the lower third
+        let lines = []; // captions waiting their turn
+        let held = { lower: null, radar: 0 };
+
+        function radarItem(o, pos, t) {
+          let g = drawn.get(o.overlay_id);
+          const fresh = !g;
+          if (fresh) {
+            g = el('g', { 'data-id': o.overlay_id }, $(o.kind === 'gap_ring' ? 'under' : 'over'));
+            drawn.set(o.overlay_id, g);
+          }
+          const a = o.anchors || {};
+          const label = (x, y, text, colour = 'var(--text)') => {
+            const tx = el('text', { x, y, 'text-anchor': 'middle', 'font-size': 34, 'font-weight': 700, fill: colour, stroke: 'rgb(11 17 16 / 0.85)', 'stroke-width': 8, 'paint-order': 'stroke', 'font-family': 'var(--font-body)' }, g);
+            tx.textContent = text;
+            return tx;
+          };
+          if (o.kind === 'gap_ring' && fresh) {
+            const [cx, cy] = P(a.centre_xy || [0, 0]);
+            const rx = ((o.data && o.data.rx_m) || a.radius_m || 6) * 10;
+            const ry = ((o.data && o.data.ry_m) || a.radius_m || 6) * 10;
+            const shut = !!(o.data && o.data.shut);
+            // A gap that stays shut is dashed and pops in; an open one draws itself round.
+            el('ellipse', { cx, cy, rx, ry, pathLength: shut ? null : 100, class: shut ? 'pop' : 'draw', fill: shut ? 'none' : 'var(--space-fill)', stroke: shut ? 'var(--shut)' : 'var(--space)', 'stroke-width': 6, 'stroke-dasharray': shut ? '14 10' : null }, g);
+            label(cx, cy - ry - 14, textOf(o), shut ? 'var(--shut)' : 'var(--space)');
+          } else if (o.kind === 'run_arrow' && fresh) {
+            const [x1, y1] = P(a.from_xy || [0, 0]);
+            const [x2, y2] = P(a.to_xy || [0, 0]);
+            el('line', { x1, y1, x2, y2, pathLength: 100, class: 'draw', stroke: 'var(--space)', 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
+            const ang = Math.atan2(y2 - y1, x2 - x1);
+            const head = [[x2, y2], [x2 - 26 * Math.cos(ang - 0.45), y2 - 26 * Math.sin(ang - 0.45)], [x2 - 26 * Math.cos(ang + 0.45), y2 - 26 * Math.sin(ang + 0.45)]];
+            el('polygon', { points: head.map((p) => p.join(',')).join(' '), fill: 'var(--space)', class: 'pop' }, g);
+          } else if (o.kind === 'pass_line' && fresh) {
+            const [x1, y1] = P(a.from_xy || [0, 0]);
+            const [x2, y2] = P(a.to_xy || [0, 0]);
+            const d = (o.data && o.data.difficulty) || 5;
+            el('line', { x1, y1, x2, y2, pathLength: 100, class: 'draw', stroke: 'var(--text)', 'stroke-width': 3 + d * 0.6, 'stroke-linecap': 'round' }, g);
+          } else if (o.kind === 'player_tag' || o.kind === 'badge') {
+            // On a radar this small, words collide: the player gets a ring, and the words go in the legend below.
+            const at = pos && pos.players[a.player_id];
+            if (fresh) el('circle', { r: 27, fill: 'none', stroke: 'var(--text)', 'stroke-width': 4, class: 'pop' }, g);
+            if (at) {
+              const [x, y] = P(at);
+              g.setAttribute('transform', `translate(${x} ${y})`);
+            }
+          } else if (o.kind === 'ghost') {
+            const at = ghostAt(o, t);
+            if (fresh) el('circle', { r: 17, fill: 'var(--ghost)', stroke: 'var(--text)', 'stroke-width': 2, 'stroke-dasharray': '5 4', class: 'pop' }, g);
+            if (at) {
+              const [x, y] = P(at);
+              g.setAttribute('transform', `translate(${x} ${y})`);
+            }
+          } else if (o.kind === 'offside_line' && fresh && a.from_xy) {
+            const [x] = P(a.from_xy);
+            el('line', { x1: x, y1: 0, x2: x, y2: 680, pathLength: 100, class: 'draw', stroke: 'var(--ash)', 'stroke-width': 4, 'stroke-dasharray': '10 8' }, g);
+          }
+        }
+
+        function drawPlayers(pos) {
+          const layer = $('players');
+          if (!pos) return;
+          if (!layer.childElementCount) {
+            for (const id of Object.keys(pos.players)) el('circle', { r: 15, 'data-id': id, fill: id.startsWith('kes') ? 'var(--kes)' : 'var(--ash)', stroke: 'rgb(11 17 16 / 0.9)', 'stroke-width': 3 }, layer);
+            el('circle', { r: 9, 'data-id': 'ball', fill: '#ffffff', stroke: '#0b1110', 'stroke-width': 3 }, layer);
+          }
+          for (const c of layer.children) {
+            const id = c.getAttribute('data-id');
+            const at = id === 'ball' ? pos.ball : pos.players[id];
+            if (!at) continue;
+            const [x, y] = P(at);
+            c.setAttribute('cx', x.toFixed(1));
+            c.setAttribute('cy', y.toFixed(1));
+          }
+        }
+
+        /** The words for the radar's tags and ghosts, one line each, keyed so a line that stays doesn't flicker. */
+        function legend(pitch) {
+          const box = $('legend');
+          const items = pitch.filter((o) => ['player_tag', 'badge', 'ghost'].includes(o.kind));
+          const key = items.map((o) => `${o.overlay_id}:${o.rev}`).join('|') + opt.lang;
+          if (box.dataset.key === key) return;
+          box.dataset.key = key;
+          box.replaceChildren(
+            ...items.map((o) => {
+              const span = document.createElement('span');
+              const dot = document.createElement('i');
+              const team = ((o.anchors && o.anchors.player_id) || '').startsWith('ash') ? 'var(--ash)' : 'var(--kes)';
+              if (o.kind === 'ghost') dot.className = 'ghost';
+              else dot.style.background = team;
+              span.append(dot, textOf(o));
+              return span;
+            }),
+          );
+        }
+
+        const clockText = (t, period) => {
+          const s = Math.max(0, Math.floor(t / 1000)) + (period > 1 ? 45 * 60 : 0);
+          return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+        };
+
+        function show(id, on) {
+          $(id).classList.toggle('on', on);
+        }
+
+        /** Every display frame: what's on air at time t. */
+        function render() {
+          let t = now();
+          if (replay && t > replay.end + 3000) {
+            if (opt.loop) {
+              clear();
+              setClock(replay.start, opt.speed);
+              t = replay.start;
+            } else clock.running = false;
+          }
+          const wall = performance.now();
+          const live = [...overlays.values()].filter((o) => forBroadcast(o) && approved(o) && t >= o.t_start_ms && t < Math.max(o.t_end_ms, o.t_start_ms + (o.kind === 'caption' ? 0 : MIN_HOLD)));
+          const pos = positions(t);
+
+          // Score bug and clock.
+          const st = statuses.filter((s) => s.t_ms <= t).pop() || statuses[0];
+          if (st) {
+            const score = `${st.score.kes}–${st.score.ash}`;
+            if ($('score').textContent !== score) {
+              $('score').textContent = score;
+              $('score').classList.remove('flash');
+              void $('score').offsetWidth;
+              $('score').classList.add('flash');
+            }
+          }
+          $('clock').textContent = clockText(t, st ? st.period : 2);
+
+          // Lower third: the latest caption, held at least MIN_HOLD so a quick line can be read.
+          // The lower third reads the real play's lines in order. Each stays up at least MIN_READ, and the last one at
+          // least MIN_HOLD; a line that arrives early waits its turn, so none flashes past or is skipped.
+          for (const o of live.filter((x) => x.kind === 'caption' && !x.counterfactual_id).sort((a, b) => a.t_start_ms - b.t_start_ms)) {
+            if (!queued.has(o.overlay_id)) (queued.add(o.overlay_id), lines.push(o));
+          }
+          const cur = held.lower;
+          const upFor = cur ? (wall - cur.since) * clock.speed : Infinity;
+          if (lines.length && upFor >= MIN_READ) held.lower = { o: lines.shift(), since: wall };
+          else if (cur && !lines.length && upFor >= MIN_HOLD && !live.some((o) => o.overlay_id === cur.o.overlay_id)) held.lower = null;
+          const lower = held.lower && held.lower.o;
+          if (lower) {
+            const text = textOf(lower);
+            const node = $('caption');
+            if (node.dataset.id !== lower.overlay_id) {
+              node.dataset.id = lower.overlay_id;
+              node.classList.add('swap');
+              setTimeout(() => {
+                node.textContent = text;
+                node.classList.remove('swap');
+              }, $('lower').classList.contains('on') ? 160 : 0);
+            }
+          }
+          show('lower', !!lower && playing);
+
+          // Stat card.
+          const stat = live.filter((o) => o.kind === 'stat_card').sort((a, b) => b.priority - a.priority)[0];
+          if (stat) {
+            $('stat-title').textContent = textOf(stat);
+            const d = stat.data || {};
+            $('stat-value').textContent = `${d.value ?? ''}${d.unit ? ` ${d.unit}` : ''}`;
+            $('stat-who').textContent = d.player || '';
+            $('stat-who').style.color = stat.anchors && stat.anchors.player_id && stat.anchors.player_id.startsWith('ash') ? 'var(--ash)' : 'var(--kes)';
+          }
+          show('stat', !!stat && playing);
+
+          // Radar: up while anything pitch-anchored is on air, and a moment after.
+          const pitch = live.filter((o) => ['gap_ring', 'run_arrow', 'pass_line', 'player_tag', 'badge', 'ghost', 'offside_line'].includes(o.kind));
+          if (pitch.length) held.radar = wall + 1500 / clock.speed;
+          const ids = new Set(pitch.map((o) => o.overlay_id));
+          for (const [id, g] of drawn) if (!ids.has(id)) (g.remove(), drawn.delete(id));
+          pitch.forEach((o) => radarItem(o, pos, t));
+          drawPlayers(pos);
+          const cf = pitch.find((o) => o.counterfactual_id);
+          $('radar-note').textContent = cf ? `WITHOUT THE RUN · ${(cf.data && cf.data.reruns) || 32} RE-RUNS` : '';
+          legend(pitch);
+          // The what-if's own lines go with its ghosts, on the radar, so the real commentary keeps the lower third.
+          const whatIf = live.filter((o) => o.kind === 'caption' && o.counterfactual_id).sort((a, b) => b.t_start_ms - a.t_start_ms)[0];
+          const story = $('story');
+          const storyId = whatIf ? whatIf.overlay_id + opt.lang : '';
+          if (story.dataset.id !== storyId) {
+            story.dataset.id = storyId;
+            story.classList.add('swap');
+            setTimeout(() => {
+              story.textContent = whatIf ? textOf(whatIf) : '';
+              story.classList.remove('swap');
+            }, story.textContent ? 160 : 0);
+          }
+          show('radar', playing && (pitch.length > 0 || wall < held.radar));
+
+          window.offball.onAir = live.map((o) => o.overlay_id);
+          window.offball.lower = lower ? lower.overlay_id : null;
+          requestAnimationFrame(render);
+        }
+
+        function clear() {
+          for (const g of drawn.values()) g.remove();
+          drawn.clear();
+          queued.clear();
+          lines = [];
+          held = { lower: null, radar: 0 };
+        }
+
+        function fit() {
+          const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+          $('stage').style.transform = `scale(${k})`;
+        }
+
+        function apply() {
+          document.documentElement.lang = opt.lang;
+          document.documentElement.dir = opt.lang === 'ar' ? 'rtl' : 'ltr';
+          $('guides').hidden = !opt.safe;
+          $('status').hidden = !opt.safe;
+          document.body.classList.toggle('key', opt.key);
+        }
+
+        // ---- CasparCG template API (also handy from OBS's custom JS) -----------------------------------------
+        function play() {
+          if (playing) return;
+          playing = true;
+          clock.running = true;
+          clock.at = performance.now();
+          show('bug', true);
+          show('brand', true);
+        }
+        function stop() {
+          playing = false;
+          ['bug', 'brand', 'lower', 'stat', 'radar'].forEach((id) => show(id, false));
+          setTimeout(() => {
+            if (playing) return;
+            clock.t = now();
+            clock.running = false;
+            clear();
+          }, 400);
+        }
+        function next() {
+          // Jump to the next graphic's start in a replay; a live feed decides its own timing.
+          if (!replay) return;
+          const t = now();
+          const upcoming = [...overlays.values()].filter((o) => forBroadcast(o) && approved(o) && o.t_start_ms > t + 50).sort((a, b) => a.t_start_ms - b.t_start_ms)[0];
+          setClock(upcoming ? upcoming.t_start_ms : replay.start, opt.speed);
+        }
+        function update(data) {
+          let given = {};
+          const raw = String(data || '').trim();
+          if (raw.startsWith('<')) {
+            const xml = new DOMParser().parseFromString(raw, 'text/xml');
+            for (const c of xml.querySelectorAll('componentData')) given[c.getAttribute('id')] = c.querySelector('data')?.getAttribute('value');
+          } else if (raw) {
+            given = JSON.parse(raw);
+          }
+          const feedChanged = given.feed && given.feed !== opt.feed;
+          for (const k of ['lang', 'approvals', 'feed']) if (given[k] != null) opt[k] = String(given[k]);
+          for (const k of ['safe', 'key', 'loop']) if (given[k] != null) opt[k] = given[k] === true || given[k] === '1' || given[k] === 'true' || given[k] === 1;
+          if (given.speed != null) opt.speed = Math.max(0.25, Math.min(60, Number(given.speed) || 1));
+          if (replay) setClock(now(), opt.speed);
+          $('caption').dataset.id = '';
+          clear();
+          apply();
+          if (feedChanged) connect(opt.feed);
+        }
+
+        window.offball = { onAir: [], options: () => ({ ...opt }), time: () => now(), playing: () => playing };
+        Object.assign(window, { play, stop, next, update });
+
+        addEventListener('resize', fit);
+        fit();
+        apply();
+        connect(opt.feed).then(() => opt.autoplay && play());
+        requestAnimationFrame(render);
+      })();
+    </script>
+  </body>
+</html>

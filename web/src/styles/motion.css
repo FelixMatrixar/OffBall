@@ -1,0 +1,224 @@
+/* Keyframes and motion utilities. Every duration and easing comes from tokens.css (PRD 16.10). */
+
+@keyframes ob-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ob-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ob-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes ob-pop {
+  0% { opacity: 0; transform: scale(0.55); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ob-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ob-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+/* A ring that grows and fades from the element's edge: drawn by ::after, so only transform and opacity change. */
+@keyframes ob-beat {
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.6); }
+}
+@keyframes ob-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@keyframes ob-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes ob-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes ob-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+/* The one sanctioned non-transform animation: PRD 16.10 asks for each word to rise and unblur. It lasts 700 ms at most. */
+@keyframes ob-word {
+  from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes ob-burst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+}
+@keyframes ob-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes ob-eq {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+@keyframes ob-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ob-drawer-in {
+  from { transform: translateX(var(--drawer-from, 100%)); }
+  to { transform: none; }
+}
+@keyframes ob-drawer-out {
+  from { transform: none; }
+  to { transform: translateX(var(--drawer-from, 100%)); }
+}
+@keyframes ob-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes ob-toast {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ob-ripple {
+  0% { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+@keyframes ob-slide-fwd {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ob-slide-back {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ob-dots {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+@keyframes ob-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes ob-strike {
+  to { background-size: 100% 2px; }
+}
+@keyframes ob-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+.anim-rise { animation: ob-rise var(--dur-slide) var(--ease-standard) backwards; }
+.anim-fade { animation: ob-fade var(--dur-base) var(--ease-standard) backwards; }
+.anim-pop {
+  animation: ob-pop var(--dur-pop) var(--ease-pop) backwards;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.anim-grow { transform-origin: left center; animation: ob-grow var(--dur-draw) var(--ease-standard) backwards; }
+.anim-wipe { animation: ob-wipe var(--dur-draw) var(--ease-standard) backwards; }
+.anim-shake { animation: ob-shake var(--dur-fill) var(--ease-standard); }
+.anim-exit { animation: ob-fade-out var(--dur-quick) var(--ease-exit) forwards; }
+.anim-slide-fwd { animation: ob-slide-fwd var(--dur-slide) var(--ease-standard) backwards; }
+.anim-slide-back { animation: ob-slide-back var(--dur-slide) var(--ease-standard) backwards; }
+.anim-beat-once,
+.anim-beat { position: relative; }
+.anim-beat-once::after,
+.anim-beat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgb(var(--space-rgb));
+  opacity: 0;
+  pointer-events: none;
+}
+.anim-beat-once::after { animation: ob-beat var(--dur-pulse) var(--ease-standard) 1; }
+[dir='rtl'] .anim-grow { transform-origin: right center; }
+[dir='rtl'] .anim-slide-fwd { animation-name: ob-slide-back; }
+[dir='rtl'] .anim-slide-back { animation-name: ob-slide-fwd; }
+
+/* Live indicators: the only motion that loops (PRD 16.10). */
+.anim-blink { animation: ob-blink var(--dur-live) var(--ease-live) infinite; }
+.anim-spin { animation: ob-spin var(--dur-live) var(--ease-linear) infinite; }
+.anim-beat::after { animation: ob-beat var(--dur-pulse) var(--ease-standard) infinite; }
+.anim-ripple {
+  animation: ob-ripple var(--dur-pulse) var(--ease-standard) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Press feedback for anything clickable. */
+.press {
+  cursor: pointer;
+  transition:
+    transform var(--dur-press) var(--ease-standard),
+    background-color var(--dur-quick),
+    color var(--dur-quick),
+    box-shadow var(--dur-quick),
+    border-color var(--dur-quick);
+}
+.press:hover { transform: translateY(-1px); }
+.press:active { transform: scale(0.96); }
+
+/* Reduced motion is a mode, not an off switch (PRD 16.10). It follows the OS setting or the in-app switch,
+   which PrefsProvider folds into data-motion. Entrances fade, drawings appear with a fade, loops hold
+   still and show a steady dot, particles and shakes are dropped. Player and ball movement stays,
+   because it is the match itself. */
+[data-motion='reduced'] :is(.anim-rise, .anim-slide-fwd, .anim-slide-back, .anim-pop, .anim-grow, .anim-wipe, .toast, .drawer, .drawer-scrim, .sheet, .caption-line) {
+  animation-name: ob-fade !important;
+  animation-duration: var(--dur-quick) !important;
+  animation-timing-function: var(--ease-standard) !important;
+  animation-iteration-count: 1 !important;
+}
+[data-motion='reduced'] :is(.drawer-closing, .toast-leaving, .sheet-closing) {
+  animation-name: ob-fade-out !important;
+}
+[data-motion='reduced'] :is(.ring-draw, .line-draw, .check-draw, .chalk-draw, .bc-ring, .bc-run) {
+  stroke-dashoffset: 0 !important;
+  animation: ob-fade var(--dur-quick) var(--ease-standard) both !important;
+}
+[data-motion='reduced'] :is(.anim-beat, .anim-beat-once, .skeleton, .pitch-sweep)::after {
+  animation: none !important;
+  opacity: 0 !important;
+}
+[data-motion='reduced'] :is(.anim-blink, .anim-spin, .anim-shake, .eq span, .typing span, .ticker, .caption-word) {
+  animation: none !important;
+}
+[data-motion='reduced'] :is(.anim-ripple, .burst, .sweep) {
+  display: none !important;
+}
+[data-motion='reduced'] .burst-rest {
+  display: inline;
+  animation: ob-fade var(--dur-quick) var(--ease-standard) both;
+}
+[data-motion='reduced'] .trace-bar {
+  animation: ob-fade var(--dur-quick) var(--ease-standard) backwards !important;
+}
+/* Broadcast reference graphics: shown in place, without the looping entrances. */
+[data-motion='reduced'] .bc-anim :is(.bc-bug, .bc-bug-r, .bc-lower, .bc-stat, .bc-tag, .bc-head) {
+  animation: none !important;
+}
+[data-motion='reduced'] .bc-anim :is(.bc-ring, .bc-run) {
+  animation: none !important;
+  stroke-dashoffset: 0 !important;
+}
+/* Change one decision's result bars: at their values at once. */
+[data-motion='reduced'] .decision-bar-fill {
+  animation: none !important;
+}
+[data-motion='reduced'] .strike {
+  animation: none !important;
+  background-size: 100% 2px;
+}
+[data-motion='reduced'] .bc-anim * {
+  animation: none !important;
+}
+[data-motion='reduced'] * {
+  transition-property: color, background-color, border-color, outline-color, opacity, fill, stroke, box-shadow !important;
+  transition-duration: var(--dur-quick) !important;
+}

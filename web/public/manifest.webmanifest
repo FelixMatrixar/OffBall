@@ -1,0 +1,23 @@
+{
+  "name": "OffBall",
+  "short_name": "OffBall",
+  "description": "The runs that create space, made visible: explainable off-ball match intelligence on a synthetic match.",
+  "id": "./",
+  "start_url": "./#/match",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1110",
+  "theme_color": "#0b1110",
+  "categories": ["sports", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Match view", "url": "./#/match" },
+    { "name": "Second screen", "url": "./#/phone" },
+    { "name": "Space Centre", "url": "./#/space-centre" }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "additionalProperties": false,
+  "description": "intents.jsonl: a player decision, logged when a player's intent changes.",
+  "properties": {
+    "player_id": {
+      "title": "Player Id",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_ms": {
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "intent": {
+      "title": "Intent",
+      "type": "string"
+    },
+    "utility": {
+      "title": "Utility",
+      "type": "number"
+    },
+    "target_xy": {
+      "anyOf": [
+        {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Xy"
+    },
+    "checkpoint_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checkpoint Id"
+    },
+    "moment_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Moment Id"
+    }
+  },
+  "required": [
+    "player_id",
+    "period",
+    "t_ms",
+    "intent",
+    "utility"
+  ],
+  "title": "Intent",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/intent.schema.json"
+}

@@ -1,0 +1,39 @@
+{
+  "meta": {"code": "hi", "name": "हिन्दी", "direction": "ltr", "decimal": ".", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "डिकॉय रन", "gap": "गैप", "space": "जगह", "half_space": "हाफ़-स्पेस",
+    "run_in_behind": "डिफ़ेंस के पीछे दौड़", "overlap": "ओवरलैप", "underlap": "अंडरलैप", "third_man_run": "थर्ड-मैन रन",
+    "blind_side_run": "ब्लाइंड-साइड रन", "centre_back": "सेंटर-बैक", "full_back": "फ़ुल-बैक", "winger": "विंगर",
+    "striker": "स्ट्राइकर", "midfielder": "मिडफ़ील्डर", "goalkeeper": "गोलकीपर", "through_ball": "थ्रू बॉल",
+    "press": "प्रेस", "counter_attack": "काउंटर-अटैक", "offside": "ऑफ़साइड", "cover_shadow": "कवर शैडो",
+    "pinning": "पिनिंग", "switch_of_play": "खेल की दिशा बदलना", "pitch_control": "जगह पर नियंत्रण",
+    "space_created": "बनाई गई जगह", "null_run": "नाकाम रन"
+  },
+  "templates": {
+    "decoy_run.casual.run": "नंबर {creator_no} को देखिए। यह दौड़ गेंद पाने के लिए नहीं, बल्कि एक डिफ़ेंडर को दूर खींचने के लिए है।",
+    "decoy_run.casual.gap": "{dragged_club} का नंबर {dragged_no} उसके पीछे जाता है। बीच में एक गैप खुल जाता है।",
+    "decoy_run.casual.finish.goal": "गोल! नंबर {creator_no} की दौड़ ने मौका बनाया, नंबर {receiver_no} ने गोल किया।",
+    "decoy_run.casual.finish.shot": "नंबर {creator_no} के बनाए गैप से नंबर {receiver_no} शॉट लेता है।",
+    "decoy_run.casual.finish.chance": "नंबर {receiver_no} उस जगह में पहुँचता है जो नंबर {creator_no} की दौड़ ने बनाई।",
+    "decoy_run.learn.define": "यह एक {term:decoy_run} था: ऐसी दौड़ जो किसी साथी के लिए जगह बनाती है।",
+    "decoy_run.analyst": "{term:decoy_run}: नंबर {creator_no} ने नंबर {dragged_no} को {displacement} मी. अपनी जगह से हटाया। गैप पर {club} का नियंत्रण +{gain} अंक; {space} मी² जगह बनी।",
+    "decoy_run.analyst.cf": "दौड़ के बिना, {runs} में से {shut} सिमुलेशन में गैप बंद रहता है।",
+    "decoy_run.player": "{player} आज अब तक {dragged_count} डिफ़ेंडरों को खींच चुके हैं और {space_total} मी² जगह बना चुके हैं।",
+    "decoy_run.audio": "{club} हमला कर रहा है। नंबर {creator_no} {direction} दौड़ता है और {dragged_club} का नंबर {dragged_no} पीछे जाता है। {gap_where} एक गैप खुलता है। नंबर {receiver_no} उसमें दौड़ता है।",
+    "decoy_run.broadcaster": "डिकॉय रन · नंबर {creator_no} ने नंबर {dragged_no} को खींचा · {space} मी² जगह बनी",
+    "decoy_run.a11y.run_arrow": "नंबर {creator_no} {direction} दौड़ता है।",
+    "decoy_run.a11y.gap_ring": "{gap_where} जगह खुलती है।",
+    "decoy_run.a11y.pass_line": "नंबर {passer_no} गैप में पास देता है।",
+    "ghost.offer": "अगर नंबर {creator_no} न दौड़ता तो? परछाइयाँ बिना दौड़ के यह चाल दोहराती हैं।",
+    "direction.left": "बाएँ विंग की ओर",
+    "direction.right": "दाएँ विंग की ओर",
+    "gap_where.centre_edge": "बीच में, बॉक्स के ठीक बाहर",
+    "gap_where.centre": "बीच में",
+    "gap_where.left_half": "बाएँ हाफ़-स्पेस में",
+    "gap_where.right_half": "दाएँ हाफ़-स्पेस में",
+    "label.correction": "सुधार",
+    "label.synthetic": "सिंथेटिक डेटा",
+    "label.ai": "एआई द्वारा बनाया गया",
+    "notice.translation": "अंग्रेज़ी में: अनुवाद समय पर तैयार नहीं हुआ।"
+  }
+}

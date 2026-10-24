@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="OffBall: the runs that create space, made visible. Explainable off-ball match intelligence on a synthetic match." />
+    <meta name="theme-color" content="#0b1110" />
+    <title>OffBall</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <noscript>
+      <style>
+        /* The app's stylesheet loads without scripts too, so the recap uses the same tokens. */
+        .noscript-recap { max-width: 880px; margin: 0 auto; padding: 32px 16px; font-family: var(--font-body); color: var(--text); }
+        .noscript-recap h1 { font-family: var(--font-display); font-size: 40px; margin: 8px 0 12px; }
+        .noscript-recap p { font-size: 17px; line-height: 1.5; }
+        .noscript-recap .kicker { font-size: 13px; font-weight: 600; color: var(--muted); }
+        .noscript-recap video { width: 100%; height: auto; border-radius: 12px; margin: 16px 0; background: var(--edge); }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <!-- Without scripts, a static recap of the moment (PRD 16.2, tier D). -->
+    <noscript>
+      <main class="noscript-recap">
+        <p class="kicker">OffBall · synthetic match · AI-generated graphics</p>
+        <h1>Kestrel Bay 1–0 Ashmoor · 63′</h1>
+        <p>Watch No. 9. His run isn’t to get the ball: it pulls Ashmoor’s No. 5 out of position, and No. 10 runs into the gap he leaves to score.</p>
+        <video src="clips/showcase-casual.mp4" poster="clips/showcase-casual.jpg" controls muted playsinline preload="metadata" width="1280" height="720">A recorded clip of the moment from the broadcast camera, with its graphics drawn in.</video>
+        <p>The live views, the six viewing modes and the ten languages need JavaScript. This recap works without it.</p>
+      </main>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

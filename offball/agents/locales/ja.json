@@ -1,0 +1,39 @@
+{
+  "meta": {"code": "ja", "name": "日本語", "direction": "ltr", "decimal": ".", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "おとりの動き", "gap": "ギャップ", "space": "スペース", "half_space": "ハーフスペース",
+    "run_in_behind": "裏への抜け出し", "overlap": "オーバーラップ", "underlap": "インナーラップ", "third_man_run": "3人目の動き",
+    "blind_side_run": "ブラインドサイドへの動き", "centre_back": "センターバック", "full_back": "サイドバック",
+    "winger": "ウイング", "striker": "センターフォワード", "midfielder": "ミッドフィールダー", "goalkeeper": "ゴールキーパー",
+    "through_ball": "スルーパス", "press": "プレス", "counter_attack": "カウンター", "offside": "オフサイド",
+    "cover_shadow": "カバーシャドウ", "pinning": "ピン留め", "switch_of_play": "サイドチェンジ",
+    "pitch_control": "スペースの支配", "space_created": "生まれたスペース", "null_run": "封じられた動き"
+  },
+  "templates": {
+    "decoy_run.casual.run": "{creator_no}番に注目。このランはボールをもらうためではなく、ディフェンダーを引きつけるためのものです。",
+    "decoy_run.casual.gap": "{dragged_club}の{dragged_no}番がついていきます。中央にギャップが生まれます。",
+    "decoy_run.casual.finish.goal": "ゴール！{creator_no}番の動きが生んだチャンスを、{receiver_no}番が決めました。",
+    "decoy_run.casual.finish.shot": "{creator_no}番が開けたギャップから、{receiver_no}番がシュート。",
+    "decoy_run.casual.finish.chance": "{creator_no}番の動きが生んだスペースに、{receiver_no}番が入り込みます。",
+    "decoy_run.learn.define": "今のが{term:decoy_run}です。味方にスペースを作るための動きです。",
+    "decoy_run.analyst": "{term:decoy_run}：{creator_no}番が{dragged_no}番を{displacement}m引き出す。{club}のギャップ支配率 +{gain}pt、生まれたスペース{space}m²。",
+    "decoy_run.analyst.cf": "この動きがなければ、{runs}回のシミュレーション中{shut}回でギャップは開きません。",
+    "decoy_run.player": "{player}は今日、{dragged_count}人のディフェンダーを引きつけ、{space_total}m²のスペースを生み出しています。",
+    "decoy_run.audio": "{club}の攻撃。{creator_no}番が{direction}走り、{dragged_club}の{dragged_no}番がついていきます。{gap_where}にギャップが開き、{receiver_no}番がそこへ走り込みます。",
+    "decoy_run.broadcaster": "おとりの動き · {creator_no}番が{dragged_no}番を引きつける · {space}m²のスペース",
+    "decoy_run.a11y.run_arrow": "{creator_no}番が{direction}走ります。",
+    "decoy_run.a11y.gap_ring": "{gap_where}にスペースが開きます。",
+    "decoy_run.a11y.pass_line": "{passer_no}番がギャップへパス。",
+    "ghost.offer": "もし{creator_no}番が走らなかったら？ゴーストがその動きなしで再現します。",
+    "direction.left": "左サイドへ",
+    "direction.right": "右サイドへ",
+    "gap_where.centre_edge": "中央のペナルティエリア手前",
+    "gap_where.centre": "中央",
+    "gap_where.left_half": "左のハーフスペース",
+    "gap_where.right_half": "右のハーフスペース",
+    "label.correction": "訂正",
+    "label.synthetic": "合成データ",
+    "label.ai": "AI生成",
+    "notice.translation": "英語で表示：翻訳が間に合いませんでした。"
+  }
+}

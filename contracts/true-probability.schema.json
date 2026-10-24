@@ -1,0 +1,38 @@
+{
+  "additionalProperties": false,
+  "description": "probabilities.jsonl: the true success probability of each pass and shot, ground truth for xPass and xG.",
+  "properties": {
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "pass",
+        "shot"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "p_success": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "P Success",
+      "type": "number"
+    },
+    "features": {
+      "additionalProperties": true,
+      "title": "Features",
+      "type": "object"
+    }
+  },
+  "required": [
+    "event_id",
+    "kind",
+    "p_success"
+  ],
+  "title": "TrueProbability",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/true-probability.schema.json"
+}

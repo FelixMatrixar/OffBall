@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "const": "clock.sync",
+      "default": "clock.sync",
+      "title": "Type",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_ms": {
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "speed": {
+      "default": 1.0,
+      "description": "Playback speed, 0.25x to 60x",
+      "title": "Speed",
+      "type": "number"
+    },
+    "server_time": {
+      "title": "Server Time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "match_id",
+    "period",
+    "t_ms",
+    "server_time"
+  ],
+  "title": "ClockSync",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/clock-sync.schema.json"
+}

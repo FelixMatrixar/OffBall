@@ -1,0 +1,413 @@
+{
+  "$defs": {
+    "Anchors": {
+      "additionalProperties": false,
+      "description": "Where a graphic sits. Renderers resolve player anchors against the frame clock.",
+      "properties": {
+        "player_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Id"
+        },
+        "player_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Player Ids"
+        },
+        "from_xy": {
+          "anyOf": [
+            {
+              "description": "Pitch position in metres: [x, y]",
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From Xy"
+        },
+        "to_xy": {
+          "anyOf": [
+            {
+              "description": "Pitch position in metres: [x, y]",
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To Xy"
+        },
+        "centre_xy": {
+          "anyOf": [
+            {
+              "description": "Pitch position in metres: [x, y]",
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Centre Xy"
+        },
+        "radius_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Radius M"
+        },
+        "polygon": {
+          "anyOf": [
+            {
+              "items": {
+                "description": "Pitch position in metres: [x, y]",
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Polygon"
+        },
+        "ghost_track_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ghost Track Id"
+        }
+      },
+      "title": "Anchors",
+      "type": "object"
+    },
+    "Speech": {
+      "additionalProperties": false,
+      "properties": {
+        "ssml_ref": {
+          "title": "Ssml Ref",
+          "type": "string"
+        },
+        "voice": {
+          "default": "narrator-1",
+          "title": "Voice",
+          "type": "string"
+        },
+        "ssml": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Speech markup; renderers synthesise it or fetch ssml_ref",
+          "title": "Ssml"
+        },
+        "pan": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": -1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Stereo pan for audio cues: -1 left, 1 right",
+          "title": "Pan"
+        }
+      },
+      "required": [
+        "ssml_ref"
+      ],
+      "title": "Speech",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "overlay_id": {
+      "title": "Overlay Id",
+      "type": "string"
+    },
+    "rev": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Rev",
+      "type": "integer"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_start_ms": {
+      "title": "T Start Ms",
+      "type": "integer"
+    },
+    "t_end_ms": {
+      "title": "T End Ms",
+      "type": "integer"
+    },
+    "kind": {
+      "enum": [
+        "control_field",
+        "gap_ring",
+        "run_arrow",
+        "pass_line",
+        "ghost",
+        "offside_line",
+        "shape_lines",
+        "player_tag",
+        "badge",
+        "caption",
+        "stat_card",
+        "chart",
+        "correction"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "layer": {
+      "title": "Layer",
+      "type": "string"
+    },
+    "priority": {
+      "default": 2,
+      "description": "0 is most important",
+      "maximum": 5,
+      "minimum": 0,
+      "title": "Priority",
+      "type": "integer"
+    },
+    "mode": {
+      "enum": [
+        "casual",
+        "learn",
+        "analyst",
+        "player",
+        "audio",
+        "broadcaster"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "anchors": {
+      "$ref": "#/$defs/Anchors"
+    },
+    "text": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Text per locale",
+      "title": "Text",
+      "type": "object"
+    },
+    "speech": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Speech"
+      },
+      "title": "Speech",
+      "type": "object"
+    },
+    "a11y_text": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "A11Y Text",
+      "type": "object"
+    },
+    "chart": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A Vega-Lite spec, themed by the client (VIS-7)",
+      "title": "Chart"
+    },
+    "data": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Numbers for stat cards, with units",
+      "title": "Data"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "confidence": {
+      "default": 1.0,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "approval": {
+      "default": "auto",
+      "enum": [
+        "auto",
+        "pending",
+        "approved",
+        "held",
+        "skipped",
+        "rejected"
+      ],
+      "title": "Approval",
+      "type": "string"
+    },
+    "counterfactual_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Counterfactual Id"
+    },
+    "detected_moment_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detected Moment Id"
+    },
+    "ai_generated": {
+      "default": true,
+      "title": "Ai Generated",
+      "type": "boolean"
+    },
+    "labels": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "array"
+    }
+  },
+  "required": [
+    "overlay_id",
+    "match_id",
+    "period",
+    "t_start_ms",
+    "t_end_ms",
+    "kind",
+    "layer",
+    "mode"
+  ],
+  "title": "Overlay",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/overlay.schema.json"
+}

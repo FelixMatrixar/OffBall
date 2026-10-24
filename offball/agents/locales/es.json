@@ -1,0 +1,40 @@
+{
+  "meta": {"code": "es", "name": "Español", "direction": "ltr", "decimal": ",", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "desmarque de arrastre", "gap": "hueco", "space": "espacio", "half_space": "carril interior",
+    "run_in_behind": "desmarque a la espalda", "overlap": "doblaje por fuera", "underlap": "doblaje por dentro",
+    "third_man_run": "tercer hombre", "blind_side_run": "desmarque por el lado ciego", "centre_back": "central",
+    "full_back": "lateral", "winger": "extremo", "striker": "delantero centro", "midfielder": "centrocampista",
+    "goalkeeper": "portero", "through_ball": "pase al hueco", "press": "presión", "counter_attack": "contraataque",
+    "offside": "fuera de juego", "cover_shadow": "sombra de cobertura", "pinning": "fijación",
+    "switch_of_play": "cambio de orientación", "pitch_control": "control del espacio",
+    "space_created": "espacio generado", "null_run": "desmarque neutralizado"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Mira al {creator_no}. Esta carrera no es para recibir el balón: es para arrastrar a un defensor.",
+    "decoy_run.casual.gap": "El {dragged_no} de {dragged_club} lo sigue. Se abre un hueco en el centro.",
+    "decoy_run.casual.finish.goal": "Gol. Lo creó la carrera del {creator_no} y lo remató el {receiver_no}.",
+    "decoy_run.casual.finish.shot": "El {receiver_no} remata desde el hueco que abrió el {creator_no}.",
+    "decoy_run.casual.finish.chance": "El {receiver_no} aparece en el espacio que generó la carrera del {creator_no}.",
+    "decoy_run.learn.define": "Eso fue un {term:decoy_run}: una carrera para que un compañero tenga espacio.",
+    "decoy_run.analyst": "{Term:decoy_run}: el {creator_no} saca al {dragged_no} {displacement} m de su posición. Control del hueco de {club}: +{gain} pts; {space} m² de espacio generado.",
+    "decoy_run.analyst.cf": "Sin la carrera, el hueco no se abre en {shut} de {runs} simulaciones.",
+    "decoy_run.player": "{player} ya ha arrastrado a {dragged_count} defensores hoy y ha generado {space_total} m² de espacio.",
+    "decoy_run.audio": "Ataca {club}. El {creator_no} corre {direction} y el {dragged_no} de {dragged_club} lo sigue. Se abre un hueco {gap_where}. El {receiver_no} entra en él.",
+    "decoy_run.broadcaster": "DESMARQUE DE ARRASTRE · El {creator_no} arrastra al {dragged_no} · {space} m² generados",
+    "decoy_run.a11y.run_arrow": "El {creator_no} corre {direction}.",
+    "decoy_run.a11y.gap_ring": "Se abre un espacio {gap_where}.",
+    "decoy_run.a11y.pass_line": "El {passer_no} pasa al hueco.",
+    "ghost.offer": "¿Y si el {creator_no} no hubiera corrido? Los fantasmas repiten la jugada sin la carrera.",
+    "direction.left": "hacia la banda izquierda",
+    "direction.right": "hacia la banda derecha",
+    "gap_where.centre_edge": "en el centro, justo fuera del área",
+    "gap_where.centre": "en el centro",
+    "gap_where.left_half": "en el carril interior izquierdo",
+    "gap_where.right_half": "en el carril interior derecho",
+    "label.correction": "Corrección",
+    "label.synthetic": "Datos sintéticos",
+    "label.ai": "Generado por IA",
+    "notice.translation": "En inglés: la traducción no estuvo lista a tiempo."
+  }
+}

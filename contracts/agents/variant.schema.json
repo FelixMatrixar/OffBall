@@ -1,0 +1,99 @@
+{
+  "additionalProperties": false,
+  "description": "The Persona's rendering of verified claims for one mode and language.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "variant",
+      "default": "variant",
+      "title": "Kind",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "casual",
+        "learn",
+        "analyst",
+        "player",
+        "audio",
+        "broadcaster"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "locale": {
+      "title": "Locale",
+      "type": "string"
+    },
+    "caption": {
+      "title": "Caption",
+      "type": "string"
+    },
+    "speech_ssml": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Speech Ssml"
+    },
+    "a11y_text": {
+      "title": "A11Y Text",
+      "type": "string"
+    },
+    "stat": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Stat"
+    },
+    "glossary_terms": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Glossary Terms",
+      "type": "array"
+    },
+    "translated_by": {
+      "default": "agent",
+      "enum": [
+        "agent",
+        "glossary",
+        "fallback_en"
+      ],
+      "title": "Translated By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "mode",
+    "locale",
+    "caption",
+    "a11y_text"
+  ],
+  "title": "Variant",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/variant.schema.json"
+}

@@ -1,0 +1,39 @@
+{
+  "meta": {"code": "id", "name": "Bahasa Indonesia", "direction": "ltr", "decimal": ",", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "lari pancingan", "gap": "celah", "space": "ruang", "half_space": "half-space",
+    "run_in_behind": "lari ke belakang bek", "overlap": "overlap", "underlap": "underlap", "third_man_run": "lari orang ketiga",
+    "blind_side_run": "lari dari sisi buta", "centre_back": "bek tengah", "full_back": "bek sayap",
+    "winger": "pemain sayap", "striker": "penyerang tengah", "midfielder": "gelandang", "goalkeeper": "kiper",
+    "through_ball": "umpan terobosan", "press": "pressing", "counter_attack": "serangan balik", "offside": "offside",
+    "cover_shadow": "bayangan penutup", "pinning": "mengunci bek", "switch_of_play": "perpindahan arah serangan",
+    "pitch_control": "penguasaan ruang", "space_created": "ruang yang tercipta", "null_run": "lari yang dinetralkan"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Perhatikan nomor {creator_no}. Lari ini bukan untuk mendapatkan bola, tapi untuk menarik seorang bek menjauh.",
+    "decoy_run.casual.gap": "Nomor {dragged_no} {dragged_club} mengikutinya. Sebuah celah terbuka di tengah.",
+    "decoy_run.casual.finish.goal": "Gol! Diciptakan oleh lari nomor {creator_no}, diselesaikan oleh nomor {receiver_no}.",
+    "decoy_run.casual.finish.shot": "Nomor {receiver_no} menembak dari celah yang dibuka nomor {creator_no}.",
+    "decoy_run.casual.finish.chance": "Nomor {receiver_no} masuk ke ruang yang diciptakan lari nomor {creator_no}.",
+    "decoy_run.learn.define": "Itu tadi {term:decoy_run}: lari yang dibuat agar rekan setim mendapat ruang.",
+    "decoy_run.analyst": "{Term:decoy_run}: nomor {creator_no} menarik nomor {dragged_no} {displacement} m dari posisinya. Penguasaan celah oleh {club}: +{gain} poin; {space} m² ruang tercipta.",
+    "decoy_run.analyst.cf": "Tanpa lari itu, celah tetap tertutup di {shut} dari {runs} simulasi.",
+    "decoy_run.player": "{player} sudah menarik {dragged_count} bek hari ini dan menciptakan {space_total} m² ruang.",
+    "decoy_run.audio": "{club} menyerang. Nomor {creator_no} berlari {direction} dan nomor {dragged_no} {dragged_club} mengikutinya. Celah terbuka {gap_where}. Nomor {receiver_no} masuk ke sana.",
+    "decoy_run.broadcaster": "LARI PANCINGAN · Nomor {creator_no} menarik nomor {dragged_no} · {space} m² tercipta",
+    "decoy_run.a11y.run_arrow": "Nomor {creator_no} berlari {direction}.",
+    "decoy_run.a11y.gap_ring": "Ruang terbuka {gap_where}.",
+    "decoy_run.a11y.pass_line": "Nomor {passer_no} mengumpan ke celah.",
+    "ghost.offer": "Bagaimana jika nomor {creator_no} tidak berlari? Bayangan memutar ulang tanpa lari itu.",
+    "direction.left": "ke arah sayap kiri",
+    "direction.right": "ke arah sayap kanan",
+    "gap_where.centre_edge": "di tengah, tepat di luar kotak penalti",
+    "gap_where.centre": "di tengah",
+    "gap_where.left_half": "di half-space kiri",
+    "gap_where.right_half": "di half-space kanan",
+    "label.correction": "Koreksi",
+    "label.synthetic": "Data sintetis",
+    "label.ai": "Dibuat oleh AI",
+    "notice.translation": "Dalam bahasa Inggris: terjemahan belum siap tepat waktu."
+  }
+}

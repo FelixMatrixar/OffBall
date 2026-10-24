@@ -1,0 +1,40 @@
+{
+  "meta": {"code": "fr", "name": "Français", "direction": "ltr", "decimal": ",", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "appel leurre", "gap": "brèche", "space": "espace", "half_space": "demi-espace",
+    "run_in_behind": "appel en profondeur", "overlap": "dédoublement extérieur", "underlap": "dédoublement intérieur",
+    "third_man_run": "troisième homme", "blind_side_run": "appel dans le dos", "centre_back": "défenseur central",
+    "full_back": "latéral", "winger": "ailier", "striker": "avant-centre", "midfielder": "milieu",
+    "goalkeeper": "gardien", "through_ball": "passe en profondeur", "press": "pressing", "counter_attack": "contre-attaque",
+    "offside": "hors-jeu", "cover_shadow": "ombre de couverture", "pinning": "fixation",
+    "switch_of_play": "renversement de jeu", "pitch_control": "contrôle de l'espace", "space_created": "espace créé",
+    "null_run": "appel neutralisé"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Regardez le n° {creator_no}. Cette course ne sert pas à recevoir le ballon : elle sert à attirer un défenseur.",
+    "decoy_run.casual.gap": "Le n° {dragged_no} de {dragged_club} le suit. Une brèche s'ouvre dans l'axe.",
+    "decoy_run.casual.finish.goal": "But. Créé par la course du n° {creator_no}, conclu par le n° {receiver_no}.",
+    "decoy_run.casual.finish.shot": "Le n° {receiver_no} frappe depuis la brèche ouverte par le n° {creator_no}.",
+    "decoy_run.casual.finish.chance": "Le n° {receiver_no} surgit dans l'espace créé par la course du n° {creator_no}.",
+    "decoy_run.learn.define": "C'était un {term:decoy_run} : une course faite pour qu'un coéquipier ait de l'espace.",
+    "decoy_run.analyst": "{Term:decoy_run} : le n° {creator_no} décale le n° {dragged_no} de {displacement} m. Contrôle de la brèche par {club} : +{gain} pts ; {space} m² d'espace créé.",
+    "decoy_run.analyst.cf": "Sans la course, la brèche reste fermée dans {shut} simulations sur {runs}.",
+    "decoy_run.player": "{player} a déjà attiré {dragged_count} défenseurs aujourd'hui et créé {space_total} m² d'espace.",
+    "decoy_run.audio": "{club} attaque. Le n° {creator_no} part {direction} et le n° {dragged_no} de {dragged_club} le suit. Une brèche s'ouvre {gap_where}. Le n° {receiver_no} s'y engouffre.",
+    "decoy_run.broadcaster": "APPEL LEURRE · Le n° {creator_no} attire le n° {dragged_no} · {space} m² créés",
+    "decoy_run.a11y.run_arrow": "Le n° {creator_no} court {direction}.",
+    "decoy_run.a11y.gap_ring": "Un espace s'ouvre {gap_where}.",
+    "decoy_run.a11y.pass_line": "Le n° {passer_no} passe dans la brèche.",
+    "ghost.offer": "Et si le n° {creator_no} n'avait pas couru ? Les fantômes rejouent l'action sans la course.",
+    "direction.left": "vers l'aile gauche",
+    "direction.right": "vers l'aile droite",
+    "gap_where.centre_edge": "dans l'axe, juste à l'entrée de la surface",
+    "gap_where.centre": "dans l'axe",
+    "gap_where.left_half": "dans le demi-espace gauche",
+    "gap_where.right_half": "dans le demi-espace droit",
+    "label.correction": "Correction",
+    "label.synthetic": "Données synthétiques",
+    "label.ai": "Généré par IA",
+    "notice.translation": "En anglais : la traduction n'était pas prête à temps."
+  }
+}

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall system states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.ss{--eo:cubic-bezier(.2,0,0,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes ssShimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes ssSpin{to{transform:rotate(360deg)}}
+@keyframes ssStep{0%,20%{opacity:.35}30%,100%{opacity:1}}
+@keyframes ssTick{0%,25%{transform:scale(0)}35%{transform:scale(1.2)}45%,100%{transform:scale(1)}}
+@keyframes ssToast{0%,8%{opacity:0;transform:translateY(16px) scale(.97)}18%,80%{opacity:1;transform:none}92%,100%{opacity:0;transform:translateY(6px)}}
+@keyframes ssTier{0%,30%{transform:translateY(0)}40%,80%{transform:translateY(34px)}90%,100%{transform:translateY(0)}}
+@keyframes ssStrike{0%,15%{background-size:0 2px}35%,100%{background-size:100% 2px}}
+@keyframes ssSwapOut{0%,40%{opacity:1;transform:none}50%,100%{opacity:0;transform:translateY(-8px)}}
+@keyframes ssSwapIn{0%,48%{opacity:0;transform:translateY(8px)}58%,95%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes ssBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes ssRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
+@keyframes ssBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ssFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ssPlay{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ssFade{0%,10%{opacity:0}25%,85%{opacity:1}100%{opacity:0}}
+.ss-shimmer{background:linear-gradient(90deg,#19251F 25%,#27362F 50%,#19251F 75%);background-size:200% 100%;animation:ssShimmer 1.4s linear infinite}
+.ss-spin{animation:ssSpin .9s linear infinite}
+.ss-ring{animation:ssRing 1.5s var(--eo) infinite}
+.ss-blink{animation:ssBlink 1.4s ease-in-out infinite}
+.ss-bob{animation:ssBob 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.ss *{animation:none!important}}
+</style>
+</helmet>
+<div class="ss" style="width: 1440px; height: 1300px; box-sizing: border-box; overflow: hidden; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 56px 64px; display: flex; flex-direction: column; gap: 24px">
+  <header>
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 56px; font-weight: 700; line-height: 1">System states</h1>
+    <p style="margin: 10px 0 0; font-size: 17px; color: #9EB0A6; max-width: 900px">What viewers see when things are loading, slow, wrong or out of scope. Every state says what’s happening, what OffBall is doing about it, and what the viewer can do.</p>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px">
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+        <div class="ss-shimmer" style="flex: 1; border-radius: 6px"></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 11px">
+          <span style="display: flex; align-items: center; gap: 6px; animation: ssStep 3s var(--eo) infinite"><span style="width: 12px; height: 12px; border-radius: 6px; background: #D7F25C; display: inline-block; animation: ssTick 3s var(--ep) infinite"></span>Match feed connected</span>
+          <span style="display: flex; align-items: center; gap: 6px; animation: ssStep 3s var(--eo) .5s infinite"><span style="width: 12px; height: 12px; border-radius: 6px; background: #D7F25C; display: inline-block; animation: ssTick 3s var(--ep) .5s infinite"></span>Space model warm</span>
+          <span style="display: flex; align-items: center; gap: 6px; color: #9EB0A6"><span class="ss-spin" style="width: 10px; height: 10px; border: 2px solid #27362F; border-top-color: #D7F25C; border-radius: 50%; display: inline-block"></span>Agents joining</span>
+        </div>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Loading a match</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">Skeleton pitch, then three checks tick off in order. First frame in 2 s or less on broadband.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="position: relative; height: 150px; border-radius: 10px; background: #14301F; overflow: hidden">
+        <svg viewBox="0 0 300 150" aria-hidden="true" style="width: 100%; height: 100%; display: block; filter: saturate(.4) brightness(.7)">
+          <circle cx="80" cy="70" r="8" style="fill: #7CC0FF"></circle><circle cx="140" cy="50" r="8" style="fill: #7CC0FF"></circle><circle cx="200" cy="90" r="8" style="fill: #E2733A"></circle><circle cx="230" cy="60" r="8" style="fill: #E2733A"></circle>
+        </svg>
+        <span style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: #121B18; border: 1px solid #27362F; font-size: 12px; font-weight: 600; white-space: nowrap">
+          <span class="ss-spin" style="width: 12px; height: 12px; border: 2px solid #27362F; border-top-color: #D7F25C; border-radius: 50%; display: inline-block"></span>Feed interrupted · holding the last frame
+        </span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Feed stall</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">After 2 s without data the picture freezes cleanly and dims. Late graphics are dropped, never shown out of sync.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #14301F; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; box-sizing: border-box">
+        <span style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: #121B18; border: 1px solid #27362F; font-size: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.3); animation: ssToast 3.4s var(--ep) infinite"><span style="width: 8px; height: 8px; border-radius: 4px; background: #D7F25C"></span>Back in sync. Nothing was missed.</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Back in sync</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">A short, polite toast when the feed recovers. It says whether anything was missed.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; display: flex; align-items: center; gap: 16px; padding: 0 16px; box-sizing: border-box">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 6px">
+          <span style="position: absolute; left: -6px; top: -4px; width: 106px; height: 32px; border-radius: 8px; box-shadow: inset 0 0 0 2px #D7F25C; animation: ssTier 3.6s var(--eo) infinite"></span>
+          <span style="height: 28px; width: 94px; display: flex; align-items: center; font-size: 12px; font-weight: 600">A · WebGPU</span>
+          <span style="height: 28px; width: 94px; display: flex; align-items: center; font-size: 12px; font-weight: 600">B · WebGL2</span>
+          <span style="height: 28px; width: 94px; display: flex; align-items: center; font-size: 12px; font-weight: 600; color: #9EB0A6">C · Canvas</span>
+          <span style="height: 28px; width: 94px; display: flex; align-items: center; font-size: 12px; font-weight: 600; color: #9EB0A6">D · Video</span>
+        </div>
+        <p style="margin: 0; font-size: 12px; line-height: 1.5">Holding 60 fps: switched to Tier B. Back to Tier A after 10 s of headroom.</p>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Quality step-down</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">Frame time over budget for 2 s steps down a tier. The viewer is told once, and can lock a tier.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #000; position: relative; overflow: hidden">
+        <div style="position: absolute; inset: 0; background: #14301F; opacity: .8"></div>
+        <span style="position: absolute; left: 10px; top: 10px; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; background: rgba(18,27,24,.9)">Tier D · pre-rendered clip</span>
+        <div style="position: absolute; left: 10px; right: 10px; bottom: 34px; font-size: 12px; background: rgba(11,17,16,.9); padding: 6px 8px; border-radius: 6px">Watch No. 9. This run isn’t to get the ball.</div>
+        <div style="position: absolute; left: 10px; right: 10px; bottom: 14px; height: 4px; border-radius: 2px; background: #27362F; overflow: hidden"><span style="position: absolute; inset: 0; background: #D7F25C; transform-origin: left; animation: ssPlay 6s linear infinite"></span></div>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Video fallback</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">On devices that can’t draw live, clips play with overlays burned in and a live caption track on top.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 14px; box-sizing: border-box; position: relative">
+        <span style="position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #FF7A7A; color: #1E0505">Correction</span>
+        <p style="margin: 26px 0 0; font-size: 14px; position: relative; height: 44px">
+          <span style="position: absolute; inset: 0; color: #9EB0A6; background-image: linear-gradient(#FFB4B4,#FFB4B4); background-repeat: no-repeat; background-position: 0 30%; animation: ssStrike 4s var(--eo) infinite, ssSwapOut 4s var(--eo) infinite">Goal for No. 7 at 41′.</span>
+          <span style="position: absolute; inset: 0; animation: ssSwapIn 4s var(--eo) infinite">Goal for No. 11 at 41′, after the feed’s correction.</span>
+        </p>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Correction</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">The old claim is struck through and replaced within 5 s, with a Correction tag that stays for 3 s.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px">
+        <span>No. 9 has made 7 off-ball runs today, the most in this match.</span>
+        <span style="color: #9EB0A6; border-left: 2px dashed #9EB0A6; padding-left: 8px">I couldn’t verify whether that’s a season record, so I’ve left it out.</span>
+        <span style="align-self: flex-start; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; box-shadow: inset 0 0 0 1px #9EB0A6; color: #9EB0A6">1 claim unverified</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Couldn’t verify</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">The Pundit answers what it can prove and says plainly what it couldn’t check. Nothing unverified is presented as fact.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; gap: 8px">
+        <span style="align-self: flex-end; background: #19251F; border-radius: 12px 12px 4px 12px; padding: 6px 10px">What are the odds Kestrel win?</span>
+        <span>OffBall doesn’t do odds or betting. I can show you who’s controlling space right now, if that helps.</span>
+        <span style="align-self: flex-start; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px #D7F25C; color: #D7F25C">Show space control</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Out of scope</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">Declines briefly without lecturing, and offers the nearest useful thing it can do.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center">
+        <span class="ss-bob" style="font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700">Ask about this match</span>
+        <span style="font-size: 11px; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px #27362F">Why did No. 5 follow?</span>
+        <span style="font-size: 11px; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px #27362F">Who made the most space?</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Empty Ask OffBall</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">Never a blank box: three questions drawn from what just happened in the match.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+        <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><span style="position: relative; width: 10px; height: 10px"><span style="position: absolute; inset: 0; border-radius: 5px; background: #E2733A"></span><span class="ss-ring" style="position: absolute; inset: 0; border-radius: 5px; border: 2px solid #E2733A"></span></span>You’re offline</span>
+        <span style="font-size: 12px; color: #9EB0A6; line-height: 1.5">The last 10 minutes are saved on this device. Live moments will catch up when you reconnect.</span>
+        <span style="align-self: flex-start; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #D7F25C; color: #0B1110">Watch the saved replay</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Offline</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">The PWA keeps a short replay buffer, so losing the network never means a blank screen.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+        <span style="font-size: 13px; font-weight: 600">Live runs are busy right now</span>
+        <span style="font-size: 12px; color: #9EB0A6; line-height: 1.5">You’re 2nd in line, about 4 minutes. The showcase replay is ready now.</span>
+        <span style="position: relative; height: 6px; border-radius: 3px; background: #27362F; overflow: hidden"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: 70%; background: #7CC0FF; transform-origin: left; animation: ssFill 2.4s var(--eo) infinite"></span></span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Fair-use limit</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">When live runs hit the limit, viewers get a place in line and an instant alternative, never an error.</p>
+    </article>
+
+    <article style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="height: 150px; border-radius: 10px; background: #0F2419; display: flex; align-items: center; justify-content: center; gap: 18px">
+        <svg viewBox="0 0 120 90" aria-hidden="true" style="width: 120px; height: 90px">
+          <ellipse cx="60" cy="45" rx="34" ry="28" style="fill: rgba(215,242,92,0.12); stroke: #D7F25C; stroke-width: 3px; animation: ssFade 3s linear infinite"></ellipse>
+        </svg>
+        <span style="font-size: 12px; line-height: 1.5; max-width: 110px">Reduced motion: the ring fades in. No drawing, no pulse.</span>
+      </div>
+      <h2 style="margin: 0; font-size: 15px">Reduced motion</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9EB0A6">Follows the system setting, or the switch in Personalize. Every state above has a fade-only version.</p>
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

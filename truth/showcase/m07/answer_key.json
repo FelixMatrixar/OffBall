@@ -1,0 +1,214 @@
+[
+ {
+  "schema_version": "2.0",
+  "moment_id": "m07-k01",
+  "match_id": "m07",
+  "source": "planted",
+  "type": "null_run",
+  "period": 1,
+  "t_start_ms": 689840,
+  "t_end_ms": 693360,
+  "team_id": "kes",
+  "creator_id": "kes-09",
+  "dragged_ids": [
+   "ash-05"
+  ],
+  "receiver_id": "kes-10",
+  "gap_zone": [
+   [
+    85.9,
+    21.8
+   ],
+   [
+    94.9,
+    21.8
+   ],
+   [
+    94.9,
+    33.8
+   ],
+   [
+    85.9,
+    33.8
+   ]
+  ],
+  "expected": {
+   "defender_displacement_m_max": 5.0,
+   "zone_control_gain_pts_max": 15.0
+  },
+  "observed": {
+   "defender_displacement_m": 2.66,
+   "zone_control_gain_pts": -34.8
+  },
+  "counterfactual": {
+   "space_created_m2": 0.0,
+   "epv_gain": 0.0,
+   "gap_opens_without_run": false,
+   "runs": 0
+  },
+  "is_null": true,
+  "outcome": "none",
+  "attempts": 15
+ },
+ {
+  "schema_version": "2.0",
+  "moment_id": "m07-k02",
+  "match_id": "m07",
+  "source": "planted",
+  "type": "decoy_run",
+  "period": 1,
+  "t_start_ms": 1766760,
+  "t_end_ms": 1772920,
+  "team_id": "kes",
+  "creator_id": "kes-09",
+  "dragged_ids": [
+   "ash-05"
+  ],
+  "receiver_id": "kes-10",
+  "gap_zone": [
+   [
+    70.4,
+    35.2
+   ],
+   [
+    79.4,
+    35.2
+   ],
+   [
+    79.4,
+    47.2
+   ],
+   [
+    70.4,
+    47.2
+   ]
+  ],
+  "expected": {
+   "defender_displacement_m_min": 8.0,
+   "zone_control_gain_pts_min": 40.0,
+   "pass_after_gap_s_max": 2.0,
+   "defender_follow_cosine_min": 0.6
+  },
+  "observed": {
+   "defender_displacement_m": 16.98,
+   "zone_control_gain_pts": 46.9,
+   "pass_after_gap_s": 0.16,
+   "defender_follow_cosine": 0.94
+  },
+  "counterfactual": {
+   "space_created_m2": 27.3,
+   "epv_gain": 0.0159,
+   "gap_opens_without_run": false,
+   "runs": 32
+  },
+  "is_null": false,
+  "outcome": "shot",
+  "attempts": 39
+ },
+ {
+  "schema_version": "2.0",
+  "moment_id": "m07-k03",
+  "match_id": "m07",
+  "source": "planted",
+  "type": "decoy_run",
+  "period": 2,
+  "t_start_ms": 1239320,
+  "t_end_ms": 1245080,
+  "team_id": "kes",
+  "creator_id": "kes-09",
+  "dragged_ids": [
+   "ash-05"
+  ],
+  "receiver_id": "kes-10",
+  "gap_zone": [
+   [
+    10.9,
+    31.9
+   ],
+   [
+    19.9,
+    31.9
+   ],
+   [
+    19.9,
+    43.9
+   ],
+   [
+    10.9,
+    43.9
+   ]
+  ],
+  "expected": {
+   "defender_displacement_m_min": 8.0,
+   "zone_control_gain_pts_min": 40.0,
+   "pass_after_gap_s_max": 2.0,
+   "defender_follow_cosine_min": 0.6
+  },
+  "observed": {
+   "defender_displacement_m": 13.33,
+   "zone_control_gain_pts": 55.2,
+   "pass_after_gap_s": 0.32,
+   "defender_follow_cosine": 1.0
+  },
+  "counterfactual": {
+   "space_created_m2": 27.2,
+   "epv_gain": 0.0314,
+   "gap_opens_without_run": false,
+   "runs": 32
+  },
+  "is_null": false,
+  "outcome": "goal",
+  "attempts": 121
+ },
+ {
+  "schema_version": "2.0",
+  "moment_id": "m07-k04",
+  "match_id": "m07",
+  "source": "planted",
+  "type": "null_run",
+  "period": 2,
+  "t_start_ms": 1918520,
+  "t_end_ms": 1922040,
+  "team_id": "kes",
+  "creator_id": "kes-35",
+  "dragged_ids": [
+   "ash-05"
+  ],
+  "receiver_id": "kes-10",
+  "gap_zone": [
+   [
+    20.1,
+    38.3
+   ],
+   [
+    29.1,
+    38.3
+   ],
+   [
+    29.1,
+    50.3
+   ],
+   [
+    20.1,
+    50.3
+   ]
+  ],
+  "expected": {
+   "defender_displacement_m_max": 5.0,
+   "zone_control_gain_pts_max": 15.0
+  },
+  "observed": {
+   "defender_displacement_m": 2.62,
+   "zone_control_gain_pts": -47.7
+  },
+  "counterfactual": {
+   "space_created_m2": 0.0,
+   "epv_gain": 0.0,
+   "gap_opens_without_run": false,
+   "runs": 0
+  },
+  "is_null": true,
+  "outcome": "none",
+  "attempts": 20
+ }
+]

@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "description": "One checkable statement. Numbers come from tool calls, so the Fact-checker can recompute them.",
+      "properties": {
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "number",
+            "statement"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "description": "English text of the claim",
+          "title": "Text",
+          "type": "string"
+        },
+        "metric": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "compute_metric name for number claims",
+          "title": "Metric"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "subject_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Subject Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "kind",
+        "text"
+      ],
+      "title": "Claim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The Explainer's structured explanation of a moment.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "draft",
+      "default": "draft",
+      "title": "Kind",
+      "type": "string"
+    },
+    "draft_id": {
+      "title": "Draft Id",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "attempt": {
+      "default": 1,
+      "title": "Attempt",
+      "type": "integer"
+    },
+    "headline": {
+      "title": "Headline",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "source": {
+      "default": "agent",
+      "enum": [
+        "agent",
+        "template"
+      ],
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "draft_id",
+    "candidate_id",
+    "headline",
+    "claims"
+  ],
+  "title": "Draft",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/draft.schema.json"
+}

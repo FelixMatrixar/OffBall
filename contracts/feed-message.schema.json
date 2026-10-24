@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "description": "A message on the match feed, from the emitter to ingest.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seq": {
+      "description": "Sequence number per match, for dedup and reorder",
+      "minimum": 0,
+      "title": "Seq",
+      "type": "integer"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "event",
+        "frame",
+        "correction",
+        "status"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "sent_at": {
+      "description": "ISO 8601 UTC timestamp",
+      "title": "Sent At",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "corrects_event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Corrects Event Id"
+    }
+  },
+  "required": [
+    "seq",
+    "match_id",
+    "kind",
+    "sent_at",
+    "payload"
+  ],
+  "title": "FeedMessage",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/feed-message.schema.json"
+}

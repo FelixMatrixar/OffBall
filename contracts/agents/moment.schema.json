@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "description": "The Scout's airtime decision for one candidate.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "moment",
+      "default": "moment",
+      "title": "Kind",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "airtime": {
+      "title": "Airtime",
+      "type": "boolean"
+    },
+    "rank": {
+      "title": "Rank",
+      "type": "integer"
+    },
+    "priority": {
+      "maximum": 5,
+      "minimum": 0,
+      "title": "Priority",
+      "type": "integer"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "want_counterfactual": {
+      "default": true,
+      "title": "Want Counterfactual",
+      "type": "boolean"
+    },
+    "decided_by": {
+      "default": "agent",
+      "enum": [
+        "agent",
+        "rule"
+      ],
+      "title": "Decided By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "airtime",
+    "rank",
+    "priority",
+    "reason"
+  ],
+  "title": "MomentPick",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/moment.schema.json"
+}

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall second screen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.ph{--eo:cubic-bezier(.2,0,0,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes phRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes phFade{from{opacity:0}to{opacity:1}}
+@keyframes phPop{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes phDraw{to{stroke-dashoffset:0}}
+@keyframes phPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes phBlink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes phDots{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+@keyframes phWord{from{opacity:0;transform:translateY(6px);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes phGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes phRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes phWave{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+@keyframes phSlideL{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.ph-rise{animation:phRise .4s var(--eo) both}
+.ph-fade{animation:phFade .3s var(--eo) both}
+.ph-pop{animation:phPop .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.ph-draw{stroke-dasharray:700;stroke-dashoffset:700;animation:phDraw 1s var(--eo) .2s forwards}
+.ph-ring{stroke-dasharray:420;stroke-dashoffset:420;transform-box:fill-box;transform-origin:center;animation:phDraw .7s var(--eo) .5s forwards,phPulse 1.8s ease-in-out 1.2s infinite}
+.ph-blink{animation:phBlink 1.4s ease-in-out infinite}
+.ph-dots span{display:inline-block;width:7px;height:7px;border-radius:4px;background:#9EB0A6;animation:phDots 1s ease-in-out infinite}
+.ph-w{display:inline-block;margin-inline-end:.26em;animation:phWord .3s var(--eo) both}
+.ph-grow{transform-origin:left center;transform-box:fill-box;animation:phGrow .7s var(--eo) both}
+.ph-ripple{animation:phRing 1.4s var(--eo) infinite}
+.ph-wave span{display:inline-block;width:3px;height:22px;border-radius:2px;background:#D7F25C;transform-origin:center;animation:phWave .8s ease-in-out infinite}
+.ph-slide{animation:phSlideL .35s var(--eo) both}
+.ph-btn{transition:transform 80ms var(--eo),background-color .15s,color .15s,box-shadow .15s;cursor:pointer}
+.ph-btn:active{transform:scale(.95)}
+.ph button:focus-visible,.ph input:focus-visible{outline:2px solid #D7F25C;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.ph *{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div class="ph" style="width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+
+  <header class="ph-rise" style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: #ECF1EC; stroke-width: 2px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: #ECF1EC; stroke-width: 2px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: #D7F25C; stroke-width: 2.2px"></circle></svg>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">OffBall</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 19px">
+      <span style="width: 8px; height: 8px; border-radius: 2px; background: #7CC0FF"></span>KES
+      <span style="font-size: 22px; font-variant-numeric: tabular-nums">0–0</span>
+      ASH<span style="width: 8px; height: 8px; border-radius: 2px; background: #E2733A"></span>
+      <span style="color: #9EB0A6; font-variant-numeric: tabular-nums">63:04</span>
+    </div>
+  </header>
+
+  <div class="ph-rise" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #9EB0A6; animation-delay: 60ms">
+    <span style="position: relative; width: 8px; height: 8px">
+      <span style="position: absolute; inset: 0; border-radius: 4px; background: #D7F25C"></span>
+      <span class="ph-ripple" style="position: absolute; inset: 0; border-radius: 4px; border: 1.5px solid #D7F25C"></span>
+    </span>
+    Paired with the living-room screen · in sync
+  </div>
+
+  <nav aria-label="Companion sections" class="ph-rise" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: #121B18; border: 1px solid #27362F; border-radius: 12px; padding: 4px; animation-delay: 100ms">
+    <span aria-hidden="true" style="{{indicator}}"></span>
+    <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3">
+      <button type="button" aria-pressed="{{tb.on}}" onClick="{{tb.pick}}" class="ph-btn" style="{{tb.style}}">{{tb.label}}</button>
+    </sc-for>
+  </nav>
+
+  <sc-if value="{{isMoment}}" hint-placeholder-val="{{true}}">
+    <div class="ph-rise" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 8px; position: relative">
+      <svg viewBox="-20 -20 720 545" role="img" aria-label="Attacking half, Kestrel Bay attacking upwards. No. 9 has pulled No. 5 wide and a gap is open in the centre." style="width: 100%; height: auto; display: block">
+        <rect x="-20" y="-20" width="720" height="545" rx="10" style="fill: #0F2419"></rect>
+        <sc-for list="{{stripes}}" as="sp" hint-placeholder-count="5">
+          <rect x="0" y="{{sp.y}}" width="680" height="105" style="{{sp.style}}"></rect>
+        </sc-for>
+        <g style="fill: none; stroke: rgba(236,241,236,0.45); stroke-width: 2px">
+          <rect x="0" y="0" width="680" height="525"></rect>
+          <rect x="138.4" y="0" width="403.2" height="165"></rect>
+          <rect x="248.4" y="0" width="183.2" height="55"></rect>
+          <path d="M266.87 165 A91.5 91.5 0 0 0 413.13 165"></path>
+          <path d="M248.5 525 A91.5 91.5 0 0 1 431.5 525"></path>
+          <rect x="303.4" y="-14" width="73.2" height="14"></rect>
+        </g>
+        <ellipse class="ph-fade" cx="280" cy="165" rx="68" ry="54" style="fill: rgba(215,242,92,0.12); animation-delay: .5s"></ellipse>
+        <ellipse class="ph-ring" cx="280" cy="165" rx="68" ry="54" style="fill: none; stroke: #D7F25C; stroke-width: 4px"></ellipse>
+        <text class="ph-pop" x="280" y="248" style="font-family: Inter, sans-serif; font-size: 24px; font-weight: 700; fill: #D7F25C; text-anchor: middle; paint-order: stroke; stroke: rgba(9,16,13,0.88); stroke-width: 6px; stroke-linejoin: round; animation-delay: .9s">Space</text>
+        <line class="ph-draw" x1="340" y1="210" x2="{{runEnd.x}}" y2="{{runEnd.y}}" style="stroke: #7CC0FF; stroke-width: 6px; stroke-linecap: round"></line>
+        <polygon class="ph-pop" points="{{runEnd.head}}" style="fill: #7CC0FF; animation-delay: 1s"></polygon>
+        <line class="ph-fade" x1="{{passLine.x1}}" y1="{{passLine.y1}}" x2="277" y2="170" style="stroke: #ECF1EC; stroke-width: 4px; stroke-dasharray: 10 9; animation-delay: 1.1s"></line>
+        <sc-for list="{{players}}" as="p" hint-placeholder-count="18">
+          <g style="{{p.gStyle}}">
+            <g class="ph-pop" style="{{p.delay}}">
+              <circle r="16" style="{{p.dot}}"></circle>
+              <text y="5.5" style="{{p.num}}">{{p.n}}</text>
+            </g>
+          </g>
+        </sc-for>
+        <g style="{{ballStyle}}"><circle class="ph-pop" r="8" style="fill: #FFFFFF; stroke: #0B1110; stroke-width: 2px; animation-delay: 1.1s"></circle></g>
+      </svg>
+      <span style="position: absolute; left: 14px; top: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; background: rgba(18,27,24,0.85); border: 1px solid #27362F"><span class="ph-blink" style="width: 6px; height: 6px; border-radius: 3px; background: #7CC0FF"></span>Tier C · Canvas 2D · 30 fps</span>
+    </div>
+    <div class="ph-rise" aria-live="polite" style="background: #121B18; border: 1px solid #27362F; border-radius: 12px; padding: 12px 14px; animation-delay: 120ms">
+      <p style="margin: 0; font-size: 17px; line-height: 1.4; font-weight: 500"><sc-for list="{{capWords}}" as="w" hint-placeholder-count="14"><span class="ph-w" style="{{w.style}}">{{w.text}}</span></sc-for></p>
+      <p style="margin: 6px 0 0; font-size: 11px; color: #9EB0A6">AI-generated · fact-checked · synthetic match</p>
+    </div>
+    <div class="ph-rise" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; animation-delay: 180ms">
+      <sc-for list="{{quick}}" as="qk" hint-placeholder-count="3">
+        <div style="background: #121B18; border: 1px solid #27362F; border-radius: 10px; padding: 8px 10px">
+          <div style="font-size: 11px; color: #9EB0A6">{{qk.label}}</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums">{{qk.value}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isPlayer}}" hint-placeholder-val="{{false}}">
+    <div class="ph-rise" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span style="position: relative; width: 56px; height: 56px; flex: none">
+          <span class="ph-ripple" style="position: absolute; inset: 0; border-radius: 28px; border: 2px solid #7CC0FF"></span>
+          <span style="position: absolute; inset: 0; border-radius: 28px; background: #7CC0FF; color: #06121F; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">9</span>
+        </span>
+        <div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">J. Velmar</div>
+          <div style="font-size: 13px; color: #9EB0A6">Striker · Kestrel Bay · your player</div>
+        </div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{tallies}}" as="ty" hint-placeholder-count="4">
+        <div class="ph-rise" style="{{ty.box}}">
+          <div style="font-size: 12px; color: #9EB0A6">{{ty.label}}</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums">{{ty.value}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div class="ph-rise" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 14px; animation-delay: 240ms">
+      <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px"><span style="font-weight: 600">Off-ball runs today</span><span style="color: #9EB0A6">7 runs</span></div>
+      <svg viewBox="0 0 320 120" role="img" aria-label="No. 9's seven off-ball runs today, drawn on a mini pitch" style="width: 100%; height: auto; display: block; border-radius: 8px">
+        <rect x="0" y="0" width="320" height="120" style="fill: #14301F"></rect>
+        <rect x="0" y="0" width="320" height="120" style="fill: none; stroke: rgba(236,241,236,0.4); stroke-width: 1.5px"></rect>
+        <line x1="160" y1="0" x2="160" y2="120" style="stroke: rgba(236,241,236,0.4); stroke-width: 1.5px"></line>
+        <rect x="270" y="30" width="50" height="60" style="fill: none; stroke: rgba(236,241,236,0.4); stroke-width: 1.5px"></rect>
+        <sc-for list="{{runs}}" as="rn" hint-placeholder-count="7">
+          <line class="ph-draw" x1="{{rn.x1}}" y1="{{rn.y1}}" x2="{{rn.x2}}" y2="{{rn.y2}}" style="{{rn.style}}"></line>
+        </sc-for>
+      </svg>
+    </div>
+    <p class="ph-fade" style="margin: 0; font-size: 13px; color: #9EB0A6; animation-delay: 400ms">Three defenders dragged ties No. 9’s season high for one match.</p>
+  </sc-if>
+
+  <sc-if value="{{isAsk}}" hint-placeholder-val="{{false}}">
+    <section aria-label="Ask OffBall" class="ph-rise" style="flex: 1; min-height: 0; background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+      <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+        <div class="ph-slide" style="align-self: flex-end; max-width: 82%; background: #19251F; border-radius: 14px 14px 4px 14px; padding: 9px 12px; font-size: 14px">{{question}}</div>
+        <sc-if value="{{typing}}" hint-placeholder-val="{{false}}">
+          <div class="ph-fade ph-dots" aria-label="OffBall is checking the data" style="display: inline-flex; gap: 5px; padding: 10px 12px; border-radius: 14px 14px 14px 4px; background: #19251F; align-self: flex-start"><span></span><span style="animation-delay: .15s"></span><span style="animation-delay: .3s"></span></div>
+          <div class="ph-fade" style="font-size: 12px; color: #9EB0A6; display: flex; align-items: center; gap: 6px"><span style="font-family: 'JetBrains Mono', monospace">{{toolLine}}</span></div>
+        </sc-if>
+        <sc-if value="{{answered}}" hint-placeholder-val="{{true}}">
+          <div aria-live="polite" style="max-width: 94%; font-size: 14px; line-height: 1.5">
+            <sc-for list="{{ansWords}}" as="aw" hint-placeholder-count="20"><span class="ph-w" style="{{aw.style}}">{{aw.text}}</span></sc-for>
+          </div>
+          <svg viewBox="0 0 300 60" role="img" aria-label="{{chartLabel}}" style="width: 100%; height: auto; display: block">
+            <sc-for list="{{bars}}" as="br" hint-placeholder-count="2">
+              <g>
+                <text x="0" y="{{br.ty}}" style="font-family: Inter, sans-serif; font-size: 11px; fill: #9EB0A6">{{br.label}}</text>
+                <rect class="ph-grow" x="74" y="{{br.y}}" width="{{br.w}}" height="16" rx="3" style="{{br.style}}"></rect>
+                <text class="ph-fade" x="{{br.vx}}" y="{{br.ty}}" style="font-family: Inter, sans-serif; font-size: 11px; font-weight: 700; fill: #ECF1EC; animation-delay: 1.2s">{{br.value}}</text>
+              </g>
+            </sc-for>
+          </svg>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <span class="ph-pop" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 6px; border-radius: 4px; border: 1px solid #27362F; color: #9EB0A6; animation-delay: 1.3s">{{source}}</span>
+            <span class="ph-pop" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: #D7F25C; color: #0B1110; animation-delay: 1.45s">Fact-checked</span>
+          </div>
+        </sc-if>
+      </div>
+      <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px">
+        <sc-for list="{{suggestions}}" as="sg" hint-placeholder-count="3">
+          <button type="button" onClick="{{sg.ask}}" class="ph-btn" style="{{sg.style}}">{{sg.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center">
+        <label for="ph-ask" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Ask about this match</label>
+        <sc-if value="{{listening}}" hint-placeholder-val="{{false}}">
+          <div class="ph-fade" style="flex: 1; min-height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 22px; border: 1px solid #D7F25C; background: #0B1110">
+            <span class="ph-wave" aria-hidden="true" style="display: inline-flex; align-items: center; gap: 3px"><span></span><span style="animation-delay: .1s"></span><span style="animation-delay: .2s"></span><span style="animation-delay: .3s"></span><span style="animation-delay: .4s"></span><span style="animation-delay: .5s"></span></span>
+            <span style="font-size: 13px; color: #D7F25C">Listening…</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{notListening}}" hint-placeholder-val="{{true}}">
+          <input id="ph-ask" type="text" placeholder="Ask about this match" style="flex: 1; min-width: 0; min-height: 44px; box-sizing: border-box; border-radius: 22px; border: 1px solid #27362F; background: #0B1110; color: #ECF1EC; padding: 0 14px; font: 400 14px Inter, sans-serif">
+        </sc-if>
+        <button type="button" aria-label="{{micLabel}}" aria-pressed="{{listening}}" onClick="{{toggleMic}}" class="ph-btn" style="position: relative; width: 44px; height: 44px; flex: none; border-radius: 22px; border: 0; background: #D7F25C; color: #0B1110; display: flex; align-items: center; justify-content: center">
+          <sc-if value="{{listening}}" hint-placeholder-val="{{false}}">
+            <span class="ph-ripple" style="position: absolute; inset: 0; border-radius: 22px; border: 2px solid #D7F25C"></span>
+            <span class="ph-ripple" style="position: absolute; inset: 0; border-radius: 22px; border: 2px solid #D7F25C; animation-delay: .7s"></span>
+          </sc-if>
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="2" width="6" height="10" rx="3" style="fill: none; stroke: currentColor; stroke-width: 1.8px"></rect><path d="M3.5 9 Q3.5 14 9 14 Q14.5 14 14.5 9 M9 14 V16.5" style="fill: none; stroke: currentColor; stroke-width: 1.8px; stroke-linecap: round"></path></svg>
+        </button>
+      </div>
+    </section>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.t0 = Date.now();
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 100);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  st() { return Object.assign({ tab: 'ask', q: 0, askAt: 0, listening: false, now: 0 }, this.state || {}); }
+  at(keys, t) {
+    if (t <= keys[0][0]) return [keys[0][1], keys[0][2]];
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i], b = keys[i + 1];
+      if (t <= b[0]) { let u = (t - a[0]) / (b[0] - a[0]); u = u * u * (3 - 2 * u); return [a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u]; }
+    }
+    const l = keys[keys.length - 1];
+    return [l[1], l[2]];
+  }
+  renderVals() {
+    const s = this.st();
+    const now = s.now || Date.now();
+    const sinceAsk = (now - (s.askAt || this.t0 || now)) / 1000;
+    const tabsDef = [{ id: 'moment', label: 'Moment' }, { id: 'player', label: 'Player' }, { id: 'ask', label: 'Ask' }];
+    const idx = Math.max(0, tabsDef.map((x) => x.id).indexOf(s.tab));
+    const tabs = tabsDef.map((tb) => ({
+      label: tb.label, on: s.tab === tb.id,
+      pick: () => this.setState({ tab: tb.id, tabAt: Date.now(), askAt: tb.id === 'ask' ? Date.now() : s.askAt }),
+      style: 'position: relative; z-index: 1; min-height: 44px; border: 0; border-radius: 8px; background: transparent; font: 600 14px Inter, sans-serif; transition: color .22s; color: ' + (s.tab === tb.id ? '#0B1110' : '#9EB0A6')
+    }));
+    const indicator = 'position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 3); border-radius: 8px; background: #ECF1EC; transition: transform .34s var(--eo); transform: translateX(' + (idx * 100) + '%)';
+
+    const t = 4.9;
+    const P = [
+      ['kes', 7, [[0, 86, 13], [4, 88, 14], [9, 90, 15]]],
+      ['kes', 8, [[0, 55, 39.5], [4.2, 60, 40.4], [6, 63, 41], [9, 66, 41]]],
+      ['kes', 9, [[0, 84, 34], [1, 84, 34], [4.6, 91, 53], [9, 92, 54]]],
+      ['kes', 10, [[0, 73, 44], [3.8, 76, 42], [5.6, 88, 40.3], [6.4, 89, 40], [9, 92, 39]]],
+      ['kes', 11, [[0, 82, 58], [4, 84, 60], [9, 86, 60]]],
+      ['kes', 2, [[0, 62, 10], [9, 66, 10]]],
+      ['kes', 3, [[0, 58, 60], [9, 62, 61]]],
+      ['kes', 6, [[0, 50, 34], [9, 54, 35]]],
+      ['ash', 1, [[0, 101, 34], [6.4, 101.5, 36], [9, 101, 35]]],
+      ['ash', 2, [[0, 89, 58], [9, 90, 59]]],
+      ['ash', 3, [[0, 88, 13], [9, 88, 14]]],
+      ['ash', 4, [[0, 91, 29], [9, 92, 30]]],
+      ['ash', 5, [[0, 90, 37], [1.5, 90, 37], [4.6, 93.5, 47.2], [9, 93.7, 47]]],
+      ['ash', 6, [[0, 79, 37], [3.5, 74, 39], [9, 75, 39]]],
+      ['ash', 7, [[0, 70, 14], [9, 71, 15]]],
+      ['ash', 8, [[0, 78, 26], [9, 79, 27]]],
+      ['ash', 10, [[0, 77, 49], [9, 79, 50]]],
+      ['ash', 11, [[0, 69, 57], [9, 70, 57]]],
+      ['ash', 9, [[0, 60, 30], [9, 61, 31]]]
+    ];
+    const VX = (y) => (68 - y) * 10, VY = (x) => (105 - x) * 10;
+    const players = [];
+    P.forEach((p, i) => {
+      const xy = this.at(p[2], t);
+      if (xy[0] < 52) return;
+      players.push({
+        n: p[1],
+        gStyle: 'transform: translate(' + VX(xy[1]).toFixed(1) + 'px, ' + VY(xy[0]).toFixed(1) + 'px)',
+        delay: 'animation-delay: ' + (i * 35) + 'ms',
+        dot: 'fill: ' + (p[0] === 'kes' ? '#7CC0FF' : '#E2733A') + '; stroke: rgba(9,16,13,0.88); stroke-width: 3px',
+        num: 'fill: ' + (p[0] === 'kes' ? '#06121F' : '#1E0C02') + '; font-family: Inter, sans-serif; font-weight: 700; font-size: 16px; text-anchor: middle'
+      });
+    });
+    const k9 = this.at(P[2][2], t);
+    const ex = VX(k9[1]), ey = VY(k9[0]);
+    const dx = ex - 340, dy = ey - 210, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+    const bx = ex - ux * 24, by = ey - uy * 24;
+    const head = ex.toFixed(1) + ',' + ey.toFixed(1) + ' ' + (bx - uy * 12).toFixed(1) + ',' + (by + ux * 12).toFixed(1) + ' ' + (bx + uy * 12).toFixed(1) + ',' + (by - ux * 12).toFixed(1);
+    const ballT = (t - 4.2) / 1.4;
+    const bxm = 60.6 + (88 - 60.6) * ballT, bym = 40.4 - 0.1 * ballT;
+    const stripes = [0, 1, 2, 3, 4].map((i) => ({ y: i * 105, style: 'fill: ' + (i % 2 ? '#173624' : '#14301F') }));
+    const words = (txt, base) => txt.split(' ').map((w, i) => ({ text: w, style: 'animation-delay: ' + (base + i * 40) + 'ms' }));
+
+    const sinceTab = (now - (s.tabAt || this.t0 || now)) / 1000;
+    const quick = [
+      { label: 'No. 5 pulled', value: '10.8 m' },
+      { label: 'Gap control', value: '+46' },
+      { label: 'xG next shot', value: '0.31' }
+    ];
+    const cu = Math.min(1, sinceTab / 1.2), e = 1 - Math.pow(1 - cu, 3);
+    const tallies = [
+      { label: 'Off-ball runs', value: String(Math.round(7 * e)) },
+      { label: 'Defenders dragged', value: String(Math.round(3 * e)) },
+      { label: 'Space created', value: Math.round(118 * e) + ' m²' },
+      { label: 'Top speed', value: (33.4 * e).toFixed(1) + ' km/h' }
+    ].map((ty, i) => Object.assign(ty, { box: 'background: #121B18; border: 1px solid #27362F; border-radius: 12px; padding: 12px; animation-delay: ' + (80 + i * 60) + 'ms' }));
+    const runDefs = [[40, 90, 110, 70], [70, 30, 150, 20], [120, 100, 200, 112], [180, 60, 250, 30], [210, 70, 280, 100], [230, 50, 300, 40], [250, 62, 292, 90]];
+    const runs = runDefs.map((r, i) => ({ x1: r[0], y1: r[1], x2: r[2], y2: r[3], style: 'stroke: ' + (i === 6 ? '#D7F25C' : '#7CC0FF') + '; stroke-width: ' + (i === 6 ? 4 : 2.5) + 'px; stroke-linecap: round; opacity: ' + (i === 6 ? 1 : 0.75) + '; animation-delay: ' + (200 + i * 120) + 'ms' }));
+
+    const Q = [
+      { label: 'Why did No. 5 follow?', q: 'Why did No. 5 follow the run?', tool: 'run_kql · follow_rates', a: 'Ashmoor’s No. 5 follows diagonal runs more than most centre-backs: 71% of the time this season, against a league average of 52%.', bars: [['No. 5', 71, '#E2733A'], ['League', 52, '#4A5B53']], unit: '%', max: 100, src: 'kql · follow_rates' },
+      { label: 'Who made most space?', q: 'Who has created the most space today?', tool: 'query_match_state · credit', a: 'No. 9 Velmar, with 118 m² from 7 off-ball runs. Next is No. 7 Quillan with 64 m².', bars: [['No. 9', 118, '#7CC0FF'], ['No. 7', 64, '#7CC0FF']], unit: ' m²', max: 140, src: 'credit · m07' },
+      { label: 'What if no run?', q: 'What if No. 9 hadn’t run?', tool: 'run_counterfactual · 64 re-runs', a: 'Without the run, No. 5 stays central and the gap stays shut in 29 of 32 re-runs. With it, the gap opens in 30 of 32.', bars: [['No run', 3, '#9EB0A6'], ['With run', 30, '#D7F25C']], unit: ' / 32', max: 32, src: 'cf m07-c0007' }
+    ];
+    const cur = Q[s.q] || Q[0];
+    const typing = sinceAsk < 1.4;
+    const bars = cur.bars.map((b, i) => {
+      const w = Math.max(8, b[1] / cur.max * 180);
+      return { label: b[0], value: b[1] + cur.unit, y: 4 + i * 30, ty: 16 + i * 30, w: w.toFixed(0), vx: (80 + w).toFixed(0), style: 'fill: ' + b[2] + '; animation-delay: ' + (600 + i * 150) + 'ms' };
+    });
+    const suggestions = Q.map((qq, i) => ({
+      label: qq.label,
+      ask: () => this.setState({ q: i, askAt: Date.now(), listening: false }),
+      style: 'flex: none; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 0; font: 500 13px Inter, sans-serif; white-space: nowrap; ' +
+        (s.q === i ? 'background: #19251F; color: #ECF1EC; box-shadow: inset 0 0 0 1px #D7F25C' : 'background: transparent; color: #9EB0A6; box-shadow: inset 0 0 0 1px #27362F')
+    }));
+
+    return {
+      tabs: tabs, indicator: indicator,
+      isMoment: s.tab === 'moment', isPlayer: s.tab === 'player', isAsk: s.tab === 'ask',
+      stripes: stripes, players: players,
+      runEnd: { x: (ex - ux * 20).toFixed(1), y: (ey - uy * 20).toFixed(1), head: head },
+      passLine: { x1: VX(bym).toFixed(1), y1: VY(bxm).toFixed(1) },
+      ballStyle: 'transform: translate(' + VX(bym).toFixed(1) + 'px, ' + VY(bxm).toFixed(1) + 'px)',
+      capWords: words('A gap opens in the centre. No. 10 runs into it, and the pass arrives.', 300),
+      quick: quick,
+      tallies: tallies, runs: runs,
+      question: cur.q, toolLine: cur.tool, typing: typing, answered: !typing,
+      ansWords: words(cur.a, 0),
+      chartLabel: cur.bars.map((b) => b[0] + ' ' + b[1] + cur.unit).join(', '),
+      bars: bars, source: cur.src,
+      suggestions: suggestions,
+      listening: s.listening, notListening: !s.listening,
+      micLabel: s.listening ? 'Stop listening' : 'Ask by voice',
+      toggleMic: () => this.setState({ listening: !s.listening })
+    };
+  }
+}
+</script>
+</body>
+</html>

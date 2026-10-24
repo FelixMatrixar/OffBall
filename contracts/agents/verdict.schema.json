@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "ClaimVerdict": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "ok": {
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "recomputed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recomputed"
+        },
+        "reason": {
+          "default": "",
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "ok"
+      ],
+      "title": "ClaimVerdict",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The Fact-checker's verdict on every claim of a draft.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "verdict",
+      "default": "verdict",
+      "title": "Kind",
+      "type": "string"
+    },
+    "draft_id": {
+      "title": "Draft Id",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "passed": {
+      "title": "Passed",
+      "type": "boolean"
+    },
+    "verdicts": {
+      "items": {
+        "$ref": "#/$defs/ClaimVerdict"
+      },
+      "title": "Verdicts",
+      "type": "array"
+    },
+    "checked_by": {
+      "default": "rule",
+      "enum": [
+        "agent",
+        "rule"
+      ],
+      "title": "Checked By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "draft_id",
+    "candidate_id",
+    "passed",
+    "verdicts"
+  ],
+  "title": "Verdict",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/verdict.schema.json"
+}

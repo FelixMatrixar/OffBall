@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "description": "How every hand-off is stored and announced.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seq": {
+      "title": "Seq",
+      "type": "integer"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "kind": {
+      "title": "Kind",
+      "type": "string"
+    },
+    "produced_by": {
+      "description": "Agent or service name",
+      "title": "Produced By",
+      "type": "string"
+    },
+    "wall_ms": {
+      "title": "Wall Ms",
+      "type": "integer"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "trace_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trace Id"
+    }
+  },
+  "required": [
+    "seq",
+    "match_id",
+    "kind",
+    "produced_by",
+    "wall_ms",
+    "payload"
+  ],
+  "title": "Envelope",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/envelope.schema.json"
+}

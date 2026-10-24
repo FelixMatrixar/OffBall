@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "const": "overlay.retract",
+      "default": "overlay.retract",
+      "title": "Type",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "overlay_id": {
+      "title": "Overlay Id",
+      "type": "string"
+    },
+    "reason": {
+      "enum": [
+        "correction",
+        "producer",
+        "superseded",
+        "expired"
+      ],
+      "title": "Reason",
+      "type": "string"
+    },
+    "corrects_event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Corrects Event Id"
+    },
+    "replacement_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Replacement Id"
+    },
+    "sent_at": {
+      "title": "Sent At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "match_id",
+    "overlay_id",
+    "reason",
+    "sent_at"
+  ],
+  "title": "OverlayRetract",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/overlay-retract.schema.json"
+}

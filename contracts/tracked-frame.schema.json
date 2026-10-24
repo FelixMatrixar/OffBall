@@ -1,0 +1,68 @@
+{
+  "additionalProperties": false,
+  "description": "A 25 Hz frame as it travels on the feed. On disk, frames are one row each in tracking.parquet.",
+  "properties": {
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "frame_id": {
+      "title": "Frame Id",
+      "type": "integer"
+    },
+    "t_ms": {
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "ball": {
+      "description": "Ball position in metres: [x, y, z]",
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Ball",
+      "type": "array"
+    },
+    "players": {
+      "additionalProperties": {
+        "maxItems": 3,
+        "minItems": 3,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "description": "player_id -> [x, y, orientation in radians]; only players on the pitch",
+      "title": "Players",
+      "type": "object"
+    }
+  },
+  "required": [
+    "period",
+    "frame_id",
+    "t_ms",
+    "ball",
+    "players"
+  ],
+  "title": "TrackedFrame",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/tracked-frame.schema.json"
+}

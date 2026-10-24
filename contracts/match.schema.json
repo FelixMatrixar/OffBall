@@ -1,0 +1,278 @@
+{
+  "$defs": {
+    "Kit": {
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "pattern": "^#[0-9a-f]{6}$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "secondary": {
+          "pattern": "^#[0-9a-f]{6}$",
+          "title": "Secondary",
+          "type": "string"
+        },
+        "pattern": {
+          "default": "plain",
+          "enum": [
+            "plain",
+            "hoops",
+            "stripes",
+            "halves",
+            "sash"
+          ],
+          "title": "Pattern",
+          "type": "string"
+        }
+      },
+      "required": [
+        "primary",
+        "secondary"
+      ],
+      "title": "Kit",
+      "type": "object"
+    },
+    "LineupEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "player_id": {
+          "title": "Player Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "number": {
+          "maximum": 99,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "role": {
+          "enum": [
+            "GK",
+            "RB",
+            "CB",
+            "LB",
+            "RWB",
+            "LWB",
+            "DM",
+            "CM",
+            "AM",
+            "RM",
+            "LM",
+            "RW",
+            "LW",
+            "ST"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "starter": {
+          "default": true,
+          "title": "Starter",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "player_id",
+        "name",
+        "number",
+        "role"
+      ],
+      "title": "LineupEntry",
+      "type": "object"
+    },
+    "PeriodInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "period": {
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "duration_ms": {
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "attacks_left_to_right": {
+          "description": "club_id of the team attacking towards x = 105 this period",
+          "title": "Attacks Left To Right",
+          "type": "string"
+        }
+      },
+      "required": [
+        "period",
+        "duration_ms",
+        "attacks_left_to_right"
+      ],
+      "title": "PeriodInfo",
+      "type": "object"
+    },
+    "TeamSheet": {
+      "additionalProperties": false,
+      "properties": {
+        "club_id": {
+          "title": "Club Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "short_name": {
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Short Name",
+          "type": "string"
+        },
+        "kit": {
+          "$ref": "#/$defs/Kit",
+          "description": "The kit worn in this match, after the colour-vision check (PRD 16.3)"
+        },
+        "formation": {
+          "title": "Formation",
+          "type": "string"
+        },
+        "lineup": {
+          "items": {
+            "$ref": "#/$defs/LineupEntry"
+          },
+          "title": "Lineup",
+          "type": "array"
+        }
+      },
+      "required": [
+        "club_id",
+        "name",
+        "short_name",
+        "kit",
+        "formation",
+        "lineup"
+      ],
+      "title": "TeamSheet",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "match.json: one file per match.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "engine": {
+      "enum": [
+        "fast",
+        "emergent"
+      ],
+      "title": "Engine",
+      "type": "string"
+    },
+    "generator_version": {
+      "title": "Generator Version",
+      "type": "string"
+    },
+    "competition": {
+      "default": "OffBall League",
+      "title": "Competition",
+      "type": "string"
+    },
+    "season": {
+      "default": "2026",
+      "title": "Season",
+      "type": "string"
+    },
+    "round": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Round"
+    },
+    "home": {
+      "$ref": "#/$defs/TeamSheet"
+    },
+    "away": {
+      "$ref": "#/$defs/TeamSheet"
+    },
+    "periods": {
+      "items": {
+        "$ref": "#/$defs/PeriodInfo"
+      },
+      "title": "Periods",
+      "type": "array"
+    },
+    "final_score": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Goals per club_id",
+      "title": "Final Score",
+      "type": "object"
+    },
+    "frame_rate": {
+      "default": 25,
+      "title": "Frame Rate",
+      "type": "integer"
+    },
+    "pitch": {
+      "default": [
+        105.0,
+        68.0
+      ],
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Pitch",
+      "type": "array"
+    },
+    "synthetic": {
+      "const": true,
+      "default": true,
+      "description": "Every OffBall match is synthetic (rule 4.7)",
+      "title": "Synthetic",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "match_id",
+    "seed",
+    "engine",
+    "generator_version",
+    "home",
+    "away",
+    "periods",
+    "final_score"
+  ],
+  "title": "MatchInfo",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/match.schema.json"
+}

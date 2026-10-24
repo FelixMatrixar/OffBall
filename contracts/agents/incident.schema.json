@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "FlagChange": {
+      "additionalProperties": false,
+      "properties": {
+        "flag": {
+          "title": "Flag",
+          "type": "string"
+        },
+        "old": {
+          "title": "Old"
+        },
+        "new": {
+          "title": "New"
+        },
+        "revert_after_s": {
+          "default": 600,
+          "title": "Revert After S",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "flag",
+        "old",
+        "new"
+      ],
+      "title": "FlagChange",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The Engineer's incident note: what it saw, what it changed, and the evidence.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "incident",
+      "default": "incident",
+      "title": "Kind",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "evidence": {
+      "description": "Queries run and metric readings cited",
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/FlagChange"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "decided_by": {
+      "default": "agent",
+      "enum": [
+        "agent",
+        "rule"
+      ],
+      "title": "Decided By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "incident_id",
+    "severity",
+    "summary"
+  ],
+  "title": "Incident",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/incident.schema.json"
+}

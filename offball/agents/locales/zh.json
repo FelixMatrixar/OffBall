@@ -1,0 +1,38 @@
+{
+  "meta": {"code": "zh", "name": "中文", "direction": "ltr", "decimal": ".", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "牵制跑位", "gap": "空当", "space": "空间", "half_space": "肋部", "run_in_behind": "身后插上",
+    "overlap": "外侧套边", "underlap": "内侧套上", "third_man_run": "第三人跑位", "blind_side_run": "盲区跑位",
+    "centre_back": "中后卫", "full_back": "边后卫", "winger": "边锋", "striker": "中锋", "midfielder": "中场",
+    "goalkeeper": "门将", "through_ball": "直塞球", "press": "逼抢", "counter_attack": "反击", "offside": "越位",
+    "cover_shadow": "遮挡线路", "pinning": "牵制", "switch_of_play": "转移进攻", "pitch_control": "空间控制",
+    "space_created": "创造的空间", "null_run": "被化解的跑位"
+  },
+  "templates": {
+    "decoy_run.casual.run": "注意{creator_no}号。这次跑动不是为了拿球，而是为了把一名后卫拉开。",
+    "decoy_run.casual.gap": "{dragged_club}的{dragged_no}号跟了过去。中路出现了空当。",
+    "decoy_run.casual.finish.goal": "进球！{creator_no}号的跑动创造了机会，{receiver_no}号完成破门。",
+    "decoy_run.casual.finish.shot": "{receiver_no}号从{creator_no}号拉开的空当中起脚射门。",
+    "decoy_run.casual.finish.chance": "{receiver_no}号插入了{creator_no}号跑动创造的空间。",
+    "decoy_run.learn.define": "这就是{term:decoy_run}：通过跑动为队友创造空间。",
+    "decoy_run.analyst": "{term:decoy_run}：{creator_no}号把{dragged_no}号拉离位置{displacement}米。{club}对空当的控制提升{gain}个百分点；创造空间{space}平方米。",
+    "decoy_run.analyst.cf": "如果没有这次跑动，{runs}次模拟中有{shut}次空当不会打开。",
+    "decoy_run.player": "{player}本场已经拉开{dragged_count}名防守球员，创造了{space_total}平方米空间。",
+    "decoy_run.audio": "{club}发起进攻。{creator_no}号{direction}跑动，{dragged_club}的{dragged_no}号跟了过去。{gap_where}出现空当，{receiver_no}号插了进去。",
+    "decoy_run.broadcaster": "牵制跑位 · {creator_no}号拉开{dragged_no}号 · 创造{space}平方米",
+    "decoy_run.a11y.run_arrow": "{creator_no}号{direction}跑动。",
+    "decoy_run.a11y.gap_ring": "{gap_where}出现空间。",
+    "decoy_run.a11y.pass_line": "{passer_no}号把球传进空当。",
+    "ghost.offer": "如果{creator_no}号没有跑动呢？虚影重演没有这次跑动的情形。",
+    "direction.left": "向左路",
+    "direction.right": "向右路",
+    "gap_where.centre_edge": "中路禁区前沿",
+    "gap_where.centre": "中路",
+    "gap_where.left_half": "左肋部",
+    "gap_where.right_half": "右肋部",
+    "label.correction": "更正",
+    "label.synthetic": "合成数据",
+    "label.ai": "AI 生成",
+    "notice.translation": "以英文显示：翻译未能及时完成。"
+  }
+}

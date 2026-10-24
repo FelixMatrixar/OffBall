@@ -1,0 +1,39 @@
+{
+  "meta": {"code": "ar", "name": "العربية", "direction": "rtl", "decimal": ".", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "ركضة خداعية", "gap": "ثغرة", "space": "مساحة", "half_space": "نصف المساحة",
+    "run_in_behind": "ركضة خلف الدفاع", "overlap": "تداخل من الخارج", "underlap": "تداخل من الداخل",
+    "third_man_run": "تحرك اللاعب الثالث", "blind_side_run": "ركضة من الجهة العمياء", "centre_back": "قلب الدفاع",
+    "full_back": "الظهير", "winger": "الجناح", "striker": "المهاجم الصريح", "midfielder": "لاعب الوسط",
+    "goalkeeper": "حارس المرمى", "through_ball": "تمريرة بينية", "press": "الضغط", "counter_attack": "هجمة مرتدة",
+    "offside": "تسلل", "cover_shadow": "ظل التغطية", "pinning": "تثبيت المدافعين", "switch_of_play": "تحويل اللعب",
+    "pitch_control": "السيطرة على المساحة", "space_created": "المساحة المصنوعة", "null_run": "ركضة أُحبطت"
+  },
+  "templates": {
+    "decoy_run.casual.run": "راقب رقم {creator_no}. هذا الركض ليس لاستلام الكرة، بل لسحب مدافع بعيدًا.",
+    "decoy_run.casual.gap": "رقم {dragged_no} في {dragged_club} يتبعه. تنفتح ثغرة في العمق.",
+    "decoy_run.casual.finish.goal": "هدف. صنعه ركض رقم {creator_no}، وأنهاه رقم {receiver_no}.",
+    "decoy_run.casual.finish.shot": "رقم {receiver_no} يسدد من الثغرة التي فتحها رقم {creator_no}.",
+    "decoy_run.casual.finish.chance": "رقم {receiver_no} يظهر في المساحة التي صنعها ركض رقم {creator_no}.",
+    "decoy_run.learn.define": "كانت تلك {term:decoy_run}: ركضة هدفها منح زميل مساحة.",
+    "decoy_run.analyst": "{term:decoy_run}: رقم {creator_no} يسحب رقم {dragged_no} مسافة {displacement} م من مركزه. سيطرة {club} على الثغرة: ‎+{gain} نقطة؛ مساحة مصنوعة {space} م².",
+    "decoy_run.analyst.cf": "من دون الركض، تبقى الثغرة مغلقة في {shut} من أصل {runs} محاكاة.",
+    "decoy_run.player": "سحب {player} حتى الآن {dragged_count} مدافعين اليوم وصنع {space_total} م² من المساحة.",
+    "decoy_run.audio": "{club} يهاجم. رقم {creator_no} ينطلق {direction} ورقم {dragged_no} في {dragged_club} يتبعه. تنفتح ثغرة {gap_where}. رقم {receiver_no} يندفع إليها.",
+    "decoy_run.broadcaster": "ركضة خداعية · رقم {creator_no} يسحب رقم {dragged_no} · {space} م² مساحة مصنوعة",
+    "decoy_run.a11y.run_arrow": "رقم {creator_no} يركض {direction}.",
+    "decoy_run.a11y.gap_ring": "تنفتح مساحة {gap_where}.",
+    "decoy_run.a11y.pass_line": "رقم {passer_no} يمرر إلى الثغرة.",
+    "ghost.offer": "ماذا لو لم يركض رقم {creator_no}؟ الأشباح تعيد اللعبة من دون الركض.",
+    "direction.left": "نحو الجناح الأيسر",
+    "direction.right": "نحو الجناح الأيمن",
+    "gap_where.centre_edge": "في العمق، خارج منطقة الجزاء مباشرة",
+    "gap_where.centre": "في العمق",
+    "gap_where.left_half": "في نصف المساحة الأيسر",
+    "gap_where.right_half": "في نصف المساحة الأيمن",
+    "label.correction": "تصحيح",
+    "label.synthetic": "بيانات اصطناعية",
+    "label.ai": "مولَّد بالذكاء الاصطناعي",
+    "notice.translation": "بالإنجليزية: لم تكن الترجمة جاهزة في الوقت المناسب."
+  }
+}

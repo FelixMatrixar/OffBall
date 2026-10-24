@@ -1,0 +1,239 @@
+/* OffBall design tokens. Every colour, type and motion value in the UI comes from here.
+   Themes are token sets switched by data-theme (PRD 16.3): dark (default), light, contrast
+   (high contrast), broadcast (scoped to TV output) and a print set. */
+
+:root {
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: Inter, system-ui, -apple-system, 'Segoe UI', 'Noto Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+
+  /* Motion: durations (PRD 16.10) */
+  --dur-press: 80ms;
+  --dur-quick: 150ms;
+  --dur-base: 220ms;
+  --dur-smooth: 340ms;
+  --dur-draw: 600ms;
+  --dur-hero: 900ms;
+
+  /* Motion: the micro-interaction timings from the PRD 16.10 table, named so nothing uses a raw value */
+  --dur-switch: 260ms;
+  --dur-pop: 450ms;
+  --dur-slide: 420ms;
+  --dur-fill: 500ms;
+  --dur-live: 1.4s;
+  --dur-pulse: 1.6s;
+  --dur-hold: 3.5s;
+  --dur-ticker: 40s;
+  --stagger: 40ms;
+  --stagger-word: 35ms;
+
+  /* Motion: easings */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-live: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-linear: linear;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --tap: 44px;
+  --focus-width: 2px;
+
+  /* QR codes stay dark on light in every theme, so any phone camera can read them. */
+  --qr-dark: #000000;
+  --qr-light: #ffffff;
+}
+
+/* Dark is the default and the broadcast look. */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b1110;
+  --surface: #121b18;
+  --surface-2: #19251f;
+  --line: #27362f;
+  --text: #ecf1ec;
+  --muted: #9eb0a6;
+  --pitch: #14301f;
+  --stripe: #173624;
+  --edge: #0f2419;
+  --chalk: rgb(236 241 236 / 0.45);
+  --halo: rgb(9 16 13 / 0.88);
+  --chip-bg: rgb(18 27 24 / 0.85);
+  --kes: #7cc0ff;
+  --ash: #e2733a;
+  --on-kes: #06121f;
+  --on-ash: #1e0c02;
+  --space: #d7f25c;
+  --space-ink: #d7f25c;
+  --on-space: #0b1110;
+  --space-fill: rgb(215 242 92 / 0.12);
+  --danger: #ff7a7a;
+  --danger-text: #ffb4b4;
+  --on-danger: #1e0505;
+  --kes-rgb: 124 192 255;
+  --ash-rgb: 226 115 58;
+  --space-rgb: 215 242 92;
+  --field-max: 0.55;
+  --contour: rgb(236 241 236 / 0.55);
+  --ball: #ffffff;
+  --ball-edge: #0b1110;
+  --focus: #d7f25c;
+  --scrim: rgb(0 0 0 / 0.5);
+  --dim: rgb(9 16 13 / 0.45);
+  --shadow: rgb(0 0 0 / 0.25);
+  --shadow-strong: rgb(0 0 0 / 0.35);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #eef2ee;
+  --surface: #ffffff;
+  --surface-2: #f1f5f2;
+  --line: #d3ddd6;
+  --text: #0f1a16;
+  --muted: #4a5b53;
+  --pitch: #dcede0;
+  --stripe: #d3e8d8;
+  --edge: #c5dfcb;
+  --chalk: rgb(20 60 40 / 0.38);
+  --halo: rgb(255 255 255 / 0.92);
+  --chip-bg: rgb(255 255 255 / 0.9);
+  --kes: #1a5db8;
+  --ash: #d2652a;
+  --on-kes: #ffffff;
+  --on-ash: #1e0c02;
+  --space: #5e7f00;
+  /* Lime as text needs to be darker than lime as a fill to reach 4.5:1 on light surfaces. */
+  --space-ink: #4a6600;
+  --on-space: #ffffff;
+  --space-fill: rgb(94 127 0 / 0.12);
+  --danger: #c62828;
+  --danger-text: #b3261e;
+  --on-danger: #ffffff;
+  --kes-rgb: 26 93 184;
+  --ash-rgb: 210 101 42;
+  --space-rgb: 94 127 0;
+  --field-max: 0.5;
+  --contour: rgb(15 26 22 / 0.5);
+  --ball: #ffffff;
+  --ball-edge: #0f1a16;
+  --focus: #4a6600;
+  --scrim: rgb(15 26 22 / 0.4);
+  --dim: rgb(238 242 238 / 0.55);
+  --shadow: rgb(15 26 22 / 0.12);
+  --shadow-strong: rgb(15 26 22 / 0.2);
+}
+
+/* High contrast: pure black and white surfaces, visible borders on everything, brighter team colours. */
+[data-theme='contrast'] {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #000000;
+  --surface-2: #111111;
+  --line: #ffffff;
+  --text: #ffffff;
+  --muted: #e6e6e6;
+  --pitch: #0c2716;
+  --stripe: #0e2c19;
+  --edge: #051409;
+  --chalk: rgb(255 255 255 / 0.85);
+  --halo: #000000;
+  --chip-bg: #000000;
+  --kes: #5cb8ff;
+  --ash: #ff8c42;
+  --on-kes: #000000;
+  --on-ash: #000000;
+  --space: #e6ff3d;
+  --space-ink: #e6ff3d;
+  --on-space: #000000;
+  --space-fill: rgb(230 255 61 / 0.18);
+  --danger: #ff6b6b;
+  --danger-text: #ffa3a3;
+  --on-danger: #000000;
+  --kes-rgb: 92 184 255;
+  --ash-rgb: 255 140 66;
+  --space-rgb: 230 255 61;
+  --field-max: 0.7;
+  --contour: #ffffff;
+  --ball: #ffffff;
+  --ball-edge: #000000;
+  --focus: #ffff00;
+  --focus-width: 3px;
+  /* Lines are white here, as is the knob: an off switch is a black track with a white outline, so the knob shows. */
+  --switch-off: #000000;
+  --switch-edge: 2px;
+  --scrim: rgb(0 0 0 / 0.8);
+  --dim: rgb(0 0 0 / 0.6);
+  --shadow: rgb(0 0 0 / 0);
+  --shadow-strong: rgb(0 0 0 / 0);
+}
+
+/* Broadcast: tuned for TV output. Scoped to the broadcast stage and the partner template, never the whole app. */
+[data-theme='broadcast'] {
+  color-scheme: dark;
+  --bg: #0e1a15;
+  --surface: #0b1110;
+  --surface-2: #19251f;
+  --text: #ecf1ec;
+  --muted: #9eb0a6;
+  --kes: #7cc0ff;
+  --ash: #e2733a;
+  --on-kes: #06121f;
+  --on-ash: #1e0c02;
+  --space: #d7f25c;
+  --space-ink: #d7f25c;
+  --on-space: #0b1110;
+  --ball: #ffffff;
+  --ball-edge: #0b1110;
+  --bc-panel: rgb(11 17 16 / 0.92);
+  --bc-chip: rgb(11 17 16 / 0.9);
+  --bc-score: #ecf1ec;
+  --bc-on-score: #0b1110;
+  --bc-clock: #19251f;
+  --bc-stand-1: #0a120f;
+  --bc-stand-2: #101c17;
+  --bc-stand-3: #0c1612;
+  --bc-stand-4: #1a2a23;
+  --bc-grass-1: #1a3d29;
+  --bc-grass-2: #173623;
+  --bc-grass-3: #12291c;
+  --bc-chalk: rgb(236 241 236 / 0.62);
+  --bc-ring-fill: rgb(215 242 92 / 0.14);
+  --bc-shadow: rgb(0 0 0 / 0.35);
+  --bc-outline: rgb(9 16 13 / 0.6);
+  --bc-skin: #e9d7c4;
+  --bc-key-1: #bdbdbd;
+  --bc-key-2: #e6e6e6;
+  --bc-safe-action: rgb(255 122 122 / 0.85);
+  --bc-safe-action-text: #ff9a9a;
+  --bc-safe-graphics: rgb(124 192 255 / 0.85);
+  --bc-safe-graphics-text: #a9d6ff;
+}
+
+/* Print and export: the light set, with flat surfaces. */
+@media print {
+  :root,
+  [data-theme] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f4f6f4;
+    --line: #c9d3cc;
+    --text: #0f1a16;
+    --muted: #4a5b53;
+    --pitch: #e6f2e9;
+    --stripe: #dcede0;
+    --edge: #d3e8d8;
+    --chalk: rgb(20 60 40 / 0.45);
+    --halo: #ffffff;
+    --kes: #1a5db8;
+    --ash: #c2561d;
+    --space: #5e7f00;
+    --space-ink: #4a6600;
+    --shadow: rgb(0 0 0 / 0);
+    --shadow-strong: rgb(0 0 0 / 0);
+  }
+}

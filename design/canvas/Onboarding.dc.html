@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall first run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.on{--eo:cubic-bezier(.2,0,0,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes onRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes onFwd{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes onBack{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes onFade{from{opacity:0}to{opacity:1}}
+@keyframes onPop{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes onWord{from{opacity:0;transform:translateY(6px);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes onWordB{from{opacity:0;transform:translateY(6px);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes onRun{0%,15%{transform:translate(0,0)}55%,100%{transform:translate(70px,-150px)}}
+@keyframes onFollow{0%,25%{transform:translate(0,0)}65%,100%{transform:translate(38px,-95px)}}
+@keyframes onIn{0%,55%{transform:translate(0,0)}80%,100%{transform:translate(118px,-12px)}}
+@keyframes onGap{0%,50%{opacity:0;transform:scale(.6)}62%{opacity:1;transform:scale(1.08)}70%,88%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes onPass{0%,62%{stroke-dashoffset:140;opacity:0}64%{opacity:1}78%{stroke-dashoffset:0;opacity:1}90%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes onBurst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+@keyframes onFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.on-rise{animation:onRise .45s var(--eo) backwards}
+.on-fwd{animation:onFwd .42s var(--eo) both}
+.on-back{animation:onBack .42s var(--eo) both}
+.on-fade{animation:onFade .3s var(--eo) both}
+.on-pop{animation:onPop .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.on-w{display:inline-block;margin-inline-end:.26em}
+.on-wa .on-w{animation:onWord .3s var(--eo) both}
+.on-wb .on-w{animation:onWordB .3s var(--eo) both}
+.on-cjk .on-w{margin-inline-end:0}
+.on-run{animation:onRun 4.5s var(--eo) infinite}
+.on-follow{animation:onFollow 4.5s var(--eo) infinite}
+.on-in{animation:onIn 4.5s var(--eo) infinite}
+.on-gap{transform-box:fill-box;transform-origin:center;animation:onGap 4.5s var(--eo) infinite}
+.on-pass{stroke-dasharray:140;animation:onPass 4.5s linear infinite}
+.on-burst{animation:onBurst 1s var(--eo) both}
+.on-float{animation:onFloat 3s ease-in-out infinite}
+.on-btn{transition:transform 80ms var(--eo),background-color .15s,color .15s,box-shadow .2s;cursor:pointer}
+.on-btn:hover{transform:translateY(-2px)}
+.on-btn:active{transform:translateY(0) scale(.97)}
+.on button:focus-visible,.on a:focus-visible{outline:2px solid #D7F25C;outline-offset:3px}
+@media (prefers-reduced-motion: reduce){.on *{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div class="on" style="min-height: 900px; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 28px 24px 40px; box-sizing: border-box">
+  <div style="max-width: 1180px; margin: 0 auto">
+
+    <header class="on-rise" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: #ECF1EC; stroke-width: 1.8px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: #ECF1EC; stroke-width: 1.8px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: #D7F25C; stroke-width: 2px"></circle></svg>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 28px">OffBall</span>
+      </div>
+      <ol aria-label="Setup progress" style="list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <sc-for list="{{stepper}}" as="sp" hint-placeholder-count="4">
+          <li style="display: flex; align-items: center; gap: 10px">
+            <span style="{{sp.dot}}">{{sp.n}}</span>
+            <span style="{{sp.labelStyle}}">{{sp.label}}</span>
+            <sc-if value="{{sp.hasLine}}" hint-placeholder-val="{{true}}">
+              <span style="position: relative; width: 48px; height: 3px; border-radius: 2px; background: #27362F; overflow: hidden"><span style="{{sp.fill}}"></span></span>
+            </sc-if>
+          </li>
+        </sc-for>
+      </ol>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: stretch">
+      <section aria-live="polite" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+
+        <sc-if value="{{isWelcome}}" hint-placeholder-val="{{true}}">
+          <div class="{{dirClass}}">
+            <p style="margin: 0 0 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: #D7F25C">WELCOME</p>
+            <h1 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 64px; line-height: 0.95; font-weight: 700">See the play behind the play.</h1>
+            <p style="margin: 0 0 24px; font-size: 18px; line-height: 1.55; color: #9EB0A6; max-width: 560px">Most goals are made off the ball. OffBall shows you the runs that open space, why they matter, and what would have happened without them. Three quick choices and you’re watching.</p>
+            <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+              <li class="on-rise" style="display: flex; gap: 12px; align-items: center; font-size: 15px; animation-delay: 120ms"><span style="width: 10px; height: 10px; border-radius: 5px; background: #D7F25C"></span>No account. Your choices stay on this device.</li>
+              <li class="on-rise" style="display: flex; gap: 12px; align-items: center; font-size: 15px; animation-delay: 200ms"><span style="width: 10px; height: 10px; border-radius: 5px; background: #7CC0FF"></span>Every claim is fact-checked against match data.</li>
+              <li class="on-rise" style="display: flex; gap: 12px; align-items: center; font-size: 15px; animation-delay: 280ms"><span style="width: 10px; height: 10px; border-radius: 5px; background: #E2733A"></span>All matches are synthetic: fictional clubs and players.</li>
+            </ul>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMode}}" hint-placeholder-val="{{false}}">
+          <div class="{{dirClass}}">
+            <h1 style="margin: 0 0 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 44px; font-weight: 700">How do you like to watch?</h1>
+            <p style="margin: 0 0 18px; font-size: 15px; color: #9EB0A6">You can switch any time during a match.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px">
+              <sc-for list="{{modeCards}}" as="mc" hint-placeholder-count="6">
+                <button type="button" aria-pressed="{{mc.on}}" onClick="{{mc.pick}}" class="on-btn" style="{{mc.style}}">
+                  <span style="display: flex; align-items: center; justify-content: space-between; width: 100%">
+                    <span style="{{mc.icon}}">{{mc.glyph}}</span>
+                    <sc-if value="{{mc.on}}" hint-placeholder-val="{{false}}">
+                      <svg class="on-pop" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" style="fill: #D7F25C"></circle><path d="M6.5 11.5 L9.6 14.5 L15.5 8" style="fill: none; stroke: #0B1110; stroke-width: 2.2px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+                    </sc-if>
+                  </span>
+                  <span style="font-size: 17px; font-weight: 700; margin-top: 10px">{{mc.label}}</span>
+                  <span style="font-size: 13px; line-height: 1.45; color: #9EB0A6; font-weight: 400">{{mc.desc}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isClub}}" hint-placeholder-val="{{false}}">
+          <div class="{{dirClass}}">
+            <h1 style="margin: 0 0 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 44px; font-weight: 700">Pick your club and player</h1>
+            <p style="margin: 0 0 18px; font-size: 15px; color: #9EB0A6">We’ll use your club’s colours and frame moments from your side.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 22px">
+              <sc-for list="{{clubCards}}" as="cc" hint-placeholder-count="3">
+                <button type="button" aria-pressed="{{cc.on}}" onClick="{{cc.pick}}" class="on-btn" style="{{cc.style}}">
+                  <span style="{{cc.badge}}"></span>
+                  <span style="font-size: 16px; font-weight: 700">{{cc.name}}</span>
+                  <sc-if value="{{cc.on}}" hint-placeholder-val="{{false}}">
+                    <svg class="on-pop" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" style="margin-left: auto"><circle cx="11" cy="11" r="10" style="fill: #D7F25C"></circle><path d="M6.5 11.5 L9.6 14.5 L15.5 8" style="fill: none; stroke: #0B1110; stroke-width: 2.2px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+                  </sc-if>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{hasPlayers}}" hint-placeholder-val="{{true}}">
+              <h2 class="on-fade" style="margin: 0 0 10px; font-size: 15px; color: #9EB0A6">Favourite player</h2>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                <sc-for list="{{playerChips}}" as="pc" hint-placeholder-count="3">
+                  <button type="button" aria-pressed="{{pc.on}}" onClick="{{pc.pick}}" class="on-btn on-rise" style="{{pc.style}}"><span style="{{pc.num}}">{{pc.n}}</span>{{pc.name}}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isLang}}" hint-placeholder-val="{{false}}">
+          <div class="{{dirClass}}">
+            <h1 style="margin: 0 0 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 44px; font-weight: 700">Language and voice</h1>
+            <p style="margin: 0 0 18px; font-size: 15px; color: #9EB0A6">Captions and commentary in your language. English is always one tap away.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-bottom: 20px">
+              <sc-for list="{{langChips}}" as="lc" hint-placeholder-count="10">
+                <button type="button" aria-pressed="{{lc.on}}" onClick="{{lc.pick}}" lang="{{lc.code}}" class="on-btn" style="{{lc.style}}">{{lc.native}}<span style="display: block; font-size: 11px; font-weight: 400; color: #9EB0A6">{{lc.en}}</span></button>
+              </sc-for>
+            </div>
+            <button type="button" role="switch" aria-checked="{{voice}}" onClick="{{toggleVoice}}" class="on-btn" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; max-width: 420px; min-height: 56px; padding: 0 16px; border-radius: 12px; border: 0; background: #121B18; box-shadow: inset 0 0 0 1px #27362F; color: #ECF1EC; font: 600 15px Inter, sans-serif; text-align: left">
+              <span>Voice commentary<span style="display: block; font-size: 12px; font-weight: 400; color: #9EB0A6">Spoken lines, paced so they never overlap</span></span>
+              <span style="{{voiceTrack}}"><span style="{{voiceKnob}}"></span></span>
+            </button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+          <div class="{{dirClass}}" style="position: relative">
+            <svg width="1" height="1" viewBox="0 0 1 1" aria-hidden="true" style="position: absolute; left: 60px; top: 40px; overflow: visible">
+              <sc-for list="{{burst}}" as="bs" hint-placeholder-count="16">
+                <circle class="on-burst" cx="0" cy="0" r="{{bs.r}}" style="{{bs.style}}"></circle>
+              </sc-for>
+            </svg>
+            <p style="margin: 0 0 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: #D7F25C">ALL SET</p>
+            <h1 style="margin: 0 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 56px; line-height: 1; font-weight: 700">Kick-off in 63 minutes of drama.</h1>
+            <p style="margin: 0 0 18px; font-size: 16px; color: #9EB0A6">Kestrel Bay v Ashmoor is live. Here’s how you’ll watch it:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{summary}}" as="sm" hint-placeholder-count="4">
+                <span class="on-pop" style="{{sm.style}}">{{sm.text}}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: auto; padding-top: 8px">
+          <sc-if value="{{canBack}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{back}}" class="on-btn on-fade" style="min-height: 48px; padding: 0 20px; border-radius: 10px; border: 0; background: transparent; box-shadow: inset 0 0 0 1px #27362F; color: #ECF1EC; font: 600 15px Inter, sans-serif">Back</button>
+          </sc-if>
+          <sc-if value="{{notDone}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{next}}" class="on-btn" style="min-height: 48px; padding: 0 26px; border-radius: 10px; border: 0; background: #D7F25C; color: #0B1110; font: 700 15px Inter, sans-serif; display: inline-flex; align-items: center; gap: 10px">{{nextLabel}}
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8 H13 M9 4 L13 8 L9 12" style="fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+            </button>
+          </sc-if>
+          <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+            <a href="Main.dc.html" class="on-btn on-pop" style="min-height: 48px; padding: 0 26px; border-radius: 10px; background: #D7F25C; color: #0B1110; font: 700 15px Inter, sans-serif; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; animation-delay: .5s">Watch the match
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2 L14 8 L4 14 Z" style="fill: currentColor"></path></svg>
+            </a>
+          </sc-if>
+          <sc-if value="{{canSkip}}" hint-placeholder-val="{{true}}">
+            <a href="Main.dc.html" style="margin-left: auto; font-size: 14px; color: #9EB0A6">Skip, use defaults</a>
+          </sc-if>
+        </div>
+      </section>
+
+      <aside aria-label="Live preview" class="on-rise" style="flex: 1 1 380px; min-width: 0; background: #121B18; border: 1px solid #27362F; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; animation-delay: 150ms">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #9EB0A6">LIVE PREVIEW</span>
+          <span style="{{previewChip}}">{{previewMode}}</span>
+        </div>
+        <svg viewBox="0 0 420 270" role="img" aria-label="Preview: a striker's decoy run pulls a defender away, a gap opens and a teammate runs into it" style="width: 100%; height: auto; display: block; border-radius: 12px">
+          <rect x="0" y="0" width="420" height="270" style="fill: #14301F"></rect>
+          <rect x="0" y="0" width="84" height="270" style="fill: #173624"></rect>
+          <rect x="168" y="0" width="84" height="270" style="fill: #173624"></rect>
+          <rect x="336" y="0" width="84" height="270" style="fill: #173624"></rect>
+          <g style="fill: none; stroke: rgba(236,241,236,0.45); stroke-width: 1.5px">
+            <rect x="6" y="6" width="408" height="258"></rect>
+            <rect x="340" y="60" width="74" height="150"></rect>
+            <line x1="6" y1="135" x2="6" y2="135"></line>
+          </g>
+          <ellipse class="on-gap" cx="300" cy="140" rx="34" ry="40" style="fill: rgba(215,242,92,0.14); stroke: #D7F25C; stroke-width: 3px"></ellipse>
+          <line class="on-pass" x1="160" y1="150" x2="292" y2="142" style="stroke: #ECF1EC; stroke-width: 3px; stroke-linecap: round"></line>
+          <g style="transform: translate(160px, 150px)"><circle r="10" style="{{kesDot}}"></circle></g>
+          <g style="transform: translate(176px, 152px)"><circle r="4.5" style="fill: #FFFFFF; stroke: #0B1110; stroke-width: 1.5px"></circle></g>
+          <g style="transform: translate(270px, 196px)"><g class="on-run"><circle r="10" style="{{kesDot}}"></circle><text y="4" style="font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; text-anchor: middle; fill: #06121F">9</text></g></g>
+          <g style="transform: translate(300px, 150px)"><g class="on-follow"><circle r="10" style="{{ashDot}}"></circle><text y="4" style="font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; text-anchor: middle; fill: #1E0C02">5</text></g></g>
+          <g style="transform: translate(180px, 160px)"><g class="on-in"><circle r="10" style="{{kesDot}}"></circle><text y="4" style="font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; text-anchor: middle; fill: #06121F">10</text></g></g>
+          <g style="transform: translate(318px, 90px)"><circle r="10" style="{{ashDot}}"></circle></g>
+          <g style="transform: translate(240px, 70px)"><circle r="10" style="{{ashDot}}"></circle></g>
+          <g style="transform: translate(380px, 136px)"><circle r="10" style="{{ashDot}}"></circle></g>
+        </svg>
+        <div class="{{previewCapClass}}" style="background: #0B1110; border: 1px solid #27362F; border-radius: 12px; padding: 12px 14px; min-height: 76px">
+          <p dir="{{previewDir}}" lang="{{previewLang}}" style="{{previewStyle}}"><sc-for list="{{previewWords}}" as="pw" hint-placeholder-count="12"><span class="on-w" style="{{pw.style}}">{{pw.text}}</span></sc-for></p>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #9EB0A6">{{previewNote}}</p>
+      </aside>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  st() { return Object.assign({ step: 0, dir: 'fwd', mode: 'casual', club: 'kes', player: '9', lang: 'en', voice: true }, this.state || {}); }
+  sw(on) {
+    return {
+      track: 'position: relative; display: inline-block; width: 44px; height: 26px; flex: none; border-radius: 13px; transition: background-color .22s; background: ' + (on ? '#D7F25C' : '#27362F'),
+      knob: 'position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 10px; background: ' + (on ? '#0B1110' : '#ECF1EC') + '; transition: transform .28s var(--ep), background-color .22s; transform: translateX(' + (on ? 18 : 0) + 'px)'
+    };
+  }
+  renderVals() {
+    const s = this.st();
+    const go = (n) => () => this.setState({ step: n, dir: n > s.step ? 'fwd' : 'back' });
+    const labels = ['Watch', 'Club', 'Language', 'Ready'];
+    const stepIdx = Math.max(0, s.step - 1);
+    const stepper = labels.map((l, i) => {
+      const done = s.step - 1 > i || s.step === 4, cur = s.step - 1 === i;
+      return {
+        n: i + 1, label: l, hasLine: i < labels.length - 1,
+        dot: 'width: 30px; height: 30px; border-radius: 15px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; transition: background-color .3s, color .3s, transform .35s var(--ep), box-shadow .3s; transform: scale(' + (cur ? 1.15 : 1) + '); ' +
+          (done ? 'background: #D7F25C; color: #0B1110' : cur ? 'background: #ECF1EC; color: #0B1110; box-shadow: 0 0 0 4px rgba(215,242,92,0.25)' : 'background: transparent; color: #9EB0A6; box-shadow: inset 0 0 0 1px #27362F'),
+        labelStyle: 'font-size: 13px; font-weight: 600; transition: color .3s; color: ' + (cur || done ? '#ECF1EC' : '#9EB0A6'),
+        fill: 'position: absolute; inset: 0; background: #D7F25C; transform-origin: left; transition: transform .5s var(--eo); transform: scaleX(' + (s.step - 1 > i ? 1 : 0) + ')'
+      };
+    });
+
+    const modes = [
+      { id: 'casual', label: 'Casual', glyph: '1', desc: 'One clear overlay at a time, in plain words.' },
+      { id: 'learn', label: 'Learn', glyph: '?', desc: 'New to tactics? Each idea explained the first time.' },
+      { id: 'analyst', label: 'Analyst', glyph: '%', desc: 'Space fields, metres, xG and the evidence behind each claim.' },
+      { id: 'player', label: 'Player focus', glyph: '9', desc: 'Follow one player’s off-ball work all match.' },
+      { id: 'audio', label: 'Audio-described', glyph: '♪', desc: 'Spoken shape and space. Works with the screen off.' },
+      { id: 'broadcaster', label: 'Broadcaster', glyph: '▶', desc: 'Producer console and the live overlay feed.' }
+    ];
+    const modeCards = modes.map((m, i) => ({
+      label: m.label, desc: m.desc, glyph: m.glyph, on: s.mode === m.id,
+      pick: () => this.setState({ mode: m.id }),
+      icon: 'width: 40px; height: 40px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-size: 22px; font-weight: 700; transition: background-color .25s, color .25s, transform .35s var(--ep); ' +
+        (s.mode === m.id ? 'background: #D7F25C; color: #0B1110; transform: rotate(-6deg) scale(1.06)' : 'background: #19251F; color: #ECF1EC'),
+      style: 'display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 150px; padding: 16px; border-radius: 16px; border: 0; text-align: left; color: #ECF1EC; font-family: Inter, sans-serif; animation: onRise .45s var(--eo) backwards; animation-delay: ' + i * 50 + 'ms; ' +
+        (s.mode === m.id ? 'background: #19251F; box-shadow: inset 0 0 0 2px #D7F25C, 0 10px 30px rgba(0,0,0,.3)' : 'background: #121B18; box-shadow: inset 0 0 0 1px #27362F')
+    }));
+
+    const clubs = [{ id: 'kes', name: 'Kestrel Bay', color: '#7CC0FF' }, { id: 'ash', name: 'Ashmoor', color: '#E2733A' }, { id: 'none', name: 'No favourite', color: '#4A5B53' }];
+    const clubCards = clubs.map((c, i) => ({
+      name: c.name, on: s.club === c.id,
+      pick: () => this.setState({ club: c.id, player: c.id === 'kes' ? '9' : c.id === 'ash' ? '5' : '' }),
+      badge: 'width: 34px; height: 40px; flex: none; border-radius: 6px 6px 17px 17px; background: ' + c.color + '; transition: transform .35s var(--ep); transform: scale(' + (s.club === c.id ? 1.1 : 1) + ')',
+      style: 'display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 0 16px; border-radius: 16px; border: 0; text-align: left; color: #ECF1EC; font-family: Inter, sans-serif; animation: onRise .45s var(--eo) backwards; animation-delay: ' + i * 60 + 'ms; ' +
+        (s.club === c.id ? 'background: #19251F; box-shadow: inset 0 0 0 2px #D7F25C' : 'background: #121B18; box-shadow: inset 0 0 0 1px #27362F')
+    }));
+    const roster = {
+      kes: [['9', 'J. Velmar'], ['10', 'T. Arkwell'], ['7', 'P. Quillan']],
+      ash: [['5', 'L. Hendricx'], ['10', 'S. Moravec'], ['1', 'Ashmoor No. 1']],
+      none: []
+    };
+    const teamColor = s.club === 'ash' ? '#E2733A' : '#7CC0FF';
+    const playerChips = (roster[s.club] || []).map((p, i) => ({
+      n: p[0], name: p[1], on: s.player === p[0],
+      pick: () => this.setState({ player: p[0] }),
+      num: 'width: 26px; height: 26px; border-radius: 13px; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; font-size: 12px; font-weight: 700; background: ' + teamColor + '; color: #0B1110',
+      style: 'display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px 0 8px; border-radius: 999px; border: 0; font: 600 14px Inter, sans-serif; animation-delay: ' + i * 60 + 'ms; ' +
+        (s.player === p[0] ? 'background: #19251F; color: #ECF1EC; box-shadow: inset 0 0 0 2px #D7F25C' : 'background: transparent; color: #ECF1EC; box-shadow: inset 0 0 0 1px #27362F')
+    }));
+
+    const langs = [
+      { code: 'en', native: 'English', en: 'English' }, { code: 'es', native: 'Español', en: 'Spanish' }, { code: 'pt', native: 'Português', en: 'Portuguese' },
+      { code: 'fr', native: 'Français', en: 'French' }, { code: 'ar', native: 'العربية', en: 'Arabic' }, { code: 'hi', native: 'हिन्दी', en: 'Hindi' },
+      { code: 'id', native: 'Bahasa Indonesia', en: 'Indonesian' }, { code: 'zh', native: '中文', en: 'Mandarin Chinese' }, { code: 'ja', native: '日本語', en: 'Japanese' },
+      { code: 'sw', native: 'Kiswahili', en: 'Swahili' }
+    ];
+    const langChips = langs.map((l, i) => ({
+      code: l.code, native: l.native, en: l.en, on: s.lang === l.code,
+      pick: () => this.setState({ lang: l.code }),
+      style: 'min-height: 56px; padding: 6px 12px; border-radius: 12px; border: 0; text-align: left; font: 600 15px Inter, sans-serif; color: #ECF1EC; animation: onRise .4s var(--eo) backwards; animation-delay: ' + i * 30 + 'ms; ' +
+        (s.lang === l.code ? 'background: #19251F; box-shadow: inset 0 0 0 2px #D7F25C' : 'background: #121B18; box-shadow: inset 0 0 0 1px #27362F')
+    }));
+
+    const lines = {
+      en: 'Watch No. 9. This run isn’t to get the ball. It’s to pull a defender away.',
+      es: 'Mira al 9. Esta carrera no es para recibir el balón: es para arrastrar a un defensor.',
+      pt: 'Repare no 9. Esta corrida não é para receber a bola: é para arrastar um defensor.',
+      fr: 'Regardez le n° 9. Cette course ne sert pas à recevoir le ballon : elle sert à attirer un défenseur.',
+      ar: 'راقب رقم 9. هذا الركض ليس لاستلام الكرة، بل لسحب مدافع بعيدًا.',
+      hi: 'नंबर 9 को देखिए। यह दौड़ गेंद पाने के लिए नहीं, बल्कि एक डिफेंडर को दूर खींचने के लिए है।',
+      id: 'Perhatikan nomor 9. Lari ini bukan untuk mendapatkan bola, tapi untuk menarik seorang bek menjauh.',
+      zh: '注意9号。这次跑动不是为了拿球，而是为了把一名后卫拉开。',
+      ja: '9番に注目。このランはボールをもらうためではなく、ディフェンダーを引きつけるためのものです。',
+      sw: 'Mtazame namba 9. Mbio hizi si za kupata mpira, bali ni za kumvuta beki mbali.'
+    };
+    const modeLines = {
+      casual: lines.en,
+      learn: 'No. 9 is making a decoy run: a run made so a teammate gets space.',
+      analyst: 'Decoy run: No. 9, 20.2 m on a diagonal. CB No. 5 displaced 10.8 m.',
+      player: 'Following No. ' + (s.player || '9') + ': 7 runs, 3 defenders dragged, 118 m² created.',
+      audio: 'No. 9 sprints towards the left wing, and Ashmoor’s No. 5 follows.',
+      broadcaster: 'overlay.upsert · run_arrow · m07-o0041 · auto'
+    };
+    const useLang = s.lang !== 'en';
+    const text = useLang ? lines[s.lang] : modeLines[s.mode];
+    const cjk = s.lang === 'zh' || s.lang === 'ja';
+    const parts = cjk ? Array.from(text) : text.split(' ');
+    const previewWords = parts.map((w, i) => ({ text: w, style: 'animation-delay: ' + Math.min(i * (cjk ? 18 : 35), 900) + 'ms' }));
+    const key = text + s.mode;
+    if (key !== this._pk) { this._pk = key; this._pf = !this._pf; }
+    const modeLabel = modes.filter((m) => m.id === s.mode)[0].label;
+    const v = this.sw(s.voice);
+
+    const burst = [];
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2, d = 80 + (i % 4) * 30;
+      burst.push({ r: 3 + (i % 3), style: 'fill: ' + ['#D7F25C', '#7CC0FF', '#E2733A'][i % 3] + '; --dx: ' + (Math.cos(a) * d).toFixed(0) + 'px; --dy: ' + (Math.sin(a) * d).toFixed(0) + 'px; animation-delay: ' + (i % 4) * 40 + 'ms' });
+    }
+    const chip = (bg, fg) => 'display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; background: ' + bg + '; color: ' + fg;
+    const clubName = clubs.filter((c) => c.id === s.club)[0].name;
+    const summary = [
+      { text: modeLabel + ' mode', style: chip('#D7F25C', '#0B1110') + '; animation-delay: 100ms' },
+      { text: s.club === 'none' ? 'No favourite club' : clubName + (s.player ? ' · No. ' + s.player : ''), style: chip('#19251F', '#ECF1EC') + '; animation-delay: 180ms' },
+      { text: langs.filter((l) => l.code === s.lang)[0].native, style: chip('#19251F', '#ECF1EC') + '; animation-delay: 260ms' },
+      { text: s.voice ? 'Voice on' : 'Voice off', style: chip('#19251F', '#ECF1EC') + '; animation-delay: 340ms' }
+    ];
+
+    return {
+      stepper: stepper,
+      dirClass: s.dir === 'back' ? 'on-back' : 'on-fwd',
+      isWelcome: s.step === 0, isMode: s.step === 1, isClub: s.step === 2, isLang: s.step === 3, isDone: s.step === 4,
+      notDone: s.step < 4, canBack: s.step > 0 && s.step < 4, canSkip: s.step < 4,
+      next: go(Math.min(4, s.step + 1)), back: go(Math.max(0, s.step - 1)),
+      nextLabel: s.step === 0 ? 'Get started' : s.step === 3 ? 'Finish' : 'Continue',
+      modeCards: modeCards, clubCards: clubCards, playerChips: playerChips, hasPlayers: playerChips.length > 0,
+      langChips: langChips, voice: s.voice, toggleVoice: () => this.setState({ voice: !s.voice }), voiceTrack: v.track, voiceKnob: v.knob,
+      burst: burst, summary: summary,
+      previewChip: 'font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #D7F25C; color: #0B1110; transition: background-color .3s',
+      previewMode: modeLabel + (useLang ? ' · ' + langs.filter((l) => l.code === s.lang)[0].en : ''),
+      kesDot: 'fill: #7CC0FF; stroke: rgba(9,16,13,.85); stroke-width: 2px',
+      ashDot: 'fill: #E2733A; stroke: rgba(9,16,13,.85); stroke-width: 2px',
+      previewCapClass: (this._pf ? 'on-wa' : 'on-wb') + (cjk ? ' on-cjk' : ''),
+      previewDir: s.lang === 'ar' ? 'rtl' : 'ltr', previewLang: s.lang,
+      previewStyle: s.mode === 'broadcaster' && !useLang ? 'margin: 0; font-family: \'JetBrains Mono\', monospace; font-size: 15px; line-height: 1.45' : 'margin: 0; font-size: 17px; line-height: 1.45; font-weight: 500',
+      previewWords: previewWords,
+      previewNote: useLang ? 'Translated with a reviewed football glossary.' : 'This is how captions will read in ' + modeLabel + ' mode.'
+    };
+  }
+}
+</script>
+</body>
+</html>

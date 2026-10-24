@@ -1,0 +1,7929 @@
+{
+ "schema_version": "2.0",
+ "seed": 2026,
+ "synthetic": true,
+ "clubs": [
+  {
+   "club_id": "kes",
+   "name": "Kestrel Bay",
+   "short_name": "KES",
+   "formation": "4-3-3",
+   "kits": {
+    "home": {
+     "primary": "#2e64a6",
+     "secondary": "#e6effc",
+     "pattern": "plain"
+    },
+    "away": {
+     "primary": "#edd05c",
+     "secondary": "#1d1b10",
+     "pattern": "stripes"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "arch",
+    "field": "#2e64a6",
+    "accent": "#e6effc",
+    "initials": "KES"
+   },
+   "squad": [
+    {
+     "player_id": "kes-01",
+     "number": 1,
+     "name": "Rowan Wexeridge",
+     "display": "R. Wexeridge",
+     "role": "GK",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 193
+    },
+    {
+     "player_id": "kes-02",
+     "number": 2,
+     "name": "Corin Brackiby",
+     "display": "C. Brackiby",
+     "role": "RB",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 181
+    },
+    {
+     "player_id": "kes-04",
+     "number": 4,
+     "name": "Mylo Arkiwick",
+     "display": "M. Arkiwick",
+     "role": "CB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 181
+    },
+    {
+     "player_id": "kes-05",
+     "number": 5,
+     "name": "Mylo Arkoham",
+     "display": "M. Arkoham",
+     "role": "CB",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 194
+    },
+    {
+     "player_id": "kes-03",
+     "number": 3,
+     "name": "Ellis Radiby",
+     "display": "E. Radiby",
+     "role": "LB",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 173
+    },
+    {
+     "player_id": "kes-06",
+     "number": 6,
+     "name": "Piet Brackocott",
+     "display": "P. Brackocott",
+     "role": "DM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 183
+    },
+    {
+     "player_id": "kes-08",
+     "number": 8,
+     "name": "Rowan Delacott",
+     "display": "R. Delacott",
+     "role": "CM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 181
+    },
+    {
+     "player_id": "kes-10",
+     "number": 10,
+     "name": "Tobin Arkwell",
+     "display": "T. Arkwell",
+     "role": "CM",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 183
+    },
+    {
+     "player_id": "kes-07",
+     "number": 7,
+     "name": "Piet Quillan",
+     "display": "P. Quillan",
+     "role": "RW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 177
+    },
+    {
+     "player_id": "kes-09",
+     "number": 9,
+     "name": "Joren Velmar",
+     "display": "J. Velmar",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 177
+    },
+    {
+     "player_id": "kes-11",
+     "number": 11,
+     "name": "Milos Dvoror",
+     "display": "M. Dvoror",
+     "role": "LW",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 176
+    },
+    {
+     "player_id": "kes-15",
+     "number": 15,
+     "name": "Rui Telorira",
+     "display": "R. Telorira",
+     "role": "GK",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 192
+    },
+    {
+     "player_id": "kes-17",
+     "number": 17,
+     "name": "Ellis Arkiby",
+     "display": "E. Arkiby",
+     "role": "GK",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 189
+    },
+    {
+     "player_id": "kes-19",
+     "number": 19,
+     "name": "Unai Belello",
+     "display": "U. Belello",
+     "role": "CB",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 186
+    },
+    {
+     "player_id": "kes-21",
+     "number": 21,
+     "name": "Vemund Dalerud",
+     "display": "V. Dalerud",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 191
+    },
+    {
+     "player_id": "kes-23",
+     "number": 23,
+     "name": "Jory Loriford",
+     "display": "J. Loriford",
+     "role": "RB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 182
+    },
+    {
+     "player_id": "kes-24",
+     "number": 24,
+     "name": "Brannoc Arkomore",
+     "display": "B. Arkomore",
+     "role": "LB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 176
+    },
+    {
+     "player_id": "kes-26",
+     "number": 26,
+     "name": "Corin Yariwick",
+     "display": "C. Yariwick",
+     "role": "DM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 178
+    },
+    {
+     "player_id": "kes-27",
+     "number": 27,
+     "name": "Vemund Bjorud",
+     "display": "V. Bjorud",
+     "role": "CM",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 178
+    },
+    {
+     "player_id": "kes-28",
+     "number": 28,
+     "name": "Odd Bjarud",
+     "display": "O. Bjarud",
+     "role": "CM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 170
+    },
+    {
+     "player_id": "kes-30",
+     "number": 30,
+     "name": "Alder Yaremore",
+     "display": "A. Yaremore",
+     "role": "AM",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 172
+    },
+    {
+     "player_id": "kes-31",
+     "number": 31,
+     "name": "Alder Radiford",
+     "display": "A. Radiford",
+     "role": "RW",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 183
+    },
+    {
+     "player_id": "kes-35",
+     "number": 35,
+     "name": "Tobin Dunaton",
+     "display": "T. Dunaton",
+     "role": "LW",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 170
+    },
+    {
+     "player_id": "kes-37",
+     "number": 37,
+     "name": "Wout Rijkostra",
+     "display": "W. Rijkostra",
+     "role": "ST",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 180
+    },
+    {
+     "player_id": "kes-39",
+     "number": 39,
+     "name": "Brannoc Haliford",
+     "display": "B. Haliford",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 174
+    }
+   ]
+  },
+  {
+   "club_id": "ash",
+   "name": "Ashmoor",
+   "short_name": "ASH",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#9a490b",
+     "secondary": "#faebe3",
+     "pattern": "hoops"
+    },
+    "away": {
+     "primary": "#67e7ee",
+     "secondary": "#0f1d1e",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "hexagon",
+    "glyph": "wing",
+    "field": "#9a490b",
+    "accent": "#faebe3",
+    "initials": "ASH"
+   },
+   "squad": [
+    {
+     "player_id": "ash-01",
+     "number": 1,
+     "name": "Tiago Esqumeiro",
+     "display": "T. Esqumeiro",
+     "role": "GK",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 184
+    },
+    {
+     "player_id": "ash-02",
+     "number": 2,
+     "name": "Unai Zarezo",
+     "display": "U. Zarezo",
+     "role": "RB",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 168
+    },
+    {
+     "player_id": "ash-05",
+     "number": 5,
+     "name": "Lars Hendricx",
+     "display": "L. Hendricx",
+     "role": "CB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 191
+    },
+    {
+     "player_id": "ash-04",
+     "number": 4,
+     "name": "Eskil Storodal",
+     "display": "E. Storodal",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 194
+    },
+    {
+     "player_id": "ash-03",
+     "number": 3,
+     "name": "Bento Ruvales",
+     "display": "B. Ruvales",
+     "role": "LB",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 183
+    },
+    {
+     "player_id": "ash-06",
+     "number": 6,
+     "name": "Tiago Orrurillo",
+     "display": "T. Orrurillo",
+     "role": "DM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 175
+    },
+    {
+     "player_id": "ash-08",
+     "number": 8,
+     "name": "Joaquim Davera",
+     "display": "J. Davera",
+     "role": "DM",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 180
+    },
+    {
+     "player_id": "ash-11",
+     "number": 11,
+     "name": "Eloy Orroiro",
+     "display": "E. Orroiro",
+     "role": "RW",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ash-10",
+     "number": 10,
+     "name": "Sander Moravec",
+     "display": "S. Moravec",
+     "role": "AM",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ash-07",
+     "number": 7,
+     "name": "Iker Davimozo",
+     "display": "I. Davimozo",
+     "role": "LW",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 181
+    },
+    {
+     "player_id": "ash-09",
+     "number": 9,
+     "name": "Iker Mendideda",
+     "display": "I. Mendideda",
+     "role": "ST",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 170
+    },
+    {
+     "player_id": "ash-13",
+     "number": 13,
+     "name": "Iker Lurules",
+     "display": "I. Lurules",
+     "role": "GK",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 194
+    },
+    {
+     "player_id": "ash-15",
+     "number": 15,
+     "name": "Tiago Cereda",
+     "display": "T. Cereda",
+     "role": "GK",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 193
+    },
+    {
+     "player_id": "ash-18",
+     "number": 18,
+     "name": "Caio Garada",
+     "display": "C. Garada",
+     "role": "CB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 177
+    },
+    {
+     "player_id": "ash-20",
+     "number": 20,
+     "name": "Femi Yawidosu",
+     "display": "F. Yawidosu",
+     "role": "CB",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 188
+    },
+    {
+     "player_id": "ash-23",
+     "number": 23,
+     "name": "Iker Ruvarente",
+     "display": "I. Ruvarente",
+     "role": "RB",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 177
+    },
+    {
+     "player_id": "ash-25",
+     "number": 25,
+     "name": "Jory Wexecott",
+     "display": "J. Wexecott",
+     "role": "LB",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ash-26",
+     "number": 26,
+     "name": "Joaquim Qullira",
+     "display": "J. Qullira",
+     "role": "DM",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 173
+    },
+    {
+     "player_id": "ash-28",
+     "number": 28,
+     "name": "Eloy Luraz",
+     "display": "E. Luraz",
+     "role": "CM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 179
+    },
+    {
+     "player_id": "ash-29",
+     "number": 29,
+     "name": "Sigurd Bjasen",
+     "display": "S. Bjasen",
+     "role": "CM",
+     "foot": "left",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ash-31",
+     "number": 31,
+     "name": "Iker Lureles",
+     "display": "I. Lureles",
+     "role": "AM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 173
+    },
+    {
+     "player_id": "ash-32",
+     "number": 32,
+     "name": "Caio Quzo",
+     "display": "C. Quzo",
+     "role": "RW",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 174
+    },
+    {
+     "player_id": "ash-35",
+     "number": 35,
+     "name": "Bento Davura",
+     "display": "B. Davura",
+     "role": "LW",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 174
+    },
+    {
+     "player_id": "ash-37",
+     "number": 37,
+     "name": "Unai Orrino",
+     "display": "U. Orrino",
+     "role": "ST",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 176
+    },
+    {
+     "player_id": "ash-39",
+     "number": 39,
+     "name": "Joaquim Alellales",
+     "display": "J. Alellales",
+     "role": "ST",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 176
+    }
+   ]
+  },
+  {
+   "club_id": "bra",
+   "name": "Brackenford",
+   "short_name": "BRA",
+   "formation": "4-4-2",
+   "kits": {
+    "home": {
+     "primary": "#706ede",
+     "secondary": "#ecedfc",
+     "pattern": "hoops"
+    },
+    "away": {
+     "primary": "#ffbf8d",
+     "secondary": "#231813",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "pennant",
+    "glyph": "key",
+    "field": "#706ede",
+    "accent": "#ecedfc",
+    "initials": "BRA"
+   },
+   "squad": [
+    {
+     "player_id": "bra-01",
+     "number": 1,
+     "name": "Lukas Morenko",
+     "display": "L. Morenko",
+     "role": "GK",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 190
+    },
+    {
+     "player_id": "bra-02",
+     "number": 2,
+     "name": "Dusan Stavacenko",
+     "display": "D. Stavacenko",
+     "role": "RB",
+     "foot": "left",
+     "age": 26,
+     "height_cm": 179
+    },
+    {
+     "player_id": "bra-05",
+     "number": 5,
+     "name": "Daichi Samura",
+     "display": "D. Samura",
+     "role": "CB",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 189
+    },
+    {
+     "player_id": "bra-06",
+     "number": 6,
+     "name": "Jens Janseord",
+     "display": "J. Janseord",
+     "role": "CB",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 186
+    },
+    {
+     "player_id": "bra-03",
+     "number": 3,
+     "name": "Stepan Holak",
+     "display": "S. Holak",
+     "role": "LB",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 173
+    },
+    {
+     "player_id": "bra-07",
+     "number": 7,
+     "name": "Matej Morik",
+     "display": "M. Morik",
+     "role": "RM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 183
+    },
+    {
+     "player_id": "bra-04",
+     "number": 4,
+     "name": "Shun Kuta",
+     "display": "S. Kuta",
+     "role": "CM",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 176
+    },
+    {
+     "player_id": "bra-08",
+     "number": 8,
+     "name": "Corin Mariwick",
+     "display": "C. Mariwick",
+     "role": "CM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 170
+    },
+    {
+     "player_id": "bra-11",
+     "number": 11,
+     "name": "Viktor Novor",
+     "display": "V. Novor",
+     "role": "LM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 182
+    },
+    {
+     "player_id": "bra-09",
+     "number": 9,
+     "name": "Ondrej Pavan",
+     "display": "O. Pavan",
+     "role": "ST",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 165
+    },
+    {
+     "player_id": "bra-10",
+     "number": 10,
+     "name": "Adel Beliun",
+     "display": "A. Beliun",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 189
+    },
+    {
+     "player_id": "bra-12",
+     "number": 12,
+     "name": "Ondrej Dvoreman",
+     "display": "O. Dvoreman",
+     "role": "GK",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 188
+    },
+    {
+     "player_id": "bra-16",
+     "number": 16,
+     "name": "Stepan Zelac",
+     "display": "S. Zelac",
+     "role": "GK",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 197
+    },
+    {
+     "player_id": "bra-18",
+     "number": 18,
+     "name": "Tomek Kraler",
+     "display": "T. Kraler",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 194
+    },
+    {
+     "player_id": "bra-19",
+     "number": 19,
+     "name": "Halvar Fjyrdal",
+     "display": "H. Fjyrdal",
+     "role": "CB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 197
+    },
+    {
+     "player_id": "bra-20",
+     "number": 20,
+     "name": "Odd Skysen",
+     "display": "O. Skysen",
+     "role": "RB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 172
+    },
+    {
+     "player_id": "bra-21",
+     "number": 21,
+     "name": "Milos Radevic",
+     "display": "M. Radevic",
+     "role": "LB",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 165
+    },
+    {
+     "player_id": "bra-22",
+     "number": 22,
+     "name": "Kenta Nahara",
+     "display": "K. Nahara",
+     "role": "DM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 174
+    },
+    {
+     "player_id": "bra-25",
+     "number": 25,
+     "name": "Halvar Hagirstrom",
+     "display": "H. Hagirstrom",
+     "role": "CM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 174
+    },
+    {
+     "player_id": "bra-26",
+     "number": 26,
+     "name": "Matej Brzer",
+     "display": "M. Brzer",
+     "role": "CM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 185
+    },
+    {
+     "player_id": "bra-29",
+     "number": 29,
+     "name": "Radim Zeler",
+     "display": "R. Zeler",
+     "role": "AM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 182
+    },
+    {
+     "player_id": "bra-30",
+     "number": 30,
+     "name": "Tomek Moren",
+     "display": "T. Moren",
+     "role": "RW",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 168
+    },
+    {
+     "player_id": "bra-32",
+     "number": 32,
+     "name": "Stepan Dvorinko",
+     "display": "S. Dvorinko",
+     "role": "LW",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 167
+    },
+    {
+     "player_id": "bra-36",
+     "number": 36,
+     "name": "Tunde Akowa",
+     "display": "T. Akowa",
+     "role": "ST",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 187
+    },
+    {
+     "player_id": "bra-39",
+     "number": 39,
+     "name": "Caio Orrurez",
+     "display": "C. Orrurez",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 169
+    }
+   ]
+  },
+  {
+   "club_id": "sal",
+   "name": "Saltmere",
+   "short_name": "SAL",
+   "formation": "3-5-2",
+   "kits": {
+    "home": {
+     "primary": "#8d2900",
+     "secondary": "#fbebe3",
+     "pattern": "hoops"
+    },
+    "away": {
+     "primary": "#56f5ff",
+     "secondary": "#0f1d1f",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "key",
+    "field": "#8d2900",
+    "accent": "#fbebe3",
+    "initials": "SAL"
+   },
+   "squad": [
+    {
+     "player_id": "sal-01",
+     "number": 1,
+     "name": "Teun Vosolstra",
+     "display": "T. Vosolstra",
+     "role": "GK",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 199
+    },
+    {
+     "player_id": "sal-04",
+     "number": 4,
+     "name": "Ewan Brackowick",
+     "display": "E. Brackowick",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 198
+    },
+    {
+     "player_id": "sal-05",
+     "number": 5,
+     "name": "Sem Ostaord",
+     "display": "S. Ostaord",
+     "role": "CB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 195
+    },
+    {
+     "player_id": "sal-06",
+     "number": 6,
+     "name": "Ellis Yaroton",
+     "display": "E. Yaroton",
+     "role": "CB",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 193
+    },
+    {
+     "player_id": "sal-02",
+     "number": 2,
+     "name": "Mees Dekastra",
+     "display": "M. Dekastra",
+     "role": "RWB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 183
+    },
+    {
+     "player_id": "sal-08",
+     "number": 8,
+     "name": "Sander Rijkoekamp",
+     "display": "S. Rijkoekamp",
+     "role": "CM",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 177
+    },
+    {
+     "player_id": "sal-14",
+     "number": 14,
+     "name": "Ruben Hendoex",
+     "display": "R. Hendoex",
+     "role": "DM",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 181
+    },
+    {
+     "player_id": "sal-10",
+     "number": 10,
+     "name": "Jens Wililijk",
+     "display": "J. Wililijk",
+     "role": "CM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 179
+    },
+    {
+     "player_id": "sal-03",
+     "number": 3,
+     "name": "Teun Klaord",
+     "display": "T. Klaord",
+     "role": "LWB",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 181
+    },
+    {
+     "player_id": "sal-09",
+     "number": 9,
+     "name": "Daan Dekestra",
+     "display": "D. Dekestra",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 179
+    },
+    {
+     "player_id": "sal-11",
+     "number": 11,
+     "name": "Teun Kloelema",
+     "display": "T. Kloelema",
+     "role": "ST",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 174
+    },
+    {
+     "player_id": "sal-13",
+     "number": 13,
+     "name": "Femi Adiwa",
+     "display": "F. Adiwa",
+     "role": "GK",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 189
+    },
+    {
+     "player_id": "sal-15",
+     "number": 15,
+     "name": "Ruben Beronoord",
+     "display": "R. Beronoord",
+     "role": "GK",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 177
+    },
+    {
+     "player_id": "sal-17",
+     "number": 17,
+     "name": "Jens Klama",
+     "display": "J. Klama",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 186
+    },
+    {
+     "player_id": "sal-18",
+     "number": 18,
+     "name": "Sem Berekamp",
+     "display": "S. Berekamp",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 193
+    },
+    {
+     "player_id": "sal-19",
+     "number": 19,
+     "name": "Femi Temeko",
+     "display": "F. Temeko",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 188
+    },
+    {
+     "player_id": "sal-21",
+     "number": 21,
+     "name": "Daan Rijkaord",
+     "display": "D. Rijkaord",
+     "role": "RWB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 168
+    },
+    {
+     "player_id": "sal-22",
+     "number": 22,
+     "name": "Teun Hendedt",
+     "display": "T. Hendedt",
+     "role": "DM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 180
+    },
+    {
+     "player_id": "sal-26",
+     "number": 26,
+     "name": "Mees Ostistra",
+     "display": "M. Ostistra",
+     "role": "CM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 187
+    },
+    {
+     "player_id": "sal-27",
+     "number": 27,
+     "name": "Eloy Cerollo",
+     "display": "E. Cerollo",
+     "role": "CM",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 177
+    },
+    {
+     "player_id": "sal-28",
+     "number": 28,
+     "name": "Teun Klodt",
+     "display": "T. Klodt",
+     "role": "AM",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 187
+    },
+    {
+     "player_id": "sal-30",
+     "number": 30,
+     "name": "Wout Klekamp",
+     "display": "W. Klekamp",
+     "role": "RW",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 173
+    },
+    {
+     "player_id": "sal-32",
+     "number": 32,
+     "name": "Eskil Storaberg",
+     "display": "E. Storaberg",
+     "role": "LW",
+     "foot": "left",
+     "age": 32,
+     "height_cm": 177
+    },
+    {
+     "player_id": "sal-33",
+     "number": 33,
+     "name": "Shun Sashiro",
+     "display": "S. Sashiro",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 168
+    },
+    {
+     "player_id": "sal-39",
+     "number": 39,
+     "name": "Joost Vosoekamp",
+     "display": "J. Vosoekamp",
+     "role": "ST",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 169
+    }
+   ]
+  },
+  {
+   "club_id": "mor",
+   "name": "Morrowdale",
+   "short_name": "MOR",
+   "formation": "4-4-2",
+   "kits": {
+    "home": {
+     "primary": "#00847e",
+     "secondary": "#e0f3f1",
+     "pattern": "halves"
+    },
+    "away": {
+     "primary": "#f59ed7",
+     "secondary": "#21171d",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "circle",
+    "glyph": "wing",
+    "field": "#00847e",
+    "accent": "#e0f3f1",
+    "initials": "MOR"
+   },
+   "squad": [
+    {
+     "player_id": "mor-01",
+     "number": 1,
+     "name": "Kobina Obuwuwa",
+     "display": "K. Obuwuwa",
+     "role": "GK",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 193
+    },
+    {
+     "player_id": "mor-02",
+     "number": 2,
+     "name": "Tomek Velovic",
+     "display": "T. Velovic",
+     "role": "RB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 181
+    },
+    {
+     "player_id": "mor-05",
+     "number": 5,
+     "name": "Yaw Osole",
+     "display": "Y. Osole",
+     "role": "CB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 186
+    },
+    {
+     "player_id": "mor-06",
+     "number": 6,
+     "name": "Tiago Garara",
+     "display": "T. Garara",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 177
+    },
+    {
+     "player_id": "mor-03",
+     "number": 3,
+     "name": "Piet Kestaridge",
+     "display": "P. Kestaridge",
+     "role": "LB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 165
+    },
+    {
+     "player_id": "mor-07",
+     "number": 7,
+     "name": "Emeka Adede",
+     "display": "E. Adede",
+     "role": "RM",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 182
+    },
+    {
+     "player_id": "mor-04",
+     "number": 4,
+     "name": "Yaw Temowa",
+     "display": "Y. Temowa",
+     "role": "CM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 186
+    },
+    {
+     "player_id": "mor-08",
+     "number": 8,
+     "name": "Seyi Adawanke",
+     "display": "S. Adawanke",
+     "role": "CM",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 178
+    },
+    {
+     "player_id": "mor-11",
+     "number": 11,
+     "name": "Femi Yawuba",
+     "display": "F. Yawuba",
+     "role": "LM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 181
+    },
+    {
+     "player_id": "mor-09",
+     "number": 9,
+     "name": "Femi Oliba",
+     "display": "F. Oliba",
+     "role": "ST",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 179
+    },
+    {
+     "player_id": "mor-10",
+     "number": 10,
+     "name": "Femi Ibade",
+     "display": "F. Ibade",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 179
+    },
+    {
+     "player_id": "mor-12",
+     "number": 12,
+     "name": "Ayo Ekenuwa",
+     "display": "A. Ekenuwa",
+     "role": "GK",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 190
+    },
+    {
+     "player_id": "mor-20",
+     "number": 20,
+     "name": "Seyi Kwila",
+     "display": "S. Kwila",
+     "role": "GK",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 195
+    },
+    {
+     "player_id": "mor-21",
+     "number": 21,
+     "name": "Femi Bamosu",
+     "display": "F. Bamosu",
+     "role": "CB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 191
+    },
+    {
+     "player_id": "mor-22",
+     "number": 22,
+     "name": "Nabil Tahaun",
+     "display": "N. Tahaun",
+     "role": "CB",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 188
+    },
+    {
+     "player_id": "mor-25",
+     "number": 25,
+     "name": "Kobina Akanuwa",
+     "display": "K. Akanuwa",
+     "role": "RB",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 180
+    },
+    {
+     "player_id": "mor-26",
+     "number": 26,
+     "name": "Kwame Demile",
+     "display": "K. Demile",
+     "role": "LB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 185
+    },
+    {
+     "player_id": "mor-30",
+     "number": 30,
+     "name": "Kwame Obuwa",
+     "display": "K. Obuwa",
+     "role": "DM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 173
+    },
+    {
+     "player_id": "mor-32",
+     "number": 32,
+     "name": "Kobina Akinoko",
+     "display": "K. Akinoko",
+     "role": "CM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 169
+    },
+    {
+     "player_id": "mor-33",
+     "number": 33,
+     "name": "Ayo Adole",
+     "display": "A. Adole",
+     "role": "CM",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 165
+    },
+    {
+     "player_id": "mor-34",
+     "number": 34,
+     "name": "Seyi Demide",
+     "display": "S. Demide",
+     "role": "AM",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 180
+    },
+    {
+     "player_id": "mor-35",
+     "number": 35,
+     "name": "Femi Ibukaba",
+     "display": "F. Ibukaba",
+     "role": "RW",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 168
+    },
+    {
+     "player_id": "mor-36",
+     "number": 36,
+     "name": "Corin Haloridge",
+     "display": "C. Haloridge",
+     "role": "LW",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 181
+    },
+    {
+     "player_id": "mor-37",
+     "number": 37,
+     "name": "Ayo Temanke",
+     "display": "A. Temanke",
+     "role": "ST",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 178
+    },
+    {
+     "player_id": "mor-38",
+     "number": 38,
+     "name": "Tomek Stavenko",
+     "display": "T. Stavenko",
+     "role": "ST",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 178
+    }
+   ]
+  },
+  {
+   "club_id": "qua",
+   "name": "Quarrystone",
+   "short_name": "QUA",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#733177",
+     "secondary": "#f6eaf6",
+     "pattern": "plain"
+    },
+    "away": {
+     "primary": "#c1c951",
+     "secondary": "#1b1c11",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "pennant",
+    "glyph": "key",
+    "field": "#733177",
+    "accent": "#f6eaf6",
+    "initials": "QUA"
+   },
+   "squad": [
+    {
+     "player_id": "qua-01",
+     "number": 1,
+     "name": "Leif Storyheim",
+     "display": "L. Storyheim",
+     "role": "GK",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 194
+    },
+    {
+     "player_id": "qua-02",
+     "number": 2,
+     "name": "Milos Holenko",
+     "display": "M. Holenko",
+     "role": "RB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 173
+    },
+    {
+     "player_id": "qua-05",
+     "number": 5,
+     "name": "Riyad Rahani",
+     "display": "R. Rahani",
+     "role": "CB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 177
+    },
+    {
+     "player_id": "qua-04",
+     "number": 4,
+     "name": "Sigurd Skarud",
+     "display": "S. Skarud",
+     "role": "CB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 194
+    },
+    {
+     "player_id": "qua-03",
+     "number": 3,
+     "name": "Leif Vikostrom",
+     "display": "L. Vikostrom",
+     "role": "LB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 176
+    },
+    {
+     "player_id": "qua-06",
+     "number": 6,
+     "name": "Vemund Fjones",
+     "display": "V. Fjones",
+     "role": "DM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 169
+    },
+    {
+     "player_id": "qua-08",
+     "number": 8,
+     "name": "Sigurd Skorsen",
+     "display": "S. Skorsen",
+     "role": "DM",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 173
+    },
+    {
+     "player_id": "qua-11",
+     "number": 11,
+     "name": "Odd Nyberg",
+     "display": "O. Nyberg",
+     "role": "RW",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 178
+    },
+    {
+     "player_id": "qua-10",
+     "number": 10,
+     "name": "Vemund Fjesen",
+     "display": "V. Fjesen",
+     "role": "AM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 168
+    },
+    {
+     "player_id": "qua-07",
+     "number": 7,
+     "name": "Eskil Nylund",
+     "display": "E. Nylund",
+     "role": "LW",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 182
+    },
+    {
+     "player_id": "qua-09",
+     "number": 9,
+     "name": "Eloy Davamente",
+     "display": "E. Davamente",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 165
+    },
+    {
+     "player_id": "qua-13",
+     "number": 13,
+     "name": "Halvar Skavik",
+     "display": "H. Skavik",
+     "role": "GK",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 193
+    },
+    {
+     "player_id": "qua-15",
+     "number": 15,
+     "name": "Torvald Toresen",
+     "display": "T. Toresen",
+     "role": "GK",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 177
+    },
+    {
+     "player_id": "qua-16",
+     "number": 16,
+     "name": "Eskil Bjelund",
+     "display": "E. Bjelund",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 188
+    },
+    {
+     "player_id": "qua-22",
+     "number": 22,
+     "name": "Eskil Lundylund",
+     "display": "E. Lundylund",
+     "role": "CB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 190
+    },
+    {
+     "player_id": "qua-26",
+     "number": 26,
+     "name": "Lars Vosakamp",
+     "display": "L. Vosakamp",
+     "role": "RB",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 171
+    },
+    {
+     "player_id": "qua-27",
+     "number": 27,
+     "name": "Odd Bjylund",
+     "display": "O. Bjylund",
+     "role": "LB",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 177
+    },
+    {
+     "player_id": "qua-28",
+     "number": 28,
+     "name": "Ren Sahara",
+     "display": "R. Sahara",
+     "role": "DM",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 185
+    },
+    {
+     "player_id": "qua-29",
+     "number": 29,
+     "name": "Arne Askoheim",
+     "display": "A. Askoheim",
+     "role": "CM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 186
+    },
+    {
+     "player_id": "qua-31",
+     "number": 31,
+     "name": "Kjell Nyrud",
+     "display": "K. Nyrud",
+     "role": "CM",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 186
+    },
+    {
+     "player_id": "qua-34",
+     "number": 34,
+     "name": "Halvar Bjedal",
+     "display": "H. Bjedal",
+     "role": "AM",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 183
+    },
+    {
+     "player_id": "qua-35",
+     "number": 35,
+     "name": "Ewan Kesteham",
+     "display": "E. Kesteham",
+     "role": "RW",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 177
+    },
+    {
+     "player_id": "qua-37",
+     "number": 37,
+     "name": "Radim Brzanko",
+     "display": "R. Brzanko",
+     "role": "LW",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 179
+    },
+    {
+     "player_id": "qua-38",
+     "number": 38,
+     "name": "Leif Fjedal",
+     "display": "L. Fjedal",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 178
+    },
+    {
+     "player_id": "qua-39",
+     "number": 39,
+     "name": "Vemund Torersen",
+     "display": "V. Torersen",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 184
+    }
+   ]
+  },
+  {
+   "club_id": "nor",
+   "name": "Northcairn",
+   "short_name": "NOR",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#a1a408",
+     "secondary": "#1b1c11",
+     "pattern": "plain"
+    },
+    "away": {
+     "primary": "#b0c4ff",
+     "secondary": "#181a24",
+     "pattern": "stripes"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "ring",
+    "field": "#a1a408",
+    "accent": "#1b1c11",
+    "initials": "NOR"
+   },
+   "squad": [
+    {
+     "player_id": "nor-01",
+     "number": 1,
+     "name": "Amine Mahaoui",
+     "display": "A. Mahaoui",
+     "role": "GK",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 188
+    },
+    {
+     "player_id": "nor-02",
+     "number": 2,
+     "name": "Ilyes Fadami",
+     "display": "I. Fadami",
+     "role": "RB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 180
+    },
+    {
+     "player_id": "nor-05",
+     "number": 5,
+     "name": "Hakim Abimi",
+     "display": "H. Abimi",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 183
+    },
+    {
+     "player_id": "nor-04",
+     "number": 4,
+     "name": "Hakim Kadami",
+     "display": "H. Kadami",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 191
+    },
+    {
+     "player_id": "nor-03",
+     "number": 3,
+     "name": "Samir Kadini",
+     "display": "S. Kadini",
+     "role": "LB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 189
+    },
+    {
+     "player_id": "nor-06",
+     "number": 6,
+     "name": "Walid Kadouun",
+     "display": "W. Kadouun",
+     "role": "DM",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 173
+    },
+    {
+     "player_id": "nor-08",
+     "number": 8,
+     "name": "Ayo Bade",
+     "display": "A. Bade",
+     "role": "DM",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 184
+    },
+    {
+     "player_id": "nor-11",
+     "number": 11,
+     "name": "Yanis Belini",
+     "display": "Y. Belini",
+     "role": "RW",
+     "foot": "left",
+     "age": 24,
+     "height_cm": 186
+    },
+    {
+     "player_id": "nor-10",
+     "number": 10,
+     "name": "Nabil Rahari",
+     "display": "N. Rahari",
+     "role": "AM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 171
+    },
+    {
+     "player_id": "nor-07",
+     "number": 7,
+     "name": "Karim Rahououi",
+     "display": "K. Rahououi",
+     "role": "LW",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 184
+    },
+    {
+     "player_id": "nor-09",
+     "number": 9,
+     "name": "Nabil Djoura",
+     "display": "N. Djoura",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 183
+    },
+    {
+     "player_id": "nor-12",
+     "number": 12,
+     "name": "Walid Beloudi",
+     "display": "W. Beloudi",
+     "role": "GK",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 190
+    },
+    {
+     "player_id": "nor-14",
+     "number": 14,
+     "name": "Hakim Tahani",
+     "display": "H. Tahani",
+     "role": "GK",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 194
+    },
+    {
+     "player_id": "nor-16",
+     "number": 16,
+     "name": "Yanis Beliri",
+     "display": "Y. Beliri",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 183
+    },
+    {
+     "player_id": "nor-18",
+     "number": 18,
+     "name": "Amine Fadara",
+     "display": "A. Fadara",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 192
+    },
+    {
+     "player_id": "nor-19",
+     "number": 19,
+     "name": "Brede Eldyvik",
+     "display": "B. Eldyvik",
+     "role": "RB",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 185
+    },
+    {
+     "player_id": "nor-21",
+     "number": 21,
+     "name": "Samir Hamidi",
+     "display": "S. Hamidi",
+     "role": "LB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 169
+    },
+    {
+     "player_id": "nor-22",
+     "number": 22,
+     "name": "Riyad Fadounani",
+     "display": "R. Fadounani",
+     "role": "DM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 171
+    },
+    {
+     "player_id": "nor-23",
+     "number": 23,
+     "name": "Hakim Belinach",
+     "display": "H. Belinach",
+     "role": "CM",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 178
+    },
+    {
+     "player_id": "nor-25",
+     "number": 25,
+     "name": "Yanis Tahira",
+     "display": "Y. Tahira",
+     "role": "CM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 177
+    },
+    {
+     "player_id": "nor-30",
+     "number": 30,
+     "name": "Amine Fadouridi",
+     "display": "A. Fadouridi",
+     "role": "AM",
+     "foot": "left",
+     "age": 32,
+     "height_cm": 179
+    },
+    {
+     "player_id": "nor-32",
+     "number": 32,
+     "name": "Nuno Ceremeiro",
+     "display": "N. Ceremeiro",
+     "role": "RW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 174
+    },
+    {
+     "player_id": "nor-33",
+     "number": 33,
+     "name": "Amine Kadarani",
+     "display": "A. Kadarani",
+     "role": "LW",
+     "foot": "both",
+     "age": 28,
+     "height_cm": 180
+    },
+    {
+     "player_id": "nor-34",
+     "number": 34,
+     "name": "Yanis Nasara",
+     "display": "Y. Nasara",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 184
+    },
+    {
+     "player_id": "nor-38",
+     "number": 38,
+     "name": "Karim Fadouch",
+     "display": "K. Fadouch",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 181
+    }
+   ]
+  },
+  {
+   "club_id": "oak",
+   "name": "Oakhallow",
+   "short_name": "OAK",
+   "formation": "3-4-3",
+   "kits": {
+    "home": {
+     "primary": "#4593d8",
+     "secondary": "#131c24",
+     "pattern": "sash"
+    },
+    "away": {
+     "primary": "#ffc16f",
+     "secondary": "#221811",
+     "pattern": "stripes"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "key",
+    "field": "#4593d8",
+    "accent": "#131c24",
+    "initials": "OAK"
+   },
+   "squad": [
+    {
+     "player_id": "oak-01",
+     "number": 1,
+     "name": "Ayo Yawawa",
+     "display": "A. Yawawa",
+     "role": "GK",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 183
+    },
+    {
+     "player_id": "oak-04",
+     "number": 4,
+     "name": "Kenta Toshiro",
+     "display": "K. Toshiro",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 188
+    },
+    {
+     "player_id": "oak-05",
+     "number": 5,
+     "name": "Sota Yozaki",
+     "display": "S. Yozaki",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 191
+    },
+    {
+     "player_id": "oak-06",
+     "number": 6,
+     "name": "Yuto Mishiro",
+     "display": "Y. Mishiro",
+     "role": "CB",
+     "foot": "left",
+     "age": 20,
+     "height_cm": 188
+    },
+    {
+     "player_id": "oak-02",
+     "number": 2,
+     "name": "Ren Mizaki",
+     "display": "R. Mizaki",
+     "role": "RWB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 168
+    },
+    {
+     "player_id": "oak-08",
+     "number": 8,
+     "name": "Taiga Kumura",
+     "display": "T. Kumura",
+     "role": "CM",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 189
+    },
+    {
+     "player_id": "oak-10",
+     "number": 10,
+     "name": "Riku Yokawa",
+     "display": "R. Yokawa",
+     "role": "CM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 180
+    },
+    {
+     "player_id": "oak-03",
+     "number": 3,
+     "name": "Sota Hashiro",
+     "display": "S. Hashiro",
+     "role": "LWB",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 173
+    },
+    {
+     "player_id": "oak-07",
+     "number": 7,
+     "name": "Mateus Esquiro",
+     "display": "M. Esquiro",
+     "role": "RW",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 174
+    },
+    {
+     "player_id": "oak-09",
+     "number": 9,
+     "name": "Taiga Kikinaga",
+     "display": "T. Kikinaga",
+     "role": "ST",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 177
+    },
+    {
+     "player_id": "oak-11",
+     "number": 11,
+     "name": "Kwame Obasu",
+     "display": "K. Obasu",
+     "role": "LW",
+     "foot": "left",
+     "age": 24,
+     "height_cm": 179
+    },
+    {
+     "player_id": "oak-12",
+     "number": 12,
+     "name": "Taiga Rikimura",
+     "display": "T. Rikimura",
+     "role": "GK",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 192
+    },
+    {
+     "player_id": "oak-14",
+     "number": 14,
+     "name": "Ren Rizaki",
+     "display": "R. Rizaki",
+     "role": "GK",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 190
+    },
+    {
+     "player_id": "oak-16",
+     "number": 16,
+     "name": "Taiga Rimimoto",
+     "display": "T. Rimimoto",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 194
+    },
+    {
+     "player_id": "oak-19",
+     "number": 19,
+     "name": "Riku Karakawa",
+     "display": "R. Karakawa",
+     "role": "CB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 188
+    },
+    {
+     "player_id": "oak-22",
+     "number": 22,
+     "name": "Wout Rijkorkamp",
+     "display": "W. Rijkorkamp",
+     "role": "CB",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 185
+    },
+    {
+     "player_id": "oak-23",
+     "number": 23,
+     "name": "Taiga Kikawa",
+     "display": "T. Kikawa",
+     "role": "RWB",
+     "foot": "both",
+     "age": 20,
+     "height_cm": 179
+    },
+    {
+     "player_id": "oak-26",
+     "number": 26,
+     "name": "Kenta Tamimura",
+     "display": "K. Tamimura",
+     "role": "DM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 183
+    },
+    {
+     "player_id": "oak-27",
+     "number": 27,
+     "name": "Daichi Yoshiro",
+     "display": "D. Yoshiro",
+     "role": "CM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 173
+    },
+    {
+     "player_id": "oak-30",
+     "number": 30,
+     "name": "Haruto Mimoto",
+     "display": "H. Mimoto",
+     "role": "CM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 185
+    },
+    {
+     "player_id": "oak-35",
+     "number": 35,
+     "name": "Kenta Nanaga",
+     "display": "K. Nanaga",
+     "role": "AM",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 180
+    },
+    {
+     "player_id": "oak-36",
+     "number": 36,
+     "name": "Teun Rijkins",
+     "display": "T. Rijkins",
+     "role": "RW",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 184
+    },
+    {
+     "player_id": "oak-37",
+     "number": 37,
+     "name": "Yuto Hazaki",
+     "display": "Y. Hazaki",
+     "role": "LW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 180
+    },
+    {
+     "player_id": "oak-38",
+     "number": 38,
+     "name": "Tunde Ekode",
+     "display": "T. Ekode",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 176
+    },
+    {
+     "player_id": "oak-39",
+     "number": 39,
+     "name": "Yaw Kwaba",
+     "display": "Y. Kwaba",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 184
+    }
+   ]
+  },
+  {
+   "club_id": "fen",
+   "name": "Fenwyck",
+   "short_name": "FEN",
+   "formation": "3-5-2",
+   "kits": {
+    "home": {
+     "primary": "#c95264",
+     "secondary": "#fce9ea",
+     "pattern": "halves"
+    },
+    "away": {
+     "primary": "#00e9d9",
+     "secondary": "#0f1e1c",
+     "pattern": "stripes"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "hexagon",
+    "glyph": "wave",
+    "field": "#c95264",
+    "accent": "#fce9ea",
+    "initials": "FEN"
+   },
+   "squad": [
+    {
+     "player_id": "fen-01",
+     "number": 1,
+     "name": "Ellis Marimore",
+     "display": "E. Marimore",
+     "role": "GK",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 186
+    },
+    {
+     "player_id": "fen-04",
+     "number": 4,
+     "name": "Brannoc Calen",
+     "display": "B. Calen",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 188
+    },
+    {
+     "player_id": "fen-05",
+     "number": 5,
+     "name": "Alder Yaran",
+     "display": "A. Yaran",
+     "role": "CB",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 192
+    },
+    {
+     "player_id": "fen-06",
+     "number": 6,
+     "name": "Mylo Kesteford",
+     "display": "M. Kesteford",
+     "role": "CB",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 185
+    },
+    {
+     "player_id": "fen-02",
+     "number": 2,
+     "name": "Yuto Tahara",
+     "display": "Y. Tahara",
+     "role": "RWB",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 181
+    },
+    {
+     "player_id": "fen-08",
+     "number": 8,
+     "name": "Rowan Brackimore",
+     "display": "R. Brackimore",
+     "role": "CM",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 172
+    },
+    {
+     "player_id": "fen-14",
+     "number": 14,
+     "name": "Tobin Yarodenby",
+     "display": "T. Yarodenby",
+     "role": "DM",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 182
+    },
+    {
+     "player_id": "fen-10",
+     "number": 10,
+     "name": "Lukas Brzovic",
+     "display": "L. Brzovic",
+     "role": "CM",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 169
+    },
+    {
+     "player_id": "fen-03",
+     "number": 3,
+     "name": "Mylo Kestileyn",
+     "display": "M. Kestileyn",
+     "role": "LWB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 174
+    },
+    {
+     "player_id": "fen-09",
+     "number": 9,
+     "name": "Ellis Tamacott",
+     "display": "E. Tamacott",
+     "role": "ST",
+     "foot": "left",
+     "age": 26,
+     "height_cm": 190
+    },
+    {
+     "player_id": "fen-11",
+     "number": 11,
+     "name": "Mees Maestra",
+     "display": "M. Maestra",
+     "role": "ST",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 181
+    },
+    {
+     "player_id": "fen-13",
+     "number": 13,
+     "name": "Tobin Tamiham",
+     "display": "T. Tamiham",
+     "role": "GK",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 185
+    },
+    {
+     "player_id": "fen-16",
+     "number": 16,
+     "name": "Jory Weximore",
+     "display": "J. Weximore",
+     "role": "GK",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 181
+    },
+    {
+     "player_id": "fen-17",
+     "number": 17,
+     "name": "Stepan Brzon",
+     "display": "S. Brzon",
+     "role": "CB",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 199
+    },
+    {
+     "player_id": "fen-18",
+     "number": 18,
+     "name": "Tobin Feniridge",
+     "display": "T. Feniridge",
+     "role": "CB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 181
+    },
+    {
+     "player_id": "fen-19",
+     "number": 19,
+     "name": "Mylo Tamimore",
+     "display": "M. Tamimore",
+     "role": "CB",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 192
+    },
+    {
+     "player_id": "fen-20",
+     "number": 20,
+     "name": "Mylo Haloby",
+     "display": "M. Haloby",
+     "role": "RWB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 175
+    },
+    {
+     "player_id": "fen-24",
+     "number": 24,
+     "name": "Amine Belourami",
+     "display": "A. Belourami",
+     "role": "DM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 180
+    },
+    {
+     "player_id": "fen-25",
+     "number": 25,
+     "name": "Tobin Marowenham",
+     "display": "T. Marowenham",
+     "role": "CM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 184
+    },
+    {
+     "player_id": "fen-26",
+     "number": 26,
+     "name": "Rowan Arkoridge",
+     "display": "R. Arkoridge",
+     "role": "CM",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 180
+    },
+    {
+     "player_id": "fen-29",
+     "number": 29,
+     "name": "Brannoc Fenan",
+     "display": "B. Fenan",
+     "role": "AM",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 178
+    },
+    {
+     "player_id": "fen-32",
+     "number": 32,
+     "name": "Corin Wexon",
+     "display": "C. Wexon",
+     "role": "RW",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 178
+    },
+    {
+     "player_id": "fen-35",
+     "number": 35,
+     "name": "Ellis Yarin",
+     "display": "E. Yarin",
+     "role": "LW",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 174
+    },
+    {
+     "player_id": "fen-37",
+     "number": 37,
+     "name": "Unai Luruda",
+     "display": "U. Luruda",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "fen-39",
+     "number": 39,
+     "name": "Mylo Feneton",
+     "display": "M. Feneton",
+     "role": "ST",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 182
+    }
+   ]
+  },
+  {
+   "club_id": "gle",
+   "name": "Glenhollow",
+   "short_name": "GLE",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#00703d",
+     "secondary": "#e3f3ea",
+     "pattern": "sash"
+    },
+    "away": {
+     "primary": "#f8bbff",
+     "secondary": "#1f1821",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "hexagon",
+    "glyph": "arch",
+    "field": "#00703d",
+    "accent": "#e3f3ea",
+    "initials": "GLE"
+   },
+   "squad": [
+    {
+     "player_id": "gle-01",
+     "number": 1,
+     "name": "Bento Garuno",
+     "display": "B. Garuno",
+     "role": "GK",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 193
+    },
+    {
+     "player_id": "gle-02",
+     "number": 2,
+     "name": "Tiago Telallente",
+     "display": "T. Telallente",
+     "role": "RB",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 165
+    },
+    {
+     "player_id": "gle-05",
+     "number": 5,
+     "name": "Nuno Garinte",
+     "display": "N. Garinte",
+     "role": "CB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 193
+    },
+    {
+     "player_id": "gle-04",
+     "number": 4,
+     "name": "Mateus Valollo",
+     "display": "M. Valollo",
+     "role": "CB",
+     "foot": "both",
+     "age": 21,
+     "height_cm": 188
+    },
+    {
+     "player_id": "gle-03",
+     "number": 3,
+     "name": "Mateus Mendemente",
+     "display": "M. Mendemente",
+     "role": "LB",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 187
+    },
+    {
+     "player_id": "gle-06",
+     "number": 6,
+     "name": "Hakim Zahami",
+     "display": "H. Zahami",
+     "role": "DM",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 181
+    },
+    {
+     "player_id": "gle-08",
+     "number": 8,
+     "name": "Nuno Orruno",
+     "display": "N. Orruno",
+     "role": "DM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 165
+    },
+    {
+     "player_id": "gle-11",
+     "number": 11,
+     "name": "Mateus Zarunte",
+     "display": "M. Zarunte",
+     "role": "RW",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 179
+    },
+    {
+     "player_id": "gle-10",
+     "number": 10,
+     "name": "Rui Garamira",
+     "display": "R. Garamira",
+     "role": "AM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 177
+    },
+    {
+     "player_id": "gle-07",
+     "number": 7,
+     "name": "Iker Davozo",
+     "display": "I. Davozo",
+     "role": "LW",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 182
+    },
+    {
+     "player_id": "gle-09",
+     "number": 9,
+     "name": "Tiago Mendozo",
+     "display": "T. Mendozo",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 182
+    },
+    {
+     "player_id": "gle-16",
+     "number": 16,
+     "name": "Bento Quda",
+     "display": "B. Quda",
+     "role": "GK",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 191
+    },
+    {
+     "player_id": "gle-18",
+     "number": 18,
+     "name": "Dusan Janok",
+     "display": "D. Janok",
+     "role": "GK",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 195
+    },
+    {
+     "player_id": "gle-19",
+     "number": 19,
+     "name": "Bento Lururado",
+     "display": "B. Lururado",
+     "role": "CB",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 187
+    },
+    {
+     "player_id": "gle-21",
+     "number": 21,
+     "name": "Nuno Esqudo",
+     "display": "N. Esqudo",
+     "role": "CB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 183
+    },
+    {
+     "player_id": "gle-22",
+     "number": 22,
+     "name": "Haruto Tata",
+     "display": "H. Tata",
+     "role": "RB",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 179
+    },
+    {
+     "player_id": "gle-25",
+     "number": 25,
+     "name": "Caio Quno",
+     "display": "C. Quno",
+     "role": "LB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 187
+    },
+    {
+     "player_id": "gle-27",
+     "number": 27,
+     "name": "Iker Valonte",
+     "display": "I. Valonte",
+     "role": "DM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 183
+    },
+    {
+     "player_id": "gle-28",
+     "number": 28,
+     "name": "Caio Aleles",
+     "display": "C. Aleles",
+     "role": "CM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 181
+    },
+    {
+     "player_id": "gle-32",
+     "number": 32,
+     "name": "Nuno Davuiro",
+     "display": "N. Davuiro",
+     "role": "CM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 174
+    },
+    {
+     "player_id": "gle-33",
+     "number": 33,
+     "name": "Bento Aladales",
+     "display": "B. Aladales",
+     "role": "AM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 188
+    },
+    {
+     "player_id": "gle-34",
+     "number": 34,
+     "name": "Joaquim Valello",
+     "display": "J. Valello",
+     "role": "RW",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 176
+    },
+    {
+     "player_id": "gle-37",
+     "number": 37,
+     "name": "Rui Garezo",
+     "display": "R. Garezo",
+     "role": "LW",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 175
+    },
+    {
+     "player_id": "gle-38",
+     "number": 38,
+     "name": "Chidi Demawa",
+     "display": "C. Demawa",
+     "role": "ST",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 176
+    },
+    {
+     "player_id": "gle-39",
+     "number": 39,
+     "name": "Tiago Lururano",
+     "display": "T. Lururano",
+     "role": "ST",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 169
+    }
+   ]
+  },
+  {
+   "club_id": "cor",
+   "name": "Corvenna",
+   "short_name": "COR",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#8252bc",
+     "secondary": "#f1ecfa",
+     "pattern": "sash"
+    },
+    "away": {
+     "primary": "#ffdb4b",
+     "secondary": "#1e1a10",
+     "pattern": "halves"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "diamond",
+    "glyph": "wing",
+    "field": "#8252bc",
+    "accent": "#f1ecfa",
+    "initials": "COR"
+   },
+   "squad": [
+    {
+     "player_id": "cor-01",
+     "number": 1,
+     "name": "Viktor Novecik",
+     "display": "V. Novecik",
+     "role": "GK",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 177
+    },
+    {
+     "player_id": "cor-02",
+     "number": 2,
+     "name": "Radim Velan",
+     "display": "R. Velan",
+     "role": "RB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 186
+    },
+    {
+     "player_id": "cor-05",
+     "number": 5,
+     "name": "Tomek Moravak",
+     "display": "T. Moravak",
+     "role": "CB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 191
+    },
+    {
+     "player_id": "cor-04",
+     "number": 4,
+     "name": "Ilyes Salari",
+     "display": "I. Salari",
+     "role": "CB",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 191
+    },
+    {
+     "player_id": "cor-03",
+     "number": 3,
+     "name": "Leif Nydal",
+     "display": "L. Nydal",
+     "role": "LB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 185
+    },
+    {
+     "player_id": "cor-06",
+     "number": 6,
+     "name": "Ondrej Dvorek",
+     "display": "O. Dvorek",
+     "role": "DM",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 176
+    },
+    {
+     "player_id": "cor-08",
+     "number": 8,
+     "name": "Yaw Akosu",
+     "display": "Y. Akosu",
+     "role": "DM",
+     "foot": "left",
+     "age": 26,
+     "height_cm": 182
+    },
+    {
+     "player_id": "cor-11",
+     "number": 11,
+     "name": "Kuba Stavik",
+     "display": "K. Stavik",
+     "role": "RW",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 181
+    },
+    {
+     "player_id": "cor-10",
+     "number": 10,
+     "name": "Tomek Holen",
+     "display": "T. Holen",
+     "role": "AM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 184
+    },
+    {
+     "player_id": "cor-07",
+     "number": 7,
+     "name": "Milos Kralok",
+     "display": "M. Kralok",
+     "role": "LW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 175
+    },
+    {
+     "player_id": "cor-09",
+     "number": 9,
+     "name": "Radim Stavoman",
+     "display": "R. Stavoman",
+     "role": "ST",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 180
+    },
+    {
+     "player_id": "cor-14",
+     "number": 14,
+     "name": "Kjell Askedal",
+     "display": "K. Askedal",
+     "role": "GK",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 185
+    },
+    {
+     "player_id": "cor-15",
+     "number": 15,
+     "name": "Matej Janir",
+     "display": "M. Janir",
+     "role": "GK",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 193
+    },
+    {
+     "player_id": "cor-16",
+     "number": 16,
+     "name": "Stepan Pavavic",
+     "display": "S. Pavavic",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 181
+    },
+    {
+     "player_id": "cor-19",
+     "number": 19,
+     "name": "Femi Yawowa",
+     "display": "F. Yawowa",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 191
+    },
+    {
+     "player_id": "cor-21",
+     "number": 21,
+     "name": "Sota Rikizaki",
+     "display": "S. Rikizaki",
+     "role": "RB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 174
+    },
+    {
+     "player_id": "cor-23",
+     "number": 23,
+     "name": "Samir Saloumi",
+     "display": "S. Saloumi",
+     "role": "LB",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 185
+    },
+    {
+     "player_id": "cor-24",
+     "number": 24,
+     "name": "Viktor Kralevisz",
+     "display": "V. Kralevisz",
+     "role": "DM",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 179
+    },
+    {
+     "player_id": "cor-26",
+     "number": 26,
+     "name": "Ruben Groord",
+     "display": "R. Groord",
+     "role": "CM",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 184
+    },
+    {
+     "player_id": "cor-27",
+     "number": 27,
+     "name": "Ruben Maekamp",
+     "display": "R. Maekamp",
+     "role": "CM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 169
+    },
+    {
+     "player_id": "cor-29",
+     "number": 29,
+     "name": "Vemund Lundeheim",
+     "display": "V. Lundeheim",
+     "role": "AM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 174
+    },
+    {
+     "player_id": "cor-30",
+     "number": 30,
+     "name": "Piet Wexoridge",
+     "display": "P. Wexoridge",
+     "role": "RW",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 184
+    },
+    {
+     "player_id": "cor-34",
+     "number": 34,
+     "name": "Kuba Janer",
+     "display": "K. Janer",
+     "role": "LW",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 172
+    },
+    {
+     "player_id": "cor-37",
+     "number": 37,
+     "name": "Ondrej Radir",
+     "display": "O. Radir",
+     "role": "ST",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 175
+    },
+    {
+     "player_id": "cor-39",
+     "number": 39,
+     "name": "Viktor Pavivic",
+     "display": "V. Pavivic",
+     "role": "ST",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 187
+    }
+   ]
+  },
+  {
+   "club_id": "wre",
+   "name": "Wrenhallow",
+   "short_name": "WRE",
+   "formation": "3-4-3",
+   "kits": {
+    "home": {
+     "primary": "#ba8739",
+     "secondary": "#201910",
+     "pattern": "stripes"
+    },
+    "away": {
+     "primary": "#72e0ff",
+     "secondary": "#101d22",
+     "pattern": "hoops"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "diamond",
+    "glyph": "wave",
+    "field": "#ba8739",
+    "accent": "#201910",
+    "initials": "WRE"
+   },
+   "squad": [
+    {
+     "player_id": "wre-01",
+     "number": 1,
+     "name": "Vemund Torirud",
+     "display": "V. Torirud",
+     "role": "GK",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 181
+    },
+    {
+     "player_id": "wre-04",
+     "number": 4,
+     "name": "Sem Beroema",
+     "display": "S. Beroema",
+     "role": "CB",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 191
+    },
+    {
+     "player_id": "wre-05",
+     "number": 5,
+     "name": "Karim Djiri",
+     "display": "K. Djiri",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 188
+    },
+    {
+     "player_id": "wre-06",
+     "number": 6,
+     "name": "Joost Wilehuis",
+     "display": "J. Wilehuis",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 194
+    },
+    {
+     "player_id": "wre-02",
+     "number": 2,
+     "name": "Chidi Demonke",
+     "display": "C. Demonke",
+     "role": "RWB",
+     "foot": "both",
+     "age": 23,
+     "height_cm": 175
+    },
+    {
+     "player_id": "wre-08",
+     "number": 8,
+     "name": "Joost Vosons",
+     "display": "J. Vosons",
+     "role": "CM",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 176
+    },
+    {
+     "player_id": "wre-10",
+     "number": 10,
+     "name": "Ruben Smiricoord",
+     "display": "R. Smiricoord",
+     "role": "CM",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 180
+    },
+    {
+     "player_id": "wre-03",
+     "number": 3,
+     "name": "Sem Beriord",
+     "display": "S. Beriord",
+     "role": "LWB",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 181
+    },
+    {
+     "player_id": "wre-07",
+     "number": 7,
+     "name": "Daan Dekoricijk",
+     "display": "D. Dekoricijk",
+     "role": "RW",
+     "foot": "left",
+     "age": 29,
+     "height_cm": 177
+    },
+    {
+     "player_id": "wre-09",
+     "number": 9,
+     "name": "Ruben Jansolema",
+     "display": "R. Jansolema",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 165
+    },
+    {
+     "player_id": "wre-11",
+     "number": 11,
+     "name": "Rowan Yariford",
+     "display": "R. Yariford",
+     "role": "LW",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 180
+    },
+    {
+     "player_id": "wre-13",
+     "number": 13,
+     "name": "Wout Smarhuis",
+     "display": "W. Smarhuis",
+     "role": "GK",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 200
+    },
+    {
+     "player_id": "wre-15",
+     "number": 15,
+     "name": "Mees Vosema",
+     "display": "M. Vosema",
+     "role": "GK",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 176
+    },
+    {
+     "player_id": "wre-16",
+     "number": 16,
+     "name": "Daan Dekiord",
+     "display": "D. Dekiord",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 187
+    },
+    {
+     "player_id": "wre-17",
+     "number": 17,
+     "name": "Wout Mastra",
+     "display": "W. Mastra",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 182
+    },
+    {
+     "player_id": "wre-21",
+     "number": 21,
+     "name": "Ruben Groema",
+     "display": "R. Groema",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 188
+    },
+    {
+     "player_id": "wre-22",
+     "number": 22,
+     "name": "Sem Smoelens",
+     "display": "S. Smoelens",
+     "role": "RWB",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 177
+    },
+    {
+     "player_id": "wre-25",
+     "number": 25,
+     "name": "Kwame Temokaba",
+     "display": "K. Temokaba",
+     "role": "DM",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 188
+    },
+    {
+     "player_id": "wre-30",
+     "number": 30,
+     "name": "Matej Stavonko",
+     "display": "M. Stavonko",
+     "role": "CM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 173
+    },
+    {
+     "player_id": "wre-31",
+     "number": 31,
+     "name": "Ruben Klestra",
+     "display": "R. Klestra",
+     "role": "CM",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 190
+    },
+    {
+     "player_id": "wre-33",
+     "number": 33,
+     "name": "Ruben Klans",
+     "display": "R. Klans",
+     "role": "AM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 186
+    },
+    {
+     "player_id": "wre-36",
+     "number": 36,
+     "name": "Femi Bami",
+     "display": "F. Bami",
+     "role": "RW",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 178
+    },
+    {
+     "player_id": "wre-37",
+     "number": 37,
+     "name": "Joaquim Garamano",
+     "display": "J. Garamano",
+     "role": "LW",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 188
+    },
+    {
+     "player_id": "wre-38",
+     "number": 38,
+     "name": "Emeka Demimi",
+     "display": "E. Demimi",
+     "role": "ST",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 179
+    },
+    {
+     "player_id": "wre-39",
+     "number": 39,
+     "name": "Taiga Rita",
+     "display": "T. Rita",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 179
+    }
+   ]
+  },
+  {
+   "club_id": "dun",
+   "name": "Duncliffe",
+   "short_name": "DUN",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#00708d",
+     "secondary": "#e0f3f6",
+     "pattern": "halves"
+    },
+    "away": {
+     "primary": "#ffa9cb",
+     "secondary": "#22171b",
+     "pattern": "halves"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "oak",
+    "field": "#00708d",
+    "accent": "#e0f3f6",
+    "initials": "DUN"
+   },
+   "squad": [
+    {
+     "player_id": "dun-01",
+     "number": 1,
+     "name": "Sota Yomoto",
+     "display": "S. Yomoto",
+     "role": "GK",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 184
+    },
+    {
+     "player_id": "dun-02",
+     "number": 2,
+     "name": "Kofi Demade",
+     "display": "K. Demade",
+     "role": "RB",
+     "foot": "left",
+     "age": 20,
+     "height_cm": 179
+    },
+    {
+     "player_id": "dun-05",
+     "number": 5,
+     "name": "Emeka Adodele",
+     "display": "E. Adodele",
+     "role": "CB",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 191
+    },
+    {
+     "player_id": "dun-04",
+     "number": 4,
+     "name": "Mateus Zareiro",
+     "display": "M. Zareiro",
+     "role": "CB",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 185
+    },
+    {
+     "player_id": "dun-03",
+     "number": 3,
+     "name": "Tunde Adode",
+     "display": "T. Adode",
+     "role": "LB",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 176
+    },
+    {
+     "player_id": "dun-06",
+     "number": 6,
+     "name": "Emeka Adaba",
+     "display": "E. Adaba",
+     "role": "DM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 179
+    },
+    {
+     "player_id": "dun-08",
+     "number": 8,
+     "name": "Kofi Temuko",
+     "display": "K. Temuko",
+     "role": "DM",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 183
+    },
+    {
+     "player_id": "dun-11",
+     "number": 11,
+     "name": "Eskil Lundastrom",
+     "display": "E. Lundastrom",
+     "role": "RW",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 181
+    },
+    {
+     "player_id": "dun-10",
+     "number": 10,
+     "name": "Odd Lundyberg",
+     "display": "O. Lundyberg",
+     "role": "AM",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 175
+    },
+    {
+     "player_id": "dun-07",
+     "number": 7,
+     "name": "Chidi Ibiwa",
+     "display": "C. Ibiwa",
+     "role": "LW",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 174
+    },
+    {
+     "player_id": "dun-09",
+     "number": 9,
+     "name": "Yaw Baba",
+     "display": "Y. Baba",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 186
+    },
+    {
+     "player_id": "dun-12",
+     "number": 12,
+     "name": "Yaw Oleko",
+     "display": "Y. Oleko",
+     "role": "GK",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 186
+    },
+    {
+     "player_id": "dun-18",
+     "number": 18,
+     "name": "Kofi Yawenuwa",
+     "display": "K. Yawenuwa",
+     "role": "GK",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 177
+    },
+    {
+     "player_id": "dun-19",
+     "number": 19,
+     "name": "Lukas Rader",
+     "display": "L. Rader",
+     "role": "CB",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 195
+    },
+    {
+     "player_id": "dun-21",
+     "number": 21,
+     "name": "Kwame Bala",
+     "display": "K. Bala",
+     "role": "CB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 182
+    },
+    {
+     "player_id": "dun-22",
+     "number": 22,
+     "name": "Kobina Olale",
+     "display": "K. Olale",
+     "role": "RB",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 174
+    },
+    {
+     "player_id": "dun-23",
+     "number": 23,
+     "name": "Tunde Osowa",
+     "display": "T. Osowa",
+     "role": "LB",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 179
+    },
+    {
+     "player_id": "dun-24",
+     "number": 24,
+     "name": "Kofi Osala",
+     "display": "K. Osala",
+     "role": "DM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 175
+    },
+    {
+     "player_id": "dun-26",
+     "number": 26,
+     "name": "Nuno Orrules",
+     "display": "N. Orrules",
+     "role": "CM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 177
+    },
+    {
+     "player_id": "dun-29",
+     "number": 29,
+     "name": "Emeka Obowa",
+     "display": "E. Obowa",
+     "role": "CM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 189
+    },
+    {
+     "player_id": "dun-30",
+     "number": 30,
+     "name": "Kobina Osewele",
+     "display": "K. Osewele",
+     "role": "AM",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 192
+    },
+    {
+     "player_id": "dun-32",
+     "number": 32,
+     "name": "Emeka Obola",
+     "display": "E. Obola",
+     "role": "RW",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 177
+    },
+    {
+     "player_id": "dun-36",
+     "number": 36,
+     "name": "Tunde Demuwa",
+     "display": "T. Demuwa",
+     "role": "LW",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 189
+    },
+    {
+     "player_id": "dun-37",
+     "number": 37,
+     "name": "Yaw Bawa",
+     "display": "Y. Bawa",
+     "role": "ST",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 189
+    },
+    {
+     "player_id": "dun-39",
+     "number": 39,
+     "name": "Yaw Adala",
+     "display": "Y. Adala",
+     "role": "ST",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 182
+    }
+   ]
+  },
+  {
+   "club_id": "lar",
+   "name": "Larkhaven",
+   "short_name": "LAR",
+   "formation": "4-4-2",
+   "kits": {
+    "home": {
+     "primary": "#892b53",
+     "secondary": "#fbe9ee",
+     "pattern": "hoops"
+    },
+    "away": {
+     "primary": "#afdf92",
+     "secondary": "#171d13",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "pennant",
+    "glyph": "wave",
+    "field": "#892b53",
+    "accent": "#fbe9ee",
+    "initials": "LAR"
+   },
+   "squad": [
+    {
+     "player_id": "lar-01",
+     "number": 1,
+     "name": "Sigurd Toradal",
+     "display": "S. Toradal",
+     "role": "GK",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 192
+    },
+    {
+     "player_id": "lar-02",
+     "number": 2,
+     "name": "Odd Nystrom",
+     "display": "O. Nystrom",
+     "role": "RB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 178
+    },
+    {
+     "player_id": "lar-05",
+     "number": 5,
+     "name": "Brede Bjastrom",
+     "display": "B. Bjastrom",
+     "role": "CB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 194
+    },
+    {
+     "player_id": "lar-06",
+     "number": 6,
+     "name": "Sigurd Bjavik",
+     "display": "S. Bjavik",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 195
+    },
+    {
+     "player_id": "lar-03",
+     "number": 3,
+     "name": "Arne Vikenes",
+     "display": "A. Vikenes",
+     "role": "LB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 193
+    },
+    {
+     "player_id": "lar-07",
+     "number": 7,
+     "name": "Arne Vikarud",
+     "display": "A. Vikarud",
+     "role": "RM",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 181
+    },
+    {
+     "player_id": "lar-04",
+     "number": 4,
+     "name": "Odd Eldivik",
+     "display": "O. Eldivik",
+     "role": "CM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 178
+    },
+    {
+     "player_id": "lar-08",
+     "number": 8,
+     "name": "Eloy Valuz",
+     "display": "E. Valuz",
+     "role": "CM",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 183
+    },
+    {
+     "player_id": "lar-11",
+     "number": 11,
+     "name": "Bento Menduno",
+     "display": "B. Menduno",
+     "role": "LM",
+     "foot": "left",
+     "age": 32,
+     "height_cm": 184
+    },
+    {
+     "player_id": "lar-09",
+     "number": 9,
+     "name": "Karim Zahadi",
+     "display": "K. Zahadi",
+     "role": "ST",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 178
+    },
+    {
+     "player_id": "lar-10",
+     "number": 10,
+     "name": "Halvar Askostrom",
+     "display": "H. Askostrom",
+     "role": "ST",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 182
+    },
+    {
+     "player_id": "lar-12",
+     "number": 12,
+     "name": "Vemund Askyvik",
+     "display": "V. Askyvik",
+     "role": "GK",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 185
+    },
+    {
+     "player_id": "lar-13",
+     "number": 13,
+     "name": "Leif Askysen",
+     "display": "L. Askysen",
+     "role": "GK",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 189
+    },
+    {
+     "player_id": "lar-15",
+     "number": 15,
+     "name": "Radim Pavec",
+     "display": "R. Pavec",
+     "role": "CB",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 192
+    },
+    {
+     "player_id": "lar-16",
+     "number": 16,
+     "name": "Leif Storoheim",
+     "display": "L. Storoheim",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 183
+    },
+    {
+     "player_id": "lar-17",
+     "number": 17,
+     "name": "Torvald Bjalund",
+     "display": "T. Bjalund",
+     "role": "RB",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 179
+    },
+    {
+     "player_id": "lar-20",
+     "number": 20,
+     "name": "Sigurd Skyllund",
+     "display": "S. Skyllund",
+     "role": "LB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 186
+    },
+    {
+     "player_id": "lar-23",
+     "number": 23,
+     "name": "Leif Vikylstrom",
+     "display": "L. Vikylstrom",
+     "role": "DM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 178
+    },
+    {
+     "player_id": "lar-24",
+     "number": 24,
+     "name": "Daan Rijkolx",
+     "display": "D. Rijkolx",
+     "role": "CM",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 189
+    },
+    {
+     "player_id": "lar-28",
+     "number": 28,
+     "name": "Arne Eldoheim",
+     "display": "A. Eldoheim",
+     "role": "CM",
+     "foot": "both",
+     "age": 34,
+     "height_cm": 175
+    },
+    {
+     "player_id": "lar-32",
+     "number": 32,
+     "name": "Odd Hagines",
+     "display": "O. Hagines",
+     "role": "AM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 179
+    },
+    {
+     "player_id": "lar-33",
+     "number": 33,
+     "name": "Odd Daladal",
+     "display": "O. Daladal",
+     "role": "RW",
+     "foot": "both",
+     "age": 21,
+     "height_cm": 178
+    },
+    {
+     "player_id": "lar-34",
+     "number": 34,
+     "name": "Torvald Lundelund",
+     "display": "T. Lundelund",
+     "role": "LW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 182
+    },
+    {
+     "player_id": "lar-35",
+     "number": 35,
+     "name": "Halvar Torillund",
+     "display": "H. Torillund",
+     "role": "ST",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 177
+    },
+    {
+     "player_id": "lar-39",
+     "number": 39,
+     "name": "Odd Askevik",
+     "display": "O. Askevik",
+     "role": "ST",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 178
+    }
+   ]
+  },
+  {
+   "club_id": "har",
+   "name": "Harbourne",
+   "short_name": "HAR",
+   "formation": "4-3-3",
+   "kits": {
+    "home": {
+     "primary": "#445c00",
+     "secondary": "#ebf1e3",
+     "pattern": "halves"
+    },
+    "away": {
+     "primary": "#8dcbff",
+     "secondary": "#141b24",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "diamond",
+    "glyph": "chevron",
+    "field": "#445c00",
+    "accent": "#ebf1e3",
+    "initials": "HAR"
+   },
+   "squad": [
+    {
+     "player_id": "har-01",
+     "number": 1,
+     "name": "Amine Djoudi",
+     "display": "A. Djoudi",
+     "role": "GK",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 192
+    },
+    {
+     "player_id": "har-02",
+     "number": 2,
+     "name": "Eskil Vikovik",
+     "display": "E. Vikovik",
+     "role": "RB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 171
+    },
+    {
+     "player_id": "har-04",
+     "number": 4,
+     "name": "Riyad Hamich",
+     "display": "R. Hamich",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 188
+    },
+    {
+     "player_id": "har-05",
+     "number": 5,
+     "name": "Adel Abara",
+     "display": "A. Abara",
+     "role": "CB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 183
+    },
+    {
+     "player_id": "har-03",
+     "number": 3,
+     "name": "Femi Adewa",
+     "display": "F. Adewa",
+     "role": "LB",
+     "foot": "left",
+     "age": 32,
+     "height_cm": 188
+    },
+    {
+     "player_id": "har-06",
+     "number": 6,
+     "name": "Daichi Mamura",
+     "display": "D. Mamura",
+     "role": "DM",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 172
+    },
+    {
+     "player_id": "har-08",
+     "number": 8,
+     "name": "Karim Abourari",
+     "display": "K. Abourari",
+     "role": "CM",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 178
+    },
+    {
+     "player_id": "har-10",
+     "number": 10,
+     "name": "Tomek Moravenko",
+     "display": "T. Moravenko",
+     "role": "CM",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 174
+    },
+    {
+     "player_id": "har-07",
+     "number": 7,
+     "name": "Karim Kadimami",
+     "display": "K. Kadimami",
+     "role": "RW",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 168
+    },
+    {
+     "player_id": "har-09",
+     "number": 9,
+     "name": "Amine Djounari",
+     "display": "A. Djounari",
+     "role": "ST",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 186
+    },
+    {
+     "player_id": "har-11",
+     "number": 11,
+     "name": "Karim Nasami",
+     "display": "K. Nasami",
+     "role": "LW",
+     "foot": "left",
+     "age": 24,
+     "height_cm": 180
+    },
+    {
+     "player_id": "har-13",
+     "number": 13,
+     "name": "Karim Salourari",
+     "display": "K. Salourari",
+     "role": "GK",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 186
+    },
+    {
+     "player_id": "har-14",
+     "number": 14,
+     "name": "Karim Mahami",
+     "display": "K. Mahami",
+     "role": "GK",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 195
+    },
+    {
+     "player_id": "har-15",
+     "number": 15,
+     "name": "Hakim Rahinoun",
+     "display": "H. Rahinoun",
+     "role": "CB",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 185
+    },
+    {
+     "player_id": "har-17",
+     "number": 17,
+     "name": "Walid Nasach",
+     "display": "W. Nasach",
+     "role": "CB",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 185
+    },
+    {
+     "player_id": "har-19",
+     "number": 19,
+     "name": "Walid Fadari",
+     "display": "W. Fadari",
+     "role": "RB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 183
+    },
+    {
+     "player_id": "har-23",
+     "number": 23,
+     "name": "Karim Nasanira",
+     "display": "K. Nasanira",
+     "role": "LB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 169
+    },
+    {
+     "player_id": "har-24",
+     "number": 24,
+     "name": "Adel Rahoumi",
+     "display": "A. Rahoumi",
+     "role": "DM",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 177
+    },
+    {
+     "player_id": "har-26",
+     "number": 26,
+     "name": "Halvar Bjyheim",
+     "display": "H. Bjyheim",
+     "role": "CM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 173
+    },
+    {
+     "player_id": "har-28",
+     "number": 28,
+     "name": "Chidi Kwako",
+     "display": "C. Kwako",
+     "role": "CM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 174
+    },
+    {
+     "player_id": "har-30",
+     "number": 30,
+     "name": "Adel Fadouri",
+     "display": "A. Fadouri",
+     "role": "AM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 179
+    },
+    {
+     "player_id": "har-33",
+     "number": 33,
+     "name": "Ilyes Mahioui",
+     "display": "I. Mahioui",
+     "role": "RW",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 176
+    },
+    {
+     "player_id": "har-34",
+     "number": 34,
+     "name": "Yanis Djara",
+     "display": "Y. Djara",
+     "role": "LW",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 174
+    },
+    {
+     "player_id": "har-36",
+     "number": 36,
+     "name": "Ilyes Zahimari",
+     "display": "I. Zahimari",
+     "role": "ST",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 180
+    },
+    {
+     "player_id": "har-39",
+     "number": 39,
+     "name": "Ilyes Saloura",
+     "display": "I. Saloura",
+     "role": "ST",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 179
+    }
+   ]
+  },
+  {
+   "club_id": "ive",
+   "name": "Ivelmouth",
+   "short_name": "IVE",
+   "formation": "3-4-3",
+   "kits": {
+    "home": {
+     "primary": "#5168b4",
+     "secondary": "#e9eefc",
+     "pattern": "stripes"
+    },
+    "away": {
+     "primary": "#fbb34c",
+     "secondary": "#201910",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "shield",
+    "glyph": "key",
+    "field": "#5168b4",
+    "accent": "#e9eefc",
+    "initials": "IVE"
+   },
+   "squad": [
+    {
+     "player_id": "ive-01",
+     "number": 1,
+     "name": "Teun Smahuis",
+     "display": "T. Smahuis",
+     "role": "GK",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 186
+    },
+    {
+     "player_id": "ive-04",
+     "number": 4,
+     "name": "Ren Tomura",
+     "display": "R. Tomura",
+     "role": "CB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 186
+    },
+    {
+     "player_id": "ive-05",
+     "number": 5,
+     "name": "Riku Tozaki",
+     "display": "R. Tozaki",
+     "role": "CB",
+     "foot": "left",
+     "age": 26,
+     "height_cm": 192
+    },
+    {
+     "player_id": "ive-06",
+     "number": 6,
+     "name": "Taiga Nazaki",
+     "display": "T. Nazaki",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 184
+    },
+    {
+     "player_id": "ive-02",
+     "number": 2,
+     "name": "Daichi Tonaga",
+     "display": "D. Tonaga",
+     "role": "RWB",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ive-08",
+     "number": 8,
+     "name": "Eskil Hageheim",
+     "display": "E. Hageheim",
+     "role": "CM",
+     "foot": "left",
+     "age": 28,
+     "height_cm": 179
+    },
+    {
+     "player_id": "ive-10",
+     "number": 10,
+     "name": "Haruto Kata",
+     "display": "H. Kata",
+     "role": "CM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 165
+    },
+    {
+     "player_id": "ive-03",
+     "number": 3,
+     "name": "Yuto Yonaga",
+     "display": "Y. Yonaga",
+     "role": "LWB",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 175
+    },
+    {
+     "player_id": "ive-07",
+     "number": 7,
+     "name": "Kaito Kizaki",
+     "display": "K. Kizaki",
+     "role": "RW",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 182
+    },
+    {
+     "player_id": "ive-09",
+     "number": 9,
+     "name": "Ren Hata",
+     "display": "R. Hata",
+     "role": "ST",
+     "foot": "both",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "ive-11",
+     "number": 11,
+     "name": "Haruto Tamoto",
+     "display": "H. Tamoto",
+     "role": "LW",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 184
+    },
+    {
+     "player_id": "ive-12",
+     "number": 12,
+     "name": "Haruto Nakawa",
+     "display": "H. Nakawa",
+     "role": "GK",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 183
+    },
+    {
+     "player_id": "ive-14",
+     "number": 14,
+     "name": "Ren Mamoto",
+     "display": "R. Mamoto",
+     "role": "GK",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 187
+    },
+    {
+     "player_id": "ive-15",
+     "number": 15,
+     "name": "Yuto Rihara",
+     "display": "Y. Rihara",
+     "role": "CB",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 185
+    },
+    {
+     "player_id": "ive-16",
+     "number": 16,
+     "name": "Dusan Janacan",
+     "display": "D. Janacan",
+     "role": "CB",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 187
+    },
+    {
+     "player_id": "ive-21",
+     "number": 21,
+     "name": "Walid Rahoudi",
+     "display": "W. Rahoudi",
+     "role": "CB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 185
+    },
+    {
+     "player_id": "ive-23",
+     "number": 23,
+     "name": "Taiga Kita",
+     "display": "T. Kita",
+     "role": "RWB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 180
+    },
+    {
+     "player_id": "ive-25",
+     "number": 25,
+     "name": "Jens Dekohuis",
+     "display": "J. Dekohuis",
+     "role": "DM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 181
+    },
+    {
+     "player_id": "ive-28",
+     "number": 28,
+     "name": "Kaito Yorazaki",
+     "display": "K. Yorazaki",
+     "role": "CM",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 172
+    },
+    {
+     "player_id": "ive-31",
+     "number": 31,
+     "name": "Yuto Rimura",
+     "display": "Y. Rimura",
+     "role": "CM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 169
+    },
+    {
+     "player_id": "ive-35",
+     "number": 35,
+     "name": "Sota Managa",
+     "display": "S. Managa",
+     "role": "AM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 168
+    },
+    {
+     "player_id": "ive-36",
+     "number": 36,
+     "name": "Ren Yorakawa",
+     "display": "R. Yorakawa",
+     "role": "RW",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 179
+    },
+    {
+     "player_id": "ive-37",
+     "number": 37,
+     "name": "Sigurd Lundevik",
+     "display": "S. Lundevik",
+     "role": "LW",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 184
+    },
+    {
+     "player_id": "ive-38",
+     "number": 38,
+     "name": "Shun Tatota",
+     "display": "S. Tatota",
+     "role": "ST",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 167
+    },
+    {
+     "player_id": "ive-39",
+     "number": 39,
+     "name": "Daichi Mihara",
+     "display": "D. Mihara",
+     "role": "ST",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 181
+    }
+   ]
+  },
+  {
+   "club_id": "jun",
+   "name": "Juniper Vale",
+   "short_name": "JUN",
+   "formation": "4-4-2",
+   "kits": {
+    "home": {
+     "primary": "#9f4c2e",
+     "secondary": "#fbeae5",
+     "pattern": "halves"
+    },
+    "away": {
+     "primary": "#8cfdd7",
+     "secondary": "#111e19",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "diamond",
+    "glyph": "ring",
+    "field": "#9f4c2e",
+    "accent": "#fbeae5",
+    "initials": "JUN"
+   },
+   "squad": [
+    {
+     "player_id": "jun-01",
+     "number": 1,
+     "name": "Alder Loron",
+     "display": "A. Loron",
+     "role": "GK",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 183
+    },
+    {
+     "player_id": "jun-02",
+     "number": 2,
+     "name": "Ewan Loriberby",
+     "display": "E. Loriberby",
+     "role": "RB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 180
+    },
+    {
+     "player_id": "jun-05",
+     "number": 5,
+     "name": "Alder Kestemore",
+     "display": "A. Kestemore",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 198
+    },
+    {
+     "player_id": "jun-06",
+     "number": 6,
+     "name": "Alder Wexoby",
+     "display": "A. Wexoby",
+     "role": "CB",
+     "foot": "left",
+     "age": 26,
+     "height_cm": 196
+    },
+    {
+     "player_id": "jun-03",
+     "number": 3,
+     "name": "Ilyes Mahouroun",
+     "display": "I. Mahouroun",
+     "role": "LB",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 178
+    },
+    {
+     "player_id": "jun-07",
+     "number": 7,
+     "name": "Piet Maracott",
+     "display": "P. Maracott",
+     "role": "RM",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 172
+    },
+    {
+     "player_id": "jun-04",
+     "number": 4,
+     "name": "Rowan Quillon",
+     "display": "R. Quillon",
+     "role": "CM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 181
+    },
+    {
+     "player_id": "jun-08",
+     "number": 8,
+     "name": "Mylo Brackon",
+     "display": "M. Brackon",
+     "role": "CM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 165
+    },
+    {
+     "player_id": "jun-11",
+     "number": 11,
+     "name": "Jory Kestomore",
+     "display": "J. Kestomore",
+     "role": "LM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 178
+    },
+    {
+     "player_id": "jun-09",
+     "number": 9,
+     "name": "Piet Marecott",
+     "display": "P. Marecott",
+     "role": "ST",
+     "foot": "left",
+     "age": 22,
+     "height_cm": 174
+    },
+    {
+     "player_id": "jun-10",
+     "number": 10,
+     "name": "Mylo Quillowick",
+     "display": "M. Quillowick",
+     "role": "ST",
+     "foot": "left",
+     "age": 32,
+     "height_cm": 183
+    },
+    {
+     "player_id": "jun-12",
+     "number": 12,
+     "name": "Ewan Dunoton",
+     "display": "E. Dunoton",
+     "role": "GK",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 188
+    },
+    {
+     "player_id": "jun-14",
+     "number": 14,
+     "name": "Dusan Pavok",
+     "display": "D. Pavok",
+     "role": "GK",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 185
+    },
+    {
+     "player_id": "jun-17",
+     "number": 17,
+     "name": "Riku Kishiro",
+     "display": "R. Kishiro",
+     "role": "CB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 188
+    },
+    {
+     "player_id": "jun-19",
+     "number": 19,
+     "name": "Ellis Loraby",
+     "display": "E. Loraby",
+     "role": "CB",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 192
+    },
+    {
+     "player_id": "jun-20",
+     "number": 20,
+     "name": "Corin Radaridge",
+     "display": "C. Radaridge",
+     "role": "RB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 175
+    },
+    {
+     "player_id": "jun-21",
+     "number": 21,
+     "name": "Mees Klenkamp",
+     "display": "M. Klenkamp",
+     "role": "LB",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 169
+    },
+    {
+     "player_id": "jun-22",
+     "number": 22,
+     "name": "Rowan Marileyby",
+     "display": "R. Marileyby",
+     "role": "DM",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 174
+    },
+    {
+     "player_id": "jun-24",
+     "number": 24,
+     "name": "Unai Esquda",
+     "display": "U. Esquda",
+     "role": "CM",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 176
+    },
+    {
+     "player_id": "jun-27",
+     "number": 27,
+     "name": "Mylo Quillaford",
+     "display": "M. Quillaford",
+     "role": "CM",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 180
+    },
+    {
+     "player_id": "jun-28",
+     "number": 28,
+     "name": "Brannoc Fenen",
+     "display": "B. Fenen",
+     "role": "AM",
+     "foot": "left",
+     "age": 21,
+     "height_cm": 182
+    },
+    {
+     "player_id": "jun-33",
+     "number": 33,
+     "name": "Alder Brackeby",
+     "display": "A. Brackeby",
+     "role": "RW",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 176
+    },
+    {
+     "player_id": "jun-35",
+     "number": 35,
+     "name": "Piet Tamowick",
+     "display": "P. Tamowick",
+     "role": "LW",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 195
+    },
+    {
+     "player_id": "jun-37",
+     "number": 37,
+     "name": "Kuba Stavan",
+     "display": "K. Stavan",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 176
+    },
+    {
+     "player_id": "jun-39",
+     "number": 39,
+     "name": "Kobina Ekinuwa",
+     "display": "K. Ekinuwa",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 183
+    }
+   ]
+  },
+  {
+   "club_id": "low",
+   "name": "Lowmarsh",
+   "short_name": "LOW",
+   "formation": "4-2-3-1",
+   "kits": {
+    "home": {
+     "primary": "#00b780",
+     "secondary": "#121e18",
+     "pattern": "stripes"
+    },
+    "away": {
+     "primary": "#ffc0ff",
+     "secondary": "#21171e",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "hexagon",
+    "glyph": "chevron",
+    "field": "#00b780",
+    "accent": "#121e18",
+    "initials": "LOW"
+   },
+   "squad": [
+    {
+     "player_id": "low-01",
+     "number": 1,
+     "name": "Eloy Garante",
+     "display": "E. Garante",
+     "role": "GK",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 187
+    },
+    {
+     "player_id": "low-02",
+     "number": 2,
+     "name": "Adel Djouun",
+     "display": "A. Djouun",
+     "role": "RB",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 174
+    },
+    {
+     "player_id": "low-05",
+     "number": 5,
+     "name": "Nuno Belodales",
+     "display": "N. Belodales",
+     "role": "CB",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 193
+    },
+    {
+     "player_id": "low-04",
+     "number": 4,
+     "name": "Rui Alozo",
+     "display": "R. Alozo",
+     "role": "CB",
+     "foot": "both",
+     "age": 21,
+     "height_cm": 194
+    },
+    {
+     "player_id": "low-03",
+     "number": 3,
+     "name": "Ondrej Janinko",
+     "display": "O. Janinko",
+     "role": "LB",
+     "foot": "left",
+     "age": 19,
+     "height_cm": 182
+    },
+    {
+     "player_id": "low-06",
+     "number": 6,
+     "name": "Tobin Radan",
+     "display": "T. Radan",
+     "role": "DM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 177
+    },
+    {
+     "player_id": "low-08",
+     "number": 8,
+     "name": "Ellis Quillewell",
+     "display": "E. Quillewell",
+     "role": "DM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 172
+    },
+    {
+     "player_id": "low-11",
+     "number": 11,
+     "name": "Unai Esqules",
+     "display": "U. Esqules",
+     "role": "RW",
+     "foot": "left",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "low-10",
+     "number": 10,
+     "name": "Mylo Radon",
+     "display": "M. Radon",
+     "role": "AM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 180
+    },
+    {
+     "player_id": "low-07",
+     "number": 7,
+     "name": "Nuno Lurino",
+     "display": "N. Lurino",
+     "role": "LW",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 186
+    },
+    {
+     "player_id": "low-09",
+     "number": 9,
+     "name": "Caio Zaririllo",
+     "display": "C. Zaririllo",
+     "role": "ST",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 176
+    },
+    {
+     "player_id": "low-13",
+     "number": 13,
+     "name": "Matej Holac",
+     "display": "M. Holac",
+     "role": "GK",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 185
+    },
+    {
+     "player_id": "low-14",
+     "number": 14,
+     "name": "Shun Tota",
+     "display": "S. Tota",
+     "role": "GK",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 178
+    },
+    {
+     "player_id": "low-17",
+     "number": 17,
+     "name": "Rui Telado",
+     "display": "R. Telado",
+     "role": "CB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 188
+    },
+    {
+     "player_id": "low-18",
+     "number": 18,
+     "name": "Kjell Lundines",
+     "display": "K. Lundines",
+     "role": "CB",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 196
+    },
+    {
+     "player_id": "low-19",
+     "number": 19,
+     "name": "Bento Menduiro",
+     "display": "B. Menduiro",
+     "role": "RB",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 168
+    },
+    {
+     "player_id": "low-21",
+     "number": 21,
+     "name": "Rowan Arkiranton",
+     "display": "R. Arkiranton",
+     "role": "LB",
+     "foot": "left",
+     "age": 20,
+     "height_cm": 188
+    },
+    {
+     "player_id": "low-26",
+     "number": 26,
+     "name": "Joaquim Mendinte",
+     "display": "J. Mendinte",
+     "role": "DM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 176
+    },
+    {
+     "player_id": "low-28",
+     "number": 28,
+     "name": "Bento Daveiro",
+     "display": "B. Daveiro",
+     "role": "CM",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 176
+    },
+    {
+     "player_id": "low-31",
+     "number": 31,
+     "name": "Femi Akile",
+     "display": "F. Akile",
+     "role": "CM",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 185
+    },
+    {
+     "player_id": "low-32",
+     "number": 32,
+     "name": "Bento Teladeda",
+     "display": "B. Teladeda",
+     "role": "AM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 174
+    },
+    {
+     "player_id": "low-33",
+     "number": 33,
+     "name": "Unai Davida",
+     "display": "U. Davida",
+     "role": "RW",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 176
+    },
+    {
+     "player_id": "low-34",
+     "number": 34,
+     "name": "Unai Ceraz",
+     "display": "U. Ceraz",
+     "role": "LW",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 174
+    },
+    {
+     "player_id": "low-35",
+     "number": 35,
+     "name": "Unai Orruzo",
+     "display": "U. Orruzo",
+     "role": "ST",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 171
+    },
+    {
+     "player_id": "low-38",
+     "number": 38,
+     "name": "Iker Quiro",
+     "display": "I. Quiro",
+     "role": "ST",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 181
+    }
+   ]
+  },
+  {
+   "club_id": "pel",
+   "name": "Pellston",
+   "short_name": "PEL",
+   "formation": "4-3-3",
+   "kits": {
+    "home": {
+     "primary": "#9766ab",
+     "secondary": "#f4ebf8",
+     "pattern": "sash"
+    },
+    "away": {
+     "primary": "#c9dc84",
+     "secondary": "#191c11",
+     "pattern": "halves"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "pennant",
+    "glyph": "bars",
+    "field": "#9766ab",
+    "accent": "#f4ebf8",
+    "initials": "PEL"
+   },
+   "squad": [
+    {
+     "player_id": "pel-01",
+     "number": 1,
+     "name": "Milos Janin",
+     "display": "M. Janin",
+     "role": "GK",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 190
+    },
+    {
+     "player_id": "pel-02",
+     "number": 2,
+     "name": "Ondrej Stavon",
+     "display": "O. Stavon",
+     "role": "RB",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 177
+    },
+    {
+     "player_id": "pel-04",
+     "number": 4,
+     "name": "Stepan Radicik",
+     "display": "S. Radicik",
+     "role": "CB",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 184
+    },
+    {
+     "player_id": "pel-05",
+     "number": 5,
+     "name": "Lukas Novavic",
+     "display": "L. Novavic",
+     "role": "CB",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 171
+    },
+    {
+     "player_id": "pel-03",
+     "number": 3,
+     "name": "Milos Janak",
+     "display": "M. Janak",
+     "role": "LB",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 177
+    },
+    {
+     "player_id": "pel-06",
+     "number": 6,
+     "name": "Stepan Zelinko",
+     "display": "S. Zelinko",
+     "role": "DM",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 175
+    },
+    {
+     "player_id": "pel-08",
+     "number": 8,
+     "name": "Stepan Holinko",
+     "display": "S. Holinko",
+     "role": "CM",
+     "foot": "left",
+     "age": 18,
+     "height_cm": 172
+    },
+    {
+     "player_id": "pel-10",
+     "number": 10,
+     "name": "Dusan Moramar",
+     "display": "D. Moramar",
+     "role": "CM",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 180
+    },
+    {
+     "player_id": "pel-07",
+     "number": 7,
+     "name": "Radim Dvorin",
+     "display": "R. Dvorin",
+     "role": "RW",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 174
+    },
+    {
+     "player_id": "pel-09",
+     "number": 9,
+     "name": "Stepan Radisz",
+     "display": "S. Radisz",
+     "role": "ST",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 172
+    },
+    {
+     "player_id": "pel-11",
+     "number": 11,
+     "name": "Tobin Yareham",
+     "display": "T. Yareham",
+     "role": "LW",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 185
+    },
+    {
+     "player_id": "pel-12",
+     "number": 12,
+     "name": "Wout Ostoedt",
+     "display": "W. Ostoedt",
+     "role": "GK",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 190
+    },
+    {
+     "player_id": "pel-13",
+     "number": 13,
+     "name": "Tomek Kralonan",
+     "display": "T. Kralonan",
+     "role": "GK",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 186
+    },
+    {
+     "player_id": "pel-16",
+     "number": 16,
+     "name": "Ondrej Pavin",
+     "display": "O. Pavin",
+     "role": "CB",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 196
+    },
+    {
+     "player_id": "pel-18",
+     "number": 18,
+     "name": "Kuba Brzic",
+     "display": "K. Brzic",
+     "role": "CB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 184
+    },
+    {
+     "player_id": "pel-19",
+     "number": 19,
+     "name": "Dusan Stavin",
+     "display": "D. Stavin",
+     "role": "RB",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 190
+    },
+    {
+     "player_id": "pel-20",
+     "number": 20,
+     "name": "Matej Novecenko",
+     "display": "M. Novecenko",
+     "role": "LB",
+     "foot": "left",
+     "age": 25,
+     "height_cm": 172
+    },
+    {
+     "player_id": "pel-24",
+     "number": 24,
+     "name": "Sem Berens",
+     "display": "S. Berens",
+     "role": "DM",
+     "foot": "right",
+     "age": 18,
+     "height_cm": 178
+    },
+    {
+     "player_id": "pel-27",
+     "number": 27,
+     "name": "Kuba Pavir",
+     "display": "K. Pavir",
+     "role": "CM",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 187
+    },
+    {
+     "player_id": "pel-28",
+     "number": 28,
+     "name": "Matej Brzir",
+     "display": "M. Brzir",
+     "role": "CM",
+     "foot": "right",
+     "age": 30,
+     "height_cm": 172
+    },
+    {
+     "player_id": "pel-29",
+     "number": 29,
+     "name": "Lars Jansoejk",
+     "display": "L. Jansoejk",
+     "role": "AM",
+     "foot": "both",
+     "age": 34,
+     "height_cm": 174
+    },
+    {
+     "player_id": "pel-31",
+     "number": 31,
+     "name": "Milos Morar",
+     "display": "M. Morar",
+     "role": "RW",
+     "foot": "left",
+     "age": 23,
+     "height_cm": 178
+    },
+    {
+     "player_id": "pel-32",
+     "number": 32,
+     "name": "Brede Skaheim",
+     "display": "B. Skaheim",
+     "role": "LW",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 185
+    },
+    {
+     "player_id": "pel-38",
+     "number": 38,
+     "name": "Tomek Zelesz",
+     "display": "T. Zelesz",
+     "role": "ST",
+     "foot": "right",
+     "age": 32,
+     "height_cm": 179
+    },
+    {
+     "player_id": "pel-39",
+     "number": 39,
+     "name": "Ondrej Holavar",
+     "display": "O. Holavar",
+     "role": "ST",
+     "foot": "left",
+     "age": 27,
+     "height_cm": 187
+    }
+   ]
+  },
+  {
+   "club_id": "riv",
+   "name": "Rivenmoor",
+   "short_name": "RIV",
+   "formation": "3-5-2",
+   "kits": {
+    "home": {
+     "primary": "#8a6700",
+     "secondary": "#f3eee0",
+     "pattern": "plain"
+    },
+    "away": {
+     "primary": "#60e2ff",
+     "secondary": "#121c23",
+     "pattern": "plain"
+    },
+    "third": {
+     "primary": "#1c1f24",
+     "secondary": "#f2f2f2",
+     "pattern": "plain"
+    }
+   },
+   "badge": {
+    "shape": "circle",
+    "glyph": "key",
+    "field": "#8a6700",
+    "accent": "#f3eee0",
+    "initials": "RIV"
+   },
+   "squad": [
+    {
+     "player_id": "riv-01",
+     "number": 1,
+     "name": "Ruben Jansans",
+     "display": "R. Jansans",
+     "role": "GK",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 188
+    },
+    {
+     "player_id": "riv-04",
+     "number": 4,
+     "name": "Sem Majk",
+     "display": "S. Majk",
+     "role": "CB",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 188
+    },
+    {
+     "player_id": "riv-05",
+     "number": 5,
+     "name": "Sem Mahuis",
+     "display": "S. Mahuis",
+     "role": "CB",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 195
+    },
+    {
+     "player_id": "riv-06",
+     "number": 6,
+     "name": "Sander Hendistra",
+     "display": "S. Hendistra",
+     "role": "CB",
+     "foot": "right",
+     "age": 27,
+     "height_cm": 195
+    },
+    {
+     "player_id": "riv-02",
+     "number": 2,
+     "name": "Mees Gristra",
+     "display": "M. Gristra",
+     "role": "RWB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 178
+    },
+    {
+     "player_id": "riv-08",
+     "number": 8,
+     "name": "Lars Hendajk",
+     "display": "L. Hendajk",
+     "role": "CM",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 165
+    },
+    {
+     "player_id": "riv-14",
+     "number": 14,
+     "name": "Unai Valudeiro",
+     "display": "U. Valudeiro",
+     "role": "DM",
+     "foot": "left",
+     "age": 34,
+     "height_cm": 175
+    },
+    {
+     "player_id": "riv-10",
+     "number": 10,
+     "name": "Jens Kledt",
+     "display": "J. Kledt",
+     "role": "CM",
+     "foot": "right",
+     "age": 23,
+     "height_cm": 185
+    },
+    {
+     "player_id": "riv-03",
+     "number": 3,
+     "name": "Odd Askeberg",
+     "display": "O. Askeberg",
+     "role": "LWB",
+     "foot": "left",
+     "age": 30,
+     "height_cm": 177
+    },
+    {
+     "player_id": "riv-09",
+     "number": 9,
+     "name": "Daan Vosastra",
+     "display": "D. Vosastra",
+     "role": "ST",
+     "foot": "right",
+     "age": 25,
+     "height_cm": 179
+    },
+    {
+     "player_id": "riv-11",
+     "number": 11,
+     "name": "Joost Bereord",
+     "display": "J. Bereord",
+     "role": "ST",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 175
+    },
+    {
+     "player_id": "riv-13",
+     "number": 13,
+     "name": "Eloy Luriles",
+     "display": "E. Luriles",
+     "role": "GK",
+     "foot": "right",
+     "age": 31,
+     "height_cm": 195
+    },
+    {
+     "player_id": "riv-15",
+     "number": 15,
+     "name": "Teun Kloldt",
+     "display": "T. Kloldt",
+     "role": "GK",
+     "foot": "right",
+     "age": 26,
+     "height_cm": 183
+    },
+    {
+     "player_id": "riv-16",
+     "number": 16,
+     "name": "Lars Voserkamp",
+     "display": "L. Voserkamp",
+     "role": "CB",
+     "foot": "left",
+     "age": 33,
+     "height_cm": 191
+    },
+    {
+     "player_id": "riv-17",
+     "number": 17,
+     "name": "Daan Klenema",
+     "display": "D. Klenema",
+     "role": "CB",
+     "foot": "right",
+     "age": 20,
+     "height_cm": 188
+    },
+    {
+     "player_id": "riv-21",
+     "number": 21,
+     "name": "Sem Maord",
+     "display": "S. Maord",
+     "role": "CB",
+     "foot": "left",
+     "age": 31,
+     "height_cm": 187
+    },
+    {
+     "player_id": "riv-23",
+     "number": 23,
+     "name": "Wout Jansax",
+     "display": "W. Jansax",
+     "role": "RWB",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 186
+    },
+    {
+     "player_id": "riv-27",
+     "number": 27,
+     "name": "Mylo Yariberby",
+     "display": "M. Yariberby",
+     "role": "DM",
+     "foot": "right",
+     "age": 29,
+     "height_cm": 176
+    },
+    {
+     "player_id": "riv-32",
+     "number": 32,
+     "name": "Teun Ostastra",
+     "display": "T. Ostastra",
+     "role": "CM",
+     "foot": "right",
+     "age": 19,
+     "height_cm": 180
+    },
+    {
+     "player_id": "riv-33",
+     "number": 33,
+     "name": "Alder Tamiby",
+     "display": "A. Tamiby",
+     "role": "CM",
+     "foot": "right",
+     "age": 24,
+     "height_cm": 180
+    },
+    {
+     "player_id": "riv-34",
+     "number": 34,
+     "name": "Yaw Osami",
+     "display": "Y. Osami",
+     "role": "AM",
+     "foot": "right",
+     "age": 21,
+     "height_cm": 188
+    },
+    {
+     "player_id": "riv-35",
+     "number": 35,
+     "name": "Kofi Akesu",
+     "display": "K. Akesu",
+     "role": "RW",
+     "foot": "right",
+     "age": 34,
+     "height_cm": 195
+    },
+    {
+     "player_id": "riv-36",
+     "number": 36,
+     "name": "Femi Kwule",
+     "display": "F. Kwule",
+     "role": "LW",
+     "foot": "right",
+     "age": 28,
+     "height_cm": 172
+    },
+    {
+     "player_id": "riv-37",
+     "number": 37,
+     "name": "Ruben Vosins",
+     "display": "R. Vosins",
+     "role": "ST",
+     "foot": "right",
+     "age": 33,
+     "height_cm": 182
+    },
+    {
+     "player_id": "riv-39",
+     "number": 39,
+     "name": "Ruben Rijkoehuis",
+     "display": "R. Rijkoehuis",
+     "role": "ST",
+     "foot": "right",
+     "age": 22,
+     "height_cm": 180
+    }
+   ]
+  }
+ ],
+ "fixtures": [
+  {
+   "round": 1,
+   "home": "low",
+   "away": "fen",
+   "match_id": "s01-01"
+  },
+  {
+   "round": 1,
+   "home": "ash",
+   "away": "nor",
+   "match_id": "s01-02"
+  },
+  {
+   "round": 1,
+   "home": "wre",
+   "away": "har",
+   "match_id": "s01-03"
+  },
+  {
+   "round": 1,
+   "home": "oak",
+   "away": "cor",
+   "match_id": "s01-04"
+  },
+  {
+   "round": 1,
+   "home": "dun",
+   "away": "riv",
+   "match_id": "s01-05"
+  },
+  {
+   "round": 1,
+   "home": "bra",
+   "away": "mor",
+   "match_id": "s01-06"
+  },
+  {
+   "round": 1,
+   "home": "gle",
+   "away": "ive",
+   "match_id": "s01-07"
+  },
+  {
+   "round": 1,
+   "home": "lar",
+   "away": "pel",
+   "match_id": "s01-08"
+  },
+  {
+   "round": 1,
+   "home": "jun",
+   "away": "sal",
+   "match_id": "s01-09"
+  },
+  {
+   "round": 1,
+   "home": "qua",
+   "away": "kes",
+   "match_id": "s01-10"
+  },
+  {
+   "round": 2,
+   "home": "ash",
+   "away": "low",
+   "match_id": "s02-01"
+  },
+  {
+   "round": 2,
+   "home": "fen",
+   "away": "har",
+   "match_id": "s02-02"
+  },
+  {
+   "round": 2,
+   "home": "oak",
+   "away": "nor",
+   "match_id": "s02-03"
+  },
+  {
+   "round": 2,
+   "home": "wre",
+   "away": "riv",
+   "match_id": "s02-04"
+  },
+  {
+   "round": 2,
+   "home": "bra",
+   "away": "cor",
+   "match_id": "s02-05"
+  },
+  {
+   "round": 2,
+   "home": "dun",
+   "away": "ive",
+   "match_id": "s02-06"
+  },
+  {
+   "round": 2,
+   "home": "lar",
+   "away": "mor",
+   "match_id": "s02-07"
+  },
+  {
+   "round": 2,
+   "home": "gle",
+   "away": "sal",
+   "match_id": "s02-08"
+  },
+  {
+   "round": 2,
+   "home": "qua",
+   "away": "pel",
+   "match_id": "s02-09"
+  },
+  {
+   "round": 2,
+   "home": "jun",
+   "away": "kes",
+   "match_id": "s02-10"
+  },
+  {
+   "round": 3,
+   "home": "low",
+   "away": "har",
+   "match_id": "s03-01"
+  },
+  {
+   "round": 3,
+   "home": "oak",
+   "away": "ash",
+   "match_id": "s03-02"
+  },
+  {
+   "round": 3,
+   "home": "fen",
+   "away": "riv",
+   "match_id": "s03-03"
+  },
+  {
+   "round": 3,
+   "home": "bra",
+   "away": "nor",
+   "match_id": "s03-04"
+  },
+  {
+   "round": 3,
+   "home": "wre",
+   "away": "ive",
+   "match_id": "s03-05"
+  },
+  {
+   "round": 3,
+   "home": "lar",
+   "away": "cor",
+   "match_id": "s03-06"
+  },
+  {
+   "round": 3,
+   "home": "dun",
+   "away": "sal",
+   "match_id": "s03-07"
+  },
+  {
+   "round": 3,
+   "home": "qua",
+   "away": "mor",
+   "match_id": "s03-08"
+  },
+  {
+   "round": 3,
+   "home": "gle",
+   "away": "kes",
+   "match_id": "s03-09"
+  },
+  {
+   "round": 3,
+   "home": "jun",
+   "away": "pel",
+   "match_id": "s03-10"
+  },
+  {
+   "round": 4,
+   "home": "oak",
+   "away": "low",
+   "match_id": "s04-01"
+  },
+  {
+   "round": 4,
+   "home": "har",
+   "away": "riv",
+   "match_id": "s04-02"
+  },
+  {
+   "round": 4,
+   "home": "bra",
+   "away": "ash",
+   "match_id": "s04-03"
+  },
+  {
+   "round": 4,
+   "home": "fen",
+   "away": "ive",
+   "match_id": "s04-04"
+  },
+  {
+   "round": 4,
+   "home": "lar",
+   "away": "nor",
+   "match_id": "s04-05"
+  },
+  {
+   "round": 4,
+   "home": "wre",
+   "away": "sal",
+   "match_id": "s04-06"
+  },
+  {
+   "round": 4,
+   "home": "qua",
+   "away": "cor",
+   "match_id": "s04-07"
+  },
+  {
+   "round": 4,
+   "home": "dun",
+   "away": "kes",
+   "match_id": "s04-08"
+  },
+  {
+   "round": 4,
+   "home": "jun",
+   "away": "mor",
+   "match_id": "s04-09"
+  },
+  {
+   "round": 4,
+   "home": "gle",
+   "away": "pel",
+   "match_id": "s04-10"
+  },
+  {
+   "round": 5,
+   "home": "low",
+   "away": "riv",
+   "match_id": "s05-01"
+  },
+  {
+   "round": 5,
+   "home": "bra",
+   "away": "oak",
+   "match_id": "s05-02"
+  },
+  {
+   "round": 5,
+   "home": "har",
+   "away": "ive",
+   "match_id": "s05-03"
+  },
+  {
+   "round": 5,
+   "home": "lar",
+   "away": "ash",
+   "match_id": "s05-04"
+  },
+  {
+   "round": 5,
+   "home": "fen",
+   "away": "sal",
+   "match_id": "s05-05"
+  },
+  {
+   "round": 5,
+   "home": "qua",
+   "away": "nor",
+   "match_id": "s05-06"
+  },
+  {
+   "round": 5,
+   "home": "wre",
+   "away": "kes",
+   "match_id": "s05-07"
+  },
+  {
+   "round": 5,
+   "home": "jun",
+   "away": "cor",
+   "match_id": "s05-08"
+  },
+  {
+   "round": 5,
+   "home": "dun",
+   "away": "pel",
+   "match_id": "s05-09"
+  },
+  {
+   "round": 5,
+   "home": "gle",
+   "away": "mor",
+   "match_id": "s05-10"
+  },
+  {
+   "round": 6,
+   "home": "bra",
+   "away": "low",
+   "match_id": "s06-01"
+  },
+  {
+   "round": 6,
+   "home": "riv",
+   "away": "ive",
+   "match_id": "s06-02"
+  },
+  {
+   "round": 6,
+   "home": "lar",
+   "away": "oak",
+   "match_id": "s06-03"
+  },
+  {
+   "round": 6,
+   "home": "har",
+   "away": "sal",
+   "match_id": "s06-04"
+  },
+  {
+   "round": 6,
+   "home": "qua",
+   "away": "ash",
+   "match_id": "s06-05"
+  },
+  {
+   "round": 6,
+   "home": "fen",
+   "away": "kes",
+   "match_id": "s06-06"
+  },
+  {
+   "round": 6,
+   "home": "jun",
+   "away": "nor",
+   "match_id": "s06-07"
+  },
+  {
+   "round": 6,
+   "home": "wre",
+   "away": "pel",
+   "match_id": "s06-08"
+  },
+  {
+   "round": 6,
+   "home": "gle",
+   "away": "cor",
+   "match_id": "s06-09"
+  },
+  {
+   "round": 6,
+   "home": "dun",
+   "away": "mor",
+   "match_id": "s06-10"
+  },
+  {
+   "round": 7,
+   "home": "low",
+   "away": "ive",
+   "match_id": "s07-01"
+  },
+  {
+   "round": 7,
+   "home": "lar",
+   "away": "bra",
+   "match_id": "s07-02"
+  },
+  {
+   "round": 7,
+   "home": "riv",
+   "away": "sal",
+   "match_id": "s07-03"
+  },
+  {
+   "round": 7,
+   "home": "qua",
+   "away": "oak",
+   "match_id": "s07-04"
+  },
+  {
+   "round": 7,
+   "home": "har",
+   "away": "kes",
+   "match_id": "s07-05"
+  },
+  {
+   "round": 7,
+   "home": "jun",
+   "away": "ash",
+   "match_id": "s07-06"
+  },
+  {
+   "round": 7,
+   "home": "fen",
+   "away": "pel",
+   "match_id": "s07-07"
+  },
+  {
+   "round": 7,
+   "home": "gle",
+   "away": "nor",
+   "match_id": "s07-08"
+  },
+  {
+   "round": 7,
+   "home": "wre",
+   "away": "mor",
+   "match_id": "s07-09"
+  },
+  {
+   "round": 7,
+   "home": "dun",
+   "away": "cor",
+   "match_id": "s07-10"
+  },
+  {
+   "round": 8,
+   "home": "lar",
+   "away": "low",
+   "match_id": "s08-01"
+  },
+  {
+   "round": 8,
+   "home": "ive",
+   "away": "sal",
+   "match_id": "s08-02"
+  },
+  {
+   "round": 8,
+   "home": "qua",
+   "away": "bra",
+   "match_id": "s08-03"
+  },
+  {
+   "round": 8,
+   "home": "riv",
+   "away": "kes",
+   "match_id": "s08-04"
+  },
+  {
+   "round": 8,
+   "home": "jun",
+   "away": "oak",
+   "match_id": "s08-05"
+  },
+  {
+   "round": 8,
+   "home": "har",
+   "away": "pel",
+   "match_id": "s08-06"
+  },
+  {
+   "round": 8,
+   "home": "gle",
+   "away": "ash",
+   "match_id": "s08-07"
+  },
+  {
+   "round": 8,
+   "home": "fen",
+   "away": "mor",
+   "match_id": "s08-08"
+  },
+  {
+   "round": 8,
+   "home": "dun",
+   "away": "nor",
+   "match_id": "s08-09"
+  },
+  {
+   "round": 8,
+   "home": "wre",
+   "away": "cor",
+   "match_id": "s08-10"
+  },
+  {
+   "round": 9,
+   "home": "low",
+   "away": "sal",
+   "match_id": "s09-01"
+  },
+  {
+   "round": 9,
+   "home": "qua",
+   "away": "lar",
+   "match_id": "s09-02"
+  },
+  {
+   "round": 9,
+   "home": "ive",
+   "away": "kes",
+   "match_id": "s09-03"
+  },
+  {
+   "round": 9,
+   "home": "jun",
+   "away": "bra",
+   "match_id": "s09-04"
+  },
+  {
+   "round": 9,
+   "home": "riv",
+   "away": "pel",
+   "match_id": "s09-05"
+  },
+  {
+   "round": 9,
+   "home": "gle",
+   "away": "oak",
+   "match_id": "s09-06"
+  },
+  {
+   "round": 9,
+   "home": "har",
+   "away": "mor",
+   "match_id": "s09-07"
+  },
+  {
+   "round": 9,
+   "home": "dun",
+   "away": "ash",
+   "match_id": "s09-08"
+  },
+  {
+   "round": 9,
+   "home": "fen",
+   "away": "cor",
+   "match_id": "s09-09"
+  },
+  {
+   "round": 9,
+   "home": "wre",
+   "away": "nor",
+   "match_id": "s09-10"
+  },
+  {
+   "round": 10,
+   "home": "qua",
+   "away": "low",
+   "match_id": "s10-01"
+  },
+  {
+   "round": 10,
+   "home": "sal",
+   "away": "kes",
+   "match_id": "s10-02"
+  },
+  {
+   "round": 10,
+   "home": "jun",
+   "away": "lar",
+   "match_id": "s10-03"
+  },
+  {
+   "round": 10,
+   "home": "ive",
+   "away": "pel",
+   "match_id": "s10-04"
+  },
+  {
+   "round": 10,
+   "home": "gle",
+   "away": "bra",
+   "match_id": "s10-05"
+  },
+  {
+   "round": 10,
+   "home": "riv",
+   "away": "mor",
+   "match_id": "s10-06"
+  },
+  {
+   "round": 10,
+   "home": "dun",
+   "away": "oak",
+   "match_id": "s10-07"
+  },
+  {
+   "round": 10,
+   "home": "har",
+   "away": "cor",
+   "match_id": "s10-08"
+  },
+  {
+   "round": 10,
+   "home": "wre",
+   "away": "ash",
+   "match_id": "s10-09"
+  },
+  {
+   "round": 10,
+   "home": "fen",
+   "away": "nor",
+   "match_id": "s10-10"
+  },
+  {
+   "round": 11,
+   "home": "low",
+   "away": "kes",
+   "match_id": "s11-01"
+  },
+  {
+   "round": 11,
+   "home": "jun",
+   "away": "qua",
+   "match_id": "s11-02"
+  },
+  {
+   "round": 11,
+   "home": "sal",
+   "away": "pel",
+   "match_id": "s11-03"
+  },
+  {
+   "round": 11,
+   "home": "gle",
+   "away": "lar",
+   "match_id": "s11-04"
+  },
+  {
+   "round": 11,
+   "home": "ive",
+   "away": "mor",
+   "match_id": "s11-05"
+  },
+  {
+   "round": 11,
+   "home": "dun",
+   "away": "bra",
+   "match_id": "s11-06"
+  },
+  {
+   "round": 11,
+   "home": "riv",
+   "away": "cor",
+   "match_id": "s11-07"
+  },
+  {
+   "round": 11,
+   "home": "wre",
+   "away": "oak",
+   "match_id": "s11-08"
+  },
+  {
+   "round": 11,
+   "home": "har",
+   "away": "nor",
+   "match_id": "s11-09"
+  },
+  {
+   "round": 11,
+   "home": "fen",
+   "away": "ash",
+   "match_id": "s11-10"
+  },
+  {
+   "round": 12,
+   "home": "jun",
+   "away": "low",
+   "match_id": "s12-01"
+  },
+  {
+   "round": 12,
+   "home": "kes",
+   "away": "pel",
+   "match_id": "s12-02"
+  },
+  {
+   "round": 12,
+   "home": "gle",
+   "away": "qua",
+   "match_id": "s12-03"
+  },
+  {
+   "round": 12,
+   "home": "sal",
+   "away": "mor",
+   "match_id": "s12-04"
+  },
+  {
+   "round": 12,
+   "home": "dun",
+   "away": "lar",
+   "match_id": "s12-05"
+  },
+  {
+   "round": 12,
+   "home": "ive",
+   "away": "cor",
+   "match_id": "s12-06"
+  },
+  {
+   "round": 12,
+   "home": "wre",
+   "away": "bra",
+   "match_id": "s12-07"
+  },
+  {
+   "round": 12,
+   "home": "riv",
+   "away": "nor",
+   "match_id": "s12-08"
+  },
+  {
+   "round": 12,
+   "home": "fen",
+   "away": "oak",
+   "match_id": "s12-09"
+  },
+  {
+   "round": 12,
+   "home": "har",
+   "away": "ash",
+   "match_id": "s12-10"
+  },
+  {
+   "round": 13,
+   "home": "low",
+   "away": "pel",
+   "match_id": "s13-01"
+  },
+  {
+   "round": 13,
+   "home": "gle",
+   "away": "jun",
+   "match_id": "s13-02"
+  },
+  {
+   "round": 13,
+   "home": "kes",
+   "away": "mor",
+   "match_id": "s13-03"
+  },
+  {
+   "round": 13,
+   "home": "dun",
+   "away": "qua",
+   "match_id": "s13-04"
+  },
+  {
+   "round": 13,
+   "home": "sal",
+   "away": "cor",
+   "match_id": "s13-05"
+  },
+  {
+   "round": 13,
+   "home": "wre",
+   "away": "lar",
+   "match_id": "s13-06"
+  },
+  {
+   "round": 13,
+   "home": "ive",
+   "away": "nor",
+   "match_id": "s13-07"
+  },
+  {
+   "round": 13,
+   "home": "fen",
+   "away": "bra",
+   "match_id": "s13-08"
+  },
+  {
+   "round": 13,
+   "home": "riv",
+   "away": "ash",
+   "match_id": "s13-09"
+  },
+  {
+   "round": 13,
+   "home": "har",
+   "away": "oak",
+   "match_id": "s13-10"
+  },
+  {
+   "round": 14,
+   "home": "gle",
+   "away": "low",
+   "match_id": "s14-01"
+  },
+  {
+   "round": 14,
+   "home": "pel",
+   "away": "mor",
+   "match_id": "s14-02"
+  },
+  {
+   "round": 14,
+   "home": "dun",
+   "away": "jun",
+   "match_id": "s14-03"
+  },
+  {
+   "round": 14,
+   "home": "kes",
+   "away": "cor",
+   "match_id": "s14-04"
+  },
+  {
+   "round": 14,
+   "home": "wre",
+   "away": "qua",
+   "match_id": "s14-05"
+  },
+  {
+   "round": 14,
+   "home": "sal",
+   "away": "nor",
+   "match_id": "s14-06"
+  },
+  {
+   "round": 14,
+   "home": "fen",
+   "away": "lar",
+   "match_id": "s14-07"
+  },
+  {
+   "round": 14,
+   "home": "ive",
+   "away": "ash",
+   "match_id": "s14-08"
+  },
+  {
+   "round": 14,
+   "home": "har",
+   "away": "bra",
+   "match_id": "s14-09"
+  },
+  {
+   "round": 14,
+   "home": "riv",
+   "away": "oak",
+   "match_id": "s14-10"
+  },
+  {
+   "round": 15,
+   "home": "low",
+   "away": "mor",
+   "match_id": "s15-01"
+  },
+  {
+   "round": 15,
+   "home": "dun",
+   "away": "gle",
+   "match_id": "s15-02"
+  },
+  {
+   "round": 15,
+   "home": "pel",
+   "away": "cor",
+   "match_id": "s15-03"
+  },
+  {
+   "round": 15,
+   "home": "wre",
+   "away": "jun",
+   "match_id": "s15-04"
+  },
+  {
+   "round": 15,
+   "home": "kes",
+   "away": "nor",
+   "match_id": "s15-05"
+  },
+  {
+   "round": 15,
+   "home": "fen",
+   "away": "qua",
+   "match_id": "s15-06"
+  },
+  {
+   "round": 15,
+   "home": "sal",
+   "away": "ash",
+   "match_id": "s15-07"
+  },
+  {
+   "round": 15,
+   "home": "har",
+   "away": "lar",
+   "match_id": "s15-08"
+  },
+  {
+   "round": 15,
+   "home": "ive",
+   "away": "oak",
+   "match_id": "s15-09"
+  },
+  {
+   "round": 15,
+   "home": "riv",
+   "away": "bra",
+   "match_id": "s15-10"
+  },
+  {
+   "round": 16,
+   "home": "low",
+   "away": "lar",
+   "match_id": "s16-01"
+  },
+  {
+   "round": 16,
+   "home": "sal",
+   "away": "ive",
+   "match_id": "s16-02"
+  },
+  {
+   "round": 16,
+   "home": "bra",
+   "away": "qua",
+   "match_id": "s16-03"
+  },
+  {
+   "round": 16,
+   "home": "kes",
+   "away": "riv",
+   "match_id": "s16-04"
+  },
+  {
+   "round": 16,
+   "home": "oak",
+   "away": "jun",
+   "match_id": "s16-05"
+  },
+  {
+   "round": 16,
+   "home": "pel",
+   "away": "har",
+   "match_id": "s16-06"
+  },
+  {
+   "round": 16,
+   "home": "ash",
+   "away": "gle",
+   "match_id": "s16-07"
+  },
+  {
+   "round": 16,
+   "home": "mor",
+   "away": "fen",
+   "match_id": "s16-08"
+  },
+  {
+   "round": 16,
+   "home": "nor",
+   "away": "dun",
+   "match_id": "s16-09"
+  },
+  {
+   "round": 16,
+   "home": "cor",
+   "away": "wre",
+   "match_id": "s16-10"
+  },
+  {
+   "round": 17,
+   "home": "low",
+   "away": "cor",
+   "match_id": "s17-01"
+  },
+  {
+   "round": 17,
+   "home": "wre",
+   "away": "dun",
+   "match_id": "s17-02"
+  },
+  {
+   "round": 17,
+   "home": "mor",
+   "away": "nor",
+   "match_id": "s17-03"
+  },
+  {
+   "round": 17,
+   "home": "fen",
+   "away": "gle",
+   "match_id": "s17-04"
+  },
+  {
+   "round": 17,
+   "home": "pel",
+   "away": "ash",
+   "match_id": "s17-05"
+  },
+  {
+   "round": 17,
+   "home": "har",
+   "away": "jun",
+   "match_id": "s17-06"
+  },
+  {
+   "round": 17,
+   "home": "kes",
+   "away": "oak",
+   "match_id": "s17-07"
+  },
+  {
+   "round": 17,
+   "home": "riv",
+   "away": "qua",
+   "match_id": "s17-08"
+  },
+  {
+   "round": 17,
+   "home": "sal",
+   "away": "bra",
+   "match_id": "s17-09"
+  },
+  {
+   "round": 17,
+   "home": "ive",
+   "away": "lar",
+   "match_id": "s17-10"
+  },
+  {
+   "round": 18,
+   "home": "wre",
+   "away": "low",
+   "match_id": "s18-01"
+  },
+  {
+   "round": 18,
+   "home": "cor",
+   "away": "nor",
+   "match_id": "s18-02"
+  },
+  {
+   "round": 18,
+   "home": "fen",
+   "away": "dun",
+   "match_id": "s18-03"
+  },
+  {
+   "round": 18,
+   "home": "mor",
+   "away": "ash",
+   "match_id": "s18-04"
+  },
+  {
+   "round": 18,
+   "home": "har",
+   "away": "gle",
+   "match_id": "s18-05"
+  },
+  {
+   "round": 18,
+   "home": "pel",
+   "away": "oak",
+   "match_id": "s18-06"
+  },
+  {
+   "round": 18,
+   "home": "riv",
+   "away": "jun",
+   "match_id": "s18-07"
+  },
+  {
+   "round": 18,
+   "home": "kes",
+   "away": "bra",
+   "match_id": "s18-08"
+  },
+  {
+   "round": 18,
+   "home": "ive",
+   "away": "qua",
+   "match_id": "s18-09"
+  },
+  {
+   "round": 18,
+   "home": "sal",
+   "away": "lar",
+   "match_id": "s18-10"
+  },
+  {
+   "round": 19,
+   "home": "low",
+   "away": "nor",
+   "match_id": "s19-01"
+  },
+  {
+   "round": 19,
+   "home": "fen",
+   "away": "wre",
+   "match_id": "s19-02"
+  },
+  {
+   "round": 19,
+   "home": "cor",
+   "away": "ash",
+   "match_id": "s19-03"
+  },
+  {
+   "round": 19,
+   "home": "har",
+   "away": "dun",
+   "match_id": "s19-04"
+  },
+  {
+   "round": 19,
+   "home": "mor",
+   "away": "oak",
+   "match_id": "s19-05"
+  },
+  {
+   "round": 19,
+   "home": "riv",
+   "away": "gle",
+   "match_id": "s19-06"
+  },
+  {
+   "round": 19,
+   "home": "pel",
+   "away": "bra",
+   "match_id": "s19-07"
+  },
+  {
+   "round": 19,
+   "home": "ive",
+   "away": "jun",
+   "match_id": "s19-08"
+  },
+  {
+   "round": 19,
+   "home": "kes",
+   "away": "lar",
+   "match_id": "s19-09"
+  },
+  {
+   "round": 19,
+   "home": "sal",
+   "away": "qua",
+   "match_id": "s19-10"
+  },
+  {
+   "round": 20,
+   "home": "fen",
+   "away": "low",
+   "match_id": "s20-01"
+  },
+  {
+   "round": 20,
+   "home": "nor",
+   "away": "ash",
+   "match_id": "s20-02"
+  },
+  {
+   "round": 20,
+   "home": "har",
+   "away": "wre",
+   "match_id": "s20-03"
+  },
+  {
+   "round": 20,
+   "home": "cor",
+   "away": "oak",
+   "match_id": "s20-04"
+  },
+  {
+   "round": 20,
+   "home": "riv",
+   "away": "dun",
+   "match_id": "s20-05"
+  },
+  {
+   "round": 20,
+   "home": "mor",
+   "away": "bra",
+   "match_id": "s20-06"
+  },
+  {
+   "round": 20,
+   "home": "ive",
+   "away": "gle",
+   "match_id": "s20-07"
+  },
+  {
+   "round": 20,
+   "home": "pel",
+   "away": "lar",
+   "match_id": "s20-08"
+  },
+  {
+   "round": 20,
+   "home": "sal",
+   "away": "jun",
+   "match_id": "s20-09"
+  },
+  {
+   "round": 20,
+   "home": "kes",
+   "away": "qua",
+   "match_id": "s20-10"
+  },
+  {
+   "round": 21,
+   "home": "low",
+   "away": "ash",
+   "match_id": "s21-01"
+  },
+  {
+   "round": 21,
+   "home": "har",
+   "away": "fen",
+   "match_id": "s21-02"
+  },
+  {
+   "round": 21,
+   "home": "nor",
+   "away": "oak",
+   "match_id": "s21-03"
+  },
+  {
+   "round": 21,
+   "home": "riv",
+   "away": "wre",
+   "match_id": "s21-04"
+  },
+  {
+   "round": 21,
+   "home": "cor",
+   "away": "bra",
+   "match_id": "s21-05"
+  },
+  {
+   "round": 21,
+   "home": "ive",
+   "away": "dun",
+   "match_id": "s21-06"
+  },
+  {
+   "round": 21,
+   "home": "mor",
+   "away": "lar",
+   "match_id": "s21-07"
+  },
+  {
+   "round": 21,
+   "home": "sal",
+   "away": "gle",
+   "match_id": "s21-08"
+  },
+  {
+   "round": 21,
+   "home": "pel",
+   "away": "qua",
+   "match_id": "s21-09"
+  },
+  {
+   "round": 21,
+   "home": "kes",
+   "away": "jun",
+   "match_id": "s21-10"
+  },
+  {
+   "round": 22,
+   "home": "har",
+   "away": "low",
+   "match_id": "s22-01"
+  },
+  {
+   "round": 22,
+   "home": "ash",
+   "away": "oak",
+   "match_id": "s22-02"
+  },
+  {
+   "round": 22,
+   "home": "riv",
+   "away": "fen",
+   "match_id": "s22-03"
+  },
+  {
+   "round": 22,
+   "home": "nor",
+   "away": "bra",
+   "match_id": "s22-04"
+  },
+  {
+   "round": 22,
+   "home": "ive",
+   "away": "wre",
+   "match_id": "s22-05"
+  },
+  {
+   "round": 22,
+   "home": "cor",
+   "away": "lar",
+   "match_id": "s22-06"
+  },
+  {
+   "round": 22,
+   "home": "sal",
+   "away": "dun",
+   "match_id": "s22-07"
+  },
+  {
+   "round": 22,
+   "home": "mor",
+   "away": "qua",
+   "match_id": "s22-08"
+  },
+  {
+   "round": 22,
+   "home": "kes",
+   "away": "gle",
+   "match_id": "s22-09"
+  },
+  {
+   "round": 22,
+   "home": "pel",
+   "away": "jun",
+   "match_id": "s22-10"
+  },
+  {
+   "round": 23,
+   "home": "low",
+   "away": "oak",
+   "match_id": "s23-01"
+  },
+  {
+   "round": 23,
+   "home": "riv",
+   "away": "har",
+   "match_id": "s23-02"
+  },
+  {
+   "round": 23,
+   "home": "ash",
+   "away": "bra",
+   "match_id": "s23-03"
+  },
+  {
+   "round": 23,
+   "home": "ive",
+   "away": "fen",
+   "match_id": "s23-04"
+  },
+  {
+   "round": 23,
+   "home": "nor",
+   "away": "lar",
+   "match_id": "s23-05"
+  },
+  {
+   "round": 23,
+   "home": "sal",
+   "away": "wre",
+   "match_id": "s23-06"
+  },
+  {
+   "round": 23,
+   "home": "cor",
+   "away": "qua",
+   "match_id": "s23-07"
+  },
+  {
+   "round": 23,
+   "home": "kes",
+   "away": "dun",
+   "match_id": "s23-08"
+  },
+  {
+   "round": 23,
+   "home": "mor",
+   "away": "jun",
+   "match_id": "s23-09"
+  },
+  {
+   "round": 23,
+   "home": "pel",
+   "away": "gle",
+   "match_id": "s23-10"
+  },
+  {
+   "round": 24,
+   "home": "riv",
+   "away": "low",
+   "match_id": "s24-01"
+  },
+  {
+   "round": 24,
+   "home": "oak",
+   "away": "bra",
+   "match_id": "s24-02"
+  },
+  {
+   "round": 24,
+   "home": "ive",
+   "away": "har",
+   "match_id": "s24-03"
+  },
+  {
+   "round": 24,
+   "home": "ash",
+   "away": "lar",
+   "match_id": "s24-04"
+  },
+  {
+   "round": 24,
+   "home": "sal",
+   "away": "fen",
+   "match_id": "s24-05"
+  },
+  {
+   "round": 24,
+   "home": "nor",
+   "away": "qua",
+   "match_id": "s24-06"
+  },
+  {
+   "round": 24,
+   "home": "kes",
+   "away": "wre",
+   "match_id": "s24-07"
+  },
+  {
+   "round": 24,
+   "home": "cor",
+   "away": "jun",
+   "match_id": "s24-08"
+  },
+  {
+   "round": 24,
+   "home": "pel",
+   "away": "dun",
+   "match_id": "s24-09"
+  },
+  {
+   "round": 24,
+   "home": "mor",
+   "away": "gle",
+   "match_id": "s24-10"
+  },
+  {
+   "round": 25,
+   "home": "low",
+   "away": "bra",
+   "match_id": "s25-01"
+  },
+  {
+   "round": 25,
+   "home": "ive",
+   "away": "riv",
+   "match_id": "s25-02"
+  },
+  {
+   "round": 25,
+   "home": "oak",
+   "away": "lar",
+   "match_id": "s25-03"
+  },
+  {
+   "round": 25,
+   "home": "sal",
+   "away": "har",
+   "match_id": "s25-04"
+  },
+  {
+   "round": 25,
+   "home": "ash",
+   "away": "qua",
+   "match_id": "s25-05"
+  },
+  {
+   "round": 25,
+   "home": "kes",
+   "away": "fen",
+   "match_id": "s25-06"
+  },
+  {
+   "round": 25,
+   "home": "nor",
+   "away": "jun",
+   "match_id": "s25-07"
+  },
+  {
+   "round": 25,
+   "home": "pel",
+   "away": "wre",
+   "match_id": "s25-08"
+  },
+  {
+   "round": 25,
+   "home": "cor",
+   "away": "gle",
+   "match_id": "s25-09"
+  },
+  {
+   "round": 25,
+   "home": "mor",
+   "away": "dun",
+   "match_id": "s25-10"
+  },
+  {
+   "round": 26,
+   "home": "ive",
+   "away": "low",
+   "match_id": "s26-01"
+  },
+  {
+   "round": 26,
+   "home": "bra",
+   "away": "lar",
+   "match_id": "s26-02"
+  },
+  {
+   "round": 26,
+   "home": "sal",
+   "away": "riv",
+   "match_id": "s26-03"
+  },
+  {
+   "round": 26,
+   "home": "oak",
+   "away": "qua",
+   "match_id": "s26-04"
+  },
+  {
+   "round": 26,
+   "home": "kes",
+   "away": "har",
+   "match_id": "s26-05"
+  },
+  {
+   "round": 26,
+   "home": "ash",
+   "away": "jun",
+   "match_id": "s26-06"
+  },
+  {
+   "round": 26,
+   "home": "pel",
+   "away": "fen",
+   "match_id": "s26-07"
+  },
+  {
+   "round": 26,
+   "home": "nor",
+   "away": "gle",
+   "match_id": "s26-08"
+  },
+  {
+   "round": 26,
+   "home": "mor",
+   "away": "wre",
+   "match_id": "s26-09"
+  },
+  {
+   "round": 26,
+   "home": "cor",
+   "away": "dun",
+   "match_id": "s26-10"
+  },
+  {
+   "round": 27,
+   "home": "dun",
+   "away": "low",
+   "match_id": "s27-01"
+  },
+  {
+   "round": 27,
+   "home": "mor",
+   "away": "cor",
+   "match_id": "s27-02"
+  },
+  {
+   "round": 27,
+   "home": "wre",
+   "away": "gle",
+   "match_id": "s27-03"
+  },
+  {
+   "round": 27,
+   "home": "pel",
+   "away": "nor",
+   "match_id": "s27-04"
+  },
+  {
+   "round": 27,
+   "home": "fen",
+   "away": "jun",
+   "match_id": "s27-05"
+  },
+  {
+   "round": 27,
+   "home": "kes",
+   "away": "ash",
+   "match_id": "s27-06"
+  },
+  {
+   "round": 27,
+   "home": "har",
+   "away": "qua",
+   "match_id": "s27-07"
+  },
+  {
+   "round": 27,
+   "home": "sal",
+   "away": "oak",
+   "match_id": "s27-08"
+  },
+  {
+   "round": 27,
+   "home": "riv",
+   "away": "lar",
+   "match_id": "s27-09"
+  },
+  {
+   "round": 27,
+   "home": "ive",
+   "away": "bra",
+   "match_id": "s27-10"
+  },
+  {
+   "round": 28,
+   "home": "sal",
+   "away": "low",
+   "match_id": "s28-01"
+  },
+  {
+   "round": 28,
+   "home": "lar",
+   "away": "qua",
+   "match_id": "s28-02"
+  },
+  {
+   "round": 28,
+   "home": "kes",
+   "away": "ive",
+   "match_id": "s28-03"
+  },
+  {
+   "round": 28,
+   "home": "bra",
+   "away": "jun",
+   "match_id": "s28-04"
+  },
+  {
+   "round": 28,
+   "home": "pel",
+   "away": "riv",
+   "match_id": "s28-05"
+  },
+  {
+   "round": 28,
+   "home": "oak",
+   "away": "gle",
+   "match_id": "s28-06"
+  },
+  {
+   "round": 28,
+   "home": "mor",
+   "away": "har",
+   "match_id": "s28-07"
+  },
+  {
+   "round": 28,
+   "home": "ash",
+   "away": "dun",
+   "match_id": "s28-08"
+  },
+  {
+   "round": 28,
+   "home": "cor",
+   "away": "fen",
+   "match_id": "s28-09"
+  },
+  {
+   "round": 28,
+   "home": "nor",
+   "away": "wre",
+   "match_id": "s28-10"
+  },
+  {
+   "round": 29,
+   "home": "low",
+   "away": "qua",
+   "match_id": "s29-01"
+  },
+  {
+   "round": 29,
+   "home": "kes",
+   "away": "sal",
+   "match_id": "s29-02"
+  },
+  {
+   "round": 29,
+   "home": "lar",
+   "away": "jun",
+   "match_id": "s29-03"
+  },
+  {
+   "round": 29,
+   "home": "pel",
+   "away": "ive",
+   "match_id": "s29-04"
+  },
+  {
+   "round": 29,
+   "home": "bra",
+   "away": "gle",
+   "match_id": "s29-05"
+  },
+  {
+   "round": 29,
+   "home": "mor",
+   "away": "riv",
+   "match_id": "s29-06"
+  },
+  {
+   "round": 29,
+   "home": "oak",
+   "away": "dun",
+   "match_id": "s29-07"
+  },
+  {
+   "round": 29,
+   "home": "cor",
+   "away": "har",
+   "match_id": "s29-08"
+  },
+  {
+   "round": 29,
+   "home": "ash",
+   "away": "wre",
+   "match_id": "s29-09"
+  },
+  {
+   "round": 29,
+   "home": "nor",
+   "away": "fen",
+   "match_id": "s29-10"
+  },
+  {
+   "round": 30,
+   "home": "kes",
+   "away": "low",
+   "match_id": "s30-01"
+  },
+  {
+   "round": 30,
+   "home": "qua",
+   "away": "jun",
+   "match_id": "s30-02"
+  },
+  {
+   "round": 30,
+   "home": "pel",
+   "away": "sal",
+   "match_id": "s30-03"
+  },
+  {
+   "round": 30,
+   "home": "lar",
+   "away": "gle",
+   "match_id": "s30-04"
+  },
+  {
+   "round": 30,
+   "home": "mor",
+   "away": "ive",
+   "match_id": "s30-05"
+  },
+  {
+   "round": 30,
+   "home": "bra",
+   "away": "dun",
+   "match_id": "s30-06"
+  },
+  {
+   "round": 30,
+   "home": "cor",
+   "away": "riv",
+   "match_id": "s30-07"
+  },
+  {
+   "round": 30,
+   "home": "oak",
+   "away": "wre",
+   "match_id": "s30-08"
+  },
+  {
+   "round": 30,
+   "home": "nor",
+   "away": "har",
+   "match_id": "s30-09"
+  },
+  {
+   "round": 30,
+   "home": "ash",
+   "away": "fen",
+   "match_id": "s30-10"
+  },
+  {
+   "round": 31,
+   "home": "low",
+   "away": "jun",
+   "match_id": "s31-01"
+  },
+  {
+   "round": 31,
+   "home": "pel",
+   "away": "kes",
+   "match_id": "s31-02"
+  },
+  {
+   "round": 31,
+   "home": "qua",
+   "away": "gle",
+   "match_id": "s31-03"
+  },
+  {
+   "round": 31,
+   "home": "mor",
+   "away": "sal",
+   "match_id": "s31-04"
+  },
+  {
+   "round": 31,
+   "home": "lar",
+   "away": "dun",
+   "match_id": "s31-05"
+  },
+  {
+   "round": 31,
+   "home": "cor",
+   "away": "ive",
+   "match_id": "s31-06"
+  },
+  {
+   "round": 31,
+   "home": "bra",
+   "away": "wre",
+   "match_id": "s31-07"
+  },
+  {
+   "round": 31,
+   "home": "nor",
+   "away": "riv",
+   "match_id": "s31-08"
+  },
+  {
+   "round": 31,
+   "home": "oak",
+   "away": "fen",
+   "match_id": "s31-09"
+  },
+  {
+   "round": 31,
+   "home": "ash",
+   "away": "har",
+   "match_id": "s31-10"
+  },
+  {
+   "round": 32,
+   "home": "pel",
+   "away": "low",
+   "match_id": "s32-01"
+  },
+  {
+   "round": 32,
+   "home": "jun",
+   "away": "gle",
+   "match_id": "s32-02"
+  },
+  {
+   "round": 32,
+   "home": "mor",
+   "away": "kes",
+   "match_id": "s32-03"
+  },
+  {
+   "round": 32,
+   "home": "qua",
+   "away": "dun",
+   "match_id": "s32-04"
+  },
+  {
+   "round": 32,
+   "home": "cor",
+   "away": "sal",
+   "match_id": "s32-05"
+  },
+  {
+   "round": 32,
+   "home": "lar",
+   "away": "wre",
+   "match_id": "s32-06"
+  },
+  {
+   "round": 32,
+   "home": "nor",
+   "away": "ive",
+   "match_id": "s32-07"
+  },
+  {
+   "round": 32,
+   "home": "bra",
+   "away": "fen",
+   "match_id": "s32-08"
+  },
+  {
+   "round": 32,
+   "home": "ash",
+   "away": "riv",
+   "match_id": "s32-09"
+  },
+  {
+   "round": 32,
+   "home": "oak",
+   "away": "har",
+   "match_id": "s32-10"
+  },
+  {
+   "round": 33,
+   "home": "low",
+   "away": "gle",
+   "match_id": "s33-01"
+  },
+  {
+   "round": 33,
+   "home": "mor",
+   "away": "pel",
+   "match_id": "s33-02"
+  },
+  {
+   "round": 33,
+   "home": "jun",
+   "away": "dun",
+   "match_id": "s33-03"
+  },
+  {
+   "round": 33,
+   "home": "cor",
+   "away": "kes",
+   "match_id": "s33-04"
+  },
+  {
+   "round": 33,
+   "home": "qua",
+   "away": "wre",
+   "match_id": "s33-05"
+  },
+  {
+   "round": 33,
+   "home": "nor",
+   "away": "sal",
+   "match_id": "s33-06"
+  },
+  {
+   "round": 33,
+   "home": "lar",
+   "away": "fen",
+   "match_id": "s33-07"
+  },
+  {
+   "round": 33,
+   "home": "ash",
+   "away": "ive",
+   "match_id": "s33-08"
+  },
+  {
+   "round": 33,
+   "home": "bra",
+   "away": "har",
+   "match_id": "s33-09"
+  },
+  {
+   "round": 33,
+   "home": "oak",
+   "away": "riv",
+   "match_id": "s33-10"
+  },
+  {
+   "round": 34,
+   "home": "mor",
+   "away": "low",
+   "match_id": "s34-01"
+  },
+  {
+   "round": 34,
+   "home": "gle",
+   "away": "dun",
+   "match_id": "s34-02"
+  },
+  {
+   "round": 34,
+   "home": "cor",
+   "away": "pel",
+   "match_id": "s34-03"
+  },
+  {
+   "round": 34,
+   "home": "jun",
+   "away": "wre",
+   "match_id": "s34-04"
+  },
+  {
+   "round": 34,
+   "home": "nor",
+   "away": "kes",
+   "match_id": "s34-05"
+  },
+  {
+   "round": 34,
+   "home": "qua",
+   "away": "fen",
+   "match_id": "s34-06"
+  },
+  {
+   "round": 34,
+   "home": "ash",
+   "away": "sal",
+   "match_id": "s34-07"
+  },
+  {
+   "round": 34,
+   "home": "lar",
+   "away": "har",
+   "match_id": "s34-08"
+  },
+  {
+   "round": 34,
+   "home": "oak",
+   "away": "ive",
+   "match_id": "s34-09"
+  },
+  {
+   "round": 34,
+   "home": "bra",
+   "away": "riv",
+   "match_id": "s34-10"
+  },
+  {
+   "round": 35,
+   "home": "low",
+   "away": "dun",
+   "match_id": "s35-01"
+  },
+  {
+   "round": 35,
+   "home": "cor",
+   "away": "mor",
+   "match_id": "s35-02"
+  },
+  {
+   "round": 35,
+   "home": "gle",
+   "away": "wre",
+   "match_id": "s35-03"
+  },
+  {
+   "round": 35,
+   "home": "nor",
+   "away": "pel",
+   "match_id": "s35-04"
+  },
+  {
+   "round": 35,
+   "home": "jun",
+   "away": "fen",
+   "match_id": "s35-05"
+  },
+  {
+   "round": 35,
+   "home": "ash",
+   "away": "kes",
+   "match_id": "s35-06"
+  },
+  {
+   "round": 35,
+   "home": "qua",
+   "away": "har",
+   "match_id": "s35-07"
+  },
+  {
+   "round": 35,
+   "home": "oak",
+   "away": "sal",
+   "match_id": "s35-08"
+  },
+  {
+   "round": 35,
+   "home": "lar",
+   "away": "riv",
+   "match_id": "s35-09"
+  },
+  {
+   "round": 35,
+   "home": "bra",
+   "away": "ive",
+   "match_id": "s35-10"
+  },
+  {
+   "round": 36,
+   "home": "cor",
+   "away": "low",
+   "match_id": "s36-01"
+  },
+  {
+   "round": 36,
+   "home": "dun",
+   "away": "wre",
+   "match_id": "s36-02"
+  },
+  {
+   "round": 36,
+   "home": "nor",
+   "away": "mor",
+   "match_id": "s36-03"
+  },
+  {
+   "round": 36,
+   "home": "gle",
+   "away": "fen",
+   "match_id": "s36-04"
+  },
+  {
+   "round": 36,
+   "home": "ash",
+   "away": "pel",
+   "match_id": "s36-05"
+  },
+  {
+   "round": 36,
+   "home": "jun",
+   "away": "har",
+   "match_id": "s36-06"
+  },
+  {
+   "round": 36,
+   "home": "oak",
+   "away": "kes",
+   "match_id": "s36-07"
+  },
+  {
+   "round": 36,
+   "home": "qua",
+   "away": "riv",
+   "match_id": "s36-08"
+  },
+  {
+   "round": 36,
+   "home": "bra",
+   "away": "sal",
+   "match_id": "s36-09"
+  },
+  {
+   "round": 36,
+   "home": "lar",
+   "away": "ive",
+   "match_id": "s36-10"
+  },
+  {
+   "round": 37,
+   "home": "low",
+   "away": "wre",
+   "match_id": "s37-01"
+  },
+  {
+   "round": 37,
+   "home": "nor",
+   "away": "cor",
+   "match_id": "s37-02"
+  },
+  {
+   "round": 37,
+   "home": "dun",
+   "away": "fen",
+   "match_id": "s37-03"
+  },
+  {
+   "round": 37,
+   "home": "ash",
+   "away": "mor",
+   "match_id": "s37-04"
+  },
+  {
+   "round": 37,
+   "home": "gle",
+   "away": "har",
+   "match_id": "s37-05"
+  },
+  {
+   "round": 37,
+   "home": "oak",
+   "away": "pel",
+   "match_id": "s37-06"
+  },
+  {
+   "round": 37,
+   "home": "jun",
+   "away": "riv",
+   "match_id": "s37-07"
+  },
+  {
+   "round": 37,
+   "home": "bra",
+   "away": "kes",
+   "match_id": "s37-08"
+  },
+  {
+   "round": 37,
+   "home": "qua",
+   "away": "ive",
+   "match_id": "s37-09"
+  },
+  {
+   "round": 37,
+   "home": "lar",
+   "away": "sal",
+   "match_id": "s37-10"
+  },
+  {
+   "round": 38,
+   "home": "nor",
+   "away": "low",
+   "match_id": "s38-01"
+  },
+  {
+   "round": 38,
+   "home": "wre",
+   "away": "fen",
+   "match_id": "s38-02"
+  },
+  {
+   "round": 38,
+   "home": "ash",
+   "away": "cor",
+   "match_id": "s38-03"
+  },
+  {
+   "round": 38,
+   "home": "dun",
+   "away": "har",
+   "match_id": "s38-04"
+  },
+  {
+   "round": 38,
+   "home": "oak",
+   "away": "mor",
+   "match_id": "s38-05"
+  },
+  {
+   "round": 38,
+   "home": "gle",
+   "away": "riv",
+   "match_id": "s38-06"
+  },
+  {
+   "round": 38,
+   "home": "bra",
+   "away": "pel",
+   "match_id": "s38-07"
+  },
+  {
+   "round": 38,
+   "home": "jun",
+   "away": "ive",
+   "match_id": "s38-08"
+  },
+  {
+   "round": 38,
+   "home": "lar",
+   "away": "kes",
+   "match_id": "s38-09"
+  },
+  {
+   "round": 38,
+   "home": "qua",
+   "away": "sal",
+   "match_id": "s38-10"
+  }
+ ]
+}

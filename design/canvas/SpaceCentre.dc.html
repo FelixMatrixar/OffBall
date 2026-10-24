@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall Space Centre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.sc{--eo:cubic-bezier(.2,0,0,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes scRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes scInA{from{opacity:0;transform:translateX(30px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes scInB{from{opacity:0;transform:translateX(30px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes scDraw{to{stroke-dashoffset:0}}
+@keyframes scPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes scRing{0%{opacity:.85;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
+@keyframes scBlink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes scTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scPop{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes scWord{from{opacity:0;transform:translateY(6px);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes scSweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.sc-rise{animation:scRise .45s var(--eo) backwards}
+.sc-in-a{animation:scInA .5s var(--eo) both}
+.sc-in-b{animation:scInB .5s var(--eo) both}
+.sc-ring{stroke-dasharray:300;stroke-dashoffset:300;transform-box:fill-box;transform-origin:center;animation:scDraw .7s var(--eo) .25s forwards,scPulse 1.8s ease-in-out 1s infinite}
+.sc-arrow{stroke-dasharray:400;stroke-dashoffset:400;animation:scDraw .9s var(--eo) .1s forwards}
+.sc-ripple{animation:scRing 1.5s var(--eo) infinite}
+.sc-blink{animation:scBlink 1.4s ease-in-out infinite}
+.sc-ticker{display:flex;width:max-content;animation:scTicker 40s linear infinite}
+.sc-ticker:hover{animation-play-state:paused}
+.sc-pop{animation:scPop .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.sc-w{display:inline-block;margin-inline-end:.26em;animation:scWord .3s var(--eo) both}
+.sc-sweep{animation:scSweep 1.1s var(--eo) 1}
+.sc-btn{transition:transform 80ms var(--eo),box-shadow .25s,background-color .2s;cursor:pointer}
+.sc-btn:hover{transform:translateY(-2px)}
+.sc-btn:active{transform:scale(.97)}
+.sc button:focus-visible,.sc a:focus-visible{outline:2px solid #D7F25C;outline-offset:3px}
+@media (prefers-reduced-motion: reduce){.sc *{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div class="sc" style="min-height: 900px; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 20px 24px 0; box-sizing: border-box; display: flex; flex-direction: column">
+  <div style="max-width: 1440px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; flex: 1">
+
+    <header class="sc-rise" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; color: #ECF1EC; text-decoration: none">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: #ECF1EC; stroke-width: 1.8px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: #ECF1EC; stroke-width: 1.8px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: #D7F25C; stroke-width: 2px"></circle></svg>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 28px">OffBall</span>
+      </a>
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 600; color: #9EB0A6">Space Centre · Round 27</h1>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; background: #D7F25C; color: #0B1110"><span class="sc-blink" style="width: 6px; height: 6px; border-radius: 3px; background: #0B1110"></span>10 LIVE</span>
+      <div style="margin-left: auto; display: flex; gap: 10px; align-items: center">
+        <span style="font-size: 13px; color: #9EB0A6">{{statusText}}</span>
+        <button type="button" aria-pressed="{{pinned}}" onClick="{{togglePin}}" class="sc-btn" style="{{pinStyle}}">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2 H10 L9.5 6.5 L12 9 H4 L6.5 6.5 Z M8 9 V14.5" style="fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linejoin: round; stroke-linecap: round"></path></svg>
+          {{pinLabel}}
+        </button>
+      </div>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: stretch">
+      <section aria-label="Spotlight" aria-live="polite" class="sc-rise" style="flex: 999 1 620px; min-width: 0; background: #121B18; border: 1px solid #27362F; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; animation-delay: 80ms">
+        <sc-for list="{{spotsA}}" as="spot" hint-placeholder-count="1">
+          <div class="sc-in-a" style="display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #D7F25C">BIGGEST MOMENT NOW</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">{{spot.home}} <span style="font-variant-numeric: tabular-nums">{{spot.score}}</span> {{spot.away}}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9EB0A6">{{clockNow}}</span>
+              <span style="margin-left: auto; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #19251F; box-shadow: inset 0 0 0 1px #D7F25C">{{spot.type}}</span>
+            </div>
+            <svg viewBox="-20 -20 1090 720" role="img" aria-label="{{spot.alt}}" style="width: 100%; height: auto; display: block; border-radius: 12px">
+              <rect x="-20" y="-20" width="1090" height="720" style="fill: #0F2419"></rect>
+              <sc-for list="{{stripes}}" as="sp" hint-placeholder-count="10">
+                <rect x="{{sp.x}}" y="0" width="105" height="680" style="{{sp.style}}"></rect>
+              </sc-for>
+              <g style="fill: none; stroke: rgba(236,241,236,0.42); stroke-width: 2px">
+                <rect x="0" y="0" width="1050" height="680"></rect>
+                <line x1="525" y1="0" x2="525" y2="680"></line>
+                <circle cx="525" cy="340" r="91.5"></circle>
+                <rect x="885" y="138.4" width="165" height="403.2"></rect>
+                <rect x="0" y="138.4" width="165" height="403.2"></rect>
+              </g>
+              <ellipse class="sc-ring" cx="{{spot.gx}}" cy="{{spot.gy}}" rx="62" ry="62" style="fill: rgba(215,242,92,0.12); stroke: #D7F25C; stroke-width: 5px"></ellipse>
+              <line class="sc-arrow" x1="{{spot.ax1}}" y1="{{spot.ay1}}" x2="{{spot.ax2}}" y2="{{spot.ay2}}" style="stroke: #7CC0FF; stroke-width: 7px; stroke-linecap: round"></line>
+              <sc-for list="{{spot.dots}}" as="d" hint-placeholder-count="16">
+                <circle class="sc-pop" cx="{{d.x}}" cy="{{d.y}}" r="15" style="{{d.style}}"></circle>
+              </sc-for>
+            </svg>
+            <p style="margin: 0; font-size: 20px; line-height: 1.4; font-weight: 500"><sc-for list="{{spot.words}}" as="w" hint-placeholder-count="12"><span class="sc-w" style="{{w.style}}">{{w.text}}</span></sc-for></p>
+            <span class="sc-sweep" aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(215,242,92,0.08), transparent); pointer-events: none"></span>
+          </div>
+        </sc-for>
+        <sc-for list="{{spotsB}}" as="spot" hint-placeholder-count="0">
+          <div class="sc-in-b" style="display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #D7F25C">BIGGEST MOMENT NOW</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700">{{spot.home}} <span style="font-variant-numeric: tabular-nums">{{spot.score}}</span> {{spot.away}}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #9EB0A6">{{clockNow}}</span>
+              <span style="margin-left: auto; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #19251F; box-shadow: inset 0 0 0 1px #D7F25C">{{spot.type}}</span>
+            </div>
+            <svg viewBox="-20 -20 1090 720" role="img" aria-label="{{spot.alt}}" style="width: 100%; height: auto; display: block; border-radius: 12px">
+              <rect x="-20" y="-20" width="1090" height="720" style="fill: #0F2419"></rect>
+              <sc-for list="{{stripes}}" as="sp" hint-placeholder-count="10">
+                <rect x="{{sp.x}}" y="0" width="105" height="680" style="{{sp.style}}"></rect>
+              </sc-for>
+              <g style="fill: none; stroke: rgba(236,241,236,0.42); stroke-width: 2px">
+                <rect x="0" y="0" width="1050" height="680"></rect>
+                <line x1="525" y1="0" x2="525" y2="680"></line>
+                <circle cx="525" cy="340" r="91.5"></circle>
+                <rect x="885" y="138.4" width="165" height="403.2"></rect>
+                <rect x="0" y="138.4" width="165" height="403.2"></rect>
+              </g>
+              <ellipse class="sc-ring" cx="{{spot.gx}}" cy="{{spot.gy}}" rx="62" ry="62" style="fill: rgba(215,242,92,0.12); stroke: #D7F25C; stroke-width: 5px"></ellipse>
+              <line class="sc-arrow" x1="{{spot.ax1}}" y1="{{spot.ay1}}" x2="{{spot.ax2}}" y2="{{spot.ay2}}" style="stroke: #7CC0FF; stroke-width: 7px; stroke-linecap: round"></line>
+              <sc-for list="{{spot.dots}}" as="d" hint-placeholder-count="16">
+                <circle class="sc-pop" cx="{{d.x}}" cy="{{d.y}}" r="15" style="{{d.style}}"></circle>
+              </sc-for>
+            </svg>
+            <p style="margin: 0; font-size: 20px; line-height: 1.4; font-weight: 500"><sc-for list="{{spot.words}}" as="w" hint-placeholder-count="12"><span class="sc-w" style="{{w.style}}">{{w.text}}</span></sc-for></p>
+            <span class="sc-sweep" aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(215,242,92,0.08), transparent); pointer-events: none"></span>
+          </div>
+        </sc-for>
+        <div aria-hidden="true" style="height: 4px; border-radius: 2px; background: #19251F; overflow: hidden">
+          <div style="{{progress}}"></div>
+        </div>
+      </section>
+
+      <aside aria-label="Up next" class="sc-rise" style="flex: 1 1 300px; min-width: 0; background: #121B18; border: 1px solid #27362F; border-radius: 18px; padding: 16px; animation-delay: 140ms">
+        <h2 style="margin: 0 0 12px; font-size: 15px">Ranked by space value right now</h2>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{ranked}}" as="rk" hint-placeholder-count="5">
+            <li style="{{rk.style}}">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; width: 22px; color: #9EB0A6">{{rk.n}}</span>
+              <span style="flex: 1; min-width: 0">
+                <span style="display: block; font-size: 14px; font-weight: 600">{{rk.match}}</span>
+                <span style="display: block; font-size: 12px; color: #9EB0A6">{{rk.type}}</span>
+              </span>
+              <span style="position: relative; width: 64px; height: 6px; border-radius: 3px; background: #27362F; overflow: hidden"><span style="{{rk.bar}}"></span></span>
+            </li>
+          </sc-for>
+        </ol>
+      </aside>
+    </div>
+
+    <section aria-label="All matches" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px">
+      <sc-for list="{{tiles}}" as="tl" hint-placeholder-count="10">
+        <button type="button" aria-pressed="{{tl.featured}}" onClick="{{tl.pick}}" class="sc-btn sc-rise" style="{{tl.style}}">
+          <span style="display: flex; align-items: center; justify-content: space-between; width: 100%">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #9EB0A6">{{tl.clock}}</span>
+            <sc-if value="{{tl.hot}}" hint-placeholder-val="{{false}}">
+              <span style="position: relative; width: 10px; height: 10px">
+                <span style="position: absolute; inset: 0; border-radius: 5px; background: #D7F25C"></span>
+                <span class="sc-ripple" style="position: absolute; inset: 0; border-radius: 5px; border: 2px solid #D7F25C"></span>
+              </span>
+            </sc-if>
+          </span>
+          <span style="display: flex; align-items: center; gap: 8px; width: 100%; font-size: 14px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 2px; background: #7CC0FF"></span><span style="flex: 1; text-align: left">{{tl.home}}</span><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 20px">{{tl.hs}}</span></span>
+          <span style="display: flex; align-items: center; gap: 8px; width: 100%; font-size: 14px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 2px; background: #E2733A"></span><span style="flex: 1; text-align: left">{{tl.away}}</span><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 20px">{{tl.as}}</span></span>
+          <svg viewBox="0 0 200 30" aria-hidden="true" style="width: 100%; height: auto; display: block; margin-top: 4px">
+            <line x1="0" y1="15" x2="200" y2="15" style="stroke: #27362F; stroke-width: 1px"></line>
+            <polyline points="{{tl.spark}}" style="fill: none; stroke: #7CC0FF; stroke-width: 2px; stroke-linejoin: round"></polyline>
+          </svg>
+          <span style="display: flex; align-items: center; gap: 8px; width: 100%; font-size: 11px; color: #9EB0A6">Space heat<span style="position: relative; flex: 1; height: 5px; border-radius: 3px; background: #27362F; overflow: hidden"><span style="{{tl.heat}}"></span></span></span>
+        </button>
+      </sc-for>
+    </section>
+  </div>
+
+  <div aria-label="Moments ticker" style="margin: 18px -24px 0; border-top: 1px solid #27362F; background: #121B18; overflow: hidden; height: 44px; display: flex; align-items: center">
+    <div class="sc-ticker">
+      <sc-for list="{{ticker}}" as="tk" hint-placeholder-count="12">
+        <span style="display: inline-flex; align-items: center; gap: 10px; padding: 0 22px; font-size: 13px; white-space: nowrap"><span style="width: 6px; height: 6px; border-radius: 3px; background: #D7F25C"></span>{{tk}}</span>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.t0 = Date.now();
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 100);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  st() { return Object.assign({ now: 0, pinned: false, featured: 0, since: 0 }, this.state || {}); }
+  renderVals() {
+    const s = this.st();
+    const now = s.now || Date.now();
+    const t0 = this.t0 || now;
+    const M = [
+      { home: 'Kestrel Bay', away: 'Ashmoor', hs: 0, as: 0, base: 63 * 60 + 4, type: 'Decoy run', value: 41, text: 'Kestrel Bay’s No. 9 drags the centre-back wide. A gap opens in the middle.', g: [885, 280], a: [840, 340, 910, 150] },
+      { home: 'Brackenford', away: 'Saltmere', hs: 2, as: 1, base: 58 * 60 + 12, type: 'Overlap', value: 33, text: 'Brackenford’s full-back overlaps outside. It’s two against one on the flank.', g: [880, 560], a: [700, 620, 900, 600] },
+      { home: 'Morrowdale', away: 'Quarrystone', hs: 1, as: 0, base: 64 * 60 + 40, type: 'Press broken', value: 29, text: 'One pass beats four Quarrystone pressers. Morrowdale break three against two.', g: [640, 330], a: [420, 360, 640, 330] },
+      { home: 'Northcairn', away: 'Oakhallow', hs: 2, as: 2, base: 63 * 60 + 20, type: 'Third-man run', value: 26, text: 'Northcairn’s No. 8 runs beyond the line before the lay-off arrives.', g: [860, 300], a: [700, 420, 860, 300] },
+      { home: 'Fenwyck', away: 'Glenhollow', hs: 3, as: 2, base: 59 * 60 + 2, type: 'Fatigue gap', value: 22, text: 'Glenhollow’s right-back is 18% slower to recover. Fenwyck keep attacking that flank.', g: [860, 120], a: [620, 160, 840, 120] },
+      { home: 'Corvenna', away: 'Wrenhallow', hs: 1, as: 1, base: 61 * 60 + 33, type: 'Switch of play', value: 18, text: 'Corvenna switch it fast. The far winger is one against one with 6 m of space.', g: [860, 600], a: [600, 100, 860, 600] },
+      { home: 'Duncliffe', away: 'Larkhaven', hs: 0, as: 2, base: 60 * 60 + 8, type: 'Cover shadow', value: 15, text: 'Larkhaven’s No. 6 cuts off the passing lane. Duncliffe have to go backwards.', g: [420, 330], a: [300, 330, 410, 330] },
+      { home: 'Harbourne', away: 'Ivelmouth', hs: 0, as: 0, base: 62 * 60 + 51, type: 'Space lost', value: 12, text: 'Ivelmouth have dropped 9 m deeper since the red card.', g: [700, 340], a: [800, 340, 700, 340] },
+      { home: 'Juniper Vale', away: 'Lowmarsh', hs: 1, as: 2, base: 57 * 60 + 17, type: 'Blind-side run', value: 10, text: 'Lowmarsh’s No. 11 arrives on the defender’s blind side.', g: [900, 420], a: [760, 520, 900, 420] },
+      { home: 'Pellston', away: 'Rivenmoor', hs: 0, as: 1, base: 62 * 60 + 5, type: 'Rotation', value: 8, text: 'Pellston rotate three attackers. One marker loses track of a runner.', g: [820, 220], a: [700, 300, 820, 220] }
+    ];
+    const order = [0, 1, 2, 3, 4];
+    const period = 7;
+    const elapsed = (now - (s.since || t0)) / 1000;
+    let featured = s.featured;
+    if (!s.pinned) featured = order[Math.floor(elapsed / period) % order.length];
+    const prog = s.pinned ? 1 : (elapsed % period) / period;
+    if (featured !== this._lastF) { this._lastF = featured; this._flip = !this._flip; }
+
+    const clock = (m) => {
+      const sec = m.base + Math.floor((now - t0) / 1000);
+      return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+    };
+    const f = M[featured];
+    const rnd = (i, k) => { const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
+    const dots = [];
+    for (let i = 0; i < 16; i++) {
+      const home = i < 8;
+      const x = home ? 380 + rnd(featured, i) * 520 : 520 + rnd(featured + 3, i) * 500;
+      const y = 60 + rnd(featured + 7, i) * 560;
+      dots.push({ x: x.toFixed(0), y: y.toFixed(0), style: 'fill: ' + (home ? '#7CC0FF' : '#E2733A') + '; stroke: rgba(9,16,13,.85); stroke-width: 3px; animation-delay: ' + (i * 25) + 'ms' });
+    }
+    const spot = {
+      home: f.home, away: f.away, score: f.hs + '–' + f.as, clock: clock(f), type: f.type,
+      alt: f.home + ' against ' + f.away + ': ' + f.text,
+      gx: f.g[0], gy: f.g[1], ax1: f.a[0], ay1: f.a[1], ax2: f.a[2], ay2: f.a[3],
+      dots: dots,
+      words: f.text.split(' ').map((w, i) => ({ text: w, style: 'animation-delay: ' + (300 + i * 35) + 'ms' }))
+    };
+    const ranked = order.map((idx, r) => {
+      const m = M[idx];
+      const on = idx === featured;
+      return {
+        n: r + 1, match: m.home + ' v ' + m.away, type: m.type + ' · ' + m.value + ' m²',
+        style: 'display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; transition: background-color .3s, box-shadow .3s, transform .35s var(--ep); ' +
+          (on ? 'background: #19251F; box-shadow: inset 0 0 0 2px #D7F25C; transform: translateX(4px)' : 'background: transparent; box-shadow: inset 0 0 0 1px #27362F'),
+        bar: 'position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: ' + (on ? '#D7F25C' : '#7CC0FF') + '; transition: width .5s var(--eo); width: ' + (m.value / 41 * 100).toFixed(0) + '%'
+      };
+    });
+    const tiles = M.map((m, i) => {
+      let pts = '';
+      for (let k = 0; k <= 20; k++) pts += (k * 10) + ',' + (15 - Math.sin(k / 2.2 + i) * 9 * rnd(i, 1) - Math.sin(k / 0.9 + i * 2) * 3).toFixed(1) + ' ';
+      const heat = 0.25 + 0.6 * Math.abs(Math.sin((now - t0) / 2400 + i * 0.9)) * (m.value / 41 + 0.3);
+      const on = i === featured;
+      return {
+        home: m.home, away: m.away, hs: m.hs, as: m.as, clock: clock(m), spark: pts.trim(), featured: on, hot: i < 5,
+        pick: () => this.setState({ featured: i, pinned: true }),
+        heat: 'position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #D7F25C; transition: width .4s linear; width: ' + Math.min(100, heat * 100).toFixed(0) + '%',
+        style: 'display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; border: 0; text-align: left; color: #ECF1EC; font-family: Inter, sans-serif; animation-delay: ' + (180 + i * 40) + 'ms; ' +
+          (on ? 'background: #19251F; box-shadow: inset 0 0 0 2px #D7F25C, 0 10px 30px rgba(0,0,0,.35)' : 'background: #121B18; box-shadow: inset 0 0 0 1px #27362F')
+      };
+    });
+    const ticker = M.map((m) => clock(m) + '  ' + m.home + ' v ' + m.away + ' · ' + m.type);
+    const stripes = [];
+    for (let i = 0; i < 10; i++) stripes.push({ x: i * 105, style: 'fill: ' + (i % 2 ? '#173624' : '#14301F') });
+
+    return {
+      spotsA: this._flip ? [spot] : [], spotsB: this._flip ? [] : [spot], clockNow: spot.clock,
+      ranked: ranked, tiles: tiles, ticker: ticker.concat(ticker), stripes: stripes,
+      progress: 'height: 100%; border-radius: 2px; background: #D7F25C; transform-origin: left; transform: scaleX(' + prog.toFixed(3) + '); transition: transform .1s linear',
+      pinned: s.pinned,
+      pinLabel: s.pinned ? 'Pinned · tap to resume' : 'Pin this match',
+      pinStyle: 'min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 8px; border: 0; font: 600 14px Inter, sans-serif; ' +
+        (s.pinned ? 'background: #D7F25C; color: #0B1110' : 'background: #121B18; color: #ECF1EC; box-shadow: inset 0 0 0 1px #27362F'),
+      togglePin: () => this.setState({ pinned: !s.pinned, featured: featured, since: Date.now() }),
+      statusText: s.pinned ? 'Whip-around paused' : 'Jumping to the biggest moment every 7 s'
+    };
+  }
+}
+</script>
+</body>
+</html>

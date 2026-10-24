@@ -1,0 +1,39 @@
+{
+  "meta": {"code": "en", "name": "English", "direction": "ltr", "decimal": ".", "review": "reference language"},
+  "glossary": {
+    "decoy_run": "decoy run", "gap": "gap", "space": "space", "half_space": "half-space",
+    "run_in_behind": "run in behind", "overlap": "overlap", "underlap": "underlap", "third_man_run": "third-man run",
+    "blind_side_run": "blind-side run", "centre_back": "centre-back", "full_back": "full-back", "winger": "winger",
+    "striker": "striker", "midfielder": "midfielder", "goalkeeper": "goalkeeper", "through_ball": "through ball",
+    "press": "press", "counter_attack": "counter-attack", "offside": "offside", "cover_shadow": "cover shadow",
+    "pinning": "pinning", "switch_of_play": "switch of play", "pitch_control": "pitch control",
+    "space_created": "space created", "null_run": "run passed on"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Watch No. {creator_no}. This run isn't for the ball. It's to pull a defender away.",
+    "decoy_run.casual.gap": "{dragged_club}'s No. {dragged_no} follows. A gap opens in the middle.",
+    "decoy_run.casual.finish.goal": "Goal. Made by No. {creator_no}'s run, finished by No. {receiver_no}.",
+    "decoy_run.casual.finish.shot": "No. {receiver_no} shoots from the gap No. {creator_no} opened.",
+    "decoy_run.casual.finish.chance": "No. {receiver_no} is into the space No. {creator_no}'s run created.",
+    "decoy_run.learn.define": "That was a {term:decoy_run}: a run made so a teammate gets space.",
+    "decoy_run.analyst": "{Term:decoy_run}: No. {creator_no} pulls No. {dragged_no} {displacement} m out of position. {club} control of the gap +{gain} pts; {space} m² of space created.",
+    "decoy_run.analyst.cf": "Without the run, the gap stays shut in {shut} of {runs} re-runs.",
+    "decoy_run.player": "{player} has dragged {dragged_count} defenders today, creating {space_total} m² of space.",
+    "decoy_run.audio": "{club} attack. No. {creator_no} sprints {direction}, and {dragged_club}'s No. {dragged_no} follows. A gap opens {gap_where}. No. {receiver_no} runs into it.",
+    "decoy_run.broadcaster": "DECOY RUN · No. {creator_no} drags No. {dragged_no} · {space} m² created",
+    "decoy_run.a11y.run_arrow": "No. {creator_no} runs {direction}.",
+    "decoy_run.a11y.gap_ring": "Space opens {gap_where}.",
+    "decoy_run.a11y.pass_line": "No. {passer_no} passes into the gap.",
+    "ghost.offer": "What if No. {creator_no} hadn't run? The ghosts replay it without the run.",
+    "direction.left": "towards the left wing",
+    "direction.right": "towards the right wing",
+    "gap_where.centre_edge": "in the centre, just outside the box",
+    "gap_where.centre": "in the centre",
+    "gap_where.left_half": "in the left half-space",
+    "gap_where.right_half": "in the right half-space",
+    "label.correction": "Correction",
+    "label.synthetic": "Synthetic data",
+    "label.ai": "AI-generated",
+    "notice.translation": "Shown in English: a translation wasn't ready in time."
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "Interval": {
+      "additionalProperties": false,
+      "properties": {
+        "median": {
+          "title": "Median",
+          "type": "number"
+        },
+        "lo": {
+          "description": "5th percentile",
+          "title": "Lo",
+          "type": "number"
+        },
+        "hi": {
+          "description": "95th percentile",
+          "title": "Hi",
+          "type": "number"
+        }
+      },
+      "required": [
+        "median",
+        "lo",
+        "hi"
+      ],
+      "title": "Interval",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The Tactician's proof of cause: the moment re-run with and without the run.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "counterfactual",
+      "default": "counterfactual",
+      "title": "Kind",
+      "type": "string"
+    },
+    "counterfactual_id": {
+      "title": "Counterfactual Id",
+      "type": "string"
+    },
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "removed_player_id": {
+      "title": "Removed Player Id",
+      "type": "string"
+    },
+    "removed_action": {
+      "title": "Removed Action",
+      "type": "string"
+    },
+    "runs": {
+      "title": "Runs",
+      "type": "integer"
+    },
+    "space_created_m2": {
+      "$ref": "#/$defs/Interval"
+    },
+    "epv_gain": {
+      "$ref": "#/$defs/Interval"
+    },
+    "gap_open_rate_with": {
+      "title": "Gap Open Rate With",
+      "type": "number"
+    },
+    "gap_open_rate_without": {
+      "title": "Gap Open Rate Without",
+      "type": "number"
+    },
+    "ghost_tracks": {
+      "additionalProperties": {
+        "items": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        "type": "array"
+      },
+      "description": "player_id -> [t_ms, x, y] for the median no-run re-run",
+      "title": "Ghost Tracks",
+      "type": "object"
+    },
+    "elapsed_ms": {
+      "default": 0,
+      "title": "Elapsed Ms",
+      "type": "integer"
+    },
+    "decided_by": {
+      "default": "agent",
+      "enum": [
+        "agent",
+        "rule"
+      ],
+      "title": "Decided By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "counterfactual_id",
+    "candidate_id",
+    "removed_player_id",
+    "removed_action",
+    "runs",
+    "space_created_m2",
+    "epv_gain",
+    "gap_open_rate_with",
+    "gap_open_rate_without"
+  ],
+  "title": "CounterfactualResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/counterfactual.schema.json"
+}

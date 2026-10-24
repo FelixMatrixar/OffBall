@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+build/
+
+# Node
+node_modules/
+
+# Build output
+dist/
+
+# Test output
+test-results/
+playwright-report/
+.coverage
+htmlcov/
+
+# Local settings and secrets
+.env
+.env.*
+*.local
+.azure/
+
+# OS files
+.DS_Store
+Thumbs.db

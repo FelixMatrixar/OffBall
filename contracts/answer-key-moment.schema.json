@@ -1,0 +1,206 @@
+{
+  "$defs": {
+    "CounterfactualTruth": {
+      "additionalProperties": false,
+      "properties": {
+        "space_created_m2": {
+          "description": "Gap-zone area the run created, against the no-run re-runs",
+          "title": "Space Created M2",
+          "type": "number"
+        },
+        "epv_gain": {
+          "description": "Gain in possession value attributable to the run",
+          "title": "Epv Gain",
+          "type": "number"
+        },
+        "gap_opens_without_run": {
+          "title": "Gap Opens Without Run",
+          "type": "boolean"
+        },
+        "runs": {
+          "default": 0,
+          "description": "Re-runs behind these numbers",
+          "title": "Runs",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "space_created_m2",
+        "epv_gain",
+        "gap_opens_without_run"
+      ],
+      "title": "CounterfactualTruth",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "answer_key.json: a labelled moment, planted by the director or labelled by the oracle.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "moment_id": {
+      "title": "Moment Id",
+      "type": "string"
+    },
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "planted",
+        "oracle"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "decoy_run",
+        "overlap",
+        "underlap",
+        "third_man_run",
+        "blind_side_run",
+        "timed_run_in_behind",
+        "false_9_drop",
+        "pinning",
+        "rotation",
+        "set_piece_screen",
+        "switch_of_play",
+        "press_broken",
+        "fatigue_gap",
+        "space_lost",
+        "rest_defence_exposed",
+        "cover_shadow",
+        "null_run",
+        "null_overlap"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_start_ms": {
+      "title": "T Start Ms",
+      "type": "integer"
+    },
+    "t_end_ms": {
+      "title": "T End Ms",
+      "type": "integer"
+    },
+    "team_id": {
+      "title": "Team Id",
+      "type": "string"
+    },
+    "creator_id": {
+      "title": "Creator Id",
+      "type": "string"
+    },
+    "dragged_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dragged Ids",
+      "type": "array"
+    },
+    "receiver_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Receiver Id"
+    },
+    "gap_zone": {
+      "items": {
+        "description": "Pitch position in metres: [x, y]",
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Gap Zone",
+      "type": "array"
+    },
+    "expected": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Expected",
+      "type": "object"
+    },
+    "observed": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Signal values the generator measured",
+      "title": "Observed",
+      "type": "object"
+    },
+    "counterfactual": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CounterfactualTruth"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "is_null": {
+      "default": false,
+      "title": "Is Null",
+      "type": "boolean"
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Outcome"
+    },
+    "attempts": {
+      "default": 1,
+      "title": "Attempts",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "moment_id",
+    "match_id",
+    "source",
+    "type",
+    "period",
+    "t_start_ms",
+    "t_end_ms",
+    "team_id",
+    "creator_id"
+  ],
+  "title": "AnswerKeyMoment",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/answer-key-moment.schema.json"
+}

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall broadcast output</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.bc{--eo:cubic-bezier(.2,0,0,1)}
+@keyframes bcBug{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes bcBugR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes bcWipe{0%,3%{clip-path:inset(0 100% 0 0)}9%,86%{clip-path:inset(0 0 0 0)}92%,100%{clip-path:inset(0 0 0 100%)}}
+@keyframes bcUp{0%,6%{opacity:0;transform:translateY(40px)}12%,86%{opacity:1;transform:none}92%,100%{opacity:0;transform:translateY(20px)}}
+@keyframes bcTag{0%,10%{opacity:0;transform:translateX(-50%) translateY(10px) scale(.7)}15%{opacity:1;transform:translateX(-50%) scale(1.08)}18%,84%{opacity:1;transform:translateX(-50%) scale(1)}90%,100%{opacity:0;transform:translateX(-50%) scale(.9)}}
+@keyframes bcRing{0%,12%{stroke-dashoffset:1200;opacity:1}26%,86%{stroke-dashoffset:0;opacity:1}92%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes bcFill{0%,20%{opacity:0}30%,86%{opacity:1}92%,100%{opacity:0}}
+@keyframes bcRun{0%,2%{stroke-dashoffset:420;opacity:1}16%,86%{stroke-dashoffset:0;opacity:1}92%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes bcHead{0%,15%{opacity:0}18%,86%{opacity:1}92%,100%{opacity:0}}
+@keyframes bcBlink{0%,100%{opacity:1}50%{opacity:.25}}
+.bc-anim .bc-bug{animation:bcBug .7s var(--eo) both}
+.bc-anim .bc-bug-r{animation:bcBugR .7s var(--eo) .15s both}
+.bc-anim .bc-lower{animation:bcWipe 10s var(--eo) infinite}
+.bc-anim .bc-stat{animation:bcUp 10s var(--eo) infinite}
+.bc-anim .bc-tag{animation:bcTag 10s var(--eo) infinite}
+.bc-anim .bc-ring{stroke-dasharray:1200;animation:bcRing 10s var(--eo) infinite,bcFill 10s var(--eo) infinite}
+.bc-anim .bc-run{stroke-dasharray:420;animation:bcRun 10s var(--eo) infinite}
+.bc-anim .bc-head{animation:bcHead 10s var(--eo) infinite}
+.bc-anim .bc-blink{animation:bcBlink 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.bc *{animation:none!important}}
+</style>
+</helmet>
+<div class="{{rootClass}}" style="{{rootStyle}}">
+
+  <sc-if value="{{program}}" hint-placeholder-val="{{true}}">
+    <svg viewBox="0 0 1920 1080" role="img" aria-label="Broadcast camera view of Ashmoor's half. Kestrel Bay's No. 9 has pulled No. 5 wide and a gap is open in the centre." style="position: absolute; inset: 0; width: 1920px; height: 1080px; display: block">
+      <rect x="0" y="0" width="1920" height="1080" style="fill: #0E1A15"></rect>
+      <rect x="0" y="0" width="1920" height="64" style="fill: #0A120F"></rect>
+      <rect x="0" y="64" width="1920" height="40" style="fill: #101C17"></rect>
+      <rect x="0" y="104" width="1920" height="38" style="fill: #0C1612"></rect>
+      <rect x="0" y="142" width="1920" height="22" style="fill: #1A2A23"></rect>
+      <sc-for list="{{stripes}}" as="sp" hint-placeholder-count="12">
+        <polygon points="{{sp.pts}}" style="{{sp.style}}"></polygon>
+      </sc-for>
+      <g style="fill: none; stroke: rgba(236,241,236,0.62); stroke-width: 3px; stroke-linejoin: round">
+        <sc-for list="{{lines}}" as="ln" hint-placeholder-count="10">
+          <polyline points="{{ln}}"></polyline>
+        </sc-for>
+      </g>
+      <polygon class="bc-ring" points="{{gap}}" style="fill: rgba(215,242,92,0.14); stroke: #D7F25C; stroke-width: 6px; stroke-linejoin: round"></polygon>
+      <polyline class="bc-run" points="{{run.line}}" style="fill: none; stroke: #7CC0FF; stroke-width: 9px; stroke-linecap: round; opacity: 0.95"></polyline>
+      <polygon class="bc-head" points="{{run.head}}" style="fill: #7CC0FF"></polygon>
+      <line x1="{{pass.x1}}" y1="{{pass.y1}}" x2="{{pass.x2}}" y2="{{pass.y2}}" style="stroke: #FFFFFF; stroke-width: 5px; stroke-dasharray: 16 12; opacity: 0.9"></line>
+      <sc-for list="{{figures}}" as="f" hint-placeholder-count="22">
+        <g>
+          <ellipse cx="{{f.x}}" cy="{{f.y}}" rx="{{f.sr}}" ry="{{f.sry}}" style="fill: rgba(0,0,0,0.35)"></ellipse>
+          <rect x="{{f.bx}}" y="{{f.by}}" width="{{f.bw}}" height="{{f.bh}}" rx="{{f.br}}" style="{{f.body}}"></rect>
+          <circle cx="{{f.x}}" cy="{{f.hy}}" r="{{f.hr}}" style="{{f.head}}"></circle>
+          <text x="{{f.x}}" y="{{f.ty}}" style="{{f.num}}">{{f.n}}</text>
+        </g>
+      </sc-for>
+      <circle cx="{{ball.x}}" cy="{{ball.y}}" r="{{ball.r}}" style="fill: #FFFFFF; stroke: #0B1110; stroke-width: 2px"></circle>
+      <g style="fill: none; stroke: #ECF1EC; stroke-width: 4px">
+        <polyline points="{{goal}}"></polyline>
+      </g>
+    </svg>
+  </sc-if>
+
+  <sc-for list="{{tags}}" as="tg" hint-placeholder-count="2">
+    <div class="bc-tag" style="{{tg.style}}">
+      <span style="{{tg.dot}}"></span>
+      <span>{{tg.text}}</span>
+    </div>
+  </sc-for>
+  <div class="bc-tag" style="{{spaceTag}}">SPACE</div>
+
+  <div class="bc-bug" style="position: absolute; left: 96px; top: 54px; display: flex; align-items: stretch; height: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: #ECF1EC; border-radius: 6px; overflow: hidden">
+    <span style="background: #7CC0FF; width: 10px"></span>
+    <span style="background: #0B1110; display: flex; align-items: center; padding: 0 18px; font-size: 36px; letter-spacing: 1px">KES</span>
+    <span style="background: #ECF1EC; color: #0B1110; display: flex; align-items: center; padding: 0 18px; font-size: 40px; font-variant-numeric: tabular-nums">0–0</span>
+    <span style="background: #0B1110; display: flex; align-items: center; padding: 0 18px; font-size: 36px; letter-spacing: 1px">ASH</span>
+    <span style="background: #E2733A; width: 10px"></span>
+    <span style="background: #19251F; display: flex; align-items: center; padding: 0 18px; font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums">63:04</span>
+  </div>
+
+  <div class="bc-bug-r" style="position: absolute; right: 96px; top: 54px; display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 18px; border-radius: 6px; background: rgba(11,17,16,0.88); color: #ECF1EC; font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: #ECF1EC; stroke-width: 2px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: #ECF1EC; stroke-width: 2px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: #D7F25C; stroke-width: 2.2px"></circle></svg>
+    OffBall · space view
+  </div>
+
+  <div class="bc-lower" style="position: absolute; left: 96px; bottom: 54px; width: 1220px; display: flex; border-radius: 8px; overflow: hidden; background: rgba(11,17,16,0.92); color: #ECF1EC">
+    <span style="width: 12px; background: #D7F25C; flex: none"></span>
+    <div style="padding: 22px 28px">
+      <p style="margin: 0; font-family: Inter, sans-serif; font-size: 38px; line-height: 1.25; font-weight: 600">Watch No. 9. This run isn’t to get the ball. It’s to pull a defender away.</p>
+      <p style="margin: 10px 0 0; font-family: Inter, sans-serif; font-size: 20px; color: #9EB0A6">OffBall · AI-generated · fact-checked · synthetic match</p>
+    </div>
+  </div>
+
+  <div class="bc-stat" style="position: absolute; right: 96px; bottom: 54px; width: 420px; border-radius: 8px; overflow: hidden; background: rgba(11,17,16,0.92); color: #ECF1EC; padding: 22px 26px; box-sizing: border-box">
+    <div style="font-family: Inter, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: #9EB0A6">DEFENDER PULLED</div>
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-top: 6px">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 76px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums">10.8 m</span>
+      <span style="font-family: Inter, sans-serif; font-size: 20px; color: #E2733A; font-weight: 600">No. 5</span>
+    </div>
+  </div>
+
+  <sc-if value="{{showSafe}}" hint-placeholder-val="{{true}}">
+    <div aria-hidden="true" style="position: absolute; left: 67.2px; top: 37.8px; width: 1785.6px; height: 1004.4px; border: 2px dashed rgba(255,122,122,0.85); box-sizing: border-box; pointer-events: none">
+      <span style="position: absolute; right: 8px; top: 4px; font: 600 16px Inter, sans-serif; color: #FF9A9A">Action-safe 93%</span>
+    </div>
+    <div aria-hidden="true" style="position: absolute; left: 96px; top: 54px; width: 1728px; height: 972px; border: 2px dashed rgba(124,192,255,0.85); box-sizing: border-box; pointer-events: none">
+      <span style="position: absolute; right: 8px; bottom: 4px; font: 600 16px Inter, sans-serif; color: #A9D6FF">Graphics-safe 90% · EBU R 95</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"output":{"editor":"enum","options":["Program","Graphics only (key)"],"default":"Program"},"showSafeAreas":{"editor":"boolean","default":true},"animateGraphics":{"editor":"boolean","default":true},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  at(keys, t, ease) {
+    if (t <= keys[0][0]) return [keys[0][1], keys[0][2]];
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i], b = keys[i + 1];
+      if (t <= b[0]) { let u = (t - a[0]) / (b[0] - a[0]); if (ease) u = u * u * (3 - 2 * u); return [a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u]; }
+    }
+    const l = keys[keys.length - 1];
+    return [l[1], l[2]];
+  }
+  renderVals() {
+    const program = this.props.output !== 'Graphics only (key)';
+    const showSafe = this.props.showSafeAreas !== false;
+    const t = 4.6;
+    const F = 7200, XC = 84, C = 150, K = 471300, H0 = -1992, V = 5760;
+    const P = (x, y) => { const d = y + C; return [960 + F * (x - XC) / d, H0 + K / d, d]; };
+    const pt = (x, y) => { const p = P(x, y); return p[0].toFixed(1) + ',' + p[1].toFixed(1); };
+    const seg = (x0, y0, x1, y1) => pt(x0, y0) + ' ' + pt(x1, y1);
+    const arc = (cx, cy, r, a0, a1, clip) => {
+      const out = [];
+      for (let i = 0; i <= 48; i++) {
+        const a = a0 + (a1 - a0) * i / 48;
+        const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
+        if (!clip || clip(x, y)) out.push(pt(x, y));
+      }
+      return out.join(' ');
+    };
+
+    const stripes = [];
+    for (let i = 0; i < 20; i++) {
+      const x0 = i * 5.25, x1 = x0 + 5.25;
+      if (x1 < 40) continue;
+      stripes.push({ pts: [pt(x0, 0), pt(x1, 0), pt(x1, 68), pt(x0, 68)].join(' '), style: 'fill: ' + (i % 2 ? '#1A3D29' : '#173623') });
+    }
+    stripes.push({ pts: [pt(105, -6), pt(115, -6), pt(115, 74), pt(105, 74)].join(' '), style: 'fill: #12291C' });
+
+    const lines = [
+      seg(30, 0, 105, 0), seg(30, 68, 105, 68), seg(105, 0, 105, 68), seg(52.5, 0, 52.5, 68),
+      [pt(105, 13.84), pt(88.5, 13.84), pt(88.5, 54.16), pt(105, 54.16)].join(' '),
+      [pt(105, 24.84), pt(99.5, 24.84), pt(99.5, 43.16), pt(105, 43.16)].join(' '),
+      arc(94, 34, 9.15, Math.PI * 0.5, Math.PI * 1.5, (x) => x <= 88.5),
+      arc(52.5, 34, 9.15, -Math.PI * 0.5, Math.PI * 0.5),
+      arc(94, 34, 0.25, 0, Math.PI * 2)
+    ];
+
+    const gapPts = [];
+    for (let i = 0; i < 48; i++) {
+      const a = i / 48 * Math.PI * 2;
+      gapPts.push(pt(88.5 + 6.2 * Math.cos(a), 40 + 6.2 * Math.sin(a)));
+    }
+
+    const keys = {
+      k2: [[0, 62, 10], [9, 66, 10]], k3: [[0, 58, 60], [9, 62, 61]], k6: [[0, 50, 34], [9, 54, 35]],
+      k7: [[0, 86, 13], [4, 88, 14], [9, 90, 15]], k8: [[0, 55, 39.5], [4.2, 60, 40.4], [6, 63, 41], [9, 66, 41]],
+      k9: [[0, 84, 34], [1, 84, 34], [4.6, 91, 53], [9, 92, 54]], k10: [[0, 73, 44], [3.8, 76, 42], [5.6, 88, 40.3], [6.4, 89, 40], [9, 92, 39]],
+      k11: [[0, 82, 58], [4, 84, 60], [9, 86, 60]],
+      a1: [[0, 101, 34], [6.4, 101.5, 36], [9, 101, 35]], a2: [[0, 89, 58], [9, 90, 59]], a3: [[0, 88, 13], [9, 88, 14]],
+      a4: [[0, 91, 29], [9, 92, 30]], a5: [[0, 90, 37], [1.5, 90, 37], [4.6, 93.5, 47.2], [9, 93.7, 47]],
+      a6: [[0, 79, 37], [3.5, 74, 39], [9, 75, 39]], a7: [[0, 70, 14], [9, 71, 15]], a8: [[0, 78, 26], [9, 79, 27]],
+      a9: [[0, 60, 30], [9, 61, 31]], a10: [[0, 77, 49], [9, 79, 50]], a11: [[0, 69, 57], [9, 70, 57]]
+    };
+    const nums = { k2: 2, k3: 3, k6: 6, k7: 7, k8: 8, k9: 9, k10: 10, k11: 11, a1: 1, a2: 2, a3: 3, a4: 4, a5: 5, a6: 6, a7: 7, a8: 8, a9: 9, a10: 10, a11: 11 };
+    const pos = {};
+    Object.keys(keys).forEach((id) => { pos[id] = this.at(keys[id], t, true); });
+    const figs = Object.keys(keys).map((id) => {
+      const xy = pos[id], p = P(xy[0], xy[1]), d = p[2];
+      const kes = id[0] === 'k';
+      const h = V * 1.85 / d, w = F * 0.62 / d, hr = w * 0.42;
+      const bodyH = h * 0.78;
+      return {
+        d: d, sx: p[0],
+        x: p[0].toFixed(1), y: p[1].toFixed(1),
+        sr: (F * 0.6 / d).toFixed(1), sry: (F * 0.18 / d).toFixed(1),
+        bx: (p[0] - w / 2).toFixed(1), by: (p[1] - bodyH).toFixed(1), bw: w.toFixed(1), bh: bodyH.toFixed(1), br: (w / 2.4).toFixed(1),
+        hy: (p[1] - bodyH - hr * 0.9).toFixed(1), hr: hr.toFixed(1),
+        ty: (p[1] - bodyH * 0.45).toFixed(1), n: nums[id],
+        body: 'fill: ' + (kes ? '#7CC0FF' : '#E2733A') + '; stroke: rgba(9,16,13,0.6); stroke-width: 1.5px',
+        head: 'fill: #E9D7C4; stroke: rgba(9,16,13,0.5); stroke-width: 1px',
+        num: 'fill: ' + (kes ? '#06121F' : '#1E0C02') + '; font-family: Inter, sans-serif; font-weight: 700; font-size: ' + (w * 0.62).toFixed(1) + 'px; text-anchor: middle; dominant-baseline: middle'
+      };
+    }).filter((f) => f.sx > -60 && f.sx < 1980).sort((a, b) => b.d - a.d);
+
+    const lead = this.at(keys.k9, Math.min(4.6, t + 0.8), true);
+    const runPts = [];
+    for (let i = 0; i <= 12; i++) {
+      const u = i / 12;
+      runPts.push(pt(84 + (lead[0] - 84) * u, 34 + (lead[1] - 34) * u));
+    }
+    const e = P(lead[0], lead[1]), s0 = P(84 + (lead[0] - 84) * 0.9, 34 + (lead[1] - 34) * 0.9);
+    const dx = e[0] - s0[0], dy = e[1] - s0[1], len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+    const hb = [e[0] + ux * 22, e[1] + uy * 22];
+    const head = hb[0].toFixed(1) + ',' + hb[1].toFixed(1) + ' ' + (e[0] - uy * 16).toFixed(1) + ',' + (e[1] + ux * 16).toFixed(1) + ' ' + (e[0] + uy * 16).toFixed(1) + ',' + (e[1] - ux * 16).toFixed(1);
+
+    const bu = (t - 4.2) / 1.4;
+    const bxm = 60.6 + (88 - 60.6) * bu, bym = 40.4 - 0.1 * bu;
+    const bp = P(bxm, bym), tp = P(88, 40.3);
+
+    const goal = (() => {
+      const l = P(105, 30.34), r = P(105, 37.66);
+      const hl = V * 2.44 / l[2], hr = V * 2.44 / r[2];
+      return [l[0], l[1], l[0], l[1] - hl, r[0], r[1] - hr, r[0], r[1]].map((v) => v.toFixed(1)).reduce((acc, v, i) => acc + (i % 2 ? ',' : ' ') + v, '').trim();
+    })();
+
+    const tag = (id, text, color) => {
+      const xy = pos[id], p = P(xy[0], xy[1]), d = p[2];
+      const top = p[1] - V * 1.85 / d - 64;
+      return {
+        text: text,
+        style: 'position: absolute; left: ' + p[0].toFixed(0) + 'px; top: ' + top.toFixed(0) + 'px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 999px; background: rgba(11,17,16,0.9); color: #ECF1EC; font: 700 26px Inter, sans-serif; white-space: nowrap; animation-delay: ' + (id === 'a5' ? 0.35 : 0) + 's',
+        dot: 'width: 14px; height: 14px; border-radius: 7px; background: ' + color
+      };
+    };
+    const gp = P(88.5, 46.8);
+
+    const rootStyle = 'position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: Inter, sans-serif; color: #ECF1EC; ' +
+      (program ? 'background: #0E1A15' : 'background-color: #D9D9D9; background-image: repeating-conic-gradient(#BDBDBD 0% 25%, #E6E6E6 0% 50%); background-size: 48px 48px');
+
+    return {
+      rootClass: 'bc' + (this.props.animateGraphics !== false ? ' bc-anim' : ''),
+      rootStyle: rootStyle,
+      program: program,
+      showSafe: showSafe,
+      stripes: stripes,
+      lines: lines,
+      gap: gapPts.join(' '),
+      run: { line: runPts.join(' '), head: head },
+      pass: { x1: bp[0].toFixed(1), y1: bp[1].toFixed(1), x2: tp[0].toFixed(1), y2: tp[1].toFixed(1) },
+      figures: figs,
+      ball: { x: bp[0].toFixed(1), y: (bp[1] - 4).toFixed(1), r: (F * 0.16 / bp[2]).toFixed(1) },
+      goal: goal,
+      tags: [tag('k9', 'No. 9 · decoy run', '#7CC0FF'), tag('a5', 'No. 5 follows', '#E2733A')],
+      spaceTag: 'position: absolute; left: ' + gp[0].toFixed(0) + 'px; top: ' + (gp[1] - 58).toFixed(0) + 'px; transform: translateX(-50%); padding: 6px 14px; border-radius: 6px; background: #D7F25C; color: #0B1110; font: 700 24px Inter, sans-serif; letter-spacing: 0.12em; animation-delay: 1.4s'
+    };
+  }
+}
+</script>
+</body>
+</html>

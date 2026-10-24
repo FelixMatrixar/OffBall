@@ -1,0 +1,229 @@
+{
+  "additionalProperties": false,
+  "description": "One line of events.jsonl, and the payload of an `event` feed message.",
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "possession_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Possession Id"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_ms": {
+      "minimum": 0,
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "team_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Team Id"
+    },
+    "player_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Player Id"
+    },
+    "type": {
+      "enum": [
+        "period_start",
+        "period_end",
+        "pass",
+        "carry",
+        "shot",
+        "save",
+        "tackle",
+        "interception",
+        "clearance",
+        "foul",
+        "card",
+        "offside",
+        "ball_out",
+        "substitution"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "subtype": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Subtype"
+    },
+    "start_xy": {
+      "anyOf": [
+        {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Start Xy"
+    },
+    "end_xy": {
+      "anyOf": [
+        {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "End Xy"
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Outcome"
+    },
+    "body_part": {
+      "anyOf": [
+        {
+          "enum": [
+            "right_foot",
+            "left_foot",
+            "head",
+            "other"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Body Part"
+    },
+    "under_pressure": {
+      "default": false,
+      "title": "Under Pressure",
+      "type": "boolean"
+    },
+    "ball_speed_mps": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ball Speed Mps"
+    },
+    "recipient_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Pass receiver; for a substitution, the player coming on",
+      "title": "Recipient Id"
+    },
+    "opponent_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The player challenged, for tackles and fouls",
+      "title": "Opponent Id"
+    },
+    "related_event_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Related Event Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "event_id",
+    "period",
+    "t_ms",
+    "type"
+  ],
+  "title": "Event",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/event.schema.json"
+}

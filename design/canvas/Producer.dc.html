@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OffBall producer console</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7CC0FF}a:hover{color:#B8DCFF}
+.pc{--eo:cubic-bezier(.2,0,0,1);--ep:cubic-bezier(.34,1.56,.64,1)}
+@keyframes pcRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pcPop{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes pcGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pcShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes pcStrike{to{background-size:100% 2px}}
+@keyframes pcBlink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes pcSlide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes pcRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
+@keyframes pcDraw{to{stroke-dashoffset:0}}
+.pc-rise{animation:pcRise .42s var(--eo) backwards}
+.pc-pop{animation:pcPop .45s var(--ep) both;transform-box:fill-box;transform-origin:center}
+.pc-grow{transform-origin:left center;animation:pcGrow .45s var(--eo) both}
+.pc-shake{animation:pcGrow .45s var(--eo) both,pcShake .5s var(--eo) both;transform-origin:left center}
+.pc-strike{background-image:linear-gradient(#FFB4B4,#FFB4B4);background-repeat:no-repeat;background-position:0 55%;background-size:0 2px;animation:pcStrike .45s var(--eo) forwards;color:#9EB0A6}
+.pc-blink{animation:pcBlink 1.2s ease-in-out infinite}
+.pc-slide{animation:pcSlide .45s var(--eo) backwards}
+.pc-ripple{animation:pcRing 1.5s var(--eo) infinite}
+.pc-draw{stroke-dasharray:420;stroke-dashoffset:420;animation:pcDraw .8s var(--eo) .3s forwards}
+.pc-btn{transition:transform 80ms var(--eo),background-color .15s,color .15s,box-shadow .2s;cursor:pointer}
+.pc-btn:hover{transform:translateY(-1px)}
+.pc-btn:active{transform:scale(.96)}
+.pc-root button:focus-visible,.pc-root a:focus-visible{outline:2px solid #D7F25C;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.pc *{animation-duration:1ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div class="pc pc-root" style="min-height: 900px; background: #0B1110; color: #ECF1EC; font-family: Inter, system-ui, sans-serif; padding: 18px 24px 28px; box-sizing: border-box">
+
+  <header class="pc-rise" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; max-width: 1440px; margin: 0 auto 16px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="28" height="28" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" style="fill: none; stroke: #ECF1EC; stroke-width: 2px"></rect><line x1="15" y1="6" x2="15" y2="24" style="stroke: #ECF1EC; stroke-width: 2px"></line><circle cx="21" cy="13" r="3.4" style="fill: none; stroke: #D7F25C; stroke-width: 2.2px"></circle></svg>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px">OffBall Producer</span>
+    </div>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 600; display: flex; gap: 10px; align-items: center; background: #121B18; border: 1px solid #27362F; border-radius: 10px; padding: 6px 12px">
+      <span>KES 0–0 ASH</span><span style="color: #9EB0A6; font-variant-numeric: tabular-nums">63:04</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: #121B18; border: 1px solid #27362F">Graphic latency p95 <strong style="font-variant-numeric: tabular-nums">2.4 s</strong>
+        <span style="position: relative; width: 60px; height: 6px; border-radius: 3px; background: #27362F; overflow: hidden"><span class="pc-grow" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80%; border-radius: 3px; background: #7CC0FF; animation-delay: .3s"></span></span></span>
+      <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: #121B18; border: 1px solid #27362F">Verified <strong>99.1%</strong>
+        <span style="position: relative; width: 60px; height: 6px; border-radius: 3px; background: #27362F; overflow: hidden"><span class="pc-grow" style="position: absolute; left: 0; top: 0; bottom: 0; width: 99%; border-radius: 3px; background: #D7F25C; animation-delay: .4s"></span></span></span>
+      <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: #121B18; border: 1px solid #27362F">Tokens <strong>41%</strong> of budget
+        <span style="position: relative; width: 60px; height: 6px; border-radius: 3px; background: #27362F; overflow: hidden"><span class="pc-grow" style="position: absolute; left: 0; top: 0; bottom: 0; width: 41%; border-radius: 3px; background: #E2733A; animation-delay: .5s"></span></span></span>
+    </div>
+    <button type="button" role="switch" aria-checked="{{auto}}" onClick="{{toggleAuto}}" class="pc-btn" style="margin-left: auto; min-height: 44px; display: inline-flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 8px; border: 0; background: #121B18; box-shadow: inset 0 0 0 1px #27362F; color: #ECF1EC; font: 600 13px Inter, sans-serif">
+      <span style="{{autoTrack}}"><span style="{{autoKnob}}"></span></span>
+      {{autoLabel}}
+    </button>
+  </header>
+
+  <main style="display: flex; flex-wrap: wrap; gap: 18px; max-width: 1440px; margin: 0 auto; align-items: flex-start">
+
+    <section aria-label="Graphics queue" class="pc-rise" style="flex: 1 1 380px; min-width: 0; background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px; animation-delay: 60ms">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">Graphics queue</h2>
+        <span style="font-size: 12px; color: #9EB0A6">Newest first</span>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+          <li class="pc-rise" style="{{it.box}}">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">{{it.kind}}</span>
+              <span style="{{it.chip}}">
+                <sc-if value="{{it.approvedNow}}" hint-placeholder-val="{{false}}">
+                  <svg class="pc-pop" width="11" height="11" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5 L5.5 10.5 L11.5 3.5" style="fill: none; stroke: currentColor; stroke-width: 2.6px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+                </sc-if>
+                {{it.status}}
+              </span>
+            </div>
+            <p style="margin: 8px 0 6px; font-size: 14px; line-height: 1.4"><span class="{{it.textClass}}">{{it.text}}</span></p>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #9EB0A6">
+              <span>Confidence {{it.conf}}</span>
+              <span style="flex: 1; height: 6px; border-radius: 3px; background: #27362F; position: relative; overflow: hidden"><span class="pc-grow" style="{{it.confBar}}"></span></span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9EB0A6; margin-top: 6px">{{it.evidence}}</div>
+            <sc-if value="{{it.pending}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap">
+                <button type="button" onClick="{{it.approve}}" class="pc-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; background: #D7F25C; color: #0B1110; font: 600 13px Inter, sans-serif">Approve</button>
+                <button type="button" onClick="{{it.hold}}" class="pc-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px #27362F; background: transparent; color: #ECF1EC; font: 600 13px Inter, sans-serif">Hold</button>
+                <button type="button" onClick="{{it.skip}}" class="pc-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px #27362F; background: transparent; color: #ECF1EC; font: 600 13px Inter, sans-serif">Skip</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{it.aired}}" hint-placeholder-val="{{false}}">
+              <div style="margin-top: 10px">
+                <button type="button" onClick="{{it.retract}}" class="pc-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px #FF9A9A; background: transparent; color: #FFB4B4; font: 600 13px Inter, sans-serif">Retract</button>
+              </div>
+            </sc-if>
+          </li>
+        </sc-for>
+      </ul>
+    </section>
+
+    <section aria-label="Program and agent trace" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+      <div class="pc-rise" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 12px; animation-delay: 120ms">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 0 4px 10px">
+          <h2 style="margin: 0; font-size: 15px">Program preview</h2>
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #FF7A7A; color: #1E0505"><span class="pc-blink" style="width: 7px; height: 7px; border-radius: 4px; background: #1E0505"></span>ON AIR</span>
+        </div>
+        <svg viewBox="-20 -20 1090 720" role="img" aria-label="Program preview: the gap ring is on air in the centre, with No. 9's run arrow." style="width: 100%; height: auto; display: block">
+          <rect x="-20" y="-20" width="1090" height="720" rx="10" style="fill: #0F2419"></rect>
+          <rect x="0" y="0" width="1050" height="680" style="fill: #14301F"></rect>
+          <g style="fill: none; stroke: rgba(236,241,236,0.45); stroke-width: 2px">
+            <rect x="0" y="0" width="1050" height="680"></rect>
+            <line x1="525" y1="0" x2="525" y2="680"></line>
+            <circle cx="525" cy="340" r="91.5"></circle>
+            <rect x="885" y="138.4" width="165" height="403.2"></rect>
+            <rect x="0" y="138.4" width="165" height="403.2"></rect>
+          </g>
+          <sc-if value="{{gapOnAir}}" hint-placeholder-val="{{true}}">
+            <ellipse class="pc-draw" cx="885" cy="280" rx="54" ry="68" style="fill: rgba(215,242,92,0.12); stroke: #D7F25C; stroke-width: 4px"></ellipse>
+          </sc-if>
+          <line class="pc-draw" x1="840" y1="340" x2="904" y2="164" style="stroke: #7CC0FF; stroke-width: 5px; stroke-linecap: round"></line>
+          <sc-for list="{{dots}}" as="d" hint-placeholder-count="22">
+            <circle class="pc-pop" cx="{{d.x}}" cy="{{d.y}}" r="13" style="{{d.style}}"></circle>
+          </sc-for>
+        </svg>
+      </div>
+
+      <div class="pc-rise" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px; animation-delay: 180ms">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px">
+          <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700">Agent trace · gap_ring m07-o0043</h2>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="font-size: 13px; color: #9EB0A6">On screen 2.9 s after the moment · budget 3 s</span>
+            <button type="button" onClick="{{replay}}" class="pc-btn" style="min-height: 44px; padding: 0 12px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px #27362F; background: transparent; color: #ECF1EC; font: 600 13px Inter, sans-serif; display: inline-flex; align-items: center; gap: 6px">
+              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7 A4.5 4.5 0 1 0 4 3.6 M2.5 1.8 V4.4 H5.1" style="fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+              Replay trace
+            </button>
+          </div>
+        </div>
+        <sc-for list="{{traceA}}" as="tg" hint-placeholder-count="1">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{tg.rows}}" as="tr" hint-placeholder-count="8">
+              <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 64px; align-items: center; gap: 10px">
+                <span style="font-size: 13px; font-weight: 600">{{tr.agent}}</span>
+                <span style="position: relative; height: 22px; border-radius: 4px; background: #19251F">
+                  <span class="{{tr.cls}}" style="{{tr.bar}}"></span>
+                  <span style="position: absolute; left: 100%; top: -4px; bottom: -4px; width: 2px; background: #FF7A7A; transform: translateX(-2px)"></span>
+                </span>
+                <span class="pc-rise" style="{{tr.msStyle}}">{{tr.ms}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <sc-for list="{{traceB}}" as="tg" hint-placeholder-count="0">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{tg.rows}}" as="tr" hint-placeholder-count="8">
+              <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 64px; align-items: center; gap: 10px">
+                <span style="font-size: 13px; font-weight: 600">{{tr.agent}}</span>
+                <span style="position: relative; height: 22px; border-radius: 4px; background: #19251F">
+                  <span class="{{tr.cls}}" style="{{tr.bar}}"></span>
+                  <span style="position: absolute; left: 100%; top: -4px; bottom: -4px; width: 2px; background: #FF7A7A; transform: translateX(-2px)"></span>
+                </span>
+                <span class="pc-rise" style="{{tr.msStyle}}">{{tr.ms}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div class="pc-rise" style="margin-top: 14px; background: #19251F; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.5; animation-delay: 1.6s">
+          <strong style="color: #FFB4B4">Fact-checker rejected one claim.</strong>
+          The draft said “No. 5 tracked 12 m”. Recomputed from <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">m07-f27562 → m07-f27605</span>: 10.8 m. The Explainer rewrote the claim and the second check passed.
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Operations" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+      <div class="pc-slide" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px; animation-delay: 200ms">
+        <h2 style="margin: 0 0 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700">Engineer</h2>
+        <p style="margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: #9EB0A6">{{engineerNote}}</p>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{flags}}" as="fl" hint-placeholder-count="5">
+            <li style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; flex: 1; min-width: 0">{{fl.key}}</span>
+              <span style="{{fl.chip}}">{{fl.value}}</span>
+            </li>
+          </sc-for>
+        </ul>
+        <sc-if value="{{flagChanged}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 12px; color: #9EB0A6">
+            <span style="display: inline-flex; align-items: center; gap: 8px">
+              <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" style="fill: none; stroke: #27362F; stroke-width: 2px"></circle><circle cx="9" cy="9" r="7" style="{{revertRing}}"></circle></svg>
+              Reverts in {{revertIn}} unless kept
+            </span>
+            <button type="button" onClick="{{undoFlag}}" class="pc-btn" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px #27362F; background: transparent; color: #ECF1EC; font: 600 13px Inter, sans-serif">Undo</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <div class="pc-slide" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px; animation-delay: 320ms">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px">
+          <span style="position: relative; width: 10px; height: 10px">
+            <span style="position: absolute; inset: 0; border-radius: 5px; background: #E2733A"></span>
+            <span class="pc-ripple" style="position: absolute; inset: 0; border-radius: 5px; border: 2px solid #E2733A"></span>
+          </span>
+          <h2 style="margin: 0; font-size: 15px">Fabric Activator alert</h2>
+        </div>
+        <p style="margin: 0 0 10px; font-size: 13px; line-height: 1.5">Fatigue gap forming: Ashmoor No. 2’s recovery speed is down 17% since 55′. Kestrel’s attacks down that flank are up 22 points.</p>
+        <a href="Main.dc.html" style="font-size: 13px; font-weight: 600">Queue a fatigue-gap graphic</a>
+      </div>
+
+      <div class="pc-slide" style="background: #121B18; border: 1px solid #27362F; border-radius: 14px; padding: 16px; animation-delay: 440ms">
+        <h2 style="margin: 0 0 6px; font-size: 15px">Corrections</h2>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9EB0A6">41′ goal reassigned by the feed (<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">m07-e1033</span>). Graphic <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">m07-o0052</span> retracted and patched in 3.1 s.</p>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.t0 = Date.now();
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  st() { return Object.assign({ auto: false, decisions: {}, justApproved: {}, flagUndone: false, traceFlip: false, now: 0 }, this.state || {}); }
+  renderVals() {
+    const s = this.st();
+    const set = (id, v) => () => this.setState({ decisions: Object.assign({}, s.decisions, { [id]: v }), justApproved: Object.assign({}, s.justApproved, { [id]: v === 'approved' }) });
+    const base = [
+      { id: 'o0046', kind: 'ghost_replay · analyst', text: 'What if No. 9 hadn’t run? Gap stays shut in 29 of 32 re-runs.', conf: 0.84, ev: 'cf m07-c0007 · 64 re-runs', status: 'pending' },
+      { id: 'o0045', kind: 'caption · casual', text: 'Goal. Made by No. 9’s run, finished by No. 10.', conf: 0.95, ev: 'm07-e0918 · m07-f27660', status: 'pending' },
+      { id: 'o0043', kind: 'gap_ring · all modes', text: 'Space opens here.', conf: 0.88, ev: 'm07-f27595 · zone control +46 pts', status: 'aired' },
+      { id: 'o0042', kind: 'player_tag · casual', text: 'No. 5 follows.', conf: 0.89, ev: 'm07-f27562', status: 'aired' },
+      { id: 'o0041', kind: 'run_arrow · casual', text: 'Watch No. 9. This run isn’t to get the ball.', conf: 0.91, ev: 'm07-f27525 · m07-f27605', status: 'aired' }
+    ];
+    const chipBase = 'display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; flex: none; transition: background-color .3s, color .3s, box-shadow .3s; ';
+    const look = {
+      pending: ['Waiting', 'box-shadow: inset 0 0 0 1px #D7F25C; color: #D7F25C'],
+      approved: ['Approved', 'background: #D7F25C; color: #0B1110'],
+      aired: ['On air', 'background: #ECF1EC; color: #0B1110'],
+      held: ['Held', 'box-shadow: inset 0 0 0 1px #9EB0A6; color: #ECF1EC'],
+      skipped: ['Skipped', 'box-shadow: inset 0 0 0 1px #27362F; color: #9EB0A6'],
+      retracted: ['Retracted', 'box-shadow: inset 0 0 0 1px #FF9A9A; color: #FFB4B4']
+    };
+    let gapOnAir = true;
+    const items = base.map((b, i) => {
+      let st = s.decisions[b.id] || b.status;
+      if (s.auto && st === 'pending' && b.conf >= 0.85) st = 'approved';
+      if (b.id === 'o0043' && st === 'retracted') gapOnAir = false;
+      return {
+        kind: b.kind, text: b.text, conf: b.conf.toFixed(2), evidence: b.ev,
+        status: look[st][0], chip: chipBase + look[st][1],
+        approvedNow: st === 'approved',
+        textClass: st === 'retracted' || st === 'skipped' ? 'pc-strike' : '',
+        box: 'background: #19251F; border-radius: 12px; padding: 12px 14px; transition: box-shadow .3s, opacity .3s; animation-delay: ' + (120 + i * 70) + 'ms; ' +
+          (st === 'pending' || st === 'held' ? 'box-shadow: inset 0 0 0 1px rgba(215,242,92,.5)' : st === 'skipped' || st === 'retracted' ? 'opacity: .65' : ''),
+        confBar: 'position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #7CC0FF; width: ' + (b.conf * 100).toFixed(0) + '%; animation-delay: ' + (300 + i * 70) + 'ms',
+        pending: st === 'pending' || st === 'held',
+        aired: st === 'aired',
+        approve: set(b.id, 'approved'), hold: set(b.id, 'held'), skip: set(b.id, 'skipped'), retract: set(b.id, 'retracted')
+      };
+    });
+    const traceRows = [
+      { agent: 'Scout', a: 0, b: 0.28 },
+      { agent: 'Explainer', a: 0.3, b: 1.15 },
+      { agent: 'Fact-checker', a: 1.15, b: 1.62, bad: true },
+      { agent: 'Explainer · retry', a: 1.62, b: 2.05 },
+      { agent: 'Fact-checker', a: 2.05, b: 2.36 },
+      { agent: 'Persona × 4', a: 2.36, b: 2.74 },
+      { agent: 'Producer', a: 2.74, b: 2.9 },
+      { agent: 'Tactician', a: 0.3, b: 3, off: true }
+    ];
+    const rows = traceRows.map((r) => {
+      const delay = Math.round((r.off ? 0.3 : r.a) * 420);
+      const dur = Math.max(220, Math.round((r.b - r.a) * 420));
+      return {
+        agent: r.agent,
+        ms: r.off ? '9.4 s' : Math.round((r.b - r.a) * 1000) + ' ms',
+        cls: r.bad ? 'pc-shake' : 'pc-grow',
+        msStyle: 'font-family: \'JetBrains Mono\', monospace; font-size: 12px; color: ' + (r.bad ? '#FFB4B4' : '#9EB0A6') + '; text-align: right; animation-delay: ' + (delay + dur) + 'ms',
+        bar: 'position: absolute; top: 3px; bottom: 3px; border-radius: 3px; left: ' + (r.a / 3 * 100).toFixed(1) + '%; width: ' + ((r.b - r.a) / 3 * 100).toFixed(1) + '%; animation-duration: ' + dur + 'ms' + (r.bad ? ', 500ms' : '') + '; animation-delay: ' + delay + 'ms' + (r.bad ? ', ' + (delay + dur) + 'ms' : '') + '; ' +
+          (r.bad ? 'background: #FF7A7A' : r.off ? 'background: repeating-linear-gradient(90deg, #4A5B53 0 8px, transparent 8px 12px)' : 'background: #7CC0FF')
+      };
+    });
+    const traceObj = { rows: rows };
+    const fast = !s.flagUndone;
+    const fchip = (on) => 'font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; transition: background-color .3s, color .3s, box-shadow .3s; ' + (on ? 'background: #D7F25C; color: #0B1110' : 'box-shadow: inset 0 0 0 1px #27362F; color: #ECF1EC');
+    const flags = [
+      { key: 'explainer.model_tier', value: fast ? 'fast · by Engineer' : 'reasoning', chip: fchip(fast) },
+      { key: 'persona.live_languages', value: 'all active', chip: fchip(false) },
+      { key: 'producer.density', value: 'standard', chip: fchip(false) },
+      { key: 'tactician.enabled', value: 'on', chip: fchip(false) },
+      { key: 'voice.enabled', value: 'on', chip: fchip(false) }
+    ];
+    const now = s.now || Date.now();
+    const left = Math.max(0, 462 - Math.floor((now - (this.t0 || now)) / 1000));
+    const revertIn = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+    const circ = 2 * Math.PI * 7;
+    const revertRing = 'fill: none; stroke: #D7F25C; stroke-width: 2px; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 9px 9px; stroke-dasharray: ' + circ.toFixed(2) + '; stroke-dashoffset: ' + (circ * (1 - left / 600)).toFixed(2) + '; transition: stroke-dashoffset 1s linear';
+    const pos = [[6, 34, 'k'], [66, 10, 'k'], [62, 61, 'k'], [46, 26, 'k'], [46, 44, 'k'], [54, 35, 'k'], [88, 14, 'k'], [60.5, 40.6, 'k'], [91, 53, 'k'], [79, 41.6, 'k'], [84, 60, 'k'],
+      [101, 34.8, 'a'], [89.5, 58.5, 'a'], [88, 13.5, 'a'], [91.5, 29.5, 'a'], [93.4, 47, 'a'], [74.2, 39, 'a'], [70.5, 14.5, 'a'], [78.5, 26.5, 'a'], [60.5, 30.5, 'a'], [78, 49.5, 'a'], [69.5, 57, 'a']];
+    const dots = pos.map((p, i) => ({ x: (p[0] * 10).toFixed(0), y: ((68 - p[1]) * 10).toFixed(0), style: 'fill: ' + (p[2] === 'k' ? '#7CC0FF' : '#E2733A') + '; stroke: rgba(9,16,13,0.88); stroke-width: 2.5px; animation-delay: ' + (200 + i * 20) + 'ms' }));
+    const sw = (on) => ({
+      track: 'position: relative; display: inline-block; width: 40px; height: 24px; flex: none; border-radius: 12px; transition: background-color .22s; background: ' + (on ? '#D7F25C' : '#27362F'),
+      knob: 'position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 9px; background: ' + (on ? '#0B1110' : '#ECF1EC') + '; transition: transform .26s var(--ep), background-color .22s; transform: translateX(' + (on ? 16 : 0) + 'px)'
+    });
+    const a = sw(s.auto);
+    return {
+      auto: s.auto, autoTrack: a.track, autoKnob: a.knob,
+      autoLabel: s.auto ? 'Automatic: high-confidence graphics air' : 'Manual approval for rings and replays',
+      toggleAuto: () => this.setState({ auto: !s.auto }),
+      items: items, gapOnAir: gapOnAir,
+      traceA: s.traceFlip ? [] : [traceObj], traceB: s.traceFlip ? [traceObj] : [],
+      replay: () => this.setState({ traceFlip: !s.traceFlip }),
+      flags: flags, flagChanged: fast,
+      engineerNote: fast ? 'Explainer p95 rose to 2.6 s at 58:40. I switched it to the fast model tier through Azure MCP Server. p95 is back to 1.9 s.' : 'Explainer is back on the reasoning tier, as you asked. I’ll keep watching its latency.',
+      revertIn: revertIn, revertRing: revertRing,
+      undoFlag: () => this.setState({ flagUndone: true }),
+      dots: dots
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "2.0",
+      "description": "Contract version, e.g. 2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "approval",
+      "default": "approval",
+      "title": "Kind",
+      "type": "string"
+    },
+    "overlay_id": {
+      "title": "Overlay Id",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "approve",
+        "hold",
+        "skip",
+        "retract"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "by": {
+      "enum": [
+        "producer",
+        "auto"
+      ],
+      "title": "By",
+      "type": "string"
+    },
+    "note": {
+      "default": "",
+      "title": "Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "overlay_id",
+    "decision",
+    "by"
+  ],
+  "title": "ApprovalDecision",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/agents/approval.schema.json"
+}

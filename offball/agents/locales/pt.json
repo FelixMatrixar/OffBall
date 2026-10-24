@@ -1,0 +1,40 @@
+{
+  "meta": {"code": "pt", "name": "Português", "direction": "ltr", "decimal": ",", "review": "draft: needs native-speaker football review (PRD 15.3)"},
+  "glossary": {
+    "decoy_run": "corrida de arrasto", "gap": "brecha", "space": "espaço", "half_space": "meio-espaço",
+    "run_in_behind": "infiltração nas costas", "overlap": "ultrapassagem por fora", "underlap": "ultrapassagem por dentro",
+    "third_man_run": "terceiro homem", "blind_side_run": "corrida pelo lado cego", "centre_back": "zagueiro",
+    "full_back": "lateral", "winger": "ponta", "striker": "centroavante", "midfielder": "meio-campista",
+    "goalkeeper": "goleiro", "through_ball": "passe em profundidade", "press": "pressão", "counter_attack": "contra-ataque",
+    "offside": "impedimento", "cover_shadow": "sombra de cobertura", "pinning": "fixação",
+    "switch_of_play": "inversão de jogo", "pitch_control": "controle do espaço", "space_created": "espaço criado",
+    "null_run": "corrida anulada"
+  },
+  "templates": {
+    "decoy_run.casual.run": "Repare no {creator_no}. Esta corrida não é para receber a bola: é para arrastar um defensor.",
+    "decoy_run.casual.gap": "O {dragged_no} do {dragged_club} vai atrás. Abre-se uma brecha no meio.",
+    "decoy_run.casual.finish.goal": "Gol. Criado pela corrida do {creator_no}, finalizado pelo {receiver_no}.",
+    "decoy_run.casual.finish.shot": "O {receiver_no} finaliza pela brecha que o {creator_no} abriu.",
+    "decoy_run.casual.finish.chance": "O {receiver_no} aparece no espaço que a corrida do {creator_no} criou.",
+    "decoy_run.learn.define": "Isso foi uma {term:decoy_run}: uma corrida feita para um companheiro ganhar espaço.",
+    "decoy_run.analyst": "{Term:decoy_run}: o {creator_no} tira o {dragged_no} {displacement} m de posição. Controle da brecha do {club}: +{gain} pts; {space} m² de espaço criado.",
+    "decoy_run.analyst.cf": "Sem a corrida, a brecha não se abre em {shut} de {runs} simulações.",
+    "decoy_run.player": "{player} já arrastou {dragged_count} defensores hoje e criou {space_total} m² de espaço.",
+    "decoy_run.audio": "O {club} ataca. O {creator_no} corre {direction} e o {dragged_no} do {dragged_club} vai atrás. Abre-se uma brecha {gap_where}. O {receiver_no} entra nela.",
+    "decoy_run.broadcaster": "CORRIDA DE ARRASTO · O {creator_no} arrasta o {dragged_no} · {space} m² criados",
+    "decoy_run.a11y.run_arrow": "O {creator_no} corre {direction}.",
+    "decoy_run.a11y.gap_ring": "Abre-se um espaço {gap_where}.",
+    "decoy_run.a11y.pass_line": "O {passer_no} passa para a brecha.",
+    "ghost.offer": "E se o {creator_no} não tivesse corrido? Os fantasmas repetem o lance sem a corrida.",
+    "direction.left": "em direção à ponta esquerda",
+    "direction.right": "em direção à ponta direita",
+    "gap_where.centre_edge": "no centro, logo fora da área",
+    "gap_where.centre": "no centro",
+    "gap_where.left_half": "no meio-espaço esquerdo",
+    "gap_where.right_half": "no meio-espaço direito",
+    "label.correction": "Correção",
+    "label.synthetic": "Dados sintéticos",
+    "label.ai": "Gerado por IA",
+    "notice.translation": "Em inglês: a tradução não ficou pronta a tempo."
+  }
+}
