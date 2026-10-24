@@ -334,8 +334,10 @@ class League:
     def save(self, public_dir: Path, truth_dir: Path) -> None:
         public_dir.mkdir(parents=True, exist_ok=True)
         truth_dir.mkdir(parents=True, exist_ok=True)
-        (public_dir / "league.json").write_text(json.dumps(self.public_json(), indent=1, ensure_ascii=False))
-        (truth_dir / "league_truth.json").write_text(json.dumps(self.truth_json(), indent=1))
+        (public_dir / "league.json").write_text(json.dumps(self.public_json(), indent=1, ensure_ascii=False),
+                                                encoding="utf-8", newline="\n")
+        (truth_dir / "league_truth.json").write_text(json.dumps(self.truth_json(), indent=1), encoding="utf-8",
+                                                     newline="\n")
 
 
 ARCHETYPES: dict[str, dict[str, float | str | int]] = {

@@ -79,7 +79,7 @@ def export_schemas(out_dir: Path) -> list[Path]:
         schema = model.model_json_schema()
         schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
         schema["$id"] = f"https://offball.dev/contracts/{name}"
-        path.write_text(json.dumps(schema, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        path.write_text(json.dumps(schema, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
         written.append(path)
     return written
 

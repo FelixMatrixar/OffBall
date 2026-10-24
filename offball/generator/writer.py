@@ -174,7 +174,8 @@ def write_match(
     truth_dir.mkdir(parents=True, exist_ok=True)
     info = match_info(result, engine, round_)
     events, serial_to_id = finalise_events(result)
-    (data_dir / "match.json").write_text(info.model_dump_json(indent=2), encoding="utf-8")
+    # Every text file is written with "\n" line endings, so the same seed gives the same bytes on any OS.
+    (data_dir / "match.json").write_text(info.model_dump_json(indent=2), encoding="utf-8", newline="\n")
     with (data_dir / "events.jsonl").open("w", encoding="utf-8", newline="\n") as fh:
         for ev in events:
             fh.write(ev.model_dump_json(exclude_none=False) + "\n")
@@ -195,11 +196,11 @@ def write_match(
             row = {"event_id": eid, "kind": pr["kind"], "p_success": pr["p_success"], "features": pr["features"]}
             fh.write(json.dumps(row, separators=(",", ":")) + "\n")
     key = answer_key if answer_key is not None else []
-    (truth_dir / "answer_key.json").write_text(json.dumps(key, indent=1), encoding="utf-8")
+    (truth_dir / "answer_key.json").write_text(json.dumps(key, indent=1), encoding="utf-8", newline="\n")
 
     manifest = {}
     for path in sorted(list(data_dir.iterdir()) + list(truth_dir.iterdir())):
         if path.is_file() and path.name != "manifest.json":
             manifest[f"{path.parent.name}/{path.name}"] = file_md5(path)
-    (data_dir / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    (data_dir / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8", newline="\n")
     return manifest

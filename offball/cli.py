@@ -59,7 +59,8 @@ def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf
             for r in dm.reports
         ],
     }
-    (truth_root / script.match_id / "director_report.json").write_text(json.dumps(report, indent=2))
+    (truth_root / script.match_id / "director_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8",
+                                                                       newline="\n")
     print(json.dumps(report, indent=2))
     print(f"{len(manifest)} files written")
 
@@ -186,7 +187,8 @@ def cmd_gates(args: argparse.Namespace) -> None:
     if args.json:
         rows = [{"gate": g.number, "name": g.name, "status": g.status, "summary": g.summary, "numbers": g.numbers}
                 for g in results]
-        (gates.REPORTS / f"gates-{name}.json").write_text(json.dumps(rows, indent=1, default=str), encoding="utf-8")
+        (gates.REPORTS / f"gates-{name}.json").write_text(json.dumps(rows, indent=1, default=str), encoding="utf-8",
+                                                          newline="\n")
     print(text)
     if any(g.status == "fail" for g in results):
         sys.exit(1)

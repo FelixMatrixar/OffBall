@@ -163,7 +163,7 @@ class FeedEmitter:
 def write_jsonl(emitter: FeedEmitter, path: Path) -> int:
     """Write the replay's messages as JSONL, in send order. Returns how many were written."""
     n = 0
-    with path.open("w", encoding="utf-8") as fh:
+    with path.open("w", encoding="utf-8", newline="\n") as fh:
         for item in emitter.messages():
             fh.write(json.dumps(item.msg, separators=(",", ":")) + "\n")
             n += 1

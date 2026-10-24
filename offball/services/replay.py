@@ -122,5 +122,5 @@ async def build_replay(match_dir: Path, config: EmitterConfig, crew: Crew | None
     messages = [m for _, _, m in timed]
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(json.dumps(m, separators=(",", ":"), ensure_ascii=False) + "\n" for m in messages),
-                   encoding="utf-8")
+                   encoding="utf-8", newline="\n")
     return ReplayResult(out, len(messages), len(state.live_overlays()), outcomes, check_messages(messages))
