@@ -907,7 +907,7 @@ Every set can be regenerated from its seed. Only the small ones live in git.
 | Set | Size | Contents | Purpose | Where it lives |
 | --- | --- | --- | --- | --- |
 | Showcase match | 1 match, Kestrel Bay v Ashmoor | A directed script with a 63' decoy-run goal and 4 other moments; events, tracking, overlays in every mode and language, voice, counterfactuals, camera paths | Demo video and the judges' live demo | Committed; video in Blob Storage |
-| Showcase matchday | 10 matches of one round | Emergent-engine matches played at the same time | Space Centre | Azure Blob Storage, with a OneLake shortcut |
+| Showcase matchday | 10 matches of one round | Emergent-engine matches played at the same time: the showcase match, and nine that each plant one moment, with oracle labels | Space Centre | Azure Blob Storage, with a OneLake shortcut |
 | Smoke set | 18 short matches: 16 of 10 minutes, one of 30 and one of 24 | Every one of the 18 moment types planted at least once, one moment a match (the decoy run twice; space lost and fatigue gap share the 24-minute match) | CI tests, quality gates, visual regression | Committed |
 | OffBall-Bench | 100 full matches with tracking | 70 with 3–6 planted moments; 20 with only null moments planted; 10 unscripted with oracle labels only; split into 40 dev and 60 test matches. Generated once, when the agents run on a real model, from the engine as it then stands | Scoring OffBall, and anyone else | Azure Blob Storage (public read), with a OneLake shortcut; dev keys public, test keys held privately and scored by the evaluation endpoint |
 | Season backdrop | 380 matches, events only | A full season from the fast engine; tracking for any match generated on demand | Season context, leaderboards, Fabric dashboards | Azure Blob Storage, with a OneLake shortcut |
@@ -1022,11 +1022,11 @@ The detectors' main limits:
 
 - **Season.** `offball season` plays the 380-match season backdrop with the fast engine, events only and with a league table, in about 70 seconds. Its ball flow is a Markov model over a 6 × 4 zone grid fitted from Wyscout. On 60 matches every per-match average sits inside the real middle half: passes 957, completion 0.82, shots 25.4, goals 2.8, possessions 241, fouls 22, offsides 2.9, corners 10.5, throw-ins 42.
 - **Benchmark.** `offball bench` writes and plays OffBall-Bench's 100 scripts: 70 with 3–6 planted moments, 20 with only null moments and 10 unscripted. They split into 40 dev and 60 test, and every type is planted 18–21 times.
-- **Matchday.** `offball matchday` plays the 10 fixtures of round 27.
+- **Matchday.** `offball matchday` plays the 10 fixtures of round 27 together. Kestrel Bay v Ashmoor is the showcase match, and each of the other nine plants one moment around the hour: an overlap, a broken press, a third-man run, a fatigue gap, a switch of play, a cover shadow, space lost, a blind-side run and a rotation. Oracle labels cover the rest.
 - **Oracle labels.** Both sets label the moments players make on their own: engine intents (decoy runs, overlaps, runs in behind) confirmed by the detectors' signal definitions, without counterfactual truth. They are sparse, none or one per unscripted calibration match.
-- Neither the benchmark nor the matchday has been generated yet.
+- The matchday is generated, and all nine planted moments verify. The benchmark has not been generated yet.
 
-**What is left.** Only one piece is needed for the agents: generating OffBall-Bench and the matchday, once, when the agents run on a real model. The video renderer is deferred beyond this submission (10.9, 27).
+**What is left.** Only one piece is needed for the agents: generating OffBall-Bench, once, when the agents run on a real model. Golden render tests already check the pipeline's output on eight stretches of the smoke set and the showcase (19.5). The video renderer is deferred beyond this submission (10.9, 27).
 
 **Reported limits.** These stay targets, published here and in `DATASHEET.md`, but none blocks a release (12.10):
 
@@ -2162,6 +2162,32 @@ Small, real and documented: a fan comprehension A/B test, interviews with coache
 
 Every pull request runs the smoke set through the gates, visual regression and a fast eval. A nightly Foundry Routine scores the full dev split, runs Agent Optimizer, and sends candidate versions through the release gate (14.9), with rubric-evaluator scores and ASSERT adversarial tests alongside. Any metric that drops past a set margin fails the run and raises an alert.
 
+### 19.5 Golden render tests
+
+Eight fixed stretches of generated play check what the pipeline sends the frontend, end to end. They work before OffBall-Bench exists and run on every pull request after. Each is about 30 s of play, 12 s either side of one planted moment: the showcase goal and the showcase's first null run, and from the smoke set an overlap, a null overlap, a third-man run, a switch of play, a broken press and a cover shadow.
+
+- **Input.** `datasets/golden/<case>/feed.jsonl` holds the window's feed, with no faults, as the live service reads it.
+- **Expectations.** `truth/golden/<case>/expected.json` is built from the answer key and the data. It lists who makes each moment, who is dragged and who receives, the run's path, the space it opens, the pass, and the score. Like every answer key, it stays out of the live pipeline's reach (BE-6).
+- **Commands.** `offball golden check <case> --stream out.jsonl` scores any output stream against `INTEGRATION.md` section 4. `offball golden run` puts every case through `offball replay` and checks the result. `offball golden build` rebuilds the cases.
+- **What a stream must do to pass:**
+  - Every message matches the contracts for this match.
+  - Frames carry the tracking at 25 Hz, `clock.sync` never lapses for more than 1.5 s of play, and the score is right, changing as the goal goes in.
+  - Each planted moment airs, with:
+    - a caption with English text in all six modes;
+    - a run arrow along the creator's run (within 3 m);
+    - a gap ring on the space the moment opens (within 5 m);
+    - a pass line, if one is drawn, joining the right players at the right length;
+    - stat cards that match the frames they cite (within 1 m).
+  - Every graphic of a moment cites frames, events or what-ifs from that moment, holds at least 2.5 s and arrives in time to be seen.
+  - No null moment is drawn as its parent: no run arrow on the null runner, and no ring on its space.
+  - Casual and Learn show one pitch graphic at a time, and Analyst up to four (15.2).
+  - Every graphic carries the AI-generated and synthetic-data labels.
+- **What it leaves out.** The wording, which the Fact-checker and the evaluations in 19.2 judge. Moments the answer key doesn't label are counted but not failed, because players make moments of their own.
+- **Where it stands.** With no model configured, the pipeline passes every plumbing check on every case and airs nothing. So the six cases with a planted moment fail on airing, and the two null cases pass. `tests/test_golden.py` tests the checker itself:
+  - a stream built from the expectations passes every case;
+  - each way of breaking that stream fails the one check that covers it;
+  - rebuilding the cases gives the committed files byte for byte.
+
 ---
 
 ## 20. How we score against the judging criteria
@@ -2324,14 +2350,14 @@ As checked on 25 October 2026. The frontend is complete against its stand-ins, a
 | --- | --- | --- |
 | Frontend (`web/`) | Every screen, mode, view, rendering tier, state and language; the partner template; the motion system. Type-check, token lint and build pass, and all 146 unit and browser tests pass. It runs on stand-ins (11.3). | The small changes in `INTEGRATION.md` section 9 and 11.3, which wait for the backend |
 | Contracts | 21 schemas exported from Pydantic models, in sync with the code | The seven new contracts and version 2.1 (11.3) |
-| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and counterfactual truth, calibrated against real data in eight stages (12.12); the fast engine, which plays the 380-match season backdrop in about 70 seconds; the director; plans with expected signals for all 18 moment types; oracle labels; the OffBall-Bench and matchday scripts; the writer with content hashes; `DATASHEET.md`. The league, the showcase (`m07`) and the 18-match smoke set, which plants every type, are generated; the showcase matches the frontend's moment, roster and direction, checked by a parity test (11.9). | Generating OffBall-Bench and the matchday, once the agents run on a real model. Reported limits rather than work: the four gates in 12.12, counterfactual truth for oracle labels, and the hard moments' success rates. The video renderer is deferred (10.9) |
+| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and counterfactual truth, calibrated against real data in eight stages (12.12); the fast engine, which plays the 380-match season backdrop in about 70 seconds; the director; plans with expected signals for all 18 moment types; oracle labels; the OffBall-Bench and matchday scripts, with the matchday generated; the writer with content hashes; `DATASHEET.md`. The league, the showcase (`m07`) and the 18-match smoke set, which plants every type, are generated; the showcase matches the frontend's moment, roster and direction, checked by a parity test (11.9). | Generating OffBall-Bench, once the agents run on a real model. Reported limits rather than work: the four gates in 12.12, counterfactual truth for oracle labels, and the hard moments' success rates. The video renderer is deferred (10.9) |
 | Calibration | `offball fit` fits targets from 380 Wyscout matches and SkillCorner's A-League aggregates and broadcast tracking, keeping only numbers; a salted-hash name blocklist; realism and tracking metrics; eight Optuna stages with logged hypotheses; `offball gates` runs all nine gates, gate 5 against SkillCorner's broadcast tracking through a camera mask. On 16 full matches every average but one sits inside the real 5th–95th range, and acceleration through the camera matches real tracking (12.12). On the calibration set gates 3, 7, 8 and 9 pass; on the smoke set gate 6 passes too. | Gates 1, 2, 4 and 5 still fail: players standing too close, runs in behind, team spacing (a classifier still tells our tracking from real at ROC AUC 0.99), peak speeds and median pass length |
 | Interpretation | Pitch control (fast and Spearman), 18 named metrics with evidence IDs, run detection, and detectors for all 18 moment types, batch and live. On the smoke set they find all 17 planted moments and credit neither null one; on `m07` they find both planted decoy runs and flag neither null run. | Space value, xG, pass difficulty, run classification, credit, ghosting, auto-eventing and vision; a learned scorer to rank candidates, since in open play the detectors also flag many genuine but minor moments; the cover-shadow detector reports one lane per pass |
 | Agents | The broadcast workflow in Agent Framework: Scout, Explainer, Fact-checker with up to two rewrites, a Persona script for each of the six modes, a Fact-checker read of every script, Producer and publish. Ask OffBall: the Pundit, then the Fact-checker. English instructions and structured output for each; model clients for a Foundry endpoint; the workflow tested with a stand-in model | Running on a real model, which waits for the Foundry endpoint; the Tactician, Engineer, recaps, the data crew, per-agent evaluations and the learning loop |
-| Services and MCP | The feed emitter with faults; the live service (ingest, gap filling, rolling detection, relay); the API with the live stream, Ask OffBall, approvals and traces; the OffBall MCP server with 11 read-only tools; replay builds checked against the contracts. The partner template plays the live stream. | Event Hubs and Web PubSub transports, the counterfactual workers, the recap, stats and decision endpoints, Docker images |
+| Services and MCP | The feed emitter with faults; the live service (ingest, gap filling, rolling detection, relay); the API with the live stream, Ask OffBall, approvals and traces; the OffBall MCP server with 11 read-only tools; replay builds checked against the contracts; eight golden render tests that score the pipeline's output stream (19.5). The partner template plays the live stream. | Event Hubs and Web PubSub transports, the counterfactual workers, the recap, stats and decision endpoints, Docker images |
 | Platform and Fabric | Nothing yet | Everything in 18.9 to 18.18, and the Fabric items |
 | Repository | The GitHub repository (github.com/FelixMatrixar/OffBall) with its full history, private for now; `.gitignore`, `.env.example` and `.gitattributes` keeping generated data byte-exact; a README; `ATTRIBUTION.md` for the calibration data; `DATASHEET.md` | Making the repository public (rule 4.4); `LICENSE`, `TRANSPARENCY.md`, `SECURITY.md` and the rest of 22.2 |
-| Code quality | Lint is clean, and 30 Python tests pass: the emitter, the live service, the tools, the workflow's wiring, the API, the fit, the realism metrics, the blocklist, the gates, the moment library, the fast engine and the smoke set's detectability | Tests against a real model; slow tests that direct a moment end to end; CI to run them (18.13) |
+| Code quality | Lint is clean, and 68 Python tests pass: the emitter, the live service, the tools, the workflow's wiring, the API, the fit, the realism metrics, the blocklist, the gates, the moment library, the fast engine, the smoke set's detectability, the showcase's parity with the frontend and the golden render checker | Tests against a real model; slow tests that direct a moment end to end; CI to run them (18.13) |
 
 **What comes next, by dependency.** The backend and AI work, in the order its dependencies allow. Each step ends with something the finished frontend can show.
 

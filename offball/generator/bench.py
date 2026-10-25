@@ -2,8 +2,9 @@
 
 OffBall-Bench is 100 full matches with tracking: 70 with three to six planted moments, 20 with only null moments
 planted, and 10 unscripted with oracle labels only, split into 40 dev and 60 test matches. The planted moments are
-dealt so every type appears at least ten times. The showcase matchday is the ten fixtures of one round, played
-unscripted at the same time, with oracle labels.
+dealt so every type appears at least ten times. The showcase matchday is the ten fixtures of the showcase round,
+played at the same time: Kestrel Bay v Ashmoor is the showcase match, and each other fixture plants one moment
+around the hour, with oracle labels for the rest.
 """
 
 from __future__ import annotations
@@ -71,7 +72,32 @@ def bench_scripts(league, matches: int = 100, seed: int = 2026) -> tuple[list[Ma
     return scripts, split
 
 
+# The moment each matchday fixture plants: (type, team, minute it may start, the player who makes it).
+MATCHDAY_MOMENTS: dict[tuple[str, str], tuple[str, str, float, str | None]] = {
+    ("bra", "sal"): ("overlap", "bra", 56.5, None),
+    ("mor", "qua"): ("press_broken", "mor", 63.0, None),
+    ("nor", "oak"): ("third_man_run", "nor", 61.5, None),
+    ("fen", "gle"): ("fatigue_gap", "fen", 72.0, None),
+    ("cor", "wre"): ("switch_of_play", "cor", 58.5, None),
+    ("dun", "lar"): ("cover_shadow", "lar", 57.0, None),
+    ("har", "ive"): ("space_lost", "ive", 57.0, None),
+    ("jun", "low"): ("blind_side_run", "low", 55.5, "low-11"),
+    ("pel", "riv"): ("rotation", "pel", 60.5, None),
+}
+
+
 def matchday_scripts(league, round_: int = 27, seed: int = 2026) -> list[MatchScript]:
-    return [MatchScript(match_id=fx.match_id, home=fx.home, away=fx.away, seed=seed * 1000 + k, round=fx.round,
-                        half_minutes=45.0)
-            for k, fx in enumerate(f for f in league.fixtures if f.round == round_)]
+    """The round's fixtures, each planting its MATCHDAY_MOMENTS moment; a fixture without one plays unscripted.
+    Kestrel Bay v Ashmoor is left out: it is the showcase match."""
+    scripts = []
+    for k, fx in enumerate(f for f in league.fixtures if f.round == round_):
+        if (fx.home, fx.away) == ("kes", "ash"):
+            continue
+        moments = []
+        if (fx.home, fx.away) in MATCHDAY_MOMENTS:
+            kind, team, minute, creator = MATCHDAY_MOMENTS[(fx.home, fx.away)]
+            moments = [StoryMoment(key="k01", type=kind, team=team, minute=minute, creator_id=creator,
+                                   window_minutes=8.0 if kind in LONG else 4.0)]
+        scripts.append(MatchScript(match_id=fx.match_id, home=fx.home, away=fx.away, seed=seed * 1000 + k,
+                                   round=fx.round, half_minutes=45.0, moments=moments))
+    return scripts

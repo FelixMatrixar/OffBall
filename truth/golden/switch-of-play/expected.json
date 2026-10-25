@@ -1,0 +1,76 @@
+{
+ "case": "switch-of-play",
+ "set": "smoke",
+ "match_id": "smk9",
+ "home": "nor",
+ "away": "oak",
+ "period": 1,
+ "from_ms": 286760,
+ "to_ms": 317920,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "smk9-k01",
+   "type": "switch_of_play",
+   "source": "planted",
+   "t_start_ms": 298760,
+   "t_end_ms": 305920,
+   "team_id": "nor",
+   "creator_id": "nor-02",
+   "dragged_ids": [
+    "oak-03"
+   ],
+   "receiver_id": "nor-02",
+   "gap": {
+    "centre_xy": [
+     51.3,
+     19.5
+    ],
+    "radius_m": 9.9
+   },
+   "must_air": true,
+   "required_kinds": [
+    "caption",
+    "gap_ring"
+   ],
+   "pass": {
+    "event_id": "smk9-e0045",
+    "t_ms": 299120,
+    "player_ids": [
+     "nor-10",
+     "nor-02"
+    ],
+    "distance_m": 31.5
+   }
+  }
+ ],
+ "score": {
+  "at_start": {
+   "nor": 1,
+   "oak": 0
+  },
+  "changes": []
+ }
+}

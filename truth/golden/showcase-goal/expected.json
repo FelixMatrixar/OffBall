@@ -1,0 +1,160 @@
+{
+ "case": "showcase-goal",
+ "set": "showcase",
+ "match_id": "m07",
+ "home": "kes",
+ "away": "ash",
+ "period": 2,
+ "from_ms": 1069000,
+ "to_ms": 1098958,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "m07-k03",
+   "type": "decoy_run",
+   "source": "planted",
+   "t_start_ms": 1081000,
+   "t_end_ms": 1086958,
+   "team_id": "kes",
+   "creator_id": "kes-09",
+   "dragged_ids": [
+    "ash-05"
+   ],
+   "receiver_id": "kes-10",
+   "gap": {
+    "centre_xy": [
+     86.5,
+     23.4
+    ],
+    "radius_m": 7.5
+   },
+   "run": {
+    "path": [
+     [
+      1080000,
+      86.27,
+      23.33
+     ],
+     [
+      1080500,
+      85.44,
+      23.42
+     ],
+     [
+      1081000,
+      84.59,
+      23.61
+     ],
+     [
+      1081500,
+      84.14,
+      22.87
+     ],
+     [
+      1082000,
+      84.05,
+      20.75
+     ],
+     [
+      1082500,
+      84.31,
+      17.23
+     ],
+     [
+      1083000,
+      84.85,
+      12.57
+     ],
+     [
+      1083500,
+      85.27,
+      8.87
+     ],
+     [
+      1084000,
+      85.53,
+      6.67
+     ],
+     [
+      1084500,
+      85.63,
+      5.75
+     ],
+     [
+      1085000,
+      85.64,
+      5.95
+     ],
+     [
+      1085500,
+      85.7,
+      6.98
+     ],
+     [
+      1086000,
+      85.86,
+      8.67
+     ],
+     [
+      1086500,
+      86.2,
+      10.62
+     ]
+    ]
+   },
+   "must_air": true,
+   "required_kinds": [
+    "caption",
+    "run_arrow",
+    "gap_ring"
+   ],
+   "pass": {
+    "event_id": "m07-e0947",
+    "t_ms": 1084200,
+    "player_ids": [
+     "kes-11",
+     "kes-10"
+    ],
+    "distance_m": 24.1
+   }
+  }
+ ],
+ "score": {
+  "at_start": {
+   "kes": 0,
+   "ash": 0
+  },
+  "changes": [
+   {
+    "shot_ms": 1086400,
+    "in_ms": 1086920,
+    "score": {
+     "kes": 1,
+     "ash": 0
+    }
+   }
+  ]
+ }
+}

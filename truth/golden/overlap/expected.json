@@ -1,0 +1,176 @@
+{
+ "case": "overlap",
+ "set": "smoke",
+ "match_id": "smk4",
+ "home": "kes",
+ "away": "ash",
+ "period": 1,
+ "from_ms": 158840,
+ "to_ms": 191040,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "smk4-k01",
+   "type": "overlap",
+   "source": "planted",
+   "t_start_ms": 170840,
+   "t_end_ms": 179040,
+   "team_id": "kes",
+   "creator_id": "kes-03",
+   "dragged_ids": [
+    "ash-02"
+   ],
+   "receiver_id": "kes-03",
+   "gap": {
+    "centre_xy": [
+     81.9,
+     62.0
+    ],
+    "radius_m": 10.0
+   },
+   "run": {
+    "path": [
+     [
+      169840,
+      50.63,
+      61.98
+     ],
+     [
+      170340,
+      51.35,
+      62.64
+     ],
+     [
+      170840,
+      52.52,
+      62.99
+     ],
+     [
+      171340,
+      54.74,
+      63.2
+     ],
+     [
+      171840,
+      58.08,
+      63.42
+     ],
+     [
+      172340,
+      62.03,
+      63.65
+     ],
+     [
+      172840,
+      66.31,
+      63.9
+     ],
+     [
+      173340,
+      70.46,
+      64.15
+     ],
+     [
+      173840,
+      73.05,
+      64.3
+     ],
+     [
+      174340,
+      74.56,
+      64.39
+     ],
+     [
+      174840,
+      75.47,
+      64.48
+     ],
+     [
+      175340,
+      75.76,
+      64.64
+     ],
+     [
+      175840,
+      75.51,
+      64.83
+     ],
+     [
+      176340,
+      74.76,
+      64.99
+     ],
+     [
+      176840,
+      73.41,
+      64.95
+     ],
+     [
+      177340,
+      72.05,
+      64.54
+     ],
+     [
+      177840,
+      71.16,
+      64.1
+     ],
+     [
+      178340,
+      70.65,
+      63.71
+     ],
+     [
+      178840,
+      70.51,
+      63.37
+     ]
+    ]
+   },
+   "must_air": true,
+   "required_kinds": [
+    "caption",
+    "run_arrow",
+    "gap_ring"
+   ],
+   "pass": {
+    "event_id": "smk4-e0043",
+    "t_ms": 173240,
+    "player_ids": [
+     "kes-11",
+     "kes-03"
+    ],
+    "distance_m": 7.8
+   }
+  }
+ ],
+ "score": {
+  "at_start": {
+   "kes": 0,
+   "ash": 0
+  },
+  "changes": []
+ }
+}

@@ -451,3 +451,4 @@ Before calling a stream or answer ready for the frontend:
 - [ ] What-if parts share a `counterfactual_id`, and ghost tracks use the times in note 2.
 - [ ] Nothing comes from `truth/` or an answer key.
 - [ ] It looks right in every mode and language when loaded with `?feed=jsonl:` (section 7).
+- [ ] For the window of a golden case, `offball golden check <case> --stream <file>` passes (PRD 19.5).

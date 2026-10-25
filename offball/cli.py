@@ -6,7 +6,7 @@
     offball match --home kes --away ash  Generate one emergent match from a seed
     offball smoke                        Generate the CI smoke set (every moment type, 13 short matches)
     offball bench [--only b001 b002]     Generate OffBall-Bench (100 full matches, answer keys, dev/test split)
-    offball matchday --round 27          Play a round's ten fixtures unscripted, with oracle labels
+    offball matchday --round 27          Play the showcase round: one planted moment a fixture, oracle labels
     offball season                       Play the 380-match season backdrop with the fast engine
     offball fit                          Fit realism targets and the fast engine from calibration/raw/
     offball blocklist                    Build the salted-hash name blocklist from calibration/raw/
@@ -14,6 +14,9 @@
     offball serve api|mcp|all            Run the API (port 8000), the MCP server (port 8001), or both
     offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000
                                          Build a replay stream through the live pipeline and the crew
+    offball golden list|build|run        Golden render tests: list or build the cases, or run the pipeline on them
+    offball golden check <case> --stream out.jsonl
+                                         Check a pipeline's output stream against a case's expectations
 """
 
 from __future__ import annotations
@@ -141,8 +144,16 @@ def cmd_matchday(args: argparse.Namespace) -> None:
     from offball.generator.bench import matchday_scripts
     from offball.generator.league import build_league
 
-    _play_set(matchday_scripts(build_league(2026), round_=args.round), "matchday", args.workers, args.attempts,
-              args.cf_runs, lambda s: True)
+    scripts = matchday_scripts(build_league(2026), round_=args.round)
+    if args.only:
+        scripts = [s for s in scripts if s.match_id in set(args.only)]
+    _play_set(scripts, "matchday", args.workers, args.attempts, args.cf_runs, lambda s: True)
+    # Kestrel Bay v Ashmoor is the showcase match.
+    if args.round == 27 and (DATASETS / "showcase" / "m07").exists():
+        import shutil
+
+        for root in (DATASETS, TRUTH):
+            shutil.copytree(root / "showcase" / "m07", root / "matchday" / "m07", dirs_exist_ok=True)
 
 
 def cmd_season(args: argparse.Namespace) -> None:
@@ -207,6 +218,48 @@ def cmd_replay(args: argparse.Namespace) -> None:
     if result.invalid:
         print(f"{len(result.invalid)} messages don't match the contracts:")
         print("\n".join(result.invalid[:20]))
+        sys.exit(1)
+
+
+def cmd_golden(args: argparse.Namespace) -> None:
+    from offball.eval import golden
+
+    names = args.cases or list(golden.CASES)
+    unknown = [n for n in names if n not in golden.CASES]
+    if unknown:
+        sys.exit(f"Unknown case {', '.join(unknown)}; known: {', '.join(golden.CASES)}")
+    if args.action == "list":
+        for name, (set_name, match_id, kind, outcome) in golden.CASES.items():
+            print(f"{name:20} {set_name}/{match_id}  {kind}{' (' + outcome + ')' if outcome else ''}")
+        return
+    if args.action == "build":
+        for name in golden.build(names):
+            print(f"{name} -> {DATASETS / 'golden' / name}, {TRUTH / 'golden' / name / 'expected.json'}")
+        return
+    reports = []
+    if args.action == "check":
+        if len(names) != 1 or not args.stream:
+            sys.exit("offball golden check <case> --stream <output.jsonl>")
+        reports.append(golden.check(golden.load_case(names[0]), golden.load_stream(Path(args.stream))))
+    else:
+        import logging
+
+        from offball.agents.crew import Crew
+        from offball.agents.llm import model_configured
+
+        logging.basicConfig(level=logging.WARNING)
+        if not model_configured():
+            print("No model is configured, so the crew is off and the pipeline airs nothing. See .env.example.")
+        crew = Crew.from_env() if model_configured() else None
+        for name in names:
+            reports.append(golden.run(name, crew, ROOT / "replays" / "golden" / f"{name}.jsonl"))
+    for r in reports:
+        print(r.text())
+    if args.json:
+        Path(args.json).write_text(json.dumps([r.to_dict() for r in reports], indent=1) + "\n", encoding="utf-8",
+                                   newline="\n")
+    print(f"{sum(r.passed for r in reports)} of {len(reports)} case(s) pass")
+    if not all(r.passed for r in reports):
         sys.exit(1)
 
 
@@ -275,10 +328,11 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--attempts", type=int, default=30)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_bench)
-    p = sub.add_parser("matchday", help="Play one round's ten fixtures unscripted, with oracle labels")
+    p = sub.add_parser("matchday", help="Play the showcase round: one planted moment a fixture, with oracle labels")
     p.add_argument("--round", type=int, default=27)
+    p.add_argument("--only", nargs="*", help="Play only these match ids (e.g. s27-06)")
     p.add_argument("--workers", type=int, default=10)
-    p.add_argument("--attempts", type=int, default=30)
+    p.add_argument("--attempts", type=int, default=60)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_matchday)
     p = sub.add_parser("season", help="Play the 380-match season backdrop with the fast engine (events only)")
@@ -303,6 +357,12 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--to-ms", type=int)
     p.add_argument("--out")
     p.set_defaults(fn=cmd_replay)
+    p = sub.add_parser("golden", help="Golden render tests: build the cases, run the pipeline on them, check a stream")
+    p.add_argument("action", choices=["list", "build", "run", "check"])
+    p.add_argument("cases", nargs="*", help="Case names; all of them when left out")
+    p.add_argument("--stream", help="For check: the pipeline's output stream, one message a line")
+    p.add_argument("--json", help="Also write the report as JSON to this file")
+    p.set_defaults(fn=cmd_golden)
     args = ap.parse_args(argv)
     args.fn(args)
 

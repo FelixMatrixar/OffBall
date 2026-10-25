@@ -1,0 +1,79 @@
+{
+ "case": "press-broken",
+ "set": "smoke",
+ "match_id": "smk10",
+ "home": "dun",
+ "away": "lar",
+ "period": 1,
+ "from_ms": 126040,
+ "to_ms": 157560,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "smk10-k01",
+   "type": "press_broken",
+   "source": "planted",
+   "t_start_ms": 138040,
+   "t_end_ms": 145560,
+   "team_id": "dun",
+   "creator_id": "dun-07",
+   "dragged_ids": [
+    "lar-10",
+    "lar-09",
+    "lar-08",
+    "lar-04"
+   ],
+   "receiver_id": "dun-07",
+   "gap": {
+    "centre_xy": [
+     61.3,
+     62.7
+    ],
+    "radius_m": 8.0
+   },
+   "must_air": true,
+   "required_kinds": [
+    "caption",
+    "gap_ring"
+   ],
+   "pass": {
+    "event_id": "smk10-e0045",
+    "t_ms": 138440,
+    "player_ids": [
+     "dun-04",
+     "dun-07"
+    ],
+    "distance_m": 24.0
+   }
+  }
+ ],
+ "score": {
+  "at_start": {
+   "dun": 0,
+   "lar": 0
+  },
+  "changes": []
+ }
+}

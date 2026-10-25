@@ -1,0 +1,10 @@
+{
+ "case": "third-man-run",
+ "set": "smoke",
+ "match_id": "smk8",
+ "home": "kes",
+ "away": "ash",
+ "period": 2,
+ "from_ms": 11400,
+ "to_ms": 42800
+}

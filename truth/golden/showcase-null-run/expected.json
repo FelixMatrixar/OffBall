@@ -1,0 +1,118 @@
+{
+ "case": "showcase-null-run",
+ "set": "showcase",
+ "match_id": "m07",
+ "home": "kes",
+ "away": "ash",
+ "period": 1,
+ "from_ms": 724600,
+ "to_ms": 752120,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "m07-k01",
+   "type": "null_run",
+   "source": "planted",
+   "t_start_ms": 736600,
+   "t_end_ms": 740120,
+   "team_id": "kes",
+   "creator_id": "kes-09",
+   "dragged_ids": [
+    "ash-05"
+   ],
+   "receiver_id": "kes-10",
+   "gap": {
+    "centre_xy": [
+     26.5,
+     45.7
+    ],
+    "radius_m": 7.5
+   },
+   "run": {
+    "path": [
+     [
+      735600,
+      24.84,
+      48.96
+     ],
+     [
+      736100,
+      26.3,
+      48.17
+     ],
+     [
+      736600,
+      27.53,
+      47.26
+     ],
+     [
+      737100,
+      28.22,
+      47.35
+     ],
+     [
+      737600,
+      28.44,
+      48.85
+     ],
+     [
+      738100,
+      28.19,
+      51.68
+     ],
+     [
+      738600,
+      27.39,
+      56.01
+     ],
+     [
+      739100,
+      26.67,
+      59.6
+     ],
+     [
+      739600,
+      26.24,
+      61.76
+     ],
+     [
+      740100,
+      26.04,
+      62.78
+     ]
+    ]
+   },
+   "must_air": false,
+   "parent": "decoy_run"
+  }
+ ],
+ "score": {
+  "at_start": {
+   "kes": 0,
+   "ash": 0
+  },
+  "changes": []
+ }
+}

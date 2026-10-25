@@ -1,0 +1,10 @@
+{
+ "case": "cover-shadow",
+ "set": "smoke",
+ "match_id": "smk15",
+ "home": "cor",
+ "away": "wre",
+ "period": 1,
+ "from_ms": 91600,
+ "to_ms": 117760
+}

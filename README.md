@@ -38,6 +38,7 @@ Every caption, graphic and answer comes from a model; there are no templates to 
 | --- | --- |
 | `uv run offball serve all` | API and MCP server (`serve api` or `serve mcp` for one) |
 | `uv run offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000` | Runs a window of a match through the live pipeline and the crew, and writes the stream to `replays/m07.jsonl`, checked against `contracts/` |
+| `uv run offball golden run` | Puts the eight golden render cases through the pipeline and checks what it sends the frontend (PRD 19.5); `golden check <case> --stream out.jsonl` checks any stream |
 | `uv run offball showcase` | Regenerates the showcase match |
 | `uv run offball schemas` | Exports the JSON Schemas in `contracts/` from the code |
 | `uv run pytest` | Python tests |

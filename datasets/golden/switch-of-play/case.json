@@ -1,0 +1,10 @@
+{
+ "case": "switch-of-play",
+ "set": "smoke",
+ "match_id": "smk9",
+ "home": "nor",
+ "away": "oak",
+ "period": 1,
+ "from_ms": 286760,
+ "to_ms": 317920
+}

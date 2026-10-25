@@ -1,0 +1,10 @@
+{
+ "case": "press-broken",
+ "set": "smoke",
+ "match_id": "smk10",
+ "home": "dun",
+ "away": "lar",
+ "period": 1,
+ "from_ms": 126040,
+ "to_ms": 157560
+}

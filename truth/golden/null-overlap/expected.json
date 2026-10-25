@@ -1,0 +1,108 @@
+{
+ "case": "null-overlap",
+ "set": "smoke",
+ "match_id": "smk5",
+ "home": "cor",
+ "away": "wre",
+ "period": 1,
+ "from_ms": 126080,
+ "to_ms": 152720,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "smk5-k01",
+   "type": "null_overlap",
+   "source": "planted",
+   "t_start_ms": 138080,
+   "t_end_ms": 140720,
+   "team_id": "cor",
+   "creator_id": "cor-03",
+   "dragged_ids": [
+    "wre-08"
+   ],
+   "receiver_id": "cor-03",
+   "gap": {
+    "centre_xy": [
+     74.9,
+     62.0
+    ],
+    "radius_m": 10.0
+   },
+   "run": {
+    "path": [
+     [
+      137080,
+      36.57,
+      53.8
+     ],
+     [
+      137580,
+      38.35,
+      55.45
+     ],
+     [
+      138080,
+      40.11,
+      56.81
+     ],
+     [
+      138580,
+      42.58,
+      57.8
+     ],
+     [
+      139080,
+      46.44,
+      58.66
+     ],
+     [
+      139580,
+      50.49,
+      59.47
+     ],
+     [
+      140080,
+      54.22,
+      60.23
+     ],
+     [
+      140580,
+      57.96,
+      60.98
+     ]
+    ]
+   },
+   "must_air": false,
+   "parent": "overlap"
+  }
+ ],
+ "score": {
+  "at_start": {
+   "cor": 0,
+   "wre": 0
+  },
+  "changes": []
+ }
+}

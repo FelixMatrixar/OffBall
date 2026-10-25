@@ -30,7 +30,8 @@ Fast-engine matches (the season backdrop) have `match.json` and `events.jsonl` o
 | Showcase | 1 | Kestrel Bay v Ashmoor, the demo match | Committed |
 | Smoke | 18 short | Every one of the 18 moment types planted at least once, one moment a match | Committed |
 | Calibration runs | 10+ full | Unscripted, for the realism and discriminator gates | Regenerated (`offball match --set calib`) |
-| Showcase matchday | 10 full | One round played together, oracle labels | Blob Storage (`offball matchday`) |
+| Showcase matchday | 10 full | One round played together: the showcase match, and nine that each plant one moment around the hour; oracle labels | Blob Storage (`offball matchday`) |
+| Golden render tests | 8 stretches | About 30 s around one planted moment each, from the showcase and smoke sets: the feed as input, and what the pipeline's output must show (PRD 19.5) | Committed (`offball golden build`) |
 | OffBall-Bench | 100 full | 70 with 3–6 planted moments, 20 with only null moments, 10 unscripted; 40 dev, 60 test | Blob Storage (`offball bench`) |
 | Season backdrop | 380, events only | The whole season from the fast engine, with its table | Blob Storage (`offball season`) |
 

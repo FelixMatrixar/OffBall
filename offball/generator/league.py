@@ -559,10 +559,9 @@ def _squad(club: Club, rng: np.random.Generator, names: NameGenerator, family_bi
     return players
 
 
-def _round_robin(club_ids: list[str], rng: np.random.Generator) -> list[list[tuple[str, str]]]:
-    """Double round robin by the circle method, home and away balanced."""
-    ids = list(club_ids)
-    rng.shuffle(ids)
+def _round_robin(first: tuple[tuple[str, str], ...]) -> list[list[tuple[str, str]]]:
+    """Double round robin by the circle method, home and away balanced, whose first round is `first`."""
+    ids = [h for h, _ in first] + [a for _, a in reversed(first)]
     n = len(ids)
     rounds: list[list[tuple[str, str]]] = []
     fixed, rest = ids[0], ids[1:]
@@ -572,13 +571,16 @@ def _round_robin(club_ids: list[str], rng: np.random.Generator) -> list[list[tup
         for i in range(n // 2):
             a, b = order[i], order[n - 1 - i]
             pairs.append((a, b) if (r + i) % 2 == 0 else (b, a))
-        rounds.append(pairs)
+        rounds.append(pairs if r else list(first))
         rest = rest[-1:] + rest[:-1]
     second = [[(b, a) for a, b in rnd] for rnd in rounds]
     return rounds + second
 
 
 SHOWCASE_ROUND = 27
+# The showcase round's ten fixtures, home side first.
+SHOWCASE_FIXTURES = (("kes", "ash"), ("bra", "sal"), ("mor", "qua"), ("nor", "oak"), ("fen", "gle"), ("cor", "wre"),
+                     ("dun", "lar"), ("har", "ive"), ("jun", "low"), ("pel", "riv"))
 
 
 def build_league(seed: int = 2026) -> League:
@@ -621,10 +623,8 @@ def build_league(seed: int = 2026) -> League:
         clubs.append(club)
 
     _pin_showcase(clubs, names)
-    rounds = _round_robin([c.club_id for c in clubs], rng)
-    # Put Kestrel Bay v Ashmoor (at Kestrel Bay) in the showcase round.
-    showcase = next(r for r, rnd in enumerate(rounds) if ("kes", "ash") in rnd)
-    rounds[showcase], rounds[SHOWCASE_ROUND - 1] = rounds[SHOWCASE_ROUND - 1], rounds[showcase]
+    rounds = _round_robin(SHOWCASE_FIXTURES)
+    rounds[0], rounds[SHOWCASE_ROUND - 1] = rounds[SHOWCASE_ROUND - 1], rounds[0]
     fixtures = []
     for r, rnd in enumerate(rounds, start=1):
         for i, (h, a) in enumerate(rnd, start=1):

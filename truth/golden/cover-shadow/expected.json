@@ -1,0 +1,66 @@
+{
+ "case": "cover-shadow",
+ "set": "smoke",
+ "match_id": "smk15",
+ "home": "cor",
+ "away": "wre",
+ "period": 1,
+ "from_ms": 91600,
+ "to_ms": 117760,
+ "modes": [
+  "casual",
+  "learn",
+  "analyst",
+  "player",
+  "audio",
+  "broadcaster"
+ ],
+ "tolerance": {
+  "timing_ms": 3000,
+  "hold_ms": 2500,
+  "anchor_m": 3.0,
+  "gap_m": 5.0,
+  "run_min_m": 4.0,
+  "number_m": 1.0,
+  "frame_m": 0.1,
+  "frame_coverage": 0.95,
+  "clock_gap_ms": 1500,
+  "score_before_ms": 500,
+  "score_after_ms": 3000,
+  "evidence_before_ms": 5000,
+  "evidence_after_ms": 8000
+ },
+ "moments": [
+  {
+   "moment_id": "smk15-k01",
+   "type": "cover_shadow",
+   "source": "planted",
+   "t_start_ms": 103600,
+   "t_end_ms": 105760,
+   "team_id": "cor",
+   "creator_id": "cor-10",
+   "dragged_ids": [
+    "wre-02"
+   ],
+   "receiver_id": null,
+   "gap": {
+    "centre_xy": [
+     59.4,
+     41.65
+    ],
+    "radius_m": 10.9
+   },
+   "must_air": true,
+   "required_kinds": [
+    "caption"
+   ]
+  }
+ ],
+ "score": {
+  "at_start": {
+   "cor": 0,
+   "wre": 0
+  },
+  "changes": []
+ }
+}

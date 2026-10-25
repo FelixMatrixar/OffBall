@@ -1,0 +1,10 @@
+{
+ "case": "null-overlap",
+ "set": "smoke",
+ "match_id": "smk5",
+ "home": "cor",
+ "away": "wre",
+ "period": 1,
+ "from_ms": 126080,
+ "to_ms": 152720
+}
