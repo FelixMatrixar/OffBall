@@ -145,6 +145,7 @@ class Simulator:
         self.energy = np.ones(22)
         self.pos = np.zeros((22, 2))
         self.vel = np.zeros((22, 2))
+        self.v_wish = np.zeros((22, 2))  # the smoothed velocity each player is aiming for
         self.ori = np.zeros(22)
         self.anchor = np.zeros((22, 2))
         self.noise = np.zeros((22, 2))
@@ -157,6 +158,11 @@ class Simulator:
         self.next_decision = np.zeros(22)
         self.stun_until = np.zeros(22)
         self.lock_until = np.zeros(22)
+        # Tactical state the Match director can set for a while (PRD 12.5, layer 3): the block sitting deeper or
+        # higher by some metres, and a flank the team in possession looks to attack.
+        self.shape_shift = np.zeros(2)
+        self.shape_shift_until = np.zeros(2)
+        self.flank_bias: list[tuple[float, float, float] | None] = [None, None]  # (side, bonus, until)
         # Players who just knocked the ball loose can't play it again until it has left them.
         self.loose_skip: list[int] = []
         self.loose_skip_until = 0.0
@@ -602,15 +608,25 @@ class Simulator:
                 owner_cap[self.owner] = 0.55  # can't run through a defender standing in the way
         # Real players seldom reach their true top speed: even an all-out run tops out a little below it.
         frac = np.minimum(self.speed_frac, self.params.pace_sprint_cap)
-        desired = np.minimum(top * frac * owner_cap, np.sqrt(2 * self.decel * 0.6 * np.maximum(dist - 0.15, 0)))
+        # Nor do they use their full acceleration for ordinary changes of pace and direction; an all-out effort
+        # (a sprint, a tracking run) does, and it isn't eased into either.
+        effort = np.clip(frac, 0.0, 1.0)
+        share = self.params.accel_scale + (1.0 - self.params.accel_scale) * effort ** self.params.accel_effort_exp
+        accel, decel = self.accel * share, self.decel * share
+        desired = np.minimum(top * frac * owner_cap, np.sqrt(2 * decel * 0.6 * np.maximum(dist - 0.15, 0)))
         with np.errstate(invalid="ignore", divide="ignore"):
             unit = np.where(dist[:, None] > 1e-6, to / dist[:, None], 0.0)
         v_des = unit * desired[:, None]
-        v_des += self._separation()
+        if self.params.move_tau > 0:
+            # Intentions change smoothly: a player eases into a new direction and pace instead of snapping to it.
+            tau = np.maximum(self.params.move_tau * (1.0 - effort), DT)
+            self.v_wish += (v_des - self.v_wish) * np.minimum(1.0, DT / tau)[:, None]
+            v_des = self.v_wish.copy()
+        v_des += self._separation()  # but bodies keep apart at once
         dv = v_des - self.vel
         cur = np.linalg.norm(self.vel, axis=1)
         des = np.linalg.norm(v_des, axis=1)
-        lim = np.where(des >= cur, self.accel, self.decel) * DT
+        lim = np.where(des >= cur, accel, decel) * DT
         n = np.linalg.norm(dv, axis=1)
         scale = np.minimum(1.0, lim / np.maximum(n, 1e-9))
         self.vel += dv * scale[:, None]
@@ -858,9 +874,10 @@ class Simulator:
             return "right_foot" if self.rng.random() < 0.5 else "left_foot"
         return f"{f}_foot" if self.rng.random() < 0.85 else ("left_foot" if f == "right" else "right_foot")
 
-    def _is_offside(self, j: int) -> bool:
+    def _is_offside(self, j: int, lag: float = 0.0) -> bool:
+        """Is j offside now, or, with a lag, where a passer last saw him that long ago?"""
         team = self.team_of[j]
-        xj, _ = self.team_frame(team, self.pos[j])
+        xj, _ = self.team_frame(team, self.pos[j] - self.vel[j] * lag)
         bx, _ = self.team_frame(team, self.ball_pos[:2])
         line = self.offside_cache[team]
         return xj > L / 2 and xj > bx + 0.3 and xj > line + 0.3
@@ -1423,6 +1440,18 @@ class Simulator:
     def _restart_pass(self, taker: int, kind: str, team: int) -> None:
         mates = [j for j in self.active_of(team) if j != taker]
         p = self.pos[taker].copy()
+        directive = self.directives.pop(taker, None)
+        if directive is not None and directive.get("action") == "pass" and self.active[directive["to"]]:
+            # A rehearsed routine: the director's target and delivery.
+            j = directive["to"]
+            target = directive.get("point_fn", lambda s: None)(self)
+            target = self.pos[j].copy() if target is None else target
+            flight = (plan_aerial(p, target, apex=directive.get("apex", 7.0)) if directive.get("aerial", True)
+                      else plan_ground(p, target, self.params.pass_arrival))
+            sub = {"throw_in": "throw_in", "corner": "corner", "kick_off": "kick_off", "goal_kick": "goal_kick",
+                   "free_kick": "free_kick"}[kind]
+            self.release_pass(taker, j, flight, subtype=sub, restart=True)
+            return
         best, best_u, best_flight = -1, -1e9, None
         for j in mates:
             dist = float(np.linalg.norm(self.pos[j] - p))

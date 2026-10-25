@@ -1,6 +1,6 @@
 # Calibration fit
 
-Fitted 2026-10-24 from 380 real matches and season aggregates. Only these fitted numbers are kept; the raw sources stay out of the repository (PRD 12.2).
+Fitted 2026-10-25 from 380 real matches and season aggregates. Only these fitted numbers are kept; the raw sources stay out of the repository (PRD 12.2).
 
 ## Per-match targets (both teams, per 95 minutes)
 
@@ -50,3 +50,14 @@ Fitted 2026-10-24 from 380 real matches and season aggregates. Only these fitted
 | pullingwiderun | 1.9005 | 1.53 | 5.098 |
 | supportrun | 4.8416 | 4.42 | 11.24 |
 | underlaprun | 0.6164 | 0.33 | 2.034 |
+
+## Tracking through a broadcast camera (10 s live-play windows at 10 Hz)
+
+| Feature | 25th | Median | 75th | Windows |
+| --- | --- | --- | --- | --- |
+| accel_p90 | 1.9972 | 2.1866 | 2.3714 | 1500 |
+| accel_mean | 0.9274 | 1.026 | 1.1298 | 1500 |
+| players_seen | 13.32 | 15.245 | 16.9825 | 1500 |
+| nn_team_mean | 8.4778 | 10.0737 | 11.5118 | 1500 |
+| nn_opp_mean | 5.3926 | 6.3195 | 7.274 | 1500 |
+| turn_mean | 0.3232 | 0.3669 | 0.4124 | 1500 |

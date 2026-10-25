@@ -1,0 +1,28 @@
+{
+  "match_id": "smk17",
+  "seconds": 142.4,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "set_piece_screen",
+      "ok": true,
+      "attempts": 9,
+      "reasons": [
+        "the delivery didn't find him (incomplete)",
+        "timed out",
+        "the screen made too little difference",
+        "the delivery didn't find him (incomplete)",
+        "the delivery didn't find him (incomplete)",
+        "the delivery didn't find him (incomplete)",
+        "the delivery didn't find him (incomplete)",
+        "the corner was never taken"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

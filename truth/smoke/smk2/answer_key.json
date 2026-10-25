@@ -4,50 +4,54 @@
   "moment_id": "smk2-k01",
   "match_id": "smk2",
   "source": "planted",
-  "type": "null_run",
-  "period": 2,
-  "t_start_ms": 153800,
-  "t_end_ms": 157320,
-  "team_id": "bra",
-  "creator_id": "bra-10",
+  "type": "decoy_run",
+  "period": 1,
+  "t_start_ms": 272200,
+  "t_end_ms": 278600,
+  "team_id": "kes",
+  "creator_id": "kes-09",
   "dragged_ids": [
-   "sal-04"
+   "ash-05"
   ],
-  "receiver_id": "bra-04",
+  "receiver_id": "kes-10",
   "gap_zone": [
    [
-    27.7,
-    8.4
+    78.1,
+    30.0
    ],
    [
-    36.7,
-    8.4
+    87.1,
+    30.0
    ],
    [
-    36.7,
-    20.4
+    87.1,
+    42.0
    ],
    [
-    27.7,
-    20.4
+    78.1,
+    42.0
    ]
   ],
   "expected": {
-   "defender_displacement_m_max": 5.0,
-   "zone_control_gain_pts_max": 15.0
+   "defender_displacement_m_min": 8.0,
+   "zone_control_gain_pts_min": 40.0,
+   "pass_after_gap_s_max": 2.0,
+   "defender_follow_cosine_min": 0.6
   },
   "observed": {
-   "defender_displacement_m": 4.81,
-   "zone_control_gain_pts": -1.1
+   "defender_displacement_m": 13.67,
+   "zone_control_gain_pts": 40.6,
+   "pass_after_gap_s": 0.0,
+   "defender_follow_cosine": 0.99
   },
   "counterfactual": {
-   "space_created_m2": 0.0,
-   "epv_gain": 0.0,
+   "space_created_m2": 25.0,
+   "epv_gain": 0.0185,
    "gap_opens_without_run": false,
-   "runs": 0
+   "runs": 16
   },
-  "is_null": true,
-  "outcome": "none",
-  "attempts": 8
+  "is_null": false,
+  "outcome": "shot",
+  "attempts": 37
  }
 ]

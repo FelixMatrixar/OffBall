@@ -1,0 +1,24 @@
+{
+  "match_id": "smk12",
+  "seconds": 88.6,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "rest_defence_exposed",
+      "ok": true,
+      "attempts": 5,
+      "reasons": [
+        "preconditions never arose",
+        "preconditions never arose",
+        "the counter never outnumbered them in the half-space",
+        "preconditions never arose"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

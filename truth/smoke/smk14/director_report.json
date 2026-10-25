@@ -1,0 +1,28 @@
+{
+  "match_id": "smk14",
+  "seconds": 116.1,
+  "segment_retries": 0,
+  "score": {
+    "dun": 0,
+    "lar": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "false_9_drop",
+      "ok": true,
+      "attempts": 9,
+      "reasons": [
+        "only 148 m2 opened behind",
+        "lost the ball during the drop",
+        "preconditions never arose",
+        "preconditions never arose",
+        "only 109 m2 opened behind",
+        "only 77 m2 opened behind",
+        "preconditions never arose",
+        "lost the ball during the drop"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

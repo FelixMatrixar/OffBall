@@ -1,0 +1,9 @@
+{
+ "smk18/events.jsonl": "55490d91a764692a7b061ceea02d854b",
+ "smk18/match.json": "fa893656d93387e63384b31f210e0484",
+ "smk18/tracking.parquet": "d6b94210711418024f78dab69ab2617f",
+ "smk18/tracking_10hz.parquet": "5ff524b10ca5b40a730b302fc98a421d",
+ "smk18/answer_key.json": "8812f60075952b5f8f4cef45a717e607",
+ "smk18/intents.jsonl": "a6810d8320b7b9f4da47b9eb69cf2dd1",
+ "smk18/probabilities.jsonl": "3e0598b918eee7afdef754c9d726d30a"
+}

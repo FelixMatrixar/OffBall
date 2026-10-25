@@ -136,7 +136,8 @@ def on_ball(sim: Simulator, i: int) -> None:
         if dist < 4.0 or dist > 62.0:
             continue
         # Passers see offside teammates, unless they misread it.
-        if sim._is_offside(j) and sim.rng.random() > 0.08 * (1.0 - sim.vision[i]):
+        # The passer reads the line from where the runner was a moment ago; the referee judges the release.
+        if sim._is_offside(j, lag=P.offside_read_lag) and sim.rng.random() > P.offside_misread * (1.0 - sim.vision[i]):
             continue
         target = pass_target(sim, i, j)
         tx, ty = team_xy(sim, team, target)
@@ -149,6 +150,9 @@ def on_ball(sim: Simulator, i: int) -> None:
         gain = held_value(target, 0.97) * (1 + 0.3 * style.directness * forward)
         u = a.p_success * gain - (1 - a.p_success) * loss_cost((tx, ty))
         u -= P.long_pass_cost * max(0.0, dist - 25.0) * (1.2 - style.directness)
+        bias = sim.flank_bias[team]
+        if bias is not None and sim.t < bias[2] and (ty - W / 2) * bias[0] > 10.0:
+            u += bias[1]  # the team is looking to attack that flank
         if cross:
             u += 0.004
         utilities.append(u)

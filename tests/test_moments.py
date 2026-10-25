@@ -12,7 +12,9 @@ from offball.models.candidates import DETECTORS
 
 
 def test_every_planted_type_has_signals_and_a_detector() -> None:
-    assert {"decoy_run", "null_run", "overlap", "null_overlap", "timed_run_in_behind"} <= set(PLANS)
+    from offball.contracts.truth import MOMENT_TYPES
+
+    assert set(PLANS) == set(MOMENT_TYPES), "every moment type in the contracts has a plan"
     for kind, plan in PLANS.items():
         assert kind in EXPECTED, f"{kind} has no expected signals for the answer key"
         base = kind.removeprefix("null_")
@@ -38,3 +40,22 @@ def test_the_engine_is_deterministic() -> None:
         return [(e["type"], e["t_ms"], e["player_id"]) for e in sim.play().events]
 
     assert events() == events()
+
+
+def test_the_fast_engine_plays_a_realistic_match_quickly() -> None:
+    import time
+
+    from offball.generator.fast import FastEngine
+
+    league = build_league(2026)
+    engine = FastEngine(league)
+    t0 = time.time()
+    info, events = engine.play("kes", "ash", "fast-test", seed=5)
+    assert time.time() - t0 < 5.0
+    passes = [e for e in events if e.type == "pass"]
+    shots = [e for e in events if e.type == "shot"]
+    assert info.engine == "fast"
+    assert 600 < len(passes) < 1300
+    assert 8 < len(shots) < 45
+    assert sum(e.outcome == "goal" for e in shots) == sum(info.final_score.values())
+    assert engine.play("kes", "ash", "fast-test", seed=5)[1] == events  # deterministic

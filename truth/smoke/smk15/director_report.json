@@ -1,0 +1,30 @@
+{
+  "match_id": "smk15",
+  "seconds": 86.1,
+  "segment_retries": 0,
+  "score": {
+    "nor": 0,
+    "oak": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "cover_shadow",
+      "ok": true,
+      "attempts": 12,
+      "reasons": [
+        "the ball still went forward",
+        "the lane stayed open (24 points)",
+        "the lane stayed open (12 points)",
+        "someone else shut the lane",
+        "the lane stayed open (9 points)",
+        "someone else shut the lane",
+        "the ball still went forward",
+        "the lane stayed open (0 points)",
+        "the lane stayed open (3 points)",
+        "the shadow denied too little"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

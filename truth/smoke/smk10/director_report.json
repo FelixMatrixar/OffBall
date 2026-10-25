@@ -1,0 +1,30 @@
+{
+  "match_id": "smk10",
+  "seconds": 146.9,
+  "segment_retries": 0,
+  "score": {
+    "dun": 0,
+    "lar": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "press_broken",
+      "ok": true,
+      "attempts": 24,
+      "reasons": [
+        "no overload in transition",
+        "the pass didn't beat the press",
+        "no overload in transition",
+        "the pass didn't beat the press",
+        "the pass didn't beat the press",
+        "the pass didn't arrive (pending)",
+        "no overload in transition",
+        "no overload in transition",
+        "the pass didn't beat the press",
+        "the pass didn't arrive (pending)"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

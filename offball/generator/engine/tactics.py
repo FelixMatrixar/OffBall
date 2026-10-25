@@ -47,8 +47,8 @@ def compute_anchors(sim: Simulator, team: int) -> np.ndarray:
         front = back + 36.0 + 10.0 * style.directness
         front = min(front, max(line - 1.0, 48.0)) if bx < line else max(front, bx)
         depth = max(front - back, 20.0)
-        width = 44.0 + 20.0 * style.width
-        cy = W / 2 + 0.18 * (by - W / 2)
+        width = P.att_width + 20.0 * style.width
+        cy = W / 2 + P.att_ball_shift * (by - W / 2)
     else:
         base_back = 18.0 + 26.0 * style.line_height
         if transition:
@@ -56,7 +56,7 @@ def compute_anchors(sim: Simulator, team: int) -> np.ndarray:
         back = float(np.clip(bx - 9.0 - 14.0 * (1.0 - style.press_height), 6.0, base_back))
         depth = P.def_depth + 11.0 * style.press_height
         width = P.def_width + 7.0 * (1.0 - style.press_intensity)
-        cy = W / 2 + 0.5 * (by - W / 2)
+        cy = W / 2 + P.def_ball_shift * (by - W / 2)
         if bx < 36.0:
             # Defending the box: drop deep and narrow, between the ball and the goal.
             squeeze = (36.0 - bx) / 36.0
@@ -79,6 +79,8 @@ def compute_anchors(sim: Simulator, team: int) -> np.ndarray:
             yt = cy + (v - 0.5) * width
             if not in_poss:
                 yt += 0.12 * (by - yt)  # squeeze towards the ball side
+        if slot.role != "GK" and sim.t < sim.shape_shift_until[team]:
+            xt += float(sim.shape_shift[team])  # a tactical change: the block sits deeper or higher for a while
         xt = float(np.clip(xt, 1.0, L - 1.0))
         yt = float(np.clip(yt, 1.5, W - 1.5))
         out[k] = (xt, yt) if d > 0 else (L - xt, W - yt)

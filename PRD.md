@@ -753,7 +753,7 @@ We fit distributions from two permissively licensed open datasets and ship only 
 
 ### 12.6 Calibration by simulation
 
-Fitting distributions sets starting values. To make whole matches realistic, the engine's parameters (72 global ones, such as decision noise, run tendencies, press thresholds and movement pace) are tuned so its output matches the calibration data.
+Fitting distributions sets starting values. To make whole matches realistic, the engine's parameters (80 global ones, such as decision noise, run tendencies, press thresholds and movement pace) are tuned so its output matches the calibration data.
 
 - **The Tuner agent proposes; an optimizer searches.** The Tuner reads gate reports and fidelity charts, forms a hypothesis ("defenders track decoy runs too often in the final third"), and chooses which parameters to search and within what bounds. An optimizer (Bayesian optimisation with Optuna) does the numeric search. The model never does the arithmetic.
 - **Nothing changes unless every gate passes.** The Validator re-runs all nine gates on each candidate. Accepted changes are committed with a calibration report and the Tuner's hypothesis log.
@@ -783,7 +783,7 @@ Sixteen moment types cover the main ways space is created and denied, plus two n
 | Null | Null run | A decoy run where the defender correctly passes the runner on and no gap opens | No control flip; any credit the system gives counts as an invented moment |
 | Null | Null overlap | An overlap the defence handles; no 2 v 1 forms | No wide-zone flip; any credit counts as invented |
 
-Each benchmark match plants 3–6 moments, drawn so every type appears at least 10 times across OffBall-Bench. On top of the planted moments, the emergent engine produces moments naturally. The oracle labels those too, from logged intents and counterfactual re-runs, so the benchmark also tests detection in unscripted play.
+Each benchmark match plants 3–6 moments, drawn so every type appears at least 10 times across OffBall-Bench. On top of the planted moments, the emergent engine produces moments naturally. The oracle labels those too, from logged intents confirmed by the moment's signal definitions, so the benchmark also tests detection in unscripted play. Oracle labels carry counterfactual truth only once their moments are re-run from a checkpoint (12.12).
 
 ### 12.8 Data contracts
 
@@ -885,7 +885,7 @@ Every set can be regenerated from its seed. Only the small ones live in git.
 | --- | --- | --- | --- | --- |
 | Showcase match | 1 match, Kestrel Bay v Ashmoor | A directed script with a 63' decoy-run goal and 4 other moments; events, tracking, overlays in every mode and language, voice, counterfactuals, camera paths | Demo video and the judges' live demo | Committed; video in Blob Storage |
 | Showcase matchday | 10 matches of one round | Emergent-engine matches played at the same time | Space Centre | Azure Blob Storage, with a OneLake shortcut |
-| Smoke set | 6 matches of 10 minutes | One planted moment each: decoy run (twice), overlap and timed run in behind, plus a null run and a null overlap | CI tests, quality gates, visual regression | Committed |
+| Smoke set | 18 short matches: 16 of 10 minutes, one of 30 and one of 24 | Every one of the 18 moment types planted at least once, one moment a match (the decoy run twice; space lost and fatigue gap share the 24-minute match) | CI tests, quality gates, visual regression | Committed |
 | OffBall-Bench | 100 full matches with tracking | 70 with 3–6 planted moments; 20 with only null moments planted; 10 unscripted with oracle labels only; split into 40 dev and 60 test matches | Scoring OffBall, and anyone else | Azure Blob Storage (public read), with a OneLake shortcut; dev keys public, test keys held privately and scored by the evaluation endpoint |
 | Season backdrop | 380 matches, events only | A full season from the fast engine; tracking for any match generated on demand | Season context, leaderboards, Fabric dashboards | Azure Blob Storage, with a OneLake shortcut |
 | Video set | 500 clips of 30 s, plus 2 full matches | Broadcast-style 1080p video with annotations and camera parameters | Vision auto-eventing, computer-vision research | Azure Blob Storage, public read, mirrored to OneLake |

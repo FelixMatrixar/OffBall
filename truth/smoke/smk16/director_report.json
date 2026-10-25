@@ -1,0 +1,25 @@
+{
+  "match_id": "smk16",
+  "seconds": 88.2,
+  "segment_retries": 0,
+  "score": {
+    "nor": 0,
+    "oak": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "rotation",
+      "ok": true,
+      "attempts": 6,
+      "reasons": [
+        "the pass never came (best lane 0.01)",
+        "the creator's decision made too little difference",
+        "the pass didn't arrive (incomplete)",
+        "lost the ball before the pass",
+        "nobody came out of it free"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

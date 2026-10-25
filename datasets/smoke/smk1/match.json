@@ -1,194 +1,194 @@
 {
   "schema_version": "2.0",
   "match_id": "smk1",
-  "seed": 113,
+  "seed": 502,
   "engine": "emergent",
   "generator_version": "0.1.0",
   "competition": "OffBall League",
   "season": "2026",
   "round": null,
   "home": {
-    "club_id": "dun",
-    "name": "Duncliffe",
-    "short_name": "DUN",
+    "club_id": "har",
+    "name": "Harbourne",
+    "short_name": "HAR",
     "kit": {
-      "primary": "#00708d",
-      "secondary": "#e0f3f6",
+      "primary": "#445c00",
+      "secondary": "#ebf1e3",
       "pattern": "halves"
     },
-    "formation": "4-2-3-1",
+    "formation": "4-3-3",
     "lineup": [
       {
-        "player_id": "dun-01",
-        "name": "S. Yomoto",
+        "player_id": "har-01",
+        "name": "A. Djoudi",
         "number": 1,
         "role": "GK",
         "starter": true
       },
       {
-        "player_id": "dun-02",
-        "name": "K. Demade",
+        "player_id": "har-02",
+        "name": "E. Vikovik",
         "number": 2,
         "role": "RB",
         "starter": true
       },
       {
-        "player_id": "dun-05",
-        "name": "E. Adodele",
-        "number": 5,
-        "role": "CB",
-        "starter": true
-      },
-      {
-        "player_id": "dun-04",
-        "name": "M. Zareiro",
+        "player_id": "har-04",
+        "name": "R. Hamich",
         "number": 4,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "dun-03",
-        "name": "T. Adode",
+        "player_id": "har-05",
+        "name": "A. Abara",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "har-03",
+        "name": "F. Adewa",
         "number": 3,
         "role": "LB",
         "starter": true
       },
       {
-        "player_id": "dun-06",
-        "name": "E. Adaba",
+        "player_id": "har-06",
+        "name": "D. Mamura",
         "number": 6,
         "role": "DM",
         "starter": true
       },
       {
-        "player_id": "dun-08",
-        "name": "K. Temuko",
+        "player_id": "har-08",
+        "name": "K. Abourari",
         "number": 8,
-        "role": "DM",
+        "role": "CM",
         "starter": true
       },
       {
-        "player_id": "dun-11",
-        "name": "E. Lundastrom",
-        "number": 11,
+        "player_id": "har-10",
+        "name": "T. Moravenko",
+        "number": 10,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "har-07",
+        "name": "K. Kadimami",
+        "number": 7,
         "role": "RW",
         "starter": true
       },
       {
-        "player_id": "dun-10",
-        "name": "O. Lundyberg",
-        "number": 10,
-        "role": "AM",
-        "starter": true
-      },
-      {
-        "player_id": "dun-07",
-        "name": "C. Ibiwa",
-        "number": 7,
-        "role": "LW",
-        "starter": true
-      },
-      {
-        "player_id": "dun-09",
-        "name": "Y. Baba",
+        "player_id": "har-09",
+        "name": "A. Djounari",
         "number": 9,
         "role": "ST",
         "starter": true
       },
       {
-        "player_id": "dun-12",
-        "name": "Y. Oleko",
-        "number": 12,
+        "player_id": "har-11",
+        "name": "K. Nasami",
+        "number": 11,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "har-13",
+        "name": "K. Salourari",
+        "number": 13,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "dun-18",
-        "name": "K. Yawenuwa",
-        "number": 18,
+        "player_id": "har-14",
+        "name": "K. Mahami",
+        "number": 14,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "dun-19",
-        "name": "L. Rader",
+        "player_id": "har-15",
+        "name": "H. Rahinoun",
+        "number": 15,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "har-17",
+        "name": "W. Nasach",
+        "number": 17,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "har-19",
+        "name": "W. Fadari",
         "number": 19,
-        "role": "CB",
-        "starter": false
-      },
-      {
-        "player_id": "dun-21",
-        "name": "K. Bala",
-        "number": 21,
-        "role": "CB",
-        "starter": false
-      },
-      {
-        "player_id": "dun-22",
-        "name": "K. Olale",
-        "number": 22,
         "role": "RB",
         "starter": false
       },
       {
-        "player_id": "dun-23",
-        "name": "T. Osowa",
+        "player_id": "har-23",
+        "name": "K. Nasanira",
         "number": 23,
         "role": "LB",
         "starter": false
       },
       {
-        "player_id": "dun-24",
-        "name": "K. Osala",
+        "player_id": "har-24",
+        "name": "A. Rahoumi",
         "number": 24,
         "role": "DM",
         "starter": false
       },
       {
-        "player_id": "dun-26",
-        "name": "N. Orrules",
+        "player_id": "har-26",
+        "name": "H. Bjyheim",
         "number": 26,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "dun-29",
-        "name": "E. Obowa",
-        "number": 29,
+        "player_id": "har-28",
+        "name": "C. Kwako",
+        "number": 28,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "dun-30",
-        "name": "K. Osewele",
+        "player_id": "har-30",
+        "name": "A. Fadouri",
         "number": 30,
         "role": "AM",
         "starter": false
       },
       {
-        "player_id": "dun-32",
-        "name": "E. Obola",
-        "number": 32,
+        "player_id": "har-33",
+        "name": "I. Mahioui",
+        "number": 33,
         "role": "RW",
         "starter": false
       },
       {
-        "player_id": "dun-36",
-        "name": "T. Demuwa",
-        "number": 36,
+        "player_id": "har-34",
+        "name": "Y. Djara",
+        "number": 34,
         "role": "LW",
         "starter": false
       },
       {
-        "player_id": "dun-37",
-        "name": "Y. Bawa",
-        "number": 37,
+        "player_id": "har-36",
+        "name": "I. Zahimari",
+        "number": 36,
         "role": "ST",
         "starter": false
       },
       {
-        "player_id": "dun-39",
-        "name": "Y. Adala",
+        "player_id": "har-39",
+        "name": "I. Saloura",
         "number": 39,
         "role": "ST",
         "starter": false
@@ -196,187 +196,187 @@
     ]
   },
   "away": {
-    "club_id": "lar",
-    "name": "Larkhaven",
-    "short_name": "LAR",
+    "club_id": "ive",
+    "name": "Ivelmouth",
+    "short_name": "IVE",
     "kit": {
-      "primary": "#afdf92",
-      "secondary": "#171d13",
+      "primary": "#fbb34c",
+      "secondary": "#201910",
       "pattern": "hoops"
     },
-    "formation": "4-4-2",
+    "formation": "3-4-3",
     "lineup": [
       {
-        "player_id": "lar-01",
-        "name": "S. Toradal",
+        "player_id": "ive-01",
+        "name": "T. Smahuis",
         "number": 1,
         "role": "GK",
         "starter": true
       },
       {
-        "player_id": "lar-02",
-        "name": "O. Nystrom",
-        "number": 2,
-        "role": "RB",
+        "player_id": "ive-04",
+        "name": "R. Tomura",
+        "number": 4,
+        "role": "CB",
         "starter": true
       },
       {
-        "player_id": "lar-05",
-        "name": "B. Bjastrom",
+        "player_id": "ive-05",
+        "name": "R. Tozaki",
         "number": 5,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "lar-06",
-        "name": "S. Bjavik",
+        "player_id": "ive-06",
+        "name": "T. Nazaki",
         "number": 6,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "lar-03",
-        "name": "A. Vikenes",
-        "number": 3,
-        "role": "LB",
+        "player_id": "ive-02",
+        "name": "D. Tonaga",
+        "number": 2,
+        "role": "RWB",
         "starter": true
       },
       {
-        "player_id": "lar-07",
-        "name": "A. Vikarud",
-        "number": 7,
-        "role": "RM",
-        "starter": true
-      },
-      {
-        "player_id": "lar-04",
-        "name": "O. Eldivik",
-        "number": 4,
-        "role": "CM",
-        "starter": true
-      },
-      {
-        "player_id": "lar-08",
-        "name": "E. Valuz",
+        "player_id": "ive-08",
+        "name": "E. Hageheim",
         "number": 8,
         "role": "CM",
         "starter": true
       },
       {
-        "player_id": "lar-11",
-        "name": "B. Menduno",
-        "number": 11,
-        "role": "LM",
+        "player_id": "ive-10",
+        "name": "H. Kata",
+        "number": 10,
+        "role": "CM",
         "starter": true
       },
       {
-        "player_id": "lar-09",
-        "name": "K. Zahadi",
+        "player_id": "ive-03",
+        "name": "Y. Yonaga",
+        "number": 3,
+        "role": "LWB",
+        "starter": true
+      },
+      {
+        "player_id": "ive-07",
+        "name": "K. Kizaki",
+        "number": 7,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "ive-09",
+        "name": "R. Hata",
         "number": 9,
         "role": "ST",
         "starter": true
       },
       {
-        "player_id": "lar-10",
-        "name": "H. Askostrom",
-        "number": 10,
-        "role": "ST",
+        "player_id": "ive-11",
+        "name": "H. Tamoto",
+        "number": 11,
+        "role": "LW",
         "starter": true
       },
       {
-        "player_id": "lar-12",
-        "name": "V. Askyvik",
+        "player_id": "ive-12",
+        "name": "H. Nakawa",
         "number": 12,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "lar-13",
-        "name": "L. Askysen",
-        "number": 13,
+        "player_id": "ive-14",
+        "name": "R. Mamoto",
+        "number": 14,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "lar-15",
-        "name": "R. Pavec",
+        "player_id": "ive-15",
+        "name": "Y. Rihara",
         "number": 15,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "lar-16",
-        "name": "L. Storoheim",
+        "player_id": "ive-16",
+        "name": "D. Janacan",
         "number": 16,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "lar-17",
-        "name": "T. Bjalund",
-        "number": 17,
-        "role": "RB",
+        "player_id": "ive-21",
+        "name": "W. Rahoudi",
+        "number": 21,
+        "role": "CB",
         "starter": false
       },
       {
-        "player_id": "lar-20",
-        "name": "S. Skyllund",
-        "number": 20,
-        "role": "LB",
-        "starter": false
-      },
-      {
-        "player_id": "lar-23",
-        "name": "L. Vikylstrom",
+        "player_id": "ive-23",
+        "name": "T. Kita",
         "number": 23,
+        "role": "RWB",
+        "starter": false
+      },
+      {
+        "player_id": "ive-25",
+        "name": "J. Dekohuis",
+        "number": 25,
         "role": "DM",
         "starter": false
       },
       {
-        "player_id": "lar-24",
-        "name": "D. Rijkolx",
-        "number": 24,
-        "role": "CM",
-        "starter": false
-      },
-      {
-        "player_id": "lar-28",
-        "name": "A. Eldoheim",
+        "player_id": "ive-28",
+        "name": "K. Yorazaki",
         "number": 28,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "lar-32",
-        "name": "O. Hagines",
-        "number": 32,
+        "player_id": "ive-31",
+        "name": "Y. Rimura",
+        "number": 31,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "ive-35",
+        "name": "S. Managa",
+        "number": 35,
         "role": "AM",
         "starter": false
       },
       {
-        "player_id": "lar-33",
-        "name": "O. Daladal",
-        "number": 33,
+        "player_id": "ive-36",
+        "name": "R. Yorakawa",
+        "number": 36,
         "role": "RW",
         "starter": false
       },
       {
-        "player_id": "lar-34",
-        "name": "T. Lundelund",
-        "number": 34,
+        "player_id": "ive-37",
+        "name": "S. Lundevik",
+        "number": 37,
         "role": "LW",
         "starter": false
       },
       {
-        "player_id": "lar-35",
-        "name": "H. Torillund",
-        "number": 35,
+        "player_id": "ive-38",
+        "name": "S. Tatota",
+        "number": 38,
         "role": "ST",
         "starter": false
       },
       {
-        "player_id": "lar-39",
-        "name": "O. Askevik",
+        "player_id": "ive-39",
+        "name": "D. Mihara",
         "number": 39,
         "role": "ST",
         "starter": false
@@ -386,18 +386,18 @@
   "periods": [
     {
       "period": 1,
-      "duration_ms": 420040,
-      "attacks_left_to_right": "dun"
+      "duration_ms": 447520,
+      "attacks_left_to_right": "har"
     },
     {
       "period": 2,
-      "duration_ms": 549640,
-      "attacks_left_to_right": "lar"
+      "duration_ms": 516960,
+      "attacks_left_to_right": "ive"
     }
   ],
   "final_score": {
-    "dun": 0,
-    "lar": 0
+    "har": 0,
+    "ive": 0
   },
   "frame_rate": 25,
   "pitch": [

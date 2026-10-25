@@ -61,7 +61,9 @@ def test_live_dedupes_and_relays(feed) -> None:
 def test_live_finds_the_decoy_run(feed) -> None:
     em, msgs = feed
     live, found, _ = play(em, msgs)
-    confirmed = [c for c in live.candidates() if c.status == "confirmed"]
+    # Other detectors find other moments in the build-up too (a run can be a decoy and a blind-side run at once);
+    # the planted decoy run is found once.
+    confirmed = [c for c in live.candidates() if c.status == "confirmed" and c.type == "decoy_run"]
     assert len(confirmed) == 1
     c = confirmed[0]
     assert (c.type, c.creator_id, c.dragged_ids, c.receiver_id) == ("decoy_run", "kes-09", ["ash-05"], "kes-10")

@@ -153,6 +153,18 @@ def downsample_10hz(table: pa.Table) -> pa.Table:
     return pa.concat_tables(out_parts)
 
 
+def refresh_manifest(data_dir: Path, truth_dir: Path) -> dict[str, str]:
+    """Recompute the hashes of the files a match's manifest lists, after a truth file was rewritten."""
+    path = data_dir / "manifest.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    for rel in manifest:
+        name = rel.split("/", 1)[1]
+        target = data_dir / name if (data_dir / name).exists() else truth_dir / name
+        manifest[rel] = file_md5(target)
+    path.write_text(json.dumps(manifest, indent=1), encoding="utf-8", newline="\n")
+    return manifest
+
+
 def file_md5(path: Path) -> str:
     h = hashlib.md5()
     with path.open("rb") as fh:

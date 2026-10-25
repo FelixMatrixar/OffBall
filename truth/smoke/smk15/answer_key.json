@@ -1,0 +1,54 @@
+[
+ {
+  "schema_version": "2.0",
+  "moment_id": "smk15-k01",
+  "match_id": "smk15",
+  "source": "planted",
+  "type": "cover_shadow",
+  "period": 1,
+  "t_start_ms": 136520,
+  "t_end_ms": 139680,
+  "team_id": "nor",
+  "creator_id": "nor-06",
+  "dragged_ids": [
+   "oak-09"
+  ],
+  "receiver_id": null,
+  "gap_zone": [
+   [
+    25.6,
+    15.0
+   ],
+   [
+    36.3,
+    15.0
+   ],
+   [
+    36.3,
+    22.3
+   ],
+   [
+    25.6,
+    22.3
+   ]
+  ],
+  "expected": {
+   "pass_prob_drop_pts_min": 30.0,
+   "ball_backwards_or_sideways": 1.0
+  },
+  "observed": {
+   "pass_prob_drop_pts": 36.9,
+   "ball_backwards_or_sideways": 1.0,
+   "defender_lane_gap_m": 0.27
+  },
+  "counterfactual": {
+   "space_created_m2": 29.6,
+   "epv_gain": 0.3839,
+   "gap_opens_without_run": false,
+   "runs": 16
+  },
+  "is_null": false,
+  "outcome": "none",
+  "attempts": 12
+ }
+]

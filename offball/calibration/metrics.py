@@ -55,6 +55,10 @@ DEFAULT_TARGETS: dict[str, Target] = {
     "behind_runs_p30": Target(1.2, 3.6, 0.5, "norm"),
     "overlap_runs_p30": Target(0.4, 1.2, 0.25, "norm"),
 }
+# How much each tracking feature counts in the loss, where `calibration/targets.json` has its real band (gate 5's
+# features, over camera-masked live-play windows; tuned as `trk_<feature>`).
+TRACKING_WEIGHTS = {"accel_p90": 2.0, "accel_mean": 1.0, "players_seen": 1.0, "nn_team_mean": 1.0,
+                    "nn_opp_mean": 1.5, "turn_mean": 0.5}
 # Engine intents -> SkillCorner run types, for the run-rate metrics.
 RUN_TYPES = {"behind_runs_p30": ("run", "behindrun"), "overlap_runs_p30": ("overlap", "overlaprun")}
 
@@ -82,6 +86,8 @@ def targets() -> dict[str, Target]:
         b = runs.get(real)
         if b is not None:  # the average player's rate within half to one and a half times the real average
             out[name] = Target(0.5 * b["mean"], 1.5 * b["mean"], DEFAULT_TARGETS[name].weight, b["source"])
+    for name, b in fitted().get("tracking", {}).items():  # the typical window sits in the middle half of real ones
+        out[f"trk_{name}"] = Target(b["p25"], b["p75"], TRACKING_WEIGHTS.get(name, 1.0), b["source"])
     peaks = fitted().get("distributions", {}).get("player_peak_speed_kmh")
     if peaks is not None:  # the typical player's peak speed sits in the middle half of real players'
         out["peak_speed_kmh"] = Target(peaks["quantiles"][25], peaks["quantiles"][75], 1.0, peaks["source"])
@@ -197,6 +203,18 @@ def dead_seconds(events: list[dict]) -> float:
         elif stopped is None and (e["type"] in STOPS or (e["type"] == "shot" and e.get("outcome") == "goal")):
             stopped = key
     return dead
+
+
+def tracking_metrics(result) -> dict[str, float]:
+    """How a match's tracking looks through a broadcast camera: gate 5's telling features, as `trk_<feature>`.
+    Empty unless SkillCorner's tracking is downloaded, since the camera footprints come from it."""
+    from offball.calibration import discriminator as D
+    from offball.generator.writer import downsample_10hz, tracking_table
+
+    if not D.available():
+        return {}
+    clips = D.clips_from_table(downsample_10hz(tracking_table(result)), result.teams[0].club.club_id, "tuning")
+    return {f"trk_{k}": v for k, v in D.tracking_summary(clips).items()}
 
 
 def robust_peak(speeds: np.ndarray) -> float:

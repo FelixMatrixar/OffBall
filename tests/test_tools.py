@@ -9,7 +9,8 @@ from offball.mcp import tools as T
 
 @pytest.fixture(scope="module")
 def goal_card():
-    goal = next(c for c in T.list_candidates("m07") if c["period"] == 2 and c["creator_id"] == "kes-09")
+    goal = next(c for c in T.list_candidates("m07")
+                if c["period"] == 2 and c["creator_id"] == "kes-09" and c["type"] == "decoy_run")
     return T.moment_card("m07", goal["candidate_id"])
 
 

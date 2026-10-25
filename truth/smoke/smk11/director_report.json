@@ -1,0 +1,30 @@
+{
+  "match_id": "smk11",
+  "seconds": 109.7,
+  "segment_retries": 0,
+  "score": {
+    "dun": 0,
+    "lar": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "pinning",
+      "ok": true,
+      "attempts": 19,
+      "reasons": [
+        "the pass never came (best lane 0.09)",
+        "the pass never came (best lane 0.06)",
+        "the pass never came (best lane 0.07)",
+        "the pass never came (best lane 0.06)",
+        "the pass never came (best lane 0.08)",
+        "the pass never came (best lane 0.20)",
+        "the pass never came (best lane 0.08)",
+        "the pass never came (best lane 0.43)",
+        "the pass never came (best lane 0.06)",
+        "the pass never came (best lane 0.35)"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

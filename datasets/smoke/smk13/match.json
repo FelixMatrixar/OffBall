@@ -1,0 +1,408 @@
+{
+  "schema_version": "2.0",
+  "match_id": "smk13",
+  "seed": 110,
+  "engine": "emergent",
+  "generator_version": "0.1.0",
+  "competition": "OffBall League",
+  "season": "2026",
+  "round": null,
+  "home": {
+    "club_id": "kes",
+    "name": "Kestrel Bay",
+    "short_name": "KES",
+    "kit": {
+      "primary": "#2e64a6",
+      "secondary": "#e6effc",
+      "pattern": "plain"
+    },
+    "formation": "4-3-3",
+    "lineup": [
+      {
+        "player_id": "kes-01",
+        "name": "R. Wexeridge",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "kes-02",
+        "name": "C. Brackiby",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "kes-04",
+        "name": "M. Arkiwick",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "kes-05",
+        "name": "M. Arkoham",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "kes-03",
+        "name": "E. Radiby",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "kes-06",
+        "name": "P. Brackocott",
+        "number": 6,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "kes-08",
+        "name": "R. Delacott",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "kes-10",
+        "name": "T. Arkwell",
+        "number": 10,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "kes-07",
+        "name": "P. Quillan",
+        "number": 7,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "kes-09",
+        "name": "J. Velmar",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "kes-11",
+        "name": "M. Dvoror",
+        "number": 11,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "kes-15",
+        "name": "R. Telorira",
+        "number": 15,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "kes-17",
+        "name": "E. Arkiby",
+        "number": 17,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "kes-19",
+        "name": "U. Belello",
+        "number": 19,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "kes-21",
+        "name": "V. Dalerud",
+        "number": 21,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "kes-23",
+        "name": "J. Loriford",
+        "number": 23,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "kes-24",
+        "name": "B. Arkomore",
+        "number": 24,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "kes-26",
+        "name": "C. Yariwick",
+        "number": 26,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "kes-27",
+        "name": "V. Bjorud",
+        "number": 27,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "kes-28",
+        "name": "O. Bjarud",
+        "number": 28,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "kes-30",
+        "name": "A. Yaremore",
+        "number": 30,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "kes-31",
+        "name": "A. Radiford",
+        "number": 31,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "kes-35",
+        "name": "T. Dunaton",
+        "number": 35,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "kes-37",
+        "name": "W. Rijkostra",
+        "number": 37,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "kes-39",
+        "name": "B. Haliford",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "away": {
+    "club_id": "ash",
+    "name": "Ashmoor",
+    "short_name": "ASH",
+    "kit": {
+      "primary": "#67e7ee",
+      "secondary": "#0f1d1e",
+      "pattern": "hoops"
+    },
+    "formation": "4-2-3-1",
+    "lineup": [
+      {
+        "player_id": "ash-01",
+        "name": "T. Esqumeiro",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "ash-02",
+        "name": "U. Zarezo",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "ash-05",
+        "name": "L. Hendricx",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "ash-04",
+        "name": "E. Storodal",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "ash-03",
+        "name": "B. Ruvales",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "ash-06",
+        "name": "T. Orrurillo",
+        "number": 6,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "ash-08",
+        "name": "J. Davera",
+        "number": 8,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "ash-11",
+        "name": "E. Orroiro",
+        "number": 11,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "ash-10",
+        "name": "S. Moravec",
+        "number": 10,
+        "role": "AM",
+        "starter": true
+      },
+      {
+        "player_id": "ash-07",
+        "name": "I. Davimozo",
+        "number": 7,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "ash-09",
+        "name": "I. Mendideda",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "ash-13",
+        "name": "I. Lurules",
+        "number": 13,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "ash-15",
+        "name": "T. Cereda",
+        "number": 15,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "ash-18",
+        "name": "C. Garada",
+        "number": 18,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "ash-20",
+        "name": "F. Yawidosu",
+        "number": 20,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "ash-23",
+        "name": "I. Ruvarente",
+        "number": 23,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "ash-25",
+        "name": "J. Wexecott",
+        "number": 25,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "ash-26",
+        "name": "J. Qullira",
+        "number": 26,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "ash-28",
+        "name": "E. Luraz",
+        "number": 28,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "ash-29",
+        "name": "S. Bjasen",
+        "number": 29,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "ash-31",
+        "name": "I. Lureles",
+        "number": 31,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "ash-32",
+        "name": "C. Quzo",
+        "number": 32,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "ash-35",
+        "name": "B. Davura",
+        "number": 35,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "ash-37",
+        "name": "U. Orrino",
+        "number": 37,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "ash-39",
+        "name": "J. Alellales",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "periods": [
+    {
+      "period": 1,
+      "duration_ms": 368280,
+      "attacks_left_to_right": "kes"
+    },
+    {
+      "period": 2,
+      "duration_ms": 578320,
+      "attacks_left_to_right": "ash"
+    }
+  ],
+  "final_score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "frame_rate": 25,
+  "pitch": [
+    105.0,
+    68.0
+  ],
+  "synthetic": true
+}

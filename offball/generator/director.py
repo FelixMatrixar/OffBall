@@ -30,6 +30,19 @@ EXPECTED: dict[str, dict[str, float]] = {
     "overlap": {"wide_zone_control_pct_min": 60, "two_v_one_s_min": 1.5, "delivery_follows": 1},
     "null_overlap": {"wide_zone_control_gain_pts_max": 15, "two_v_one_s_max": 0.5},
     "timed_run_in_behind": {"onside_at_release": 1, "beyond_line_on_receipt_m_min": 3},
+    "underlap": {"half_space_control_pct_min": 60, "receiver_separation_m_min": 3},
+    "third_man_run": {"run_before_link_receives": 1, "line_broken_m_min": 1, "passes_max": 2},
+    "switch_of_play": {"block_shift_lag_s_min": 1.5, "winger_space_m_min": 5},
+    "press_broken": {"pressers_committed_min": 4, "defenders_bypassed_min": 6, "transition_2v3": 1},
+    "pinning": {"pinned_s_min": 2, "receiver_space_m_min": 5},
+    "rest_defence_exposed": {"cover_short_min": 1, "half_space_overload_min": 1},
+    "blind_side_run": {"start_outside_view_cone": 1, "separation_growth_m_min": 3},
+    "false_9_drop": {"cb_step_up_m_min": 10, "space_behind_gain_m2_min": 150},
+    "cover_shadow": {"pass_prob_drop_pts_min": 30, "ball_backwards_or_sideways": 1},
+    "rotation": {"zones_swapped": 1, "marker_switch": 1, "receiver_separation_m_min": 4},
+    "set_piece_screen": {"header_separation_gain_m_min": 2},
+    "space_lost": {"line_height_drop_m_min": 8, "drop_minutes_min": 5, "field_tilt_swing_pts_min": 10},
+    "fatigue_gap": {"recovery_speed_drop_pct_min": 15, "flank_share_gain_pts_min": 20},
 }
 
 
@@ -127,7 +140,8 @@ def _attempt(sim: Simulator, script: MatchScript, spec: StoryMoment, n: int, cf_
     for attempt in range(1, max_attempts + 1):
         plan = make_plan(spec, sim)
         sim.plans.append(plan)
-        deadline = sim.t + spec.window_minutes * 60 + 20
+        # Long enough for the plan's own wait and run: team moments play out over minutes.
+        deadline = sim.t + max(spec.window_minutes * 60, plan.max_wait_s + plan.max_run_s) + 20
         broke_script = False
         while plan.state != "done" and not sim.period_over and sim.t < deadline:
             sim.step()
@@ -157,12 +171,13 @@ def _counterfactual(sim: Simulator, plan: MomentPlan, runs: int) -> Counterfactu
             fork = sim.fork(plan.start_checkpoint)
             fork.reseed(derived_seed(sim.match_id, plan.spec.key, "cf", mode, k))
             cf = make_plan(plan.spec, fork, mode=mode, timing=dict(plan.timing))
-            cf.creator, cf.dragged, cf.receiver, cf.passer = plan.creator, plan.dragged, plan.receiver, plan.passer
+            for name, value in plan.carry_over().items():
+                setattr(cf, name, value)
             cf.state, cf.t_start = "run", fork.t
             cf.result.t_start = fork.t
             cf.start(fork)
             fork.plans.append(cf)
-            limit = fork.t + 8.0
+            limit = fork.t + plan.cf_horizon_s
             while cf.state != "done" and fork.t < limit and not fork.period_over:
                 fork.step()
             if cf.state == "done":

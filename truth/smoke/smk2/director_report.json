@@ -1,26 +1,30 @@
 {
   "match_id": "smk2",
-  "seconds": 116.3,
+  "seconds": 285.9,
   "segment_retries": 0,
   "score": {
-    "bra": 0,
-    "sal": 1
+    "kes": 0,
+    "ash": 0
   },
   "moments": [
     {
       "key": "k01",
-      "type": "null_run",
+      "type": "decoy_run",
       "ok": true,
-      "attempts": 8,
+      "attempts": 37,
       "reasons": [
+        "the gap never opened in time",
+        "the gap never opened in time",
+        "the pass didn't go into the gap",
+        "lost the ball before the pass",
+        "the gap never opened in time",
         "preconditions never arose",
         "preconditions never arose",
         "preconditions never arose",
-        "preconditions never arose",
-        "the defender followed the runner",
-        "preconditions never arose",
-        "preconditions never arose"
+        "the gap never opened in time",
+        "the gap never opened in time"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

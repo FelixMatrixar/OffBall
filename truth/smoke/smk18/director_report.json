@@ -1,0 +1,29 @@
+{
+  "match_id": "smk18",
+  "seconds": 233.9,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "space_lost",
+      "ok": true,
+      "attempts": 1,
+      "reasons": []
+    },
+    {
+      "key": "k02",
+      "type": "fatigue_gap",
+      "ok": true,
+      "attempts": 3,
+      "reasons": [
+        "the flank's share of attacks rose only -44 points",
+        "the flank's share of attacks rose only -41 points"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

@@ -14,7 +14,8 @@ from offball.services.state import MatchState
 
 
 def _goal_id() -> str:
-    return next(c["candidate_id"] for c in T.list_candidates("m07") if c["period"] == 2 and c["creator_id"] == "kes-09")
+    return next(c["candidate_id"] for c in T.list_candidates("m07")
+                if c["period"] == 2 and c["creator_id"] == "kes-09" and c["type"] == "decoy_run")
 
 
 async def test_a_moment_goes_on_air(scripted) -> None:

@@ -1,29 +1,21 @@
 {
   "match_id": "smk1",
-  "seconds": 117.8,
+  "seconds": 69.4,
   "segment_retries": 0,
   "score": {
-    "dun": 0,
-    "lar": 0
+    "har": 0,
+    "ive": 0
   },
   "moments": [
     {
       "key": "k01",
       "type": "decoy_run",
       "ok": true,
-      "attempts": 16,
+      "attempts": 2,
       "reasons": [
-        "the gap never opened in time",
-        "the defender didn't follow far enough",
-        "the defender moved, but not with the runner",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "preconditions never arose",
-        "the pass didn't go into the gap"
+        "preconditions never arose"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

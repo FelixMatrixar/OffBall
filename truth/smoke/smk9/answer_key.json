@@ -1,0 +1,53 @@
+[
+ {
+  "schema_version": "2.0",
+  "moment_id": "smk9-k01",
+  "match_id": "smk9",
+  "source": "planted",
+  "type": "switch_of_play",
+  "period": 1,
+  "t_start_ms": 146880,
+  "t_end_ms": 154040,
+  "team_id": "nor",
+  "creator_id": "nor-02",
+  "dragged_ids": [
+   "oak-11"
+  ],
+  "receiver_id": "nor-02",
+  "gap_zone": [
+   [
+    37.7,
+    4.6
+   ],
+   [
+    51.7,
+    4.6
+   ],
+   [
+    51.7,
+    18.6
+   ],
+   [
+    37.7,
+    18.6
+   ]
+  ],
+  "expected": {
+   "block_shift_lag_s_min": 1.5,
+   "winger_space_m_min": 5.0
+  },
+  "observed": {
+   "block_shift_lag_s": 2.88,
+   "winger_space_m": 11.38
+  },
+  "counterfactual": {
+   "space_created_m2": 28.4,
+   "epv_gain": 0.0019,
+   "gap_opens_without_run": false,
+   "runs": 16
+  },
+  "is_null": false,
+  "outcome": "none",
+  "attempts": 4
+ }
+]

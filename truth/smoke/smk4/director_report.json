@@ -1,9 +1,9 @@
 {
   "match_id": "smk4",
-  "seconds": 211.8,
+  "seconds": 88.4,
   "segment_retries": 0,
   "score": {
-    "kes": 0,
+    "kes": 1,
     "ash": 0
   },
   "moments": [
@@ -11,19 +11,13 @@
       "key": "k01",
       "type": "overlap",
       "ok": true,
-      "attempts": 25,
+      "attempts": 4,
       "reasons": [
         "preconditions never arose",
-        "the overlap pass didn't arrive (out)",
-        "the overlap pass didn't arrive (incomplete)",
         "preconditions never arose",
-        "preconditions never arose",
-        "the wide zone never turned",
-        "the overlap pass didn't arrive (incomplete)",
-        "preconditions never arose",
-        "the overlap pass didn't arrive (out)",
         "preconditions never arose"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

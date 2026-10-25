@@ -1,0 +1,408 @@
+{
+  "schema_version": "2.0",
+  "match_id": "smk10",
+  "seed": 328,
+  "engine": "emergent",
+  "generator_version": "0.1.0",
+  "competition": "OffBall League",
+  "season": "2026",
+  "round": null,
+  "home": {
+    "club_id": "dun",
+    "name": "Duncliffe",
+    "short_name": "DUN",
+    "kit": {
+      "primary": "#00708d",
+      "secondary": "#e0f3f6",
+      "pattern": "halves"
+    },
+    "formation": "4-2-3-1",
+    "lineup": [
+      {
+        "player_id": "dun-01",
+        "name": "S. Yomoto",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "dun-02",
+        "name": "K. Demade",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "dun-05",
+        "name": "E. Adodele",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "dun-04",
+        "name": "M. Zareiro",
+        "number": 4,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "dun-03",
+        "name": "T. Adode",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "dun-06",
+        "name": "E. Adaba",
+        "number": 6,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "dun-08",
+        "name": "K. Temuko",
+        "number": 8,
+        "role": "DM",
+        "starter": true
+      },
+      {
+        "player_id": "dun-11",
+        "name": "E. Lundastrom",
+        "number": 11,
+        "role": "RW",
+        "starter": true
+      },
+      {
+        "player_id": "dun-10",
+        "name": "O. Lundyberg",
+        "number": 10,
+        "role": "AM",
+        "starter": true
+      },
+      {
+        "player_id": "dun-07",
+        "name": "C. Ibiwa",
+        "number": 7,
+        "role": "LW",
+        "starter": true
+      },
+      {
+        "player_id": "dun-09",
+        "name": "Y. Baba",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "dun-12",
+        "name": "Y. Oleko",
+        "number": 12,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "dun-18",
+        "name": "K. Yawenuwa",
+        "number": 18,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "dun-19",
+        "name": "L. Rader",
+        "number": 19,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "dun-21",
+        "name": "K. Bala",
+        "number": 21,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "dun-22",
+        "name": "K. Olale",
+        "number": 22,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "dun-23",
+        "name": "T. Osowa",
+        "number": 23,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "dun-24",
+        "name": "K. Osala",
+        "number": 24,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "dun-26",
+        "name": "N. Orrules",
+        "number": 26,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "dun-29",
+        "name": "E. Obowa",
+        "number": 29,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "dun-30",
+        "name": "K. Osewele",
+        "number": 30,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "dun-32",
+        "name": "E. Obola",
+        "number": 32,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "dun-36",
+        "name": "T. Demuwa",
+        "number": 36,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "dun-37",
+        "name": "Y. Bawa",
+        "number": 37,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "dun-39",
+        "name": "Y. Adala",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "away": {
+    "club_id": "lar",
+    "name": "Larkhaven",
+    "short_name": "LAR",
+    "kit": {
+      "primary": "#afdf92",
+      "secondary": "#171d13",
+      "pattern": "hoops"
+    },
+    "formation": "4-4-2",
+    "lineup": [
+      {
+        "player_id": "lar-01",
+        "name": "S. Toradal",
+        "number": 1,
+        "role": "GK",
+        "starter": true
+      },
+      {
+        "player_id": "lar-02",
+        "name": "O. Nystrom",
+        "number": 2,
+        "role": "RB",
+        "starter": true
+      },
+      {
+        "player_id": "lar-05",
+        "name": "B. Bjastrom",
+        "number": 5,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "lar-06",
+        "name": "S. Bjavik",
+        "number": 6,
+        "role": "CB",
+        "starter": true
+      },
+      {
+        "player_id": "lar-03",
+        "name": "A. Vikenes",
+        "number": 3,
+        "role": "LB",
+        "starter": true
+      },
+      {
+        "player_id": "lar-07",
+        "name": "A. Vikarud",
+        "number": 7,
+        "role": "RM",
+        "starter": true
+      },
+      {
+        "player_id": "lar-04",
+        "name": "O. Eldivik",
+        "number": 4,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "lar-08",
+        "name": "E. Valuz",
+        "number": 8,
+        "role": "CM",
+        "starter": true
+      },
+      {
+        "player_id": "lar-11",
+        "name": "B. Menduno",
+        "number": 11,
+        "role": "LM",
+        "starter": true
+      },
+      {
+        "player_id": "lar-09",
+        "name": "K. Zahadi",
+        "number": 9,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "lar-10",
+        "name": "H. Askostrom",
+        "number": 10,
+        "role": "ST",
+        "starter": true
+      },
+      {
+        "player_id": "lar-12",
+        "name": "V. Askyvik",
+        "number": 12,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "lar-13",
+        "name": "L. Askysen",
+        "number": 13,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "lar-15",
+        "name": "R. Pavec",
+        "number": 15,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "lar-16",
+        "name": "L. Storoheim",
+        "number": 16,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "lar-17",
+        "name": "T. Bjalund",
+        "number": 17,
+        "role": "RB",
+        "starter": false
+      },
+      {
+        "player_id": "lar-20",
+        "name": "S. Skyllund",
+        "number": 20,
+        "role": "LB",
+        "starter": false
+      },
+      {
+        "player_id": "lar-23",
+        "name": "L. Vikylstrom",
+        "number": 23,
+        "role": "DM",
+        "starter": false
+      },
+      {
+        "player_id": "lar-24",
+        "name": "D. Rijkolx",
+        "number": 24,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "lar-28",
+        "name": "A. Eldoheim",
+        "number": 28,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "lar-32",
+        "name": "O. Hagines",
+        "number": 32,
+        "role": "AM",
+        "starter": false
+      },
+      {
+        "player_id": "lar-33",
+        "name": "O. Daladal",
+        "number": 33,
+        "role": "RW",
+        "starter": false
+      },
+      {
+        "player_id": "lar-34",
+        "name": "T. Lundelund",
+        "number": 34,
+        "role": "LW",
+        "starter": false
+      },
+      {
+        "player_id": "lar-35",
+        "name": "H. Torillund",
+        "number": 35,
+        "role": "ST",
+        "starter": false
+      },
+      {
+        "player_id": "lar-39",
+        "name": "O. Askevik",
+        "number": 39,
+        "role": "ST",
+        "starter": false
+      }
+    ]
+  },
+  "periods": [
+    {
+      "period": 1,
+      "duration_ms": 416480,
+      "attacks_left_to_right": "dun"
+    },
+    {
+      "period": 2,
+      "duration_ms": 552960,
+      "attacks_left_to_right": "lar"
+    }
+  ],
+  "final_score": {
+    "dun": 0,
+    "lar": 0
+  },
+  "frame_rate": 25,
+  "pitch": [
+    105.0,
+    68.0
+  ],
+  "synthetic": true
+}

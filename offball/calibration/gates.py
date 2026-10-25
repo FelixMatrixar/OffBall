@@ -364,9 +364,23 @@ def gate_behaviour(matches: list[Match]) -> Gate:
                 "Run rates sit within the real range." if not problems else "; ".join(problems), numbers)
 
 
-def gate_discriminator() -> Gate:
-    return Gate(5, "Discriminator", "not run",
-                "Needs SkillCorner's tracking files (about 89 MB a match, in Git LFS), not downloaded yet.")
+def gate_discriminator(matches: list[Match], max_auc: float = 0.65) -> Gate:
+    """A classifier tries to tell 10 s of our camera-masked tracking from SkillCorner's broadcast tracking."""
+    from offball.calibration import discriminator
+
+    if not discriminator.available():
+        return Gate(5, "Discriminator", "not run",
+                    "Needs SkillCorner's tracking files in calibration/raw/ (about 90 MB a match, in Git LFS).")
+    dirs = [m.dir for m in matches if (m.dir / "tracking_10hz.parquet").exists()]
+    if not dirs:
+        return Gate(5, "Discriminator", "not run", "No 10 Hz tracking in the set.")
+    result = discriminator.evaluate(dirs)
+    tells = ", ".join(f"{k} (real {v['real']:g}, ours {v['generated']:g})"
+                      for k, v in list(result["telltales"].items())[:3])
+    ok = result["auc"] <= max_auc
+    note = (f"A classifier tells our windows from real ones with ROC AUC {result['auc']} (at most {max_auc}) on "
+            f"held-out matches; its strongest tells: {tells}.")
+    return Gate(5, "Discriminator", "pass" if ok else "fail", note, result)
 
 
 def gate_detectability(matches: list[Match], need: float = 0.95) -> Gate:
@@ -384,8 +398,13 @@ def gate_detectability(matches: list[Match], need: float = 0.95) -> Gate:
             if base not in DETECTORS:
                 uncovered[k["type"]] += 1
                 continue
-            near = [c for c in cands if c.type == base and c.period == k["period"] and c.creator_id == k["creator_id"]
-                    and abs(c.t_start_ms - k["t_start_ms"]) <= 3000]
+            det = DETECTORS[base]
+            tolerance = getattr(det, "match_tolerance_ms", 3000)
+            # Team moments play out over minutes and belong to a team; the others to a player, within seconds.
+            owner_key, owner = (("team_id", k["team_id"]) if getattr(det, "team_moment", False)
+                                else ("creator_id", k["creator_id"]))
+            near = [c for c in cands if c.type == base and c.period == k["period"] and getattr(c, owner_key) == owner
+                    and abs(c.t_start_ms - k["t_start_ms"]) <= tolerance]
             if k["is_null"]:
                 invented += bool(near)
             else:
@@ -531,7 +550,7 @@ def run(name_or_path: str) -> list[Gate]:
     if not matches:
         raise FileNotFoundError(f"No matches in {name_or_path}")
     return [gate_realism(matches), gate_physics(matches), gate_consistency(matches), gate_behaviour(matches),
-            gate_discriminator(), gate_detectability(matches), gate_novelty(matches), gate_diversity(matches),
+            gate_discriminator(matches), gate_detectability(matches), gate_novelty(matches), gate_diversity(matches),
             gate_determinism(matches)]
 
 

@@ -4,54 +4,50 @@
   "moment_id": "smk3-k01",
   "match_id": "smk3",
   "source": "planted",
-  "type": "decoy_run",
-  "period": 1,
-  "t_start_ms": 257440,
-  "t_end_ms": 264080,
-  "team_id": "nor",
-  "creator_id": "nor-09",
+  "type": "null_run",
+  "period": 2,
+  "t_start_ms": 238040,
+  "t_end_ms": 241560,
+  "team_id": "bra",
+  "creator_id": "bra-10",
   "dragged_ids": [
-   "oak-05"
+   "sal-05"
   ],
-  "receiver_id": "nor-10",
+  "receiver_id": "bra-04",
   "gap_zone": [
    [
-    71.8,
-    23.6
+    20.9,
+    30.4
    ],
    [
-    80.8,
-    23.6
+    29.9,
+    30.4
    ],
    [
-    80.8,
-    35.6
+    29.9,
+    42.4
    ],
    [
-    71.8,
-    35.6
+    20.9,
+    42.4
    ]
   ],
   "expected": {
-   "defender_displacement_m_min": 8.0,
-   "zone_control_gain_pts_min": 40.0,
-   "pass_after_gap_s_max": 2.0,
-   "defender_follow_cosine_min": 0.6
+   "defender_displacement_m_max": 5.0,
+   "zone_control_gain_pts_max": 15.0
   },
   "observed": {
-   "defender_displacement_m": 14.5,
-   "zone_control_gain_pts": 43.1,
-   "pass_after_gap_s": 0.08,
-   "defender_follow_cosine": 0.99
+   "defender_displacement_m": 3.51,
+   "zone_control_gain_pts": 5.3
   },
   "counterfactual": {
-   "space_created_m2": 18.1,
-   "epv_gain": 0.0098,
+   "space_created_m2": 0.0,
+   "epv_gain": 0.0,
    "gap_opens_without_run": false,
-   "runs": 16
+   "runs": 0
   },
-  "is_null": false,
-  "outcome": "chance",
-  "attempts": 8
+  "is_null": true,
+  "outcome": "none",
+  "attempts": 3
  }
 ]

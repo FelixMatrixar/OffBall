@@ -1,26 +1,22 @@
 {
   "match_id": "smk3",
-  "seconds": 80.3,
+  "seconds": 74.8,
   "segment_retries": 0,
   "score": {
-    "nor": 0,
-    "oak": 0
+    "bra": 0,
+    "sal": 0
   },
   "moments": [
     {
       "key": "k01",
-      "type": "decoy_run",
+      "type": "null_run",
       "ok": true,
-      "attempts": 8,
+      "attempts": 3,
       "reasons": [
-        "the defender didn't follow far enough",
-        "the gap didn't open enough",
         "preconditions never arose",
-        "the defender didn't follow far enough",
-        "the pass didn't go into the gap",
-        "the gap never opened in time",
-        "the gap never opened in time"
+        "preconditions never arose"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

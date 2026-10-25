@@ -39,3 +39,12 @@ calibration/raw/
 # Calibration runs: regenerated on demand, only their gate reports are kept (PRD 12.11)
 datasets/calib/
 truth/calib/
+
+# The season backdrop lives in Blob Storage, regenerated from its seed (PRD 12.11)
+datasets/season/
+
+# OffBall-Bench and the showcase matchday live in Blob Storage, regenerated from their seeds (PRD 12.11)
+datasets/bench/
+truth/bench/
+datasets/matchday/
+truth/matchday/

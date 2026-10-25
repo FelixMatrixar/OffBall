@@ -1,0 +1,22 @@
+{
+  "match_id": "smk13",
+  "seconds": 69.1,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "blind_side_run",
+      "ok": true,
+      "attempts": 3,
+      "reasons": [
+        "he didn't get away from the defender",
+        "the pass didn't arrive (incomplete)"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

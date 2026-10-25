@@ -391,12 +391,12 @@
     },
     {
       "period": 2,
-      "duration_ms": 578560,
+      "duration_ms": 463960,
       "attacks_left_to_right": "ash"
     }
   ],
   "final_score": {
-    "kes": 0,
+    "kes": 1,
     "ash": 0
   },
   "frame_rate": 25,

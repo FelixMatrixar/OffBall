@@ -114,6 +114,65 @@ def wyscout_matches(path: Path) -> tuple[list[dict[str, float]], dict[str, list[
     return rows, {"pass_length_m": pass_lengths, "shot_distance_m": shot_distances}
 
 
+FAST_MODEL = ROOT / "calibration" / "fast_engine.json"
+ZONES_X, ZONES_Y = 6, 4
+
+
+def _zone(x: float, y: float) -> int:
+    """Zone of a Wyscout position (0-100, in the acting team's attacking direction)."""
+    zx = min(int(x / (100.0 / ZONES_X)), ZONES_X - 1)
+    zy = min(int(y / (100.0 / ZONES_Y)), ZONES_Y - 1)
+    return zx * ZONES_Y + zy
+
+
+def fast_model(path: Path) -> dict:
+    """The fast engine's ball-flow model (PRD 12.4): per zone, how often the team on the ball passes or shoots,
+    how often a pass is completed, where completed passes go, how often shots score, and the tempo of play.
+    Only these fitted numbers are kept."""
+    events = json.loads(path.read_text(encoding="utf-8"))
+    n_zones = ZONES_X * ZONES_Y
+    actions = np.zeros((n_zones, 2))  # passes, shots
+    completed = np.zeros(n_zones)
+    goals = np.zeros(n_zones)
+    moves = np.zeros((n_zones, n_zones))
+    gaps: list[float] = []
+    matches = {e["matchId"] for e in events}
+    last: tuple[int, float] | None = None
+    for e in sorted(events, key=lambda e: (e["matchId"], e["matchPeriod"], e["eventSec"])):
+        name, sub = e["eventName"], e["subEventName"]
+        pos = e.get("positions") or []
+        if not pos or name not in ("Pass", "Shot", "Free Kick"):
+            continue
+        z = _zone(pos[0]["x"], pos[0]["y"])
+        tags = {t["id"] for t in e.get("tags", [])}
+        key = (e["matchId"], e["eventSec"])
+        if last is not None and last[0] == key[0] and 0 < key[1] - last[1] < 30:
+            gaps.append(key[1] - last[1])
+        last = key
+        if name == "Pass" or (name == "Free Kick" and sub in PASS_FREE_KICKS):
+            actions[z, 0] += 1
+            if ACCURATE in tags and len(pos) > 1:
+                completed[z] += 1
+                moves[z, _zone(pos[1]["x"], pos[1]["y"])] += 1
+        elif name == "Shot" or (name == "Free Kick" and sub in SHOT_FREE_KICKS):
+            actions[z, 1] += 1
+            goals[z] += GOAL_TAG in tags
+    totals = actions.sum(axis=1)
+    return {
+        "version": 1,
+        "fitted": time.strftime("%Y-%m-%d"),
+        "source": "Wyscout, English first division 2017/18 (CC BY 4.0)",
+        "matches": len(matches),
+        "zones": [ZONES_X, ZONES_Y],
+        "shot_share": [round(float(actions[z, 1] / max(totals[z], 1)), 5) for z in range(n_zones)],
+        "pass_completion": [round(float(completed[z] / max(actions[z, 0], 1)), 5) for z in range(n_zones)],
+        "pass_to": [[round(float(v), 5) for v in moves[z] / max(moves[z].sum(), 1)] for z in range(n_zones)],
+        "goal_rate": [round(float(goals[z] / max(actions[z, 1], 1)), 5) for z in range(n_zones)],
+        "actions_per_match": round(float(totals.sum() / max(len(matches), 1)), 1),
+        "seconds_between_actions": round(float(np.median(gaps)), 2) if gaps else 3.0,
+    }
+
+
 def _num(v: str) -> float | None:
     try:
         return float(v)
@@ -220,6 +279,18 @@ def fit(raw: Path = RAW) -> dict:
     }
 
 
+def fit_tracking() -> dict:
+    """Bands for the tracking features that told our tracking from real tracking (gate 5), over SkillCorner's
+    live-play broadcast windows. Empty until its tracking files are downloaded."""
+    from offball.calibration import discriminator as D
+
+    if not D.available():
+        return {}
+    x = D.real_windows()
+    src = "SkillCorner open data, A-League 2024/25 broadcast tracking (MIT)"
+    return {name: band(list(x[:, D.FEATURES.index(name)]), src) for name in D.TRACKING_FEATURES}
+
+
 def write_report(targets: dict, path: Path = REPORT) -> None:
     lines = ["# Calibration fit", "",
              f"Fitted {targets['fitted']} from {targets['matches']} real matches and season aggregates. "
@@ -238,16 +309,25 @@ def write_report(targets: dict, path: Path = REPORT) -> None:
               "| Run type | Mean | Median | 95th |", "| --- | --- | --- | --- |"]
     for k, b in targets["runs_per30_tip"].items():
         lines.append(f"| {k} | {b['mean']:g} | {b['p50']:g} | {b['p95']:g} |")
+    if targets.get("tracking"):
+        lines += ["", "## Tracking through a broadcast camera (10 s live-play windows at 10 Hz)", "",
+                  "| Feature | 25th | Median | 75th | Windows |", "| --- | --- | --- | --- | --- |"]
+        for k, b in targets["tracking"].items():
+            lines.append(f"| {k} | {b['p25']:g} | {b['p50']:g} | {b['p75']:g} | {b['n']} |")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> None:
     targets = fit()
-    TARGETS.write_text(json.dumps(targets, indent=1) + "\n", encoding="utf-8")
+    targets["tracking"] = fit_tracking()
+    TARGETS.write_text(json.dumps(targets, indent=1) + "\n", encoding="utf-8", newline="\n")
     write_report(targets)
     print(f"Fitted {len(targets['match'])} match targets from {targets['matches']} matches in {targets['seconds']} s "
           f"-> {TARGETS}")
+    model = fast_model(RAW / "wyscout" / "events_England.json")
+    FAST_MODEL.write_text(json.dumps(model, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(f"Fitted the fast engine's ball-flow model over {model['zones'][0]}x{model['zones'][1]} zones -> {FAST_MODEL}")
 
 
 if __name__ == "__main__":

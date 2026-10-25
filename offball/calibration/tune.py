@@ -18,7 +18,7 @@ from pathlib import Path
 
 import optuna
 
-from offball.calibration.metrics import deviation, loss, match_metrics, summarise, targets
+from offball.calibration.metrics import deviation, loss, match_metrics, summarise, targets, tracking_metrics
 from offball.generator.engine.params import PARAMS_PATH, EngineParams
 
 PAIRINGS = [("kes", "ash"), ("bra", "sal"), ("mor", "qua"), ("nor", "oak"), ("fen", "gle"), ("cor", "wre"),
@@ -53,7 +53,8 @@ def play_one(args: tuple[dict, int, float]) -> dict[str, float]:
     league = build_league(2026)
     home, away = PAIRINGS[seed % len(PAIRINGS)]
     sim = Simulator(league, home, away, f"cal{seed}", seed=seed, half_minutes=half, params=EngineParams(**values))
-    return match_metrics(sim.play())
+    result = sim.play()
+    return {**match_metrics(result), **tracking_metrics(result)}
 
 
 def evaluate(overrides: dict, matches: int, half: float, pool: ProcessPoolExecutor, seed0: int = 100,
@@ -72,12 +73,13 @@ def main() -> None:
     ap.add_argument("--half", type=float, default=15.0)
     ap.add_argument("--workers", type=int, default=14)
     ap.add_argument("--search", nargs="*", default=DEFAULT_SEARCH)
+    ap.add_argument("--base", type=Path, default=PARAMS_PATH, help="parameters to start the search from")
     ap.add_argument("--out", type=Path, default=PARAMS_PATH)
     ap.add_argument("--log", type=Path, default=PARAMS_PATH.parent / "reports" / "tuning-log.jsonl")
     args = ap.parse_args()
 
     bounds = EngineParams.bounds()
-    base = EngineParams.load(args.out)
+    base = EngineParams.load(args.base)
     args.log.parent.mkdir(parents=True, exist_ok=True)
     pool = ProcessPoolExecutor(max_workers=args.workers)
 
@@ -113,7 +115,7 @@ def main() -> None:
         "searched": args.search,
         "metrics": {k: round(v, 3) for k, v in confirm.items()},
         "outside_band": {k: round(deviation(confirm[k], t), 3) for k, t in targets().items()
-                         if deviation(confirm[k], t) > 0},
+                         if k in confirm and deviation(confirm[k], t) > 0},
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({"params": asdict(best), "report": report}, indent=2), encoding="utf-8")

@@ -4,7 +4,13 @@
     offball league                       Build the league (public data + held-out truth)
     offball showcase                     Generate the showcase match, Kestrel Bay v Ashmoor
     offball match --home kes --away ash  Generate one emergent match from a seed
-    offball smoke                        Generate the CI smoke set
+    offball smoke                        Generate the CI smoke set (every moment type, 13 short matches)
+    offball bench [--only b001 b002]     Generate OffBall-Bench (100 full matches, answer keys, dev/test split)
+    offball matchday --round 27          Play a round's ten fixtures unscripted, with oracle labels
+    offball season                       Play the 380-match season backdrop with the fast engine
+    offball fit                          Fit realism targets and the fast engine from calibration/raw/
+    offball blocklist                    Build the salted-hash name blocklist from calibration/raw/
+    offball gates smoke|calib|<dir>      Run the nine quality gates and write their report
     offball serve api|mcp|all            Run the API (port 8000), the MCP server (port 8001), or both
     offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000
                                          Build a replay stream through the live pipeline and the crew
@@ -38,17 +44,27 @@ def cmd_league(args: argparse.Namespace) -> None:
     print(f"League built from seed {args.seed}: {len(league.clubs)} clubs, {len(league.fixtures)} fixtures")
 
 
-def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf_runs: int) -> None:
+def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf_runs: int,
+                    oracle: bool = False) -> None:
     from offball.generator.director import play_script
     from offball.generator.league import build_league
-    from offball.generator.writer import write_match
+    from offball.generator.writer import refresh_manifest, write_match
 
     league = build_league(2026)
     t0 = time.time()
     dm = play_script(league, script, counterfactual_runs=cf_runs, max_attempts=attempts)
     key = [row.model_dump() for row in dm.answer_key]
-    manifest = write_match(dm.result, data_root / script.match_id, truth_root / script.match_id,
-                           round_=script.round, answer_key=key)
+    data_dir, truth_dir = data_root / script.match_id, truth_root / script.match_id
+    manifest = write_match(dm.result, data_dir, truth_dir, round_=script.round, answer_key=key)
+    if oracle:
+        # Label the moments the players made on their own, from the decision log and the detectors' signals.
+        from offball.generator.oracle import oracle_labels
+        from offball.models.match_data import MatchData
+
+        intents = [json.loads(line) for line in (truth_dir / "intents.jsonl").read_text(encoding="utf-8").splitlines()]
+        key += [row.model_dump() for row in oracle_labels(MatchData.load(data_dir), intents, first_n=len(key) + 1)]
+        (truth_dir / "answer_key.json").write_text(json.dumps(key, indent=1), encoding="utf-8", newline="\n")
+        manifest = refresh_manifest(data_dir, truth_dir)
     report = {
         "match_id": script.match_id,
         "seconds": round(time.time() - t0, 1),
@@ -58,6 +74,7 @@ def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf
             {"key": r.key, "type": r.type, "ok": r.ok, "attempts": r.attempts, "reasons": r.reasons[-10:]}
             for r in dm.reports
         ],
+        "oracle_labels": sum(row.get("source") == "oracle" for row in key),
     }
     (truth_root / script.match_id / "director_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8",
                                                                        newline="\n")
@@ -81,23 +98,9 @@ def cmd_match(args: argparse.Namespace) -> None:
 
 
 def cmd_smoke(args: argparse.Namespace) -> None:
-    from offball.generator.script import MatchScript, StoryMoment
+    from offball.generator.smoke import smoke_scripts
 
-    scripts = [
-        MatchScript(match_id="smk1", home="dun", away="lar", seed=113, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="decoy_run", team="dun", minute=2.0, outcome="chance")]),
-        MatchScript(match_id="smk2", home="bra", away="sal", seed=102, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="null_run", team="bra", minute=6.0)]),
-        MatchScript(match_id="smk3", home="nor", away="oak", seed=103, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="decoy_run", team="nor", minute=2.0, outcome="chance")]),
-        MatchScript(match_id="smk4", home="kes", away="ash", seed=104, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="overlap", team="kes", minute=1.5, outcome="chance")]),
-        MatchScript(match_id="smk5", home="kes", away="ash", seed=125, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="null_overlap", team="kes", minute=1.5)]),
-        MatchScript(match_id="smk6", home="har", away="ive", seed=106, half_minutes=5,
-                    moments=[StoryMoment(key="k01", type="timed_run_in_behind", team="har", minute=1.5,
-                                         outcome="chance")]),
-    ]
+    scripts = smoke_scripts()
     # Each match is seeded on its own, so they can play in parallel and still come out the same.
     from concurrent.futures import ProcessPoolExecutor
 
@@ -106,6 +109,48 @@ def cmd_smoke(args: argparse.Namespace) -> None:
                 for script in scripts]
         for job in jobs:
             job.result()
+
+
+def _play_set(scripts, name: str, workers: int, attempts: int, cf_runs: int, oracle_for) -> None:
+    from concurrent.futures import ProcessPoolExecutor
+
+    with ProcessPoolExecutor(max_workers=max(1, min(workers, len(scripts)))) as pool:
+        jobs = [pool.submit(_write_directed, s, DATASETS / name, TRUTH / name, attempts, cf_runs, oracle_for(s))
+                for s in scripts]
+        for job in jobs:
+            job.result()
+
+
+def cmd_bench(args: argparse.Namespace) -> None:
+    from offball.generator.bench import bench_scripts
+    from offball.generator.league import build_league
+
+    scripts, split = bench_scripts(build_league(2026), matches=args.matches)
+    if args.only:
+        scripts = [s for s in scripts if s.match_id in set(args.only)]
+    (DATASETS / "bench").mkdir(parents=True, exist_ok=True)
+    (DATASETS / "bench" / "split.json").write_text(json.dumps(split, indent=1), encoding="utf-8", newline="\n")
+    # Unscripted matches carry oracle labels only; every match also gets any the players made on their own.
+    _play_set(scripts, "bench", args.workers, args.attempts, args.cf_runs, lambda s: True)
+
+
+def cmd_matchday(args: argparse.Namespace) -> None:
+    from offball.generator.bench import matchday_scripts
+    from offball.generator.league import build_league
+
+    _play_set(matchday_scripts(build_league(2026), round_=args.round), "matchday", args.workers, args.attempts,
+              args.cf_runs, lambda s: True)
+
+
+def cmd_season(args: argparse.Namespace) -> None:
+    from offball.generator.fast import play_season
+    from offball.generator.league import build_league
+
+    t0 = time.time()
+    table = play_season(build_league(2026), DATASETS / "season", seed=args.seed)
+    leader = next(iter(sorted(table.items(), key=lambda kv: (-kv[1][6], kv[1][5] - kv[1][4]))))
+    print(f"{sum(r[0] for r in table.values()) // 2} matches in {time.time() - t0:.0f} s -> {DATASETS / 'season'}; "
+          f"top of the table: {leader[0]} on {leader[1][6]} points")
 
 
 def cmd_serve(args: argparse.Namespace) -> None:
@@ -217,9 +262,25 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(fn=cmd_match)
     p = sub.add_parser("smoke")
     p.add_argument("--attempts", type=int, default=40)
-    p.add_argument("--workers", type=int, default=6)
+    p.add_argument("--workers", type=int, default=13)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_smoke)
+    p = sub.add_parser("bench", help="Generate OffBall-Bench: 100 full matches with answer keys, dev/test split")
+    p.add_argument("--matches", type=int, default=100)
+    p.add_argument("--only", nargs="*", help="Generate only these match ids (e.g. b001 b002)")
+    p.add_argument("--workers", type=int, default=15)
+    p.add_argument("--attempts", type=int, default=30)
+    p.add_argument("--cf-runs", type=int, default=8)
+    p.set_defaults(fn=cmd_bench)
+    p = sub.add_parser("matchday", help="Play one round's ten fixtures unscripted, with oracle labels")
+    p.add_argument("--round", type=int, default=27)
+    p.add_argument("--workers", type=int, default=10)
+    p.add_argument("--attempts", type=int, default=30)
+    p.add_argument("--cf-runs", type=int, default=8)
+    p.set_defaults(fn=cmd_matchday)
+    p = sub.add_parser("season", help="Play the 380-match season backdrop with the fast engine (events only)")
+    p.add_argument("--seed", type=int, default=2026)
+    p.set_defaults(fn=cmd_season)
     sub.add_parser("fit").set_defaults(fn=cmd_fit)
     sub.add_parser("blocklist").set_defaults(fn=cmd_blocklist)
     p = sub.add_parser("gates")

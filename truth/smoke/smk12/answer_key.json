@@ -1,0 +1,51 @@
+[
+ {
+  "schema_version": "2.0",
+  "moment_id": "smk12-k01",
+  "match_id": "smk12",
+  "source": "planted",
+  "type": "rest_defence_exposed",
+  "period": 1,
+  "t_start_ms": 96080,
+  "t_end_ms": 99280,
+  "team_id": "kes",
+  "creator_id": "kes-09",
+  "dragged_ids": [],
+  "receiver_id": "kes-07",
+  "gap_zone": [
+   [
+    82.3,
+    13.0
+   ],
+   [
+    105.0,
+    13.0
+   ],
+   [
+    105.0,
+    27.0
+   ],
+   [
+    82.3,
+    27.0
+   ]
+  ],
+  "expected": {
+   "cover_short_min": 1.0,
+   "half_space_overload_min": 1.0
+  },
+  "observed": {
+   "cover_short": 1.0,
+   "half_space_overload": 1.0
+  },
+  "counterfactual": {
+   "space_created_m2": 208.9,
+   "epv_gain": 0.0571,
+   "gap_opens_without_run": false,
+   "runs": 16
+  },
+  "is_null": false,
+  "outcome": "none",
+  "attempts": 5
+ }
+]

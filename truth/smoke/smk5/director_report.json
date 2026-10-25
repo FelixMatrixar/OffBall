@@ -1,6 +1,6 @@
 {
   "match_id": "smk5",
-  "seconds": 48.6,
+  "seconds": 100.8,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,10 +11,15 @@
       "key": "k01",
       "type": "null_overlap",
       "ok": true,
-      "attempts": 2,
+      "attempts": 6,
       "reasons": [
+        "preconditions never arose",
+        "the flank opened anyway",
+        "the flank opened anyway",
+        "the flank opened anyway",
         "the flank opened anyway"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

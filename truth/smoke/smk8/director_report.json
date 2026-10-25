@@ -1,0 +1,28 @@
+{
+  "match_id": "smk8",
+  "seconds": 121.1,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "third_man_run",
+      "ok": true,
+      "attempts": 9,
+      "reasons": [
+        "preconditions never arose",
+        "preconditions never arose",
+        "the pass to the link didn't arrive (incomplete)",
+        "the lay-off never came (best lane 0.00)",
+        "the lay-off didn't arrive (incomplete)",
+        "preconditions never arose",
+        "the lay-off didn't arrive (out)",
+        "preconditions never arose"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

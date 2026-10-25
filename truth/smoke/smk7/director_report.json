@@ -1,0 +1,30 @@
+{
+  "match_id": "smk7",
+  "seconds": 179.5,
+  "segment_retries": 0,
+  "score": {
+    "kes": 0,
+    "ash": 0
+  },
+  "moments": [
+    {
+      "key": "k01",
+      "type": "underlap",
+      "ok": true,
+      "attempts": 30,
+      "reasons": [
+        "the half-space never turned",
+        "the underlap was never found (best lane 0.11)",
+        "the underlap was never found (best lane 0.01)",
+        "the underlap was never found (best lane 0.00)",
+        "the underlap was never found (best lane 0.00)",
+        "the half-space never turned",
+        "the half-space never turned",
+        "the half-space never turned",
+        "the half-space never turned",
+        "the half-space would have opened without the underlap"
+      ]
+    }
+  ],
+  "oracle_labels": 0
+}

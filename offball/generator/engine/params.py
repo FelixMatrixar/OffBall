@@ -1,4 +1,4 @@
-"""Global engine parameters: the ~45 numbers calibration by simulation tunes (PRD 12.6).
+"""Global engine parameters: the 80 numbers calibration by simulation tunes (PRD 12.6).
 
 Each field has a default and a search range. `calibration/params.json` overrides the defaults; the Tuner
 agent picks which fields to search and within what bounds, and Optuna does the numeric search. Nothing
@@ -59,6 +59,8 @@ class EngineParams:
     hold_risk: float = tunable(0.45, 0.25, 0.7, "Chance per unit pressure of being dispossessed when holding")
     clear_keep: float = tunable(0.42, 0.3, 0.55, "Chance a clearance stays with the team")
     long_pass_cost: float = tunable(0.0004, 0.0, 0.0015, "Dislike of long balls per metre beyond 25 m, scaled by (1.2 - directness)")
+    offside_misread: float = tunable(0.08, 0.02, 0.8, "Chance a passer with no vision misreads a teammate's offside position")
+    offside_read_lag: float = tunable(0.0, 0.0, 0.5, "How out of date a passer's read of a runner against the line is, s")
     # Dribbling and duels.
     carry_lead: float = tunable(0.25, 0.0, 0.5, "Slack a defender has to reach the dribbling line, s")
     carry_tau: float = tunable(0.3, 0.15, 0.5, "Spread of the dribbling race, s")
@@ -69,6 +71,10 @@ class EngineParams:
     # Defensive shape.
     def_width: float = tunable(39.0, 32.0, 46.0, "Width of the block out of possession, m")
     def_depth: float = tunable(25.0, 20.0, 32.0, "Length of the block out of possession, m")
+    def_ball_shift: float = tunable(0.5, 0.3, 0.85, "How far the block slides across towards the ball")
+    # Shape in possession.
+    att_width: float = tunable(44.0, 34.0, 52.0, "Width of the shape in possession before the club's style, m")
+    att_ball_shift: float = tunable(0.18, 0.05, 0.5, "How far the shape in possession slides towards the ball")
     box_squeeze_depth: float = tunable(9.0, 4.0, 14.0, "How much the block shortens defending the box, m")
     box_squeeze_width: float = tunable(10.0, 5.0, 16.0, "How much the block narrows defending the box, m")
     zone_radius: float = tunable(9.5, 7.0, 13.0, "Zonal marking radius, m")
@@ -96,6 +102,9 @@ class EngineParams:
     pace_support_cap: float = tunable(0.6, 0.4, 0.75, "Fastest pace offering support")
     pace_sprint_cap: float = tunable(0.92, 0.75, 1.0, "Share of top speed even an all-out sprint reaches")
     pace_chase_cap: float = tunable(0.9, 0.65, 1.0, "Fastest pace chasing a loose ball")
+    accel_scale: float = tunable(1.0, 0.2, 1.0, "Share of a player's acceleration used for ordinary changes of pace")
+    accel_effort_exp: float = tunable(2.0, 1.0, 6.0, "How steeply the share rises to full acceleration with effort")
+    move_tau: float = tunable(0.0, 0.0, 0.8, "How smoothly a player eases into a new direction and pace, s")
     drift_sd: float = tunable(2.0, 1.0, 6.0, "How far players drift around their spot in the shape, m")
     drift_period: float = tunable(6.0, 2.0, 10.0, "How often a player picks a new spot to drift to, s")
     # Stoppages: the ball is out of play for about 44% of a real match.
