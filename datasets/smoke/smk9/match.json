@@ -391,12 +391,12 @@
     },
     {
       "period": 2,
-      "duration_ms": 589760,
+      "duration_ms": 635320,
       "attacks_left_to_right": "oak"
     }
   ],
   "final_score": {
-    "nor": 0,
+    "nor": 1,
     "oak": 0
   },
   "frame_rate": 25,

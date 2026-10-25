@@ -1,10 +1,10 @@
 {
   "match_id": "smk3",
-  "seconds": 74.8,
+  "seconds": 40.9,
   "segment_retries": 0,
   "score": {
     "bra": 0,
-    "sal": 0
+    "sal": 1
   },
   "moments": [
     {
@@ -13,7 +13,7 @@
       "ok": true,
       "attempts": 3,
       "reasons": [
-        "preconditions never arose",
+        "the defender followed the runner",
         "preconditions never arose"
       ]
     }

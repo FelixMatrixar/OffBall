@@ -917,6 +917,7 @@ class CoverShadow(_Finish, MomentPlan):
         sim.directives[o] = {"action": "pass", "to": q, "hold": True, "when": lambda s: False}
         self.look_until = sim.t + 1.6
         self.lane_gap_at_pass: float | None = None
+        self.passer_gap_at_pass = 0.0
         self._events_at = len(sim.events)
 
     def step(self, sim: Simulator) -> bool:
@@ -936,6 +937,7 @@ class CoverShadow(_Finish, MomentPlan):
         if passes:
             self.next_pass = passes[0]
             self.lane_gap_at_pass = _seg_dist(sim, self.creator, o, q)
+            self.passer_gap_at_pass = _dist(sim, self.creator, o)
             self.timing["measure_at"] = elapsed
             self._measure(sim)
             return self.finish(sim)
@@ -975,6 +977,8 @@ class CoverShadow(_Finish, MomentPlan):
             return False, "the ball still went forward"
         if self.lane_gap_at_pass is None or self.lane_gap_at_pass > 2.0:
             return False, "someone else shut the lane"
+        if self.passer_gap_at_pass < 3.0:
+            return False, "he ended up pressing the passer, not shadowing the lane"  # as the detector judges it
         return True, "ok"
 
 
@@ -1260,6 +1264,8 @@ class SetPieceScreen(_Finish, MomentPlan):
         outcome = (self.pass_event or {}).get("outcome")
         if outcome != "complete":
             return False, f"the delivery didn't find him ({outcome})"
+        if not s.get("screened"):
+            return False, "the screen wasn't set in time"  # he got free, but not from a screen
         if gain < 2.0:
             return False, "the screen didn't free him"
         return self._check_outcome()

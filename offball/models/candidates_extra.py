@@ -297,7 +297,7 @@ class BlindSideRunDetector(_EventDetector):
     gets three metres away from him within 1.5 s (PRD 12.7, Blind-side run)."""
 
     type = "blind_side_run"
-    run_args = {"min_speed": 3.5, "min_frames": 15, "min_disp": 4.0}  # often a jog across his back, not a sprint
+    run_args = {"min_speed": 3.0, "min_frames": 15, "min_disp": 4.0}  # often a jog across his back, not a sprint
 
     def evaluate(self, run, now_idx: int | None = None) -> Candidate | None:
         md, period, club = self.md, run.period, run.club
@@ -344,6 +344,7 @@ class FalseNineDetector(_EventDetector):
     attackers' control of the space behind that defender grows (PRD 12.7, False 9 drop)."""
 
     type = "false_9_drop"
+    run_args = {"min_speed": 4.0, "min_frames": 20, "min_disp": 8.0}  # a purposeful drop, seldom a sprint
 
     def evaluate(self, run, now_idx: int | None = None) -> Candidate | None:
         md, period, club = self.md, run.period, run.club
@@ -448,10 +449,12 @@ class CoverShadowDetector(_EventDetector):
                   and float(np.linalg.norm(pf.xy[i_rel, d] - a)) >= 3.0]
         if not movers:
             return None
-        stepped = [(lane_dist(i_rel, d), d) for moved, d in movers if moved >= 1.0]
+        stepped = [d for moved, d in movers if moved >= 1.0]
         if not stepped:
             return None  # nobody stepped in: the lane was already shut
-        _, dcol = min(stepped)
+        # The shadow is his whose absence would reopen the lane most.
+        others = [int(d) for d in defenders]
+        dcol = max(stepped, key=lambda d: lane_probability(pf.xy[i_rel], pcol, qcol, [o for o in others if o != d]))
         signals = [
             Signal(name="pass_prob_drop_pts", value=round(100 * drop, 0), threshold=30.0, unit="pts",
                    evidence_ids=[md.frame_id(period, int(pf.t_ms[i_open])), md.frame_id(period, int(pf.t_ms[i_rel]))]),

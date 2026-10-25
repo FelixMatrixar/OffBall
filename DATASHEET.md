@@ -40,20 +40,21 @@ Fast-engine matches (the season backdrop) have `match.json` and `events.jsonl` o
 
 ## Collection process
 
-**How was it generated?** The emergent engine plays 22 policy-driven players at 25 Hz; the fast engine samples ball events from a ball-flow model fitted to real matches. Both are seeded: the same seed and generator version give byte-identical files on any machine (gate 9). Settings were tuned in five Optuna stages against targets fitted from:
+**How was it generated?** The emergent engine plays 22 policy-driven players at 25 Hz; the fast engine samples ball events from a ball-flow model fitted to real matches. Both are seeded: the same seed and generator version give byte-identical files on any machine (gate 9). Settings were tuned in eight Optuna stages against targets fitted from:
 
 - Wyscout's English first division 2017/18, 380 matches (Pappalardo et al., 2019; CC BY 4.0): event rates, pass lengths, shot locations, the fast engine's ball flow.
-- SkillCorner's A-League 2024/25 open data (MIT): physical output, speed bands, peak speed, ball-in-play time, run rates, and broadcast tracking for the discriminator.
+- SkillCorner's A-League 2024/25 open data (MIT): physical output, speed bands, peak speed, ball-in-play time, run rates, and broadcast tracking for the discriminator and the tracking bands (acceleration, turning, spacing and players in view).
 
 See `ATTRIBUTION.md`.
 
 ## How real is it
 
-Measured by the nine quality gates (`offball gates <set>`, reports in `calibration/reports/`). On 10 full calibration matches the averages of shots, goals, shots in the box, pass completion, throw-ins, distance covered, high-speed running and peak speed sit inside the real range; offsides, possessions, median pass length and ball-in-play time sit just outside the middle half of real matches. Known gaps:
+Measured by the nine quality gates (`offball gates <set>`, reports in `calibration/reports/`; PRD 12.12 has the figures). On 16 full matches every per-match average sits inside the real 5th–95th range except running at 15–20 km/h, just below it, and players' acceleration and turning through a broadcast camera match real tracking. Known gaps:
 
 - Players stand too close to each other more often than real players (gate 2).
-- A classifier can still tell 10 s of our tracking from SkillCorner's broadcast tracking (gate 5, ROC AUC about 0.99): our players accelerate slightly more sharply and stand about 2 m further from their nearest opponent.
-- The decoy run is the hardest moment to plant: about half of the scripts tried verify within 40 attempts.
+- A classifier can still tell 10 s of our tracking from SkillCorner's broadcast tracking (gate 5, ROC AUC 0.99): our players stand about 2 m further from their nearest opponent, and fewer of them are in view.
+- Players make fewer runs in behind than real ones (gate 4), and their peak speeds run a little high.
+- Some moments are hard to plant: in the pairings tried, the decoy run verified in 4 of 12, the cover shadow in 2 of 6 and the set-piece screen in 2 of 7.
 
 ## Uses
 

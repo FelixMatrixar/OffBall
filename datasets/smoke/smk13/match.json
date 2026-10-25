@@ -386,12 +386,12 @@
   "periods": [
     {
       "period": 1,
-      "duration_ms": 368280,
+      "duration_ms": 369080,
       "attacks_left_to_right": "kes"
     },
     {
       "period": 2,
-      "duration_ms": 578320,
+      "duration_ms": 587200,
       "attacks_left_to_right": "ash"
     }
   ],

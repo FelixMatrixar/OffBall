@@ -6,30 +6,30 @@
   "source": "planted",
   "type": "timed_run_in_behind",
   "period": 1,
-  "t_start_ms": 221640,
-  "t_end_ms": 225520,
+  "t_start_ms": 253400,
+  "t_end_ms": 258560,
   "team_id": "kes",
   "creator_id": "kes-09",
   "dragged_ids": [
-   "ash-02"
+   "ash-05"
   ],
   "receiver_id": "kes-09",
   "gap_zone": [
    [
-    83.0,
-    26.7
+    78.8,
+    25.9
    ],
    [
-    97.0,
-    26.7
+    92.8,
+    25.9
    ],
    [
-    97.0,
-    38.7
+    92.8,
+    37.9
    ],
    [
-    83.0,
-    38.7
+    78.8,
+    37.9
    ]
   ],
   "expected": {
@@ -37,18 +37,18 @@
    "beyond_line_on_receipt_m_min": 3.0
   },
   "observed": {
-   "onside_margin_m": 0.67,
+   "onside_margin_m": 2.83,
    "onside_at_release": 1.0,
-   "beyond_line_on_receipt_m": 5.16
+   "beyond_line_on_receipt_m": 10.67
   },
   "counterfactual": {
-   "space_created_m2": 36.7,
-   "epv_gain": 0.0251,
+   "space_created_m2": 66.4,
+   "epv_gain": 0.037,
    "gap_opens_without_run": false,
    "runs": 16
   },
   "is_null": false,
   "outcome": "shot",
-  "attempts": 1
+  "attempts": 2
  }
 ]

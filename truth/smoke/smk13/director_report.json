@@ -1,6 +1,6 @@
 {
   "match_id": "smk13",
-  "seconds": 69.1,
+  "seconds": 76.7,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,10 +11,18 @@
       "key": "k01",
       "type": "blind_side_run",
       "ok": true,
-      "attempts": 3,
+      "attempts": 28,
       "reasons": [
         "he didn't get away from the defender",
-        "the pass didn't arrive (incomplete)"
+        "he didn't get away from the defender",
+        "he didn't get away from the defender",
+        "he didn't get away from the defender",
+        "the pass didn't arrive (out)",
+        "the pass didn't arrive (pending)",
+        "he didn't get away from the defender",
+        "he didn't get away from the defender",
+        "he didn't get away from the defender",
+        "he didn't get away from the defender"
       ]
     }
   ],

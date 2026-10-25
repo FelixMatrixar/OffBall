@@ -391,13 +391,13 @@
     },
     {
       "period": 2,
-      "duration_ms": 537960,
+      "duration_ms": 545080,
       "attacks_left_to_right": "sal"
     }
   ],
   "final_score": {
     "bra": 0,
-    "sal": 0
+    "sal": 1
   },
   "frame_rate": 25,
   "pitch": [

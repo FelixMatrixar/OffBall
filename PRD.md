@@ -895,9 +895,9 @@ At 25 Hz, a match is about 143,000 frames and 3.1 million player positions, an e
 
 ### 12.12 Calibration against real data: where it stands
 
-As checked on 24 October 2026.
+As checked on 25 October 2026.
 
-**The fit.** `offball fit` reads the two sources from `calibration/raw/`, which git ignores, and keeps only numbers: `calibration/targets.json` and `calibration/reports/fit-report.md`. From 380 Wyscout matches (643,150 events) it fits per-match rates for passes, completion, pass length, long passes, shots, goals, conversion, shots in the box, possessions, fouls, offsides, corners and throw-ins, plus pass-length and shot-distance distributions. From 210 SkillCorner player-seasons it fits distance per 95 minutes; the share of distance at 15–20 km/h, above 20 km/h and above 25 km/h; the share of time the ball is in play; peak speed; and off-ball runs by type. Tuning aims for the middle half (25th–75th percentile) of real values; gate 1 uses the 5th–95th. Two choices keep the comparison like for like. Possessions are team switches among passes, free kicks, shots and clearances, because Wyscout's touch and deflection events have no counterpart in a generated match. SkillCorner's numbers are season averages per player, so gate 1 compares a set's average against them rather than each match.
+**The fit.** `offball fit` reads the sources from `calibration/raw/`, which git ignores, and keeps only numbers: `calibration/targets.json`, `calibration/fast_engine.json` and `calibration/reports/fit-report.md`. From 380 Wyscout matches (643,150 events) it fits per-match rates for passes, completion, pass length, long passes, shots, goals, conversion, shots in the box, possessions, fouls, offsides, corners and throw-ins, plus pass-length and shot-distance distributions and the fast engine's ball flow. From 210 SkillCorner player-seasons it fits distance per 95 minutes; the share of distance at 15–20 km/h, above 20 km/h and above 25 km/h; the share of time the ball is in play; peak speed; and off-ball runs by type. From SkillCorner's broadcast tracking of 10 A-League matches (10 Hz, only the players the camera saw) it fits bands for the six features of 10-second live-play windows that told our tracking from real tracking: acceleration (mean and 90th percentile), turning, players in view, and distance to the nearest teammate and nearest opponent. Tuning aims for the middle half (25th–75th percentile) of real values; gate 1 uses the 5th–95th. Three choices keep the comparison like for like. Possessions are team switches among passes, free kicks, shots and clearances, because Wyscout's touch and deflection events have no counterpart in a generated match. SkillCorner's physical numbers are season averages per player, so gate 1 compares a set's average against them rather than each match. Broadcasts cut away to replays at stoppages and SkillCorner leaves those frames out, so tracking is compared on live play only.
 
 **What the fit changed in the engine.** Measuring against real data exposed missing mechanisms, not only wrong settings:
 
@@ -908,51 +908,112 @@ As checked on 24 October 2026.
 | Ball in play | 56% of the time | 66–70% | Stoppages last longer, and players walk and mill about at restarts |
 | Speed | 6.8% of distance above 20 km/h, 1.5% above 25 | 13–17% and 5% | Receivers run only as fast as they need to arrive with the ball; tunable caps for sprints and chases; players drift around their spot |
 | Physics | | Players stopped dead at the touchline; markers on top of their man | Targets stay inside the pitch, so players brake; bodies repel sharply inside 0.6 m |
+| Offsides | 2–6 a match | 0.8 | Passers read the line from where a runner was a moment ago, and sometimes misread it |
+| Acceleration | 2.2 m/s² at the 90th percentile, through the camera | 3.7 | Ordinary changes of pace use part of a player's acceleration, rising steeply to full only for all-out efforts; intentions change smoothly |
+| Team shape | Nearest opponent 6.3 m and nearest teammate 10.0 m, in view | 8.0 m and 11.4 m | The width of the shape in and out of possession, and how far it slides towards the ball, made tunable; tuning has barely moved the gap yet |
 
-The engine now has 72 tunable parameters (`EngineParams`).
+The engine now has 80 tunable parameters (`EngineParams`).
 
-**Tuning.** Three Optuna stages, each starting from the last one's best and each with the Tuner's hypothesis logged in `calibration/params.json`: 20 trials over 41 parameters (loss 48.2 to 7.7), 28 over 25 (20.7 to 5.7) and 60 over 25 (4.95 to 2.49, confirmed at 2.0 on 28 fresh matches). Each stage's loss is against the targets of its time, because the engine and the metrics grew between stages.
+**Tuning.** Eight Optuna stages, each starting from the last one's best, each with the Tuner's hypothesis, search and losses logged in `calibration/params.json` and every trial in `calibration/reports/tuning-log-stage<n>.jsonl`:
 
-**How real the data is now.** Ten full, unscripted calibration matches on the final engine (`datasets/calib`, regenerated on demand and not committed):
+| Stage | Trials | Parameters searched | Loss: start, best (confirmed) | What it went after |
+| --- | --- | --- | --- | --- |
+| 1 | 20 | 41 | 48.2, 7.7 | Shots at twice the real rate, possessions too long, too little jogging |
+| 2 | 28 | 25 | 20.7, 5.7 | Too much sprinting; the ball in play too long |
+| 3 | 60 | 25 | 4.95, 2.49 (2.0) | Pressing, duels and pace once sprints were capped |
+| 4 | 8 | 2 | 2.42, 2.04 | Offsides: how late and how often passers misread the line |
+| 5 | 45 | 22 | 3.60, 0.86 (1.52) | Jerky acceleration: easing into changes of pace |
+| 6 | 40 | 18 | 28.4, 5.4 (5.6) | Gate 5's tells, now in the loss: the acceleration curve, smoothing and team shape |
+| 7 | 50 | 28 | 5.4, 3.1 (4.1) | The sprint speed, distance, offsides and duels stage 6 cost |
+| 8 | 30 | 11 | 3.1, 2.5 (3.2) | Fouls at half the real rate; the foul share was then set by hand |
 
-| Statistic (per match, both teams) | Generated, average of 10 | Real middle half | Real 5th–95th |
+Each stage's loss is against the targets and metrics of its time; from stage 6 it includes the six tracking bands, which is why it jumps. On 16 full-length matches the adopted parameters score 1.55 on the event and physical targets, against 1.72 before stages 6–8, and 1.0 on the tracking bands, against 27.6.
+
+**How real the data is now.** Sixteen full, unscripted matches on the final engine (the full-length confirmation in `calibration/params.json`):
+
+| Statistic (per match, both teams) | Generated, average of 16 | Real middle half | Real 5th–95th |
 | --- | --- | --- | --- |
-| Shots | 22.7 | 19.8–26.0 | 14.9–31.3 |
-| Share of shots in the box | 0.55 | 0.50–0.65 | 0.39–0.75 |
-| Goals | 3.6 | 1.0–3.9 | 0–5.0 |
-| Pass completion | 0.81 | 0.79–0.83 | 0.74–0.86 |
-| Throw-ins | 44.7 | 37.8–50.6 | 29.0–62.9 |
-| Distance per outfield player | 10.9 km | 10.3–11.5 | 9.6–12.2 |
-| Ball in play | 55% | 54–58% | 51–60% |
-| Passes | 1,030 | 866–1,024 | 766–1,175 |
-| Median pass length | 16.1 m | 17.1–18.6 | 16.0–19.8 |
+| Shots | 21.8 | 19.8–26.0 | 14.9–31.3 |
+| Share of shots in the box | 0.56 | 0.50–0.65 | 0.39–0.75 |
+| Goals | 2.1 | 1.0–3.9 | 0–5.0 |
+| Passes | 939 | 866–1,024 | 766–1,175 |
+| Pass completion | 0.79 | 0.79–0.83 | 0.74–0.86 |
+| Median pass length | 16.4 m | 17.1–18.6 | 16.0–19.8 |
 | Possessions | 218 | 240–277 | 212–309 |
-| Fouls | 16.7 | 18.0–24.2 | 13.5–29.0 |
-| Corners | 7.8 | 7.9–12.1 | 5.0–15.8 |
-| Offsides | 0.8 | 2.0–5.8 | 1.0–8.0 |
+| Fouls | 18.9 | 18.0–24.2 | 13.5–29.0 |
+| Corners | 8.0 | 7.9–12.1 | 5.0–15.8 |
+| Offsides | 2.5 | 2.0–5.8 | 1.0–8.0 |
+| Throw-ins | 48.9 | 37.8–50.6 | 29.0–62.9 |
+| Ball in play | 52% | 54–58% | 51–60% |
+| Distance per outfield player | 10.6 km | 10.3–11.5 | 9.6–12.2 |
 | Distance above 20 km/h | 4.6% | 5.3–8.1% | 4.3–9.7% |
-| Distance at 15–20 km/h | 19.2% | 12.7–15.8% | 10.9–18.3% |
-| Distance above 25 km/h | 2.3% | 1.0–2.0% | 0.6–2.8% |
+| Distance at 15–20 km/h | 10.8% | 12.7–15.8% | 10.9–18.3% |
+| Distance above 25 km/h | 2.3% | 0.9–2.0% | 0.6–2.8% |
+| A typical player's peak speed | 29.7 km/h | 27.5–29.2 | 26.3–30.3 |
 
-Every average sits inside the real 5th–95th range except running at 15–20 km/h and offsides. Pass lengths match the real distribution (KS 0.08) and so do players' distances (KS 0.07); shot distances (KS 0.20) and peak speeds (KS 0.13) don't yet.
+Every average sits inside the real 5th–95th range except running at 15–20 km/h, just below it. Through a broadcast camera, the median 10-second live-play window:
 
-**Gates.** `offball gates <set>` runs all nine and writes `calibration/reports/gates-<set>.md` and `.json`.
+| Tracking feature | Generated | Real middle half | Real 5th–95th |
+| --- | --- | --- | --- |
+| Speed change, 90th percentile | 2.41 m/s² | 2.00–2.37 | 1.74–2.85 |
+| Speed change, mean | 1.15 m/s² | 0.93–1.13 | 0.80–1.30 |
+| Turning | 0.37 rad/s | 0.32–0.41 | 0.27–0.49 |
+| Players in view | 12.7 | 13.3–17.0 | 10.9–19.1 |
+| Nearest teammate | 11.4 m | 8.5–11.5 | 6.5–13.3 |
+| Nearest opponent | 8.8 m | 5.4–7.3 | 4.3–8.6 |
 
-| Gate | Smoke set (6 matches of 10 minutes) | Calibration set (10 full matches) |
+**Gates.** `offball gates <set>` runs all nine and writes `calibration/reports/gates-<set>.md` (and `.json` with `--json`).
+
+| Gate | Smoke set (18 short matches) | Calibration set (10 full matches) |
 | --- | --- | --- |
-| 1. Realism | Fail; 10-minute matches are too short to judge per-match rates | Fail on the gaps above |
-| 2. Physics | Fail: players closer than 0.5 m (376 sampled frames) and sharp accelerations (23) | Fail: 3,630 close pairs and 563 sharp accelerations in 1.4 million frames; hard braking at the touchline is down from 716 to 10 |
+| 1. Realism | Fail; short matches are too short to judge per-match rates | Fail: median pass length (3 of 10 matches inside the real 5th–95th), throw-ins (6), corners (7), completion and possessions (8 each) against 9 needed; players' peak speeds (KS 0.36) and distances (KS 0.12). Pass lengths (KS 0.07) and shot distances (KS 0.10) match |
+| 2. Physics | Fail: 2,949 close pairs in 478,000 frames | Fail: 9,274 times two players were closer than 0.5 m, and 55 hard decelerations, in 1.44 million frames; twice the close pairs of the engine before stage 6 |
 | 3. Consistency | Pass | Pass |
-| 4. Behaviour | Pass | Fail, narrowly: 1.14 runs in behind per 30 minutes against at least 1.21 |
-| 5. Discriminator | Not run | Not run |
-| 6. Detectability | Pass: 4 of 4 planted moments found, no null moment credited | No planted moments |
+| 4. Behaviour | Fail: 0.81 runs in behind per 30 minutes against at least 1.21 | Fail: 0.93 against at least 1.21 |
+| 5. Discriminator | Fail: ROC AUC 0.99 | Fail: ROC AUC 0.991, from 0.999 before stage 6. Its tells are now spacing (nearest opponent 8.4 m against 6.3), speed in view (90th percentile 3.7 m/s against 4.1) and acceleration (2.44 m/s² against 2.19) |
+| 6. Detectability | Pass: 17 of 17 planted moments found, no null moment credited | No planted moments |
 | 7. Novelty | Pass | Pass |
 | 8. Diversity | Pass | Pass |
 | 9. Determinism | Pass | Pass |
 
-**Moments.** Five of the 18 types have a plan, expected signals and a detector: decoy run, overlap, timed run in behind, and the null run and null overlap. Across 25 trial, smoke and showcase moments, every planted one was found from the data alone and no null one was credited. On the calibrated engine the decoy run is the hardest to plant: about half of the scripts tried verified within 40 attempts, even with its soft constraint that the nearest covering defender is caught watching the ball (logged as an intent). The overlap and the timed run verified in two of three pairings tried, the null run in all.
+**Moments.** All 18 types have a plan, expected signals and a detector that reads only the observed data (16 detectors; each null type is judged by its parent's). The smoke set plants every type at least once, one moment a match and the decoy run twice: all 19 verify, and the detectors find all 17 planted moments and credit neither null one. How often a script verifies within 40 attempts depends on the type and the pairing. On the final engine, across the smoke fixtures and 38 trial matches: the timed run in behind verified in 6 of 7 pairings tried, fatigue gap in 5 of 5, space lost in 4 of 5, the null overlap in 3 of 7, the decoy run in 4 of 12, the cover shadow in 2 of 6, and the set-piece screen in 2 of 7 (one without its screen in place, which the plan now rejects). The other 11 types verified at their first pairing.
 
-**Still open.** Offsides (0.8 a match against 2–6), running at 15–20 km/h, shot distances, short passes, possessions, players standing too close and sharp accelerations; a higher success rate for the decoy run; the other 13 moment types; gate 5, which needs SkillCorner's tracking files (about 1.8 GB, not downloaded yet) and the broadcast-camera mask; and regenerating the showcase (`m07`) on the calibrated engine, which waits for the showcase alignment (11.9).
+Planting on the calibrated engine shaped several plans, each through soft constraints logged as intents:
+
+- In the decoy run, the nearest cover watches the ball for 4 s.
+- In pinning, the two centre-backs hold the striker sitting in their seam for 3 s.
+- In press broken, the passer finds the pocket he can reach, and may chip or loft the ball over the press.
+- The cover shadow must be cast from inside the lane, not by the man pressing the passer.
+- The set-piece screen is a timed routine:
+  - The taker waits for the routine to be set.
+  - The target stands beside his marker and times a run onto a whipped delivery.
+  - The marker reacts 0.35 s late, and a screen set in his path costs him 0.5 s more. The engine's bodies only push each other apart, so the plan supplies the block.
+  - Crossable free kicks count as well as corners.
+
+The detectors' main limits:
+
+- When two lanes close at the same pass, the cover-shadow detector reports the bigger drop, so a planted shadow on the other lane can go unfound.
+- In open play the detectors also flag many genuine but minor moments. Around the showcase goal they find a switch of play, two blind-side runs and a third-man run besides the planted decoy run, so the Scout must rank them.
+
+**The fast engine and the sets.**
+
+- **Season.** `offball season` plays the 380-match season backdrop with the fast engine, events only and with a league table, in about 70 seconds. Its ball flow is a Markov model over a 6 × 4 zone grid fitted from Wyscout. On 60 matches every per-match average sits inside the real middle half: passes 957, completion 0.82, shots 25.4, goals 2.8, possessions 241, fouls 22, offsides 2.9, corners 10.5, throw-ins 42.
+- **Benchmark.** `offball bench` writes and plays OffBall-Bench's 100 scripts: 70 with 3–6 planted moments, 20 with only null moments and 10 unscripted. They split into 40 dev and 60 test, and every type is planted 18–21 times.
+- **Matchday.** `offball matchday` plays the 10 fixtures of round 27.
+- **Oracle labels.** Both sets label the moments players make on their own: engine intents (decoy runs, overlaps, runs in behind) confirmed by the detectors' signal definitions, without counterfactual truth. They are sparse, none or one per unscripted calibration match.
+- Neither the benchmark nor the matchday has been generated yet.
+
+**Still open.**
+
+- Players standing too close (gate 2), now twice as often since stage 6, probably because braking is scaled down with acceleration.
+- Runs in behind (gate 4).
+- Team spacing, which the shape settings haven't fixed, and peak speeds that now sit above the real distribution (gate 5 and gate 1).
+- Median pass length, possessions and running at 15–20 km/h, at the edge of the real range.
+- Higher success rates for the decoy run, cover shadow and set-piece screen.
+- Generating OffBall-Bench and the matchday.
+- Counterfactual truth for oracle labels.
+- The video renderer.
+- Regenerating the showcase (`m07`) on the calibrated engine, which waits for the showcase alignment (11.9).
 
 ---
 
@@ -2234,20 +2295,20 @@ A team of up to four covers five workstreams by pairing; owners are named at kic
 
 ### 23.4 Where the build stands
 
-As checked on 24 October 2026. The frontend is complete against its stand-ins; the backend, the agents and the deployment are the work that remains.
+As checked on 25 October 2026. The frontend is complete against its stand-ins, and the synthetic data is close to it; the agents on a real model, the interpretation models, the backend's Azure side and the deployment are the work that remains.
 
 | Area | Built | Not built yet |
 | --- | --- | --- |
 | Frontend (`web/`) | Every screen, mode, view, rendering tier, state and language; the partner template; the motion system. Type-check, token lint and build pass, and all 146 unit and browser tests pass. It runs on stand-ins (11.3). | The small changes in `INTEGRATION.md` section 9 and 11.3, which wait for the backend |
 | Contracts | 21 schemas exported from Pydantic models, in sync with the code | The seven new contracts and version 2.1 (11.3) |
-| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and 32-run counterfactual truth, calibrated against real data (12.12); the director; the writer with content hashes; plans with expected signals for five moment types: decoy run, overlap and timed run in behind, plus the null run and the null overlap. The league, the showcase (`m07`) and the six-match smoke set are generated. | The fast engine; plans for the other 13 moment types; the video renderer; regenerating `m07` on the calibrated engine, which waits for the showcase alignment (11.9) |
-| Calibration | `offball fit` fits targets from 380 Wyscout matches and SkillCorner's A-League aggregates, keeping only numbers; a salted-hash name blocklist; realism metrics; a three-stage Optuna tune with logged hypotheses; `offball gates` runs all nine gates. On 10 full matches, every average but two sits inside the real 5th–95th range (12.12). | Offsides, running at 15–20 km/h, shot distances, pass length and possessions are still off; physics fails on players standing too close; gate 5 needs SkillCorner's tracking files (about 1.8 GB, not downloaded yet) and the camera mask |
-| Interpretation | Pitch control (fast and Spearman), 18 named metrics with evidence IDs, run detection, and detectors for decoy runs, overlaps and timed runs in behind. On `m07` it finds both planted decoy runs, flags neither null run, and adds three candidates the answer key doesn't cover, which oracle labels will settle. | Space value, xG, pass difficulty, run classification, credit, ghosting, auto-eventing and vision; live (streaming) detection; the other 13 detectors |
+| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and counterfactual truth, calibrated against real data in eight stages (12.12); the fast engine, which plays the 380-match season backdrop in about 70 seconds; the director; plans with expected signals for all 18 moment types; oracle labels; the OffBall-Bench and matchday scripts; the writer with content hashes; `DATASHEET.md`. The league, the showcase (`m07`) and the 18-match smoke set, which plants every type, are generated. | Generating OffBall-Bench and the matchday; counterfactual truth for oracle labels; higher success rates for the decoy run, cover shadow and set-piece screen; the video renderer; regenerating `m07` on the calibrated engine, which waits for the showcase alignment (11.9) |
+| Calibration | `offball fit` fits targets from 380 Wyscout matches and SkillCorner's A-League aggregates and broadcast tracking, keeping only numbers; a salted-hash name blocklist; realism and tracking metrics; eight Optuna stages with logged hypotheses; `offball gates` runs all nine gates, gate 5 against SkillCorner's broadcast tracking through a camera mask. On 16 full matches every average but one sits inside the real 5th–95th range, and acceleration through the camera matches real tracking (12.12). On the calibration set gates 3, 7, 8 and 9 pass; on the smoke set gate 6 passes too. | Gates 1, 2, 4 and 5 still fail: players standing too close, runs in behind, team spacing (a classifier still tells our tracking from real at ROC AUC 0.99), peak speeds and median pass length |
+| Interpretation | Pitch control (fast and Spearman), 18 named metrics with evidence IDs, run detection, and detectors for all 18 moment types, batch and live. On the smoke set they find all 17 planted moments and credit neither null one; on `m07` they find both planted decoy runs and flag neither null run. | Space value, xG, pass difficulty, run classification, credit, ghosting, auto-eventing and vision; a learned scorer to rank candidates, since in open play the detectors also flag many genuine but minor moments; the cover-shadow detector reports one lane per pass |
 | Agents | The broadcast workflow in Agent Framework: Scout, Explainer, Fact-checker with up to two rewrites, a Persona script for each of the six modes, a Fact-checker read of every script, Producer and publish. Ask OffBall: the Pundit, then the Fact-checker. English instructions and structured output for each; model clients for a Foundry endpoint; the workflow tested with a stand-in model | Running on a real model, which waits for the Foundry endpoint; the Tactician, Engineer, recaps, the data crew, per-agent evaluations and the learning loop |
 | Services and MCP | The feed emitter with faults; the live service (ingest, gap filling, rolling detection, relay); the API with the live stream, Ask OffBall, approvals and traces; the OffBall MCP server with 11 read-only tools; replay builds checked against the contracts. The partner template plays the live stream. | Event Hubs and Web PubSub transports, the counterfactual workers, the recap, stats and decision endpoints, Docker images |
 | Platform and Fabric | Nothing yet | Everything in 18.9 to 18.18, and the Fabric items |
-| Repository | A git repository with its history, `.gitignore` and `.env.example`; `ATTRIBUTION.md` for the calibration data | The public GitHub repository (rule 4.4); the README is a title only, and `LICENSE` and the other files in 22.2 don't exist yet |
-| Code quality | Lint is clean, and 28 Python tests pass: the emitter, the live service, the tools, the workflow's wiring, the API, the fit, the realism metrics, the blocklist, the gates and the moment library | Tests against a real model; slow tests that direct a moment end to end |
+| Repository | The GitHub repository (github.com/FelixMatrixar/OffBall) with its full history, private for now; `.gitignore`, `.env.example` and `.gitattributes` keeping generated data byte-exact; a README; `ATTRIBUTION.md` for the calibration data; `DATASHEET.md` | Making the repository public (rule 4.4); `LICENSE`, `TRANSPARENCY.md`, `SECURITY.md` and the rest of 22.2 |
+| Code quality | Lint is clean, and 30 Python tests pass: the emitter, the live service, the tools, the workflow's wiring, the API, the fit, the realism metrics, the blocklist, the gates, the moment library, the fast engine and the smoke set's detectability | Tests against a real model; slow tests that direct a moment end to end; CI to run them (18.13) |
 
 **What comes next, by dependency.** The backend and AI work, in the order its dependencies allow. Each step ends with something the finished frontend can show.
 
@@ -2262,7 +2323,7 @@ As checked on 24 October 2026. The frontend is complete against its stand-ins; t
 9. **The emergent world (M4, M5).** `fit.py`, the gate runner, the remaining moment types and detectors, the models in section 13, and OffBall-Bench.
 10. **Production and learning (M7, M9).** Production, load and fault-injection tests, partner and public endpoints, and the learning loop.
 
-Step 9 has started: the fit, the gate runner, the calibrated engine and five moment types are built (12.12). Steps 3 and 4 are built and tested, apart from the Event Hubs and Web PubSub transports, and step 7's broadcast crew and MCP server are built and wait for a model endpoint. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
+Step 1's repository is created and pushed; making it public and its CI checks remain. Step 9 is mostly built: the fit, the gates, the calibrated engine, all 18 moment types and their detectors, the fast engine and the benchmark scripts (12.12); the models in section 13 and generating OffBall-Bench remain. Steps 3 and 4 are built and tested, apart from the Event Hubs and Web PubSub transports, and step 7's broadcast crew and MCP server are built and wait for a model endpoint. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
 
 ---
 

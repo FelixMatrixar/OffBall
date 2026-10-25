@@ -67,7 +67,7 @@ class EngineParams:
     carry_beat: float = tunable(0.35, 0.15, 0.55, "Base chance a dribbler beats a challenge")
     tackle_hazard: float = tunable(0.02, 0.008, 0.04, "Tackle attempts per tick when engaged")
     goal_side_boost: float = tunable(2.2, 1.0, 3.5, "Extra tackle attempts for a defender in the way")
-    foul_base: float = tunable(0.2, 0.08, 0.35, "Share of challenges that are fouls")
+    foul_base: float = tunable(0.2, 0.08, 0.5, "Share of challenges that are fouls")
     # Defensive shape.
     def_width: float = tunable(39.0, 32.0, 46.0, "Width of the block out of possession, m")
     def_depth: float = tunable(25.0, 20.0, 32.0, "Length of the block out of possession, m")

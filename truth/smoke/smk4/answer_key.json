@@ -6,29 +6,29 @@
   "source": "planted",
   "type": "overlap",
   "period": 1,
-  "t_start_ms": 99760,
-  "t_end_ms": 105640,
+  "t_start_ms": 124800,
+  "t_end_ms": 129880,
   "team_id": "kes",
   "creator_id": "kes-02",
   "dragged_ids": [
-   "ash-03"
+   "ash-07"
   ],
   "receiver_id": "kes-02",
   "gap_zone": [
    [
-    67.9,
+    61.0,
     0.0
    ],
    [
-    83.9,
+    77.0,
     0.0
    ],
    [
-    83.9,
+    77.0,
     12.0
    ],
    [
-    67.9,
+    61.0,
     12.0
    ]
   ],
@@ -38,19 +38,19 @@
    "delivery_follows": 1.0
   },
   "observed": {
-   "wide_zone_control_start_pct": 44.8,
-   "wide_zone_control_pct": 91.4,
-   "two_v_one_s": 2.0,
+   "wide_zone_control_start_pct": 36.2,
+   "wide_zone_control_pct": 78.7,
+   "two_v_one_s": 3.2,
    "delivery_follows": 1.0
   },
   "counterfactual": {
-   "space_created_m2": 95.9,
-   "epv_gain": 0.0165,
+   "space_created_m2": 89.9,
+   "epv_gain": 0.013,
    "gap_opens_without_run": false,
    "runs": 16
   },
   "is_null": false,
   "outcome": "none",
-  "attempts": 4
+  "attempts": 29
  }
 ]

@@ -1,6 +1,6 @@
 {
   "match_id": "smk8",
-  "seconds": 121.1,
+  "seconds": 56.4,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,16 +11,15 @@
       "key": "k01",
       "type": "third_man_run",
       "ok": true,
-      "attempts": 9,
+      "attempts": 8,
       "reasons": [
-        "preconditions never arose",
-        "preconditions never arose",
         "the pass to the link didn't arrive (incomplete)",
-        "the lay-off never came (best lane 0.00)",
-        "the lay-off didn't arrive (incomplete)",
         "preconditions never arose",
-        "the lay-off didn't arrive (out)",
-        "preconditions never arose"
+        "the pass to the link didn't arrive (out)",
+        "the lay-off never came (best lane 0.00)",
+        "the pass to the link didn't arrive (pending)",
+        "the pass to the link didn't arrive (incomplete)",
+        "the pass to the link didn't arrive (pending)"
       ]
     }
   ],

@@ -6,28 +6,28 @@
   "source": "planted",
   "type": "rest_defence_exposed",
   "period": 1,
-  "t_start_ms": 96080,
-  "t_end_ms": 99280,
+  "t_start_ms": 106200,
+  "t_end_ms": 109360,
   "team_id": "kes",
-  "creator_id": "kes-09",
+  "creator_id": "kes-07",
   "dragged_ids": [],
-  "receiver_id": "kes-07",
+  "receiver_id": "kes-09",
   "gap_zone": [
    [
-    82.3,
-    13.0
+    62.3,
+    41.0
    ],
    [
-    105.0,
-    13.0
+    86.3,
+    41.0
    ],
    [
-    105.0,
-    27.0
+    86.3,
+    55.0
    ],
    [
-    82.3,
-    27.0
+    62.3,
+    55.0
    ]
   ],
   "expected": {
@@ -39,13 +39,13 @@
    "half_space_overload": 1.0
   },
   "counterfactual": {
-   "space_created_m2": 208.9,
-   "epv_gain": 0.0571,
+   "space_created_m2": 11.5,
+   "epv_gain": 0.0028,
    "gap_opens_without_run": false,
    "runs": 16
   },
   "is_null": false,
   "outcome": "none",
-  "attempts": 5
+  "attempts": 9
  }
 ]

@@ -1,6 +1,6 @@
 {
   "match_id": "smk14",
-  "seconds": 116.1,
+  "seconds": 88.9,
   "segment_retries": 0,
   "score": {
     "dun": 0,
@@ -11,16 +11,18 @@
       "key": "k01",
       "type": "false_9_drop",
       "ok": true,
-      "attempts": 9,
+      "attempts": 15,
       "reasons": [
-        "only 148 m2 opened behind",
+        "lost the ball during the drop",
+        "lost the ball during the drop",
         "lost the ball during the drop",
         "preconditions never arose",
+        "only 118 m2 opened behind",
         "preconditions never arose",
-        "only 109 m2 opened behind",
-        "only 77 m2 opened behind",
         "preconditions never arose",
-        "lost the ball during the drop"
+        "only 104 m2 opened behind",
+        "the centre-back stepped up only 7.5 m",
+        "preconditions never arose"
       ]
     }
   ],

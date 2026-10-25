@@ -391,7 +391,7 @@
     },
     {
       "period": 2,
-      "duration_ms": 615240,
+      "duration_ms": 500280,
       "attacks_left_to_right": "lar"
     }
   ],

@@ -6,32 +6,32 @@
   "source": "planted",
   "type": "rotation",
   "period": 2,
-  "t_start_ms": 215320,
-  "t_end_ms": 224280,
+  "t_start_ms": 211200,
+  "t_end_ms": 220440,
   "team_id": "nor",
-  "creator_id": "nor-09",
+  "creator_id": "nor-10",
   "dragged_ids": [
-   "oak-02",
-   "oak-06",
-   "oak-10"
+   "oak-10",
+   "oak-08",
+   "oak-05"
   ],
-  "receiver_id": "nor-09",
+  "receiver_id": "nor-10",
   "gap_zone": [
    [
-    32.2,
-    12.8
+    37.8,
+    35.0
    ],
    [
-    52.2,
-    12.8
+    57.8,
+    35.0
    ],
    [
-    52.2,
-    32.8
+    57.8,
+    55.0
    ],
    [
-    32.2,
-    32.8
+    37.8,
+    55.0
    ]
   ],
   "expected": {
@@ -42,16 +42,16 @@
   "observed": {
    "zones_swapped": 1.0,
    "marker_switch": 1.0,
-   "receiver_separation_m": 6.08
+   "receiver_separation_m": 6.55
   },
   "counterfactual": {
-   "space_created_m2": 43.4,
-   "epv_gain": 0.0035,
+   "space_created_m2": 47.0,
+   "epv_gain": 0.0023,
    "gap_opens_without_run": false,
    "runs": 16
   },
   "is_null": false,
-  "outcome": "none",
-  "attempts": 6
+  "outcome": "chance",
+  "attempts": 9
  }
 ]

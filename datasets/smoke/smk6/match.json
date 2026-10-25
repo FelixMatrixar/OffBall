@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "match_id": "smk6",
-  "seed": 611,
+  "seed": 721,
   "engine": "emergent",
   "generator_version": "0.1.0",
   "competition": "OffBall League",
@@ -386,12 +386,12 @@
   "periods": [
     {
       "period": 1,
-      "duration_ms": 369280,
+      "duration_ms": 379880,
       "attacks_left_to_right": "kes"
     },
     {
       "period": 2,
-      "duration_ms": 455720,
+      "duration_ms": 450800,
       "attacks_left_to_right": "ash"
     }
   ],

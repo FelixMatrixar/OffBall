@@ -1,28 +1,27 @@
 {
   "match_id": "smk15",
-  "seconds": 86.1,
+  "seconds": 48.6,
   "segment_retries": 0,
   "score": {
-    "nor": 0,
-    "oak": 0
+    "cor": 0,
+    "wre": 0
   },
   "moments": [
     {
       "key": "k01",
       "type": "cover_shadow",
       "ok": true,
-      "attempts": 12,
+      "attempts": 10,
       "reasons": [
+        "the lane stayed open (14 points)",
         "the ball still went forward",
-        "the lane stayed open (24 points)",
-        "the lane stayed open (12 points)",
         "someone else shut the lane",
-        "the lane stayed open (9 points)",
-        "someone else shut the lane",
+        "preconditions never arose",
+        "the lane stayed open (17 points)",
         "the ball still went forward",
-        "the lane stayed open (0 points)",
-        "the lane stayed open (3 points)",
-        "the shadow denied too little"
+        "the lane stayed open (1 points)",
+        "the lane stayed open (6 points)",
+        "the lane stayed open (3 points)"
       ]
     }
   ],

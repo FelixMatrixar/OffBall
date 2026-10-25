@@ -1,382 +1,382 @@
 {
   "schema_version": "2.0",
   "match_id": "smk15",
-  "seed": 314,
+  "seed": 755,
   "engine": "emergent",
   "generator_version": "0.1.0",
   "competition": "OffBall League",
   "season": "2026",
   "round": null,
   "home": {
-    "club_id": "nor",
-    "name": "Northcairn",
-    "short_name": "NOR",
+    "club_id": "cor",
+    "name": "Corvenna",
+    "short_name": "COR",
     "kit": {
-      "primary": "#a1a408",
-      "secondary": "#1b1c11",
-      "pattern": "plain"
+      "primary": "#8252bc",
+      "secondary": "#f1ecfa",
+      "pattern": "sash"
     },
     "formation": "4-2-3-1",
     "lineup": [
       {
-        "player_id": "nor-01",
-        "name": "A. Mahaoui",
+        "player_id": "cor-01",
+        "name": "V. Novecik",
         "number": 1,
         "role": "GK",
         "starter": true
       },
       {
-        "player_id": "nor-02",
-        "name": "I. Fadami",
+        "player_id": "cor-02",
+        "name": "R. Velan",
         "number": 2,
         "role": "RB",
         "starter": true
       },
       {
-        "player_id": "nor-05",
-        "name": "H. Abimi",
+        "player_id": "cor-05",
+        "name": "T. Moravak",
         "number": 5,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "nor-04",
-        "name": "H. Kadami",
+        "player_id": "cor-04",
+        "name": "I. Salari",
         "number": 4,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "nor-03",
-        "name": "S. Kadini",
+        "player_id": "cor-03",
+        "name": "L. Nydal",
         "number": 3,
         "role": "LB",
         "starter": true
       },
       {
-        "player_id": "nor-06",
-        "name": "W. Kadouun",
+        "player_id": "cor-06",
+        "name": "O. Dvorek",
         "number": 6,
         "role": "DM",
         "starter": true
       },
       {
-        "player_id": "nor-08",
-        "name": "A. Bade",
+        "player_id": "cor-08",
+        "name": "Y. Akosu",
         "number": 8,
         "role": "DM",
         "starter": true
       },
       {
-        "player_id": "nor-11",
-        "name": "Y. Belini",
+        "player_id": "cor-11",
+        "name": "K. Stavik",
         "number": 11,
         "role": "RW",
         "starter": true
       },
       {
-        "player_id": "nor-10",
-        "name": "N. Rahari",
+        "player_id": "cor-10",
+        "name": "T. Holen",
         "number": 10,
         "role": "AM",
         "starter": true
       },
       {
-        "player_id": "nor-07",
-        "name": "K. Rahououi",
+        "player_id": "cor-07",
+        "name": "M. Kralok",
         "number": 7,
         "role": "LW",
         "starter": true
       },
       {
-        "player_id": "nor-09",
-        "name": "N. Djoura",
+        "player_id": "cor-09",
+        "name": "R. Stavoman",
         "number": 9,
         "role": "ST",
         "starter": true
       },
       {
-        "player_id": "nor-12",
-        "name": "W. Beloudi",
-        "number": 12,
-        "role": "GK",
-        "starter": false
-      },
-      {
-        "player_id": "nor-14",
-        "name": "H. Tahani",
+        "player_id": "cor-14",
+        "name": "K. Askedal",
         "number": 14,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "nor-16",
-        "name": "Y. Beliri",
+        "player_id": "cor-15",
+        "name": "M. Janir",
+        "number": 15,
+        "role": "GK",
+        "starter": false
+      },
+      {
+        "player_id": "cor-16",
+        "name": "S. Pavavic",
         "number": 16,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "nor-18",
-        "name": "A. Fadara",
-        "number": 18,
+        "player_id": "cor-19",
+        "name": "F. Yawowa",
+        "number": 19,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "nor-19",
-        "name": "B. Eldyvik",
-        "number": 19,
+        "player_id": "cor-21",
+        "name": "S. Rikizaki",
+        "number": 21,
         "role": "RB",
         "starter": false
       },
       {
-        "player_id": "nor-21",
-        "name": "S. Hamidi",
-        "number": 21,
+        "player_id": "cor-23",
+        "name": "S. Saloumi",
+        "number": 23,
         "role": "LB",
         "starter": false
       },
       {
-        "player_id": "nor-22",
-        "name": "R. Fadounani",
-        "number": 22,
+        "player_id": "cor-24",
+        "name": "V. Kralevisz",
+        "number": 24,
         "role": "DM",
         "starter": false
       },
       {
-        "player_id": "nor-23",
-        "name": "H. Belinach",
-        "number": 23,
+        "player_id": "cor-26",
+        "name": "R. Groord",
+        "number": 26,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "nor-25",
-        "name": "Y. Tahira",
-        "number": 25,
+        "player_id": "cor-27",
+        "name": "R. Maekamp",
+        "number": 27,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "nor-30",
-        "name": "A. Fadouridi",
-        "number": 30,
+        "player_id": "cor-29",
+        "name": "V. Lundeheim",
+        "number": 29,
         "role": "AM",
         "starter": false
       },
       {
-        "player_id": "nor-32",
-        "name": "N. Ceremeiro",
-        "number": 32,
+        "player_id": "cor-30",
+        "name": "P. Wexoridge",
+        "number": 30,
         "role": "RW",
         "starter": false
       },
       {
-        "player_id": "nor-33",
-        "name": "A. Kadarani",
-        "number": 33,
+        "player_id": "cor-34",
+        "name": "K. Janer",
+        "number": 34,
         "role": "LW",
         "starter": false
       },
       {
-        "player_id": "nor-34",
-        "name": "Y. Nasara",
-        "number": 34,
+        "player_id": "cor-37",
+        "name": "O. Radir",
+        "number": 37,
         "role": "ST",
         "starter": false
       },
       {
-        "player_id": "nor-38",
-        "name": "K. Fadouch",
-        "number": 38,
+        "player_id": "cor-39",
+        "name": "V. Pavivic",
+        "number": 39,
         "role": "ST",
         "starter": false
       }
     ]
   },
   "away": {
-    "club_id": "oak",
-    "name": "Oakhallow",
-    "short_name": "OAK",
+    "club_id": "wre",
+    "name": "Wrenhallow",
+    "short_name": "WRE",
     "kit": {
-      "primary": "#4593d8",
-      "secondary": "#131c24",
-      "pattern": "sash"
+      "primary": "#ba8739",
+      "secondary": "#201910",
+      "pattern": "stripes"
     },
     "formation": "3-4-3",
     "lineup": [
       {
-        "player_id": "oak-01",
-        "name": "A. Yawawa",
+        "player_id": "wre-01",
+        "name": "V. Torirud",
         "number": 1,
         "role": "GK",
         "starter": true
       },
       {
-        "player_id": "oak-04",
-        "name": "K. Toshiro",
+        "player_id": "wre-04",
+        "name": "S. Beroema",
         "number": 4,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "oak-05",
-        "name": "S. Yozaki",
+        "player_id": "wre-05",
+        "name": "K. Djiri",
         "number": 5,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "oak-06",
-        "name": "Y. Mishiro",
+        "player_id": "wre-06",
+        "name": "J. Wilehuis",
         "number": 6,
         "role": "CB",
         "starter": true
       },
       {
-        "player_id": "oak-02",
-        "name": "R. Mizaki",
+        "player_id": "wre-02",
+        "name": "C. Demonke",
         "number": 2,
         "role": "RWB",
         "starter": true
       },
       {
-        "player_id": "oak-08",
-        "name": "T. Kumura",
+        "player_id": "wre-08",
+        "name": "J. Vosons",
         "number": 8,
         "role": "CM",
         "starter": true
       },
       {
-        "player_id": "oak-10",
-        "name": "R. Yokawa",
+        "player_id": "wre-10",
+        "name": "R. Smiricoord",
         "number": 10,
         "role": "CM",
         "starter": true
       },
       {
-        "player_id": "oak-03",
-        "name": "S. Hashiro",
+        "player_id": "wre-03",
+        "name": "S. Beriord",
         "number": 3,
         "role": "LWB",
         "starter": true
       },
       {
-        "player_id": "oak-07",
-        "name": "M. Esquiro",
+        "player_id": "wre-07",
+        "name": "D. Dekoricijk",
         "number": 7,
         "role": "RW",
         "starter": true
       },
       {
-        "player_id": "oak-09",
-        "name": "T. Kikinaga",
+        "player_id": "wre-09",
+        "name": "R. Jansolema",
         "number": 9,
         "role": "ST",
         "starter": true
       },
       {
-        "player_id": "oak-11",
-        "name": "K. Obasu",
+        "player_id": "wre-11",
+        "name": "R. Yariford",
         "number": 11,
         "role": "LW",
         "starter": true
       },
       {
-        "player_id": "oak-12",
-        "name": "T. Rikimura",
-        "number": 12,
+        "player_id": "wre-13",
+        "name": "W. Smarhuis",
+        "number": 13,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "oak-14",
-        "name": "R. Rizaki",
-        "number": 14,
+        "player_id": "wre-15",
+        "name": "M. Vosema",
+        "number": 15,
         "role": "GK",
         "starter": false
       },
       {
-        "player_id": "oak-16",
-        "name": "T. Rimimoto",
+        "player_id": "wre-16",
+        "name": "D. Dekiord",
         "number": 16,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "oak-19",
-        "name": "R. Karakawa",
-        "number": 19,
+        "player_id": "wre-17",
+        "name": "W. Mastra",
+        "number": 17,
         "role": "CB",
         "starter": false
       },
       {
-        "player_id": "oak-22",
-        "name": "W. Rijkorkamp",
+        "player_id": "wre-21",
+        "name": "R. Groema",
+        "number": 21,
+        "role": "CB",
+        "starter": false
+      },
+      {
+        "player_id": "wre-22",
+        "name": "S. Smoelens",
         "number": 22,
-        "role": "CB",
-        "starter": false
-      },
-      {
-        "player_id": "oak-23",
-        "name": "T. Kikawa",
-        "number": 23,
         "role": "RWB",
         "starter": false
       },
       {
-        "player_id": "oak-26",
-        "name": "K. Tamimura",
-        "number": 26,
+        "player_id": "wre-25",
+        "name": "K. Temokaba",
+        "number": 25,
         "role": "DM",
         "starter": false
       },
       {
-        "player_id": "oak-27",
-        "name": "D. Yoshiro",
-        "number": 27,
-        "role": "CM",
-        "starter": false
-      },
-      {
-        "player_id": "oak-30",
-        "name": "H. Mimoto",
+        "player_id": "wre-30",
+        "name": "M. Stavonko",
         "number": 30,
         "role": "CM",
         "starter": false
       },
       {
-        "player_id": "oak-35",
-        "name": "K. Nanaga",
-        "number": 35,
+        "player_id": "wre-31",
+        "name": "R. Klestra",
+        "number": 31,
+        "role": "CM",
+        "starter": false
+      },
+      {
+        "player_id": "wre-33",
+        "name": "R. Klans",
+        "number": 33,
         "role": "AM",
         "starter": false
       },
       {
-        "player_id": "oak-36",
-        "name": "T. Rijkins",
+        "player_id": "wre-36",
+        "name": "F. Bami",
         "number": 36,
         "role": "RW",
         "starter": false
       },
       {
-        "player_id": "oak-37",
-        "name": "Y. Hazaki",
+        "player_id": "wre-37",
+        "name": "J. Garamano",
         "number": 37,
         "role": "LW",
         "starter": false
       },
       {
-        "player_id": "oak-38",
-        "name": "T. Ekode",
+        "player_id": "wre-38",
+        "name": "E. Demimi",
         "number": 38,
         "role": "ST",
         "starter": false
       },
       {
-        "player_id": "oak-39",
-        "name": "Y. Kwaba",
+        "player_id": "wre-39",
+        "name": "T. Rita",
         "number": 39,
         "role": "ST",
         "starter": false
@@ -386,18 +386,18 @@
   "periods": [
     {
       "period": 1,
-      "duration_ms": 390960,
-      "attacks_left_to_right": "nor"
+      "duration_ms": 388680,
+      "attacks_left_to_right": "cor"
     },
     {
       "period": 2,
-      "duration_ms": 529160,
-      "attacks_left_to_right": "oak"
+      "duration_ms": 545320,
+      "attacks_left_to_right": "wre"
     }
   ],
   "final_score": {
-    "nor": 0,
-    "oak": 0
+    "cor": 0,
+    "wre": 0
   },
   "frame_rate": 25,
   "pitch": [

@@ -1,9 +1,9 @@
 {
   "match_id": "smk16",
-  "seconds": 88.2,
+  "seconds": 66.8,
   "segment_retries": 0,
   "score": {
-    "nor": 0,
+    "nor": 1,
     "oak": 0
   },
   "moments": [
@@ -11,13 +11,16 @@
       "key": "k01",
       "type": "rotation",
       "ok": true,
-      "attempts": 6,
+      "attempts": 9,
       "reasons": [
-        "the pass never came (best lane 0.01)",
-        "the creator's decision made too little difference",
-        "the pass didn't arrive (incomplete)",
-        "lost the ball before the pass",
-        "nobody came out of it free"
+        "the pass never came (best lane 0.02)",
+        "preconditions never arose",
+        "the pass never came (best lane 0.00)",
+        "preconditions never arose",
+        "the pass never came (best lane 0.00)",
+        "preconditions never arose",
+        "preconditions never arose",
+        "preconditions never arose"
       ]
     }
   ],

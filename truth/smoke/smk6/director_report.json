@@ -1,6 +1,6 @@
 {
   "match_id": "smk6",
-  "seconds": 42.5,
+  "seconds": 34.0,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,8 +11,10 @@
       "key": "k01",
       "type": "timed_run_in_behind",
       "ok": true,
-      "attempts": 1,
-      "reasons": []
+      "attempts": 2,
+      "reasons": [
+        "the pass in behind didn't arrive (incomplete)"
+      ]
     }
   ],
   "oracle_labels": 0

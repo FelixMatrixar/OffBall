@@ -6,30 +6,30 @@
   "source": "planted",
   "type": "cover_shadow",
   "period": 1,
-  "t_start_ms": 136520,
-  "t_end_ms": 139680,
-  "team_id": "nor",
-  "creator_id": "nor-06",
+  "t_start_ms": 103600,
+  "t_end_ms": 105760,
+  "team_id": "cor",
+  "creator_id": "cor-10",
   "dragged_ids": [
-   "oak-09"
+   "wre-02"
   ],
   "receiver_id": null,
   "gap_zone": [
    [
-    25.6,
-    15.0
+    56.4,
+    31.2
    ],
    [
-    36.3,
-    15.0
+    62.4,
+    31.2
    ],
    [
-    36.3,
-    22.3
+    62.4,
+    52.1
    ],
    [
-    25.6,
-    22.3
+    56.4,
+    52.1
    ]
   ],
   "expected": {
@@ -37,18 +37,18 @@
    "ball_backwards_or_sideways": 1.0
   },
   "observed": {
-   "pass_prob_drop_pts": 36.9,
+   "pass_prob_drop_pts": 75.8,
    "ball_backwards_or_sideways": 1.0,
-   "defender_lane_gap_m": 0.27
+   "defender_lane_gap_m": 0.06
   },
   "counterfactual": {
-   "space_created_m2": 29.6,
-   "epv_gain": 0.3839,
+   "space_created_m2": 50.3,
+   "epv_gain": 0.3992,
    "gap_opens_without_run": false,
    "runs": 16
   },
   "is_null": false,
   "outcome": "none",
-  "attempts": 12
+  "attempts": 10
  }
 ]

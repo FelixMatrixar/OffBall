@@ -1,19 +1,20 @@
 {
   "match_id": "smk1",
-  "seconds": 69.4,
+  "seconds": 34.1,
   "segment_retries": 0,
   "score": {
-    "har": 0,
-    "ive": 0
+    "nor": 0,
+    "oak": 1
   },
   "moments": [
     {
       "key": "k01",
       "type": "decoy_run",
       "ok": true,
-      "attempts": 2,
+      "attempts": 3,
       "reasons": [
-        "preconditions never arose"
+        "the pass didn't go into the gap",
+        "the pass didn't go into the gap"
       ]
     }
   ],
