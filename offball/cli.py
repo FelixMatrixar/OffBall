@@ -45,7 +45,7 @@ def cmd_league(args: argparse.Namespace) -> None:
 
 
 def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf_runs: int,
-                    oracle: bool = False) -> None:
+                    oracle: bool = False, prepare=None) -> None:
     from offball.generator.director import play_script
     from offball.generator.league import build_league
     from offball.generator.writer import refresh_manifest, write_match
@@ -53,6 +53,8 @@ def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf
     league = build_league(2026)
     t0 = time.time()
     dm = play_script(league, script, counterfactual_runs=cf_runs, max_attempts=attempts)
+    if prepare is not None:
+        prepare(dm)
     key = [row.model_dump() for row in dm.answer_key]
     data_dir, truth_dir = data_root / script.match_id, truth_root / script.match_id
     manifest = write_match(dm.result, data_dir, truth_dir, round_=script.round, answer_key=key)
@@ -83,10 +85,11 @@ def _write_directed(script, data_root: Path, truth_root: Path, attempts: int, cf
 
 
 def cmd_showcase(args: argparse.Namespace) -> None:
-    from offball.generator.director import showcase_script
+    from offball.generator.director import place_showcase_goal, showcase_script
 
     script = showcase_script()
-    _write_directed(script, DATASETS / "showcase", TRUTH / "showcase", args.attempts, args.cf_runs)
+    _write_directed(script, DATASETS / "showcase", TRUTH / "showcase", args.attempts, args.cf_runs,
+                    prepare=place_showcase_goal)
 
 
 def cmd_match(args: argparse.Namespace) -> None:
@@ -247,7 +250,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--seed", type=int, default=2026)
     p.set_defaults(fn=cmd_league)
     p = sub.add_parser("showcase")
-    p.add_argument("--attempts", type=int, default=75, help="Attempts per moment (goal moments get twice as many)")
+    p.add_argument("--attempts", type=int, default=150, help="Attempts per moment (goal moments get twice as many)")
     p.add_argument("--cf-runs", type=int, default=16)
     p.set_defaults(fn=cmd_showcase)
     p = sub.add_parser("match")

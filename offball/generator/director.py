@@ -95,7 +95,9 @@ def play_script(
         raise ValueError("Invalid script: " + "; ".join(problems))
     kits = kit_for_fixture(league.club(script.home), league.club(script.away))
     sim = Simulator(league, script.home, script.away, script.match_id, seed=script.seed, kits=kits,
-                    half_minutes=script.half_minutes, params=params)
+                    half_minutes=script.half_minutes, params=params,
+                    home_direction=1 if script.home_attacks_right_first else -1,
+                    subs_after_s=script.subs_after_minute * 60.0)
     pending = sorted(script.moments, key=lambda m: m.minute)
     answer_key: list[AnswerKeyMoment] = []
     reports: list[MomentReport] = []
@@ -224,6 +226,11 @@ def _answer_key_row(sim: Simulator, script: MatchScript, spec: StoryMoment, plan
     )
 
 
+# The showcase goal's clock: period 2 from 63:00, and the seconds after that of each beat.
+SHOWCASE_T0_S = 18 * 60.0
+SHOWCASE_BEATS = {"run": 1.0, "follow": 2.5, "gap": 3.8, "pass": 4.2, "shot": 6.4, "goal": 6.9}
+
+
 def showcase_script() -> MatchScript:
     """Kestrel Bay v Ashmoor, round 27: the decoy-run goal on 63 minutes that the demo is built around."""
     from offball.generator.script import ScorePath
@@ -234,18 +241,45 @@ def showcase_script() -> MatchScript:
         away="ash",
         seed=7,
         round=27,
+        home_attacks_right_first=False,
+        subs_after_minute=64.0,
         brief=("A tight game: Kestrel Bay's striker keeps testing Ashmoor's centre-backs. One passes the runner on "
                "early; on 63 minutes Hendricx follows Velmar's decoy run and Arkwell scores through the gap."),
         moments=[
             StoryMoment(key="k01", type="null_run", team="kes", minute=11.0, creator_id="kes-09",
                         note="Ashmoor's other centre-back passes Velmar on correctly; no gap opens."),
-            StoryMoment(key="k02", type="decoy_run", team="kes", minute=27.0, creator_id="kes-09",
+            StoryMoment(key="k02", type="decoy_run", team="kes", minute=24.0, creator_id="kes-09",
                         outcome="chance", note="Velmar pulls a centre-back wide; the chance goes begging."),
-            StoryMoment(key="k03", type="decoy_run", team="kes", minute=62.5, creator_id="kes-09",
-                        dragged_id="ash-05", receiver_id="kes-10", outcome="goal",
+            StoryMoment(key="k03", type="decoy_run", team="kes", minute=59.0, latest_minute=63.0, creator_id="kes-09",
+                        dragged_id="ash-05", receiver_id="kes-10", outcome="goal", sure=True,
                         note="The showcase goal: Velmar drags Hendricx wide, Arkwell runs into the gap and scores."),
             StoryMoment(key="k04", type="null_run", team="kes", minute=76.0, creator_id="kes-09",
                         note="Ashmoor have learned: the runner is passed on and no gap opens."),
         ],
-        score_path=[ScorePath(minute=62.5, max_goals={"kes": 0, "ash": 0})],
+        score_path=[ScorePath(minute=59.0, max_goals={"kes": 0, "ash": 0}),
+                    ScorePath(minute=63.5, max_goals={"kes": 1, "ash": 0})],
     )
+
+
+def place_showcase_goal(dm: DirectedMatch) -> None:
+    """Put the showcase goal on SHOWCASE_T0_S: its run, pass, shot and goal on their SHOWCASE_BEATS, and the
+    follow and the gap where play puts them in between."""
+    import tempfile
+    from pathlib import Path
+
+    from offball.generator.retime import retime_moment
+    from offball.generator.writer import write_match
+    from offball.models.match_data import MatchData
+    from offball.models.metrics import moment_beats
+
+    goal = next((r for r in dm.answer_key if r.type == "decoy_run" and r.outcome == "goal"), None)
+    if goal is None or goal.receiver_id is None or not goal.dragged_ids:
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        write_match(dm.result, Path(tmp) / "data", Path(tmp) / "truth")
+        md = MatchData.load(Path(tmp) / "data")
+        beats = moment_beats(md, goal.period, goal.team_id, goal.t_start_ms, goal.dragged_ids[0], goal.receiver_id,
+                             goal.gap_zone)
+    targets = {name: int(round((SHOWCASE_T0_S + SHOWCASE_BEATS[name]) * 1000)) for name in ("run", "pass", "shot", "goal")}
+    retime_moment(dm.result, dm.answer_key, goal.period, beats, targets, derived_seed(dm.script.seed, "clock"),
+                  firm=("pass", "shot", "goal"))

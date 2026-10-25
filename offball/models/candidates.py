@@ -442,6 +442,7 @@ class UnderlapDetector:
     with room to turn (PRD 12.7, Underlap)."""
 
     type = "underlap"
+    run_args = {"min_speed": 4.0, "min_frames": 20, "min_disp": 6.0}  # a purposeful run inside, seldom a sprint
 
     def __init__(self, md: MatchData) -> None:
         self.md = md

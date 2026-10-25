@@ -26,7 +26,7 @@ from offball.agents.schemas import (
 
 ROOT = Path(__file__).resolve().parents[1]
 M07 = ROOT / "datasets" / "showcase" / "m07"
-GOAL_WINDOW = {"period": 2, "from_ms": 1_225_000, "to_ms": 1_252_000}
+GOAL_WINDOW = {"period": 2, "from_ms": 1_066_000, "to_ms": 1_093_000}
 
 
 @pytest.fixture(scope="session")
@@ -61,17 +61,17 @@ class ScriptedModel(BaseChatClient):
             return ScoutDecision(airtime=True, priority=0, want_counterfactual=True, reason="A goal came from it.")
         if schema is DraftOut:
             return DraftOut(headline="No. 9's run pulled No. 5 away and opened the gap.", confidence=0.9, claims=[
-                ClaimOut(claim_id="c1", kind="number", text="No. 5 was pulled 15.1 m out of position.",
+                ClaimOut(claim_id="c1", kind="number", text="No. 5 was pulled 14.7 m out of position.",
                          metric="displacement_m", params_json=json.dumps({"player_id": "ash-05", "period": 2,
-                                                                          "t_start_ms": 1239560, "t_end_ms": 1243560}),
-                         value=15.1, unit="m", subject_ids=["ash-05"], evidence_ids=["m07-f2-30989"]),
+                                                                          "t_start_ms": 1081000, "t_end_ms": 1085000}),
+                         value=14.7, unit="m", subject_ids=["ash-05"], evidence_ids=["m07-f2-27025"]),
                 ClaimOut(claim_id="c2", kind="statement", text="No. 10 scored from the gap.", metric=None,
-                         params_json=None, value=None, unit=None, subject_ids=["kes-10"], evidence_ids=["m07-e1335"]),
+                         params_json=None, value=None, unit=None, subject_ids=["kes-10"], evidence_ids=["m07-e0948"]),
             ])
         if schema is VerdictOut:
             self._verdicts += 1
             ok = not (self.reject_first_draft and self._verdicts == 1)
-            return VerdictOut(passed=ok, checks=[ClaimCheck(claim_id=c, ok=ok, recomputed=15.1 if c == "c1" else None,
+            return VerdictOut(passed=ok, checks=[ClaimCheck(claim_id=c, ok=ok, recomputed=14.7 if c == "c1" else None,
                                                             reason="matches" if ok else "recompute it")
                                                  for c in ("c1", "c2")])
         if schema is ModeScript:

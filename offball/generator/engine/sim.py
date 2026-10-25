@@ -99,6 +99,7 @@ class MatchResult:
     recorders: dict[int, Recorder]
     period_lengths: dict[int, int]
     planted: list[dict]
+    home_direction: int = 1  # +1 when the home side attacks towards x = 105 in the first half
 
 
 class Simulator:
@@ -112,8 +113,11 @@ class Simulator:
         kits: tuple[dict, dict] | None = None,
         half_minutes: float = 45.0,
         params: EngineParams | None = None,
+        home_direction: int = 1,
+        subs_after_s: float = 0.0,
     ) -> None:
         self.league = league
+        self.home_direction = home_direction
         self.params = params or EngineParams.load()
         self.match_id = match_id
         self.seed = seed
@@ -126,9 +130,11 @@ class Simulator:
             style = club.style
             starters = club.starters()
             bench = [p for p in club.players if p not in starters]
-            t = TeamRT(club, side, +1 if side == 0 else -1, style, FORMATIONS[style.formation], kits[side])
+            t = TeamRT(club, side, home_direction if side == 0 else -home_direction, style, FORMATIONS[style.formation],
+                       kits[side])
             t.bench = bench
-            t.sub_windows = sorted(float(self.rng.uniform(lo, lo + 6)) * 60 for lo in (57, 67, 77))
+            # A script can hold substitutions back until a given time.
+            t.sub_windows = sorted(max(float(self.rng.uniform(lo, lo + 6)) * 60, subs_after_s) for lo in (57, 67, 77))
             self.teams.append(t)
         self.match_players: list[Player] = list(home.players) + list(away.players)
         self.pidx = {p.player_id: k for k, p in enumerate(self.match_players)}
@@ -882,7 +888,8 @@ class Simulator:
         line = self.offside_cache[team]
         return xj > L / 2 and xj > bx + 0.3 and xj > line + 0.3
 
-    def shoot(self, i: int, penalty: bool = False, header: bool = False, free_kick: bool = False) -> None:
+    def shoot(self, i: int, penalty: bool = False, header: bool = False, free_kick: bool = False,
+              outcome: str | None = None) -> None:
         team = self.team_of[i]
         d = self.teams[team].direction
         self._log_carry(i)
@@ -907,7 +914,9 @@ class Simulator:
                 if 0.05 < s < 0.6 and float(np.linalg.norm(rel - s * seg)) < 1.1:
                     blockers.append(k)
         u = float(self.rng.random())
-        if u < xg:
+        if outcome is not None:
+            pass  # set by a script rather than drawn
+        elif u < xg:
             outcome = "goal"
         elif blockers and self.rng.random() < 1 - 0.65 ** len(blockers):
             outcome = "blocked"
@@ -1107,7 +1116,7 @@ class Simulator:
                 self.ball_pos[2] = 1.6
                 self.shoot(r, header=True)
             elif r in self.directives and self.directives[r].get("action") == "shoot_on_receive":
-                self.directives[r] = {"action": "shoot"}
+                self.directives[r] = {"action": "shoot", "outcome": self.directives[r].get("outcome")}
         else:
             self._finalise_pass(plan, outcome="incomplete", recipient=None)
             # Defenders who cut out a cross in their own box often head it behind.
@@ -1155,6 +1164,8 @@ class Simulator:
         outcome = plan["outcome"]
         if outcome == "goal":
             self.teams[team].score += 1
+            end = self.flight.position_at(plan["end_time"])
+            self.ball_pos = np.array([*self.flight.end[:2], end[2]])  # in the net, over the line
             self.ball_vel[:] = 0.0
             self.owner = -1
             self.ball_state = "dead"
@@ -1601,6 +1612,7 @@ class Simulator:
             recorders=self.recorders,
             period_lengths=self.period_lengths,
             planted=self.planted,
+            home_direction=self.home_direction,
         )
 
 

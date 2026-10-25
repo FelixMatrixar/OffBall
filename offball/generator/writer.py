@@ -43,7 +43,7 @@ def match_info(result: MatchResult, engine: str = "emergent", round_: int | None
     home, away = result.teams
     periods = []
     for period, n in sorted(result.period_lengths.items()):
-        ltr = home.club.club_id if (period == 1) else away.club.club_id
+        ltr = home.club.club_id if (period == 1) == (result.home_direction > 0) else away.club.club_id
         periods.append(PeriodInfo(period=period, duration_ms=(n - 1) * FRAME_MS, attacks_left_to_right=ltr))
     return MatchInfo(
         match_id=result.match_id,
@@ -210,9 +210,10 @@ def write_match(
     key = answer_key if answer_key is not None else []
     (truth_dir / "answer_key.json").write_text(json.dumps(key, indent=1), encoding="utf-8", newline="\n")
 
+    # The director's report records a run, with wall-clock times, so it isn't one of the reproducible files.
     manifest = {}
     for path in sorted(list(data_dir.iterdir()) + list(truth_dir.iterdir())):
-        if path.is_file() and path.name != "manifest.json":
+        if path.is_file() and path.name not in ("manifest.json", "director_report.json"):
             manifest[f"{path.parent.name}/{path.name}"] = file_md5(path)
     (data_dir / "manifest.json").write_text(json.dumps(manifest, indent=1), encoding="utf-8", newline="\n")
     return manifest

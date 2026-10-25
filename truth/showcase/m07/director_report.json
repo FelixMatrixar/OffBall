@@ -1,27 +1,25 @@
 {
   "match_id": "m07",
-  "seconds": 718.3,
-  "segment_retries": 1,
+  "seconds": 197.7,
+  "segment_retries": 6,
   "score": {
-    "kes": 2,
-    "ash": 0
+    "kes": 1,
+    "ash": 1
   },
   "moments": [
     {
       "key": "k01",
       "type": "null_run",
       "ok": true,
-      "attempts": 15,
+      "attempts": 9,
       "reasons": [
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
         "the defender followed the runner",
         "the defender followed the runner",
         "the defender followed the runner",
         "the defender followed the runner",
         "the defender followed the runner",
-        "preconditions never arose",
+        "the defender followed the runner",
+        "the defender followed the runner",
         "the defender followed the runner"
       ]
     },
@@ -29,35 +27,24 @@
       "key": "k02",
       "type": "decoy_run",
       "ok": true,
-      "attempts": 39,
-      "reasons": [
-        "preconditions never arose",
-        "preconditions never arose",
-        "lost the ball before the pass",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "the gap never opened in time",
-        "the gap never opened in time"
-      ]
+      "attempts": 1,
+      "reasons": []
     },
     {
       "key": "k03",
       "type": "decoy_run",
       "ok": true,
-      "attempts": 121,
+      "attempts": 35,
       "reasons": [
         "preconditions never arose",
         "preconditions never arose",
-        "no goal",
-        "no goal",
-        "preconditions never arose",
+        "the gap would have opened without the run",
+        "lost the ball before the pass",
         "the gap never opened in time",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
+        "the pass into the gap didn't arrive",
+        "the gap never opened in time",
+        "the gap never opened in time",
+        "the pass into the gap didn't arrive",
         "preconditions never arose"
       ]
     },
@@ -65,19 +52,18 @@
       "key": "k04",
       "type": "null_run",
       "ok": true,
-      "attempts": 20,
+      "attempts": 9,
       "reasons": [
-        "preconditions never arose",
         "the defender followed the runner",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
         "the defender followed the runner",
-        "preconditions never arose",
-        "preconditions never arose",
+        "the defender followed the runner",
+        "the defender followed the runner",
+        "the defender followed the runner",
+        "the defender followed the runner",
+        "the defender followed the runner",
         "the defender followed the runner"
       ]
     }
-  ]
+  ],
+  "oracle_labels": 0
 }

@@ -7,7 +7,7 @@
    "club_id": "kes",
    "name": "Kestrel Bay",
    "short_name": "KES",
-   "formation": "4-3-3",
+   "formation": "4-1-2-3",
    "kits": {
     "home": {
      "primary": "#2e64a6",
@@ -36,8 +36,8 @@
     {
      "player_id": "kes-01",
      "number": 1,
-     "name": "Rowan Wexeridge",
-     "display": "R. Wexeridge",
+     "name": "Edric Thorncastle",
+     "display": "E. Thorncastle",
      "role": "GK",
      "foot": "right",
      "age": 18,
@@ -46,8 +46,8 @@
     {
      "player_id": "kes-02",
      "number": 2,
-     "name": "Corin Brackiby",
-     "display": "C. Brackiby",
+     "name": "Dorian Ferrow",
+     "display": "D. Ferrow",
      "role": "RB",
      "foot": "right",
      "age": 29,
@@ -56,8 +56,8 @@
     {
      "player_id": "kes-04",
      "number": 4,
-     "name": "Mylo Arkiwick",
-     "display": "M. Arkiwick",
+     "name": "Soren Brannagh",
+     "display": "S. Brannagh",
      "role": "CB",
      "foot": "right",
      "age": 20,
@@ -66,8 +66,8 @@
     {
      "player_id": "kes-05",
      "number": 5,
-     "name": "Mylo Arkoham",
-     "display": "M. Arkoham",
+     "name": "Lowen Marrow",
+     "display": "L. Marrow",
      "role": "CB",
      "foot": "right",
      "age": 31,
@@ -76,8 +76,8 @@
     {
      "player_id": "kes-03",
      "number": 3,
-     "name": "Ellis Radiby",
-     "display": "E. Radiby",
+     "name": "Kasimir Ambrose",
+     "display": "K. Ambrose",
      "role": "LB",
      "foot": "left",
      "age": 19,
@@ -86,8 +86,8 @@
     {
      "player_id": "kes-06",
      "number": 6,
-     "name": "Piet Brackocott",
-     "display": "P. Brackocott",
+     "name": "Orrin Castellane",
+     "display": "O. Castellane",
      "role": "DM",
      "foot": "right",
      "age": 33,
@@ -96,8 +96,8 @@
     {
      "player_id": "kes-08",
      "number": 8,
-     "name": "Rowan Delacott",
-     "display": "R. Delacott",
+     "name": "Rowan Delacorte",
+     "display": "R. Delacorte",
      "role": "CM",
      "foot": "right",
      "age": 18,
@@ -108,7 +108,7 @@
      "number": 10,
      "name": "Tobin Arkwell",
      "display": "T. Arkwell",
-     "role": "CM",
+     "role": "AM",
      "foot": "right",
      "age": 26,
      "height_cm": 183
@@ -136,8 +136,8 @@
     {
      "player_id": "kes-11",
      "number": 11,
-     "name": "Milos Dvoror",
-     "display": "M. Dvoror",
+     "name": "Nevin Penhallow",
+     "display": "N. Penhallow",
      "role": "LW",
      "foot": "left",
      "age": 23,
@@ -289,7 +289,7 @@
    "club_id": "ash",
    "name": "Ashmoor",
    "short_name": "ASH",
-   "formation": "4-2-3-1",
+   "formation": "4-4-1-1",
    "kits": {
     "home": {
      "primary": "#9a490b",
@@ -318,8 +318,8 @@
     {
      "player_id": "ash-01",
      "number": 1,
-     "name": "Tiago Esqumeiro",
-     "display": "T. Esqumeiro",
+     "name": "Bram Aldwyn",
+     "display": "B. Aldwyn",
      "role": "GK",
      "foot": "left",
      "age": 23,
@@ -328,8 +328,8 @@
     {
      "player_id": "ash-02",
      "number": 2,
-     "name": "Unai Zarezo",
-     "display": "U. Zarezo",
+     "name": "Caspar Fennimore",
+     "display": "C. Fennimore",
      "role": "RB",
      "foot": "right",
      "age": 22,
@@ -348,8 +348,8 @@
     {
      "player_id": "ash-04",
      "number": 4,
-     "name": "Eskil Storodal",
-     "display": "E. Storodal",
+     "name": "Garrick Tallow",
+     "display": "G. Tallow",
      "role": "CB",
      "foot": "right",
      "age": 32,
@@ -358,8 +358,8 @@
     {
      "player_id": "ash-03",
      "number": 3,
-     "name": "Bento Ruvales",
-     "display": "B. Ruvales",
+     "name": "Hollis Strand",
+     "display": "H. Strand",
      "role": "LB",
      "foot": "left",
      "age": 25,
@@ -368,8 +368,8 @@
     {
      "player_id": "ash-06",
      "number": 6,
-     "name": "Tiago Orrurillo",
-     "display": "T. Orrurillo",
+     "name": "Valen Pryor",
+     "display": "V. Pryor",
      "role": "DM",
      "foot": "right",
      "age": 33,
@@ -378,9 +378,9 @@
     {
      "player_id": "ash-08",
      "number": 8,
-     "name": "Joaquim Davera",
-     "display": "J. Davera",
-     "role": "DM",
+     "name": "Ivor Rowntree",
+     "display": "I. Rowntree",
+     "role": "CM",
      "foot": "right",
      "age": 24,
      "height_cm": 180
@@ -388,9 +388,9 @@
     {
      "player_id": "ash-11",
      "number": 11,
-     "name": "Eloy Orroiro",
-     "display": "E. Orroiro",
-     "role": "RW",
+     "name": "Florin Danvers",
+     "display": "F. Danvers",
+     "role": "RM",
      "foot": "right",
      "age": 20,
      "height_cm": 178
@@ -408,9 +408,9 @@
     {
      "player_id": "ash-07",
      "number": 7,
-     "name": "Iker Davimozo",
-     "display": "I. Davimozo",
-     "role": "LW",
+     "name": "Alden Kettering",
+     "display": "A. Kettering",
+     "role": "LM",
      "foot": "left",
      "age": 28,
      "height_cm": 181
@@ -418,8 +418,8 @@
     {
      "player_id": "ash-09",
      "number": 9,
-     "name": "Iker Mendideda",
-     "display": "I. Mendideda",
+     "name": "Emrys Wyndham",
+     "display": "E. Wyndham",
      "role": "ST",
      "foot": "right",
      "age": 19,

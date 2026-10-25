@@ -3,12 +3,12 @@
   "gate": 1,
   "name": "Realism",
   "status": "fail",
-  "summary": "Outside: passes 1.01e+03 (real 5th\u201395th: 765.839\u20131174.83); median_pass_m 15.5 (real 5th\u201395th: 15.9817\u201319.7506); long_pass_share 0.189 (real 5th\u201395th: 0.1429\u20130.2675); shots 25.2 (real 5th\u201395th: 14.8808\u201331.2604); goals 2.41 (real 5th\u201395th: 0\u20135.0424); shots_in_box_share 0.487 (real 5th\u201395th: 0.387\u20130.75); possessions 243 (real 5th\u201395th: 211.502\u2013309.004); fouls 16.2 (real 5th\u201395th: 13.5196\u201329.007); offsides 4.24 (real 5th\u201395th: 0.9747\u20137.9918); corners 4.96 (real 5th\u201395th: 4.9905\u201315.8026); throw_ins 52.6 (real 5th\u201395th: 29.0156\u201362.9388); running_share 0.109 (real 5th\u201395th: 0.1091\u20130.183); KS pass_length_m 0.103 (at most 0.1); KS shot_distance_m 0.104 (at most 0.1); KS player_peak_speed_kmh 0.279 (at most 0.1)",
+  "summary": "Outside: passes 986 (real 5th\u201395th: 765.839\u20131174.83); median_pass_m 15.2 (real 5th\u201395th: 15.9817\u201319.7506); long_pass_share 0.183 (real 5th\u201395th: 0.1429\u20130.2675); shots 25.5 (real 5th\u201395th: 14.8808\u201331.2604); goals 2.39 (real 5th\u201395th: 0\u20135.0424); shots_in_box_share 0.521 (real 5th\u201395th: 0.387\u20130.75); possessions 230 (real 5th\u201395th: 211.502\u2013309.004); fouls 17 (real 5th\u201395th: 13.5196\u201329.007); offsides 3.89 (real 5th\u201395th: 0.9747\u20137.9918); corners 4.61 (real 5th\u201395th: 4.9905\u201315.8026); throw_ins 56.2 (real 5th\u201395th: 29.0156\u201362.9388); running_share 0.108 (real 5th\u201395th: 0.1091\u20130.183); KS pass_length_m 0.111 (at most 0.1); KS shot_distance_m 0.103 (at most 0.1); KS player_km_per95 0.142 (at most 0.1); KS player_peak_speed_kmh 0.299 (at most 0.1)",
   "numbers": {
    "per_metric": {
     "passes": {
-     "share_inside_p5_p95": 0.83,
-     "mean": 1013.793,
+     "share_inside_p5_p95": 0.78,
+     "mean": 985.581,
      "real_p5": 765.8392,
      "real_p95": 1174.8291,
      "compared": "each match against real matches"
@@ -22,91 +22,91 @@
     },
     "median_pass_m": {
      "share_inside_p5_p95": 0.33,
-     "mean": 15.529,
+     "mean": 15.249,
      "real_p5": 15.9817,
      "real_p95": 19.7506,
      "compared": "each match against real matches"
     },
     "long_pass_share": {
-     "share_inside_p5_p95": 0.89,
-     "mean": 0.189,
+     "share_inside_p5_p95": 0.83,
+     "mean": 0.183,
      "real_p5": 0.1429,
      "real_p95": 0.2675,
      "compared": "each match against real matches"
     },
     "shots": {
-     "share_inside_p5_p95": 0.61,
-     "mean": 25.177,
+     "share_inside_p5_p95": 0.72,
+     "mean": 25.545,
      "real_p5": 14.8808,
      "real_p95": 31.2604,
      "compared": "each match against real matches"
     },
     "goals": {
      "share_inside_p5_p95": 0.67,
-     "mean": 2.407,
+     "mean": 2.385,
      "real_p5": 0.0,
      "real_p95": 5.0424,
      "compared": "each match against real matches"
     },
     "shots_in_box_share": {
      "share_inside_p5_p95": 0.56,
-     "mean": 0.487,
+     "mean": 0.521,
      "real_p5": 0.387,
      "real_p95": 0.75,
      "compared": "each match against real matches"
     },
     "possessions": {
-     "share_inside_p5_p95": 0.89,
-     "mean": 242.584,
+     "share_inside_p5_p95": 0.72,
+     "mean": 229.755,
      "real_p5": 211.5022,
      "real_p95": 309.0039,
      "compared": "each match against real matches"
     },
     "fouls": {
      "share_inside_p5_p95": 0.56,
-     "mean": 16.155,
+     "mean": 17.019,
      "real_p5": 13.5196,
      "real_p95": 29.007,
      "compared": "each match against real matches"
     },
     "offsides": {
-     "share_inside_p5_p95": 0.56,
-     "mean": 4.243,
+     "share_inside_p5_p95": 0.5,
+     "mean": 3.889,
      "real_p5": 0.9747,
      "real_p95": 7.9918,
      "compared": "each match against real matches"
     },
     "corners": {
-     "share_inside_p5_p95": 0.61,
-     "mean": 4.957,
+     "share_inside_p5_p95": 0.56,
+     "mean": 4.607,
      "real_p5": 4.9905,
      "real_p95": 15.8026,
      "compared": "each match against real matches"
     },
     "throw_ins": {
-     "share_inside_p5_p95": 0.78,
-     "mean": 52.607,
+     "share_inside_p5_p95": 0.67,
+     "mean": 56.178,
      "real_p5": 29.0156,
      "real_p95": 62.9388,
      "compared": "each match against real matches"
     },
     "km_per_outfield": {
      "mean_inside_p5_p95": true,
-     "mean": 10.904,
+     "mean": 10.763,
      "real_p5": 9.58,
      "real_p95": 12.2488,
      "compared": "set average against season averages"
     },
     "hsr_share": {
      "mean_inside_p5_p95": true,
-     "mean": 0.044,
+     "mean": 0.043,
      "real_p5": 0.0428,
      "real_p95": 0.0973,
      "compared": "set average against season averages"
     },
     "running_share": {
      "mean_inside_p5_p95": false,
-     "mean": 0.109,
+     "mean": 0.108,
      "real_p5": 0.1091,
      "real_p95": 0.183,
      "compared": "set average against season averages"
@@ -120,17 +120,17 @@
     },
     "in_play_share": {
      "mean_inside_p5_p95": true,
-     "mean": 0.558,
+     "mean": 0.543,
      "real_p5": 0.5091,
      "real_p95": 0.5992,
      "compared": "set average against season averages"
     }
    },
    "ks": {
-    "pass_length_m": 0.103,
-    "shot_distance_m": 0.104,
-    "player_km_per95": 0.062,
-    "player_peak_speed_kmh": 0.279
+    "pass_length_m": 0.111,
+    "shot_distance_m": 0.103,
+    "player_km_per95": 0.142,
+    "player_peak_speed_kmh": 0.299
    }
   }
  },
@@ -138,15 +138,15 @@
   "gate": 2,
   "name": "Physics",
   "status": "fail",
-  "summary": "Over the limits: separation (2949 times)",
+  "summary": "Over the limits: separation (3126 times)",
   "numbers": {
    "worst": {
     "speed": 9.44,
     "accel": 6.91,
     "decel": 16.14,
     "turn": 12.2,
-    "pass_ball": 30.9,
-    "shot_ball": 36.0
+    "pass_ball": 23.37,
+    "shot_ball": 35.18
    },
    "limits": {
     "speed": 10.5,
@@ -160,14 +160,14 @@
    "violations": {
     "speed": 0,
     "accel": 0,
-    "decel": 15,
+    "decel": 18,
     "turn": 0,
     "off_pitch": 0,
-    "separation": 2949,
+    "separation": 3126,
     "pass_ball": 0,
     "shot_ball": 0
    },
-   "frames": 478314
+   "frames": 481210
   }
  },
  {
@@ -298,7 +298,7 @@
     "real_median": 1.13
    },
    "overlaprun": {
-    "mean": 0.83,
+    "mean": 0.66,
     "real_mean": 0.7908,
     "real_median": 0.3
    }
@@ -308,42 +308,42 @@
   "gate": 5,
   "name": "Discriminator",
   "status": "fail",
-  "summary": "A classifier tells our windows from real ones with ROC AUC 0.989 (at most 0.65) on held-out matches; its strongest tells: speed_p90 (real 4.16, ours 3.823), accel_p90 (real 2.191, ours 2.478), nn_opp_mean (real 6.343, ours 7.904).",
+  "summary": "A classifier tells our windows from real ones with ROC AUC 0.99 (at most 0.65) on held-out matches; its strongest tells: nn_opp_mean (real 6.343, ours 7.957), accel_p90 (real 2.191, ours 2.491), speed_p90 (real 4.16, ours 3.808).",
   "numbers": {
-   "auc": 0.989,
+   "auc": 0.99,
    "real_windows": 1500,
-   "generated_windows": 1020,
+   "generated_windows": 987,
    "real_matches": 10,
    "generated_matches": 18,
    "telltales": {
-    "speed_p90": {
-     "real": 4.16,
-     "generated": 3.823,
-     "importance": 0.013
+    "nn_opp_mean": {
+     "real": 6.343,
+     "generated": 7.957,
+     "importance": 0.021
     },
     "accel_p90": {
      "real": 2.191,
-     "generated": 2.478,
-     "importance": 0.011
+     "generated": 2.491,
+     "importance": 0.019
     },
-    "nn_opp_mean": {
-     "real": 6.343,
-     "generated": 7.904,
-     "importance": 0.008
+    "speed_p90": {
+     "real": 4.16,
+     "generated": 3.808,
+     "importance": 0.01
     },
     "ball_speed_mean": {
      "real": 6.381,
-     "generated": 7.188,
-     "importance": 0.002
+     "generated": 7.09,
+     "importance": 0.003
     },
     "players_seen": {
      "real": 15.355,
-     "generated": 12.715,
-     "importance": 0.002
+     "generated": 12.77,
+     "importance": 0.001
     },
     "ball_speed_p90": {
      "real": 13.284,
-     "generated": 11.982,
+     "generated": 11.815,
      "importance": 0.001
     }
    }
@@ -368,7 +368,7 @@
   "numbers": {
    "blocklist_size": 728,
    "real_names_found": 0,
-   "possessions_checked": 333,
+   "possessions_checked": 332,
    "real_possessions": 20000,
    "closest_mean_m": 3.04,
    "copies": 0

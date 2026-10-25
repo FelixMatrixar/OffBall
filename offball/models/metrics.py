@@ -388,3 +388,39 @@ def _filter_events(md: MatchData, type_: str, club_id: str | None, player_id: st
 def catalogue() -> list[dict[str, Any]]:
     """The metric catalogue, as the compute_metric tool describes it to agents."""
     return [{"name": s.name, "unit": s.unit, "description": s.description, "params": s.params} for s in REGISTRY.values()]
+
+
+def moment_beats(md: MatchData, period: int, club: str, start_ms: int, dragged: str, receiver: str,
+                 zone: list[tuple[float, float]]) -> dict[str, int | None]:
+    """When each beat of a decoy-run goal happens, in ms of the period clock, read from the data alone: the run
+    starts; the dragged defender is 2 m off his spot; the attackers' control of the gap he leaves is up 30 points,
+    open enough to play into; the pass to the receiver; his shot; and the ball crossing the goal line. None for a
+    beat that never came."""
+    pf = md.periods[period]
+    i0 = pf.index_of(start_ms)
+    beats: dict[str, int | None] = {"run": start_ms, "follow": None, "gap": None, "pass": None, "shot": None,
+                                    "goal": None}
+    dcol = md.players.index(dragged)
+    spot = pf.xy[i0, dcol].astype(float)
+    cells = _zone_cells(zone)
+    base = zone_control_at(md, club, period, i0, cells).mean()
+    for i in range(i0, min(i0 + 10 * 25, pf.n)):
+        if beats["follow"] is None and float(np.linalg.norm(pf.xy[i, dcol] - spot)) >= 2.0:
+            beats["follow"] = int(pf.t_ms[i])
+        if beats["gap"] is None and zone_control_at(md, club, period, i, cells).mean() - base >= 0.30:
+            beats["gap"] = int(pf.t_ms[i])
+        if beats["follow"] is not None and beats["gap"] is not None:
+            break
+    later = md.events_between(period, start_ms, start_ms + 15_000)
+    passes = [e for e in later if e.type == "pass" and e.team_id == club and e.recipient_id == receiver]
+    if passes:
+        beats["pass"] = passes[0].t_ms
+        shots = [e for e in later if e.type == "shot" and e.player_id == receiver and e.t_ms >= passes[0].t_ms]
+        if shots:
+            beats["shot"] = shots[0].t_ms
+            goal_x = 105.0 if md.direction(period, club) > 0 else 0.0
+            for i in range(pf.index_of(shots[0].t_ms), min(pf.index_of(shots[0].t_ms) + 5 * 25, pf.n)):
+                if (pf.ball[i, 0] - goal_x) * (1 if goal_x > 0 else -1) >= 0:
+                    beats["goal"] = int(pf.t_ms[i])
+                    break
+    return beats

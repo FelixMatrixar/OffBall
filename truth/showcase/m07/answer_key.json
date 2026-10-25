@@ -6,8 +6,8 @@
   "source": "planted",
   "type": "null_run",
   "period": 1,
-  "t_start_ms": 689840,
-  "t_end_ms": 693360,
+  "t_start_ms": 736600,
+  "t_end_ms": 740120,
   "team_id": "kes",
   "creator_id": "kes-09",
   "dragged_ids": [
@@ -16,20 +16,20 @@
   "receiver_id": "kes-10",
   "gap_zone": [
    [
-    85.9,
-    21.8
+    22.0,
+    39.7
    ],
    [
-    94.9,
-    21.8
+    31.0,
+    39.7
    ],
    [
-    94.9,
-    33.8
+    31.0,
+    51.7
    ],
    [
-    85.9,
-    33.8
+    22.0,
+    51.7
    ]
   ],
   "expected": {
@@ -37,8 +37,8 @@
    "zone_control_gain_pts_max": 15.0
   },
   "observed": {
-   "defender_displacement_m": 2.66,
-   "zone_control_gain_pts": -34.8
+   "defender_displacement_m": 1.23,
+   "zone_control_gain_pts": -43.7
   },
   "counterfactual": {
    "space_created_m2": 0.0,
@@ -48,7 +48,7 @@
   },
   "is_null": true,
   "outcome": "none",
-  "attempts": 15
+  "attempts": 9
  },
  {
   "schema_version": "2.0",
@@ -57,8 +57,8 @@
   "source": "planted",
   "type": "decoy_run",
   "period": 1,
-  "t_start_ms": 1766760,
-  "t_end_ms": 1772920,
+  "t_start_ms": 1504760,
+  "t_end_ms": 1510320,
   "team_id": "kes",
   "creator_id": "kes-09",
   "dragged_ids": [
@@ -67,20 +67,20 @@
   "receiver_id": "kes-10",
   "gap_zone": [
    [
-    70.4,
-    35.2
+    23.6,
+    26.0
    ],
    [
-    79.4,
-    35.2
+    32.6,
+    26.0
    ],
    [
-    79.4,
-    47.2
+    32.6,
+    38.0
    ],
    [
-    70.4,
-    47.2
+    23.6,
+    38.0
    ]
   ],
   "expected": {
@@ -90,20 +90,20 @@
    "defender_follow_cosine_min": 0.6
   },
   "observed": {
-   "defender_displacement_m": 16.98,
-   "zone_control_gain_pts": 46.9,
-   "pass_after_gap_s": 0.16,
-   "defender_follow_cosine": 0.94
+   "defender_displacement_m": 17.27,
+   "zone_control_gain_pts": 48.4,
+   "pass_after_gap_s": 0.32,
+   "defender_follow_cosine": 0.99
   },
   "counterfactual": {
-   "space_created_m2": 27.3,
-   "epv_gain": 0.0159,
+   "space_created_m2": 20.7,
+   "epv_gain": 0.013,
    "gap_opens_without_run": false,
    "runs": 32
   },
   "is_null": false,
   "outcome": "shot",
-  "attempts": 39
+  "attempts": 1
  },
  {
   "schema_version": "2.0",
@@ -112,8 +112,8 @@
   "source": "planted",
   "type": "decoy_run",
   "period": 2,
-  "t_start_ms": 1239320,
-  "t_end_ms": 1245080,
+  "t_start_ms": 1081000,
+  "t_end_ms": 1086958,
   "team_id": "kes",
   "creator_id": "kes-09",
   "dragged_ids": [
@@ -122,20 +122,20 @@
   "receiver_id": "kes-10",
   "gap_zone": [
    [
-    10.9,
-    31.9
+    82.0,
+    17.4
    ],
    [
-    19.9,
-    31.9
+    91.0,
+    17.4
    ],
    [
-    19.9,
-    43.9
+    91.0,
+    29.4
    ],
    [
-    10.9,
-    43.9
+    82.0,
+    29.4
    ]
   ],
   "expected": {
@@ -145,20 +145,20 @@
    "defender_follow_cosine_min": 0.6
   },
   "observed": {
-   "defender_displacement_m": 13.33,
-   "zone_control_gain_pts": 55.2,
-   "pass_after_gap_s": 0.32,
+   "defender_displacement_m": 9.65,
+   "zone_control_gain_pts": 41.7,
+   "pass_after_gap_s": 0.04,
    "defender_follow_cosine": 1.0
   },
   "counterfactual": {
-   "space_created_m2": 27.2,
-   "epv_gain": 0.0314,
+   "space_created_m2": 16.7,
+   "epv_gain": 0.0153,
    "gap_opens_without_run": false,
    "runs": 32
   },
   "is_null": false,
   "outcome": "goal",
-  "attempts": 121
+  "attempts": 35
  },
  {
   "schema_version": "2.0",
@@ -167,30 +167,30 @@
   "source": "planted",
   "type": "null_run",
   "period": 2,
-  "t_start_ms": 1918520,
-  "t_end_ms": 1922040,
+  "t_start_ms": 2049200,
+  "t_end_ms": 2052720,
   "team_id": "kes",
-  "creator_id": "kes-35",
+  "creator_id": "kes-09",
   "dragged_ids": [
-   "ash-05"
+   "ash-04"
   ],
   "receiver_id": "kes-10",
   "gap_zone": [
    [
-    20.1,
-    38.3
+    85.5,
+    33.2
    ],
    [
-    29.1,
-    38.3
+    94.5,
+    33.2
    ],
    [
-    29.1,
-    50.3
+    94.5,
+    45.2
    ],
    [
-    20.1,
-    50.3
+    85.5,
+    45.2
    ]
   ],
   "expected": {
@@ -198,8 +198,8 @@
    "zone_control_gain_pts_max": 15.0
   },
   "observed": {
-   "defender_displacement_m": 2.62,
-   "zone_control_gain_pts": -47.7
+   "defender_displacement_m": 4.29,
+   "zone_control_gain_pts": -36.7
   },
   "counterfactual": {
    "space_created_m2": 0.0,
@@ -209,6 +209,6 @@
   },
   "is_null": true,
   "outcome": "none",
-  "attempts": 20
+  "attempts": 9
  }
 ]

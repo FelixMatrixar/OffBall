@@ -25,6 +25,8 @@ class StoryMoment(Contract):
     receiver_id: str | None = None
     outcome: Outcome = "chance"
     note: str = ""
+    latest_minute: float | None = Field(default=None, ge=0, le=95, description="The moment must start by this minute")
+    sure: bool = Field(default=False, description="Its final shot ends as `outcome` asks, rather than as drawn")
 
 
 class ScorePath(Contract):
@@ -44,6 +46,9 @@ class MatchScript(Contract):
     moments: list[StoryMoment] = Field(default_factory=list, max_length=8)
     score_path: list[ScorePath] = Field(default_factory=list)
     half_minutes: float = Field(default=45.0, gt=0, le=45.0)
+    home_attacks_right_first: bool = Field(default=True, description="The home side attacks towards x = 105 in "
+                                           "the first half")
+    subs_after_minute: float = Field(default=0.0, ge=0, le=95, description="No substitutions before this minute")
 
     def validate_against(self, league) -> list[str]:
         """Problems a script can have before it is played. An empty list means it can be dry-run."""

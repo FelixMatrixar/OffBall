@@ -84,7 +84,7 @@ OffBall is planned at its highest potential. Work is ordered by dependency, not 
 | Visualization | A tiered visualization system: WebGPU 3D, WebGL2, Canvas 2D and pre-rendered fallbacks, adaptive quality, declarative charts (section 16) |
 | Modes | 6: Casual, Learn, Analyst, Player focus, Audio-described and Broadcaster |
 | Languages | 10 launch languages, text and voice |
-| Fan features | Ask OffBall voice Q&A, Change one decision, a second-screen companion, the Space Centre whip-around, share cards and vertical clips |
+| Fan features | Ask OffBall voice Q&A, Change one decision, the tactics board, a second-screen companion, the Space Centre whip-around, share cards and vertical clips |
 | Broadcaster | Live partner protocol with retractions; OBS and CasparCG reference templates; a producer console with human approval |
 | Auto-eventing | From tracking, and from synthetic broadcast video through a vision pipeline |
 | Microsoft technology | Four hero technologies used in depth: Foundry, Agent Framework and MCP with Azure MCP Server (priority 1), and Fabric Real-Time Intelligence (priority 2); GitHub's developer tools are not used (section 17) |
@@ -253,7 +253,7 @@ Fans see the pass and the finish, not the gap that made both possible. Take a de
 - User accounts or stored viewer data.
 - Native app-store apps. The installable PWA covers phones, tablets and TVs with a browser.
 - Biomechanics or 3D pose estimation. 3D players are animated from speed and orientation, not from estimated poses.
-- A free-form tactics board where viewers place players or draw moves. Change one decision (10.10) covers what-ifs whose results can be checked; arbitrary set-ups could not be.
+- Coaching advice for real teams. The tactics board (10.11) explores what works in OffBall's synthetic world, where the engine is the referee.
 
 ---
 
@@ -320,7 +320,7 @@ Viewers set these at first run (15.8) and change them any time in the Personaliz
 | Player identification: real-time name tags, speed and distance indicators at thresholds | Full | Name tags on the 2D and 3D views. Badges appear above 25.2 km/h (sprint), at 19.8 km/h for high-speed running in the analyst view, and at each kilometre covered. |
 | Pass quality: distance, accuracy, difficulty | Full | Pass distance and completion per player and team. Difficulty on a 0–10 scale from a model trained on the generator's true completion probabilities, so its calibration is measured, not assumed. |
 | Speed metrics: ball speed and shot speed | Full | Computed from the ball's tracked 3D path; shown on passes and shots above set thresholds. |
-| Auto-eventing: generate metrics automatically rather than by hand-tagging | Full | Events derived automatically from raw tracking, and from synthetic broadcast video through detection, tracking and pitch registration. Both are scored against the generator's ground-truth events (10.9). |
+| Auto-eventing: generate metrics automatically rather than by hand-tagging | Full | Events derived automatically from raw tracking and scored against the generator's ground-truth events (13). Auto-eventing from synthetic broadcast video follows when the video renderer is built (10.9, deferred). |
 | Narrative generation: key narratives, player-performance context, milestones, recaps | Full | Live moment narratives; season context ("the third defender No. 9 has dragged today, and the 41st this season"); milestones; halftime and full-time recaps with replays, share cards and vertical clips. |
 | Explainability: control vs chaos, pressure changes, game rhythm | Full | Every moment explained by its cause and proved by counterfactual. A control index shows control versus chaos. Press-height and line-height shifts mark pressure changes. A momentum ribbon of space value shows game rhythm. |
 | Data innovation: create or extend synthetic, football-realistic datasets | Full | The calibrated two-engine generator, orientation-aware tracking, oracle labels, counterfactual truth, synthetic broadcast video with annotations, and OffBall-Bench (section 12) |
@@ -330,7 +330,7 @@ Viewers set these at first run (15.8) and change them any time in the Personaliz
 
 ## 10. Signature experiences
 
-Ten experiences that carry the product. Each lists its acceptance criteria.
+Eleven experiences that carry the product. Each lists its acceptance criteria.
 
 ### 10.1 The space layer
 
@@ -395,6 +395,8 @@ Halftime and full-time recaps of the top space moments, a Space Created leaderbo
 
 ### 10.9 Synthetic broadcast video and vision auto-eventing
 
+**Deferred beyond this submission (27).** The rest of this subsection is the design for when it is built.
+
 The 3D scene is rendered as broadcast-style video with a moving camera, together with exact per-frame annotations: bounding boxes, player IDs, pitch positions and camera parameters. A vision pipeline detects and tracks players, maps them to the pitch, and auto-events the match from video alone. Its output is scored against the generator's truth.
 
 - The video pipeline feeds the same interpret service as the tracking feed.
@@ -405,7 +407,7 @@ The 3D scene is rendered as broadcast-style video with a moving camera, together
 Viewers pick a player at a moment and change one thing they did: make a different run, hold the line instead of following, play a different pass. The Tactician re-runs the moment from that point 32 times with the change, and OffBall shows what would have happened next to what did, on the pitch and in numbers. It turns "what if they hadn't run?" (10.2) from one question OffBall asks into any question a viewer asks, within the options the moment really offered.
 
 - **Only options the moment offered.** The choices are the ones open to that player at that moment, worked out from the observed state: the run types the run classifier knows, a pass to each teammate with its difficulty, and the defending options (track the runner, pass the runner on, hold the line). They are ranked by modelled value. The generator's own decision log stays held out (12.9) and is used only to grade the results.
-- **One change per re-run.** Everything else plays out from the observed state as the engine would play it. Changing two decisions at once, or placing players freely, is out of scope (7.2).
+- **One change per re-run.** Everything else plays out from the observed state as the engine would play it. Changing two decisions at once, or placing players freely, belongs to the tactics board (10.11).
 - **The same visual grammar.** Ghost players with dashed trails follow the changed path, the control field switches to the changed world, a ring shows where space opens or stays shut, and a changed pass is drawn dashed (15.2). Side by side works as it does for 10.2.
 - **Results as distributions.** How often the gap opens, and how many shots and goals, out of 32 re-runs; space created with its 90% interval; the best chance's xG. Each sits beside what happened. Casual and Learn get one plain sentence and the counts; Analyst adds intervals and each option's modelled value.
 - **Labelled for what it is.** A simulation of a synthetic match from the observed state, not a prediction or coaching advice; AI-generated and fact-checked like any caption.
@@ -416,6 +418,25 @@ Acceptance criteria:
 - On OffBall-Bench, the Tactician's result for a changed decision is compared with the generator re-running the same change from its checkpoint (19.2).
 - Re-runs are rate-limited per viewer. When the Tactician is busy, the viewer gets a place in line, and options already re-run stay one click away (15.11).
 - Fully usable by keyboard and screen reader: players and options are listed as well as shown on the pitch, and the result is announced.
+
+### 10.11 Tactics board
+
+Viewers set up a situation themselves and ask OffBall how to score from it. They place players from the two clubs on the pitch, or start from any frame of a match, and can give some of them an action: a run, a pass, a press, holding the line. The Tactician proposes the plans worth trying, the engine plays each one forward many times, and OffBall shows the plans that most often lead to a goal, explained and fact-checked like any caption.
+
+- **From a frame or a blank pitch.** "From here" copies every position at the current frame of a replay; "Blank" places both starting XIs in their clubs' shapes. Players are dragged into place, and a line drawn from a player gives him an action.
+- **The engine is the referee.** In OffBall's world the engine is the ground truth, so playing a set-up forward is the true answer for that set-up, not an estimate of one. Each plan is played 64 times and gives how often it leads to a shot and to a goal, the xG of its best chance and the space it creates, with 90% intervals. This is what lets the board answer the question 10.10 has to estimate.
+- **The AI suggests and explains; it never computes.** The Tactician proposes candidate plans from the options the set-up offers, using the same option lists as 10.10: up to three attackers' runs from the types the run classifier knows, and passes with their difficulty. It tests them through the engine and ranks them by goals per re-run. The Explainer writes why the best plans work (who gets dragged, which gap opens, who arrives in it) as claims with evidence, and the Fact-checker checks every claim against the re-runs. No number comes from a model (13).
+- **Hidden state stays hidden.** Re-runs give each player what the observed data supports: his role, his club's style and the physical numbers measured from his tracking. They never use the generator's held-out attributes or decision log (12.9).
+- **The same visual grammar.** Plans are drawn as dashed run and pass arrows, ranked in a side list. The chosen plan replays as ghost players, with the control field switching to its world and a ring where space opens (15.2, 16).
+- **Labelled for what it is.** What works in OffBall's synthetic world, for learning ideas such as decoy runs and third-man runs. It is not a prediction, and not coaching advice for real teams.
+
+Acceptance criteria:
+
+- A plan the viewer draws gets its result within 10 s (p95); the Tactician's three best plans for a set-up arrive within 30 s.
+- Every claim about a plan cites its re-runs and passes the Fact-checker; a plan whose explanation fails is shown with its numbers only.
+- Set-ups are checked before they run: at most 11 a side, everyone on the pitch, one ball, and offside judged at the start as in a match.
+- Re-runs are rate-limited per viewer, sharing 10.10's budget and its place in line (15.11).
+- Fully usable by keyboard and screen reader: players are placed from a list with their coordinates, plans are listed as well as drawn, and results are announced.
 
 ---
 
@@ -479,7 +500,7 @@ Hexagons are AI agents in Microsoft Foundry; everything else is deterministic co
 | Calibration fitter | Developer machine, CI, Fabric notebooks | Python; reads downloaded open data, writes `calibration/params.json` |
 | League builder, both engines, feed emitter | Azure Container Apps jobs and services | Python and NumPy, with Numba for hot loops where profiling shows it pays; seeded and deterministic |
 | Video and clip renderer | Azure Container Apps serverless GPU, headless Babylon.js | TypeScript; the same scene code as the 3D view |
-| Vision tracker | Azure Container Apps serverless GPU | Python; detector, tracker and pitch registration |
+| Vision tracker (deferred, 10.9) | Azure Container Apps serverless GPU | Python; detector, tracker and pitch registration |
 | Live service: ingest, interpret and relay | Azure Container Apps | Python; each replica owns some matches, by Event Hubs partition (11.4) |
 | Agents | Microsoft Foundry hosted agents running Microsoft Agent Framework workflows; Container Apps workers as the fallback | Tools through Foundry Toolboxes, one per role; native A2A endpoints for the Pundit and Producer; improved by the learning loop (14.9) |
 | OffBall MCP server | Azure Container Apps | Match-data tools for agents; a public read-only subset for developers |
@@ -601,6 +622,7 @@ One FastAPI service on Container Apps. The paths and shapes are the ones the fro
 | `GET /api/matches/{id}/suggestions` | `suggestions` in `pundit.ts` | Public | Three questions about what just happened |
 | `GET /api/matches/{id}/decisions` | `DECISIONS` in `decisions.ts` | Public | The decision points in a window, each with its options ranked by modelled value |
 | `POST /api/matches/{id}/decisions/{point_id}/runs`, `GET …/runs/{run_id}` | `scenarioFor` in `decisions.ts` | Public, rate-limited | `200` with the result when it was precomputed; `202` with a place in line; `429` when busy |
+| `POST /api/tactics/runs`, `GET /api/tactics/runs/{run_id}` | Nothing yet: the tactics board is a new screen (10.11) | Public, rate-limited | A set-up, and optionally the viewer's plan, in; `202` with a place in line; then the plans ranked by goals per re-run, with their distributions, ghost tracks and verified explanations |
 | `GET /api/matches/{id}/recaps/{kind}` | `useRecapPackage` in `recap.ts` | Public | The recap package and its moments |
 | `PUT /api/matches/{id}/recaps/{kind}` | `publishRecap` in `recap.ts` | Producer | Publishes it, and `recap.published` goes out on the stream |
 | `GET /api/matches/{id}/stats/{name}` | `content.ts`, `stats.ts` | Public | Panel numbers and chart data, in the frontend's shapes |
@@ -646,16 +668,17 @@ Cosmos DB uses session consistency and runs in its free tier: 1,000 RU/s of prov
 
 **Live runs draw on a pool.** Generating a directed match takes minutes: the showcase took 718 s with its retries and counterfactual runs. So a judge's live run doesn't generate a match on demand. The generator keeps a pool of matches and rounds made in advance, and a live run emits one at 1x through the real pipeline, with the agents working live. A new match is generated in the background to refill the pool.
 
-**The showcase must match the frontend.** The frontend is built around one moment (`INTEGRATION.md` section 2), and the generated showcase doesn't match it yet:
+**The showcase matches the frontend.** The frontend is built around one moment (`INTEGRATION.md` section 2), and the generated showcase (`m07`) agrees with it, with no change to the frontend:
 
-| Attribute | Frontend | Generated `m07` today |
-| --- | --- | --- |
-| Goal moment | Period 2 from 63:00 (`t_ms` 1,080,000), with its beats at fixed times after that | Period 2 from 65:39 (`t_ms` 1,239,320) |
-| Kestrel Bay's attacking direction in period 2 | Left to right | Right to left |
-| Names and roles | For example `kes-01` E. Thorncastle; `kes-10` an attacking midfielder | `kes-01` R. Wexeridge; `kes-10` a central midfielder; 5 of the 22 starters' names agree |
-| Space created by the run | 41 m², 90% interval 33–48 (stand-in numbers) | 27.2 m² in the counterfactual truth; 55 m² by the detector's own measure |
+| Attribute | Frontend and generated `m07` |
+| --- | --- |
+| Goal moment | Period 2 from 63:00 (`t_ms` 1,080,000): Velmar's run, Hendricx following, the gap, the pass, Arkwell's shot and the goal each on the frontend's beat, to within 0.3 s |
+| Kestrel Bay's attacking direction in period 2 | Left to right |
+| Names, numbers and roles | The frontend's 22 starters; the names pass the same blocklist check as every generated name (gate 7) |
+| Players on the pitch during the moment | Exactly those 22 |
+| Score | 0-0 until the goal |
 
-The plan is to direct the generator to the frontend's showcase rather than change the finished frontend. The showcase script (`showcase_script` in `offball/generator/director.py`) pins the moment to 63:00, with the beats in `STEP_TIMES` as soft constraints checked to within 0.3 s; sets the attacking directions; and uses the frontend's roster for the two clubs, after the same blocklist check as every generated name (gate 7). The frontend's stand-in numbers then give way to the computed ones arriving on the stream. A CI parity check fails the build if the generated showcase and the frontend's assumptions drift apart again (open question 16).
+The frontend's stand-in numbers, such as the space the run created, give way to the computed ones arriving on the stream. A parity check (`tests/test_showcase_parity.py`) reads the frontend's own `web/src/lib/match.ts` and fails the build if the two drift apart.
 
 ### 11.10 Backend requirements
 
@@ -749,14 +772,14 @@ We fit distributions from two permissively licensed open datasets and ship only 
 4. **Engine run.** The fast or emergent engine, as above. Every pass and shot carries its true success probability, which becomes ground truth for pass difficulty and xG.
 5. **Feed emitter.** Replays a match as a stream at 1x to 60x, with realistic feed faults: about 1% late events, duplicates, corrections and optional frame drops.
 6. **Truth writer.** Writes the answer key, intents and counterfactual truth to the held-out store.
-7. **Video renderer.** Renders broadcast-style video and annotations from the 3D scene for selected matches and clips.
+7. **Video renderer.** Renders broadcast-style video and annotations from the 3D scene for selected matches and clips. Deferred beyond this submission (10.9, 27).
 
 ### 12.6 Calibration by simulation
 
 Fitting distributions sets starting values. To make whole matches realistic, the engine's parameters (80 global ones, such as decision noise, run tendencies, press thresholds and movement pace) are tuned so its output matches the calibration data.
 
 - **The Tuner agent proposes; an optimizer searches.** The Tuner reads gate reports and fidelity charts, forms a hypothesis ("defenders track decoy runs too often in the final third"), and chooses which parameters to search and within what bounds. An optimizer (Bayesian optimisation with Optuna) does the numeric search. The model never does the arithmetic.
-- **Nothing changes unless every gate passes.** The Validator re-runs all nine gates on each candidate. Accepted changes are committed with a calibration report and the Tuner's hypothesis log.
+- **Nothing gets worse unseen.** The Validator re-runs all nine gates on each candidate. A candidate must keep the five release gates passing (12.10), and what it does to the other four is reported with it. Accepted changes are committed with a calibration report and the Tuner's hypothesis log.
 
 ### 12.7 Story moments
 
@@ -861,7 +884,7 @@ Each overlay carries its own start and end time and revision number, so a render
 
 ### 12.10 Quality gates
 
-Nine gates decide whether a generated match counts as good synthetic data. All run in CI on every generator change; the Validator turns failures into a plain-language report on the data-quality dashboard in Fabric. Thresholds are starting values.
+Nine gates decide whether a generated match counts as good synthetic data. Five are release gates and must pass on every shipped set: consistency, detectability, novelty, diversity and determinism. The other four, realism, physics, behaviour and the discriminator, are reported against their thresholds, which stay the target; their gaps are published in `DATASHEET.md` and 12.12. All run in CI on every generator change; the Validator turns failures into a plain-language report on the data-quality dashboard in Fabric. Thresholds are starting values.
 
 | Gate | What it checks | Pass threshold |
 | --- | --- | --- |
@@ -886,9 +909,9 @@ Every set can be regenerated from its seed. Only the small ones live in git.
 | Showcase match | 1 match, Kestrel Bay v Ashmoor | A directed script with a 63' decoy-run goal and 4 other moments; events, tracking, overlays in every mode and language, voice, counterfactuals, camera paths | Demo video and the judges' live demo | Committed; video in Blob Storage |
 | Showcase matchday | 10 matches of one round | Emergent-engine matches played at the same time | Space Centre | Azure Blob Storage, with a OneLake shortcut |
 | Smoke set | 18 short matches: 16 of 10 minutes, one of 30 and one of 24 | Every one of the 18 moment types planted at least once, one moment a match (the decoy run twice; space lost and fatigue gap share the 24-minute match) | CI tests, quality gates, visual regression | Committed |
-| OffBall-Bench | 100 full matches with tracking | 70 with 3–6 planted moments; 20 with only null moments planted; 10 unscripted with oracle labels only; split into 40 dev and 60 test matches | Scoring OffBall, and anyone else | Azure Blob Storage (public read), with a OneLake shortcut; dev keys public, test keys held privately and scored by the evaluation endpoint |
+| OffBall-Bench | 100 full matches with tracking | 70 with 3–6 planted moments; 20 with only null moments planted; 10 unscripted with oracle labels only; split into 40 dev and 60 test matches. Generated once, when the agents run on a real model, from the engine as it then stands | Scoring OffBall, and anyone else | Azure Blob Storage (public read), with a OneLake shortcut; dev keys public, test keys held privately and scored by the evaluation endpoint |
 | Season backdrop | 380 matches, events only | A full season from the fast engine; tracking for any match generated on demand | Season context, leaderboards, Fabric dashboards | Azure Blob Storage, with a OneLake shortcut |
-| Video set | 500 clips of 30 s, plus 2 full matches | Broadcast-style 1080p video with annotations and camera parameters | Vision auto-eventing, computer-vision research | Azure Blob Storage, public read, mirrored to OneLake |
+| Video set | 500 clips of 30 s, plus 2 full matches | Broadcast-style 1080p video with annotations and camera parameters | Vision auto-eventing, computer-vision research | Deferred beyond this submission (10.9, 27) |
 | Calibration runs | 1,000 fast-engine matches and 200 emergent-engine matches | Unscripted play across all 20 clubs | Realism, behaviour, discriminator and diversity gates | Regenerated in CI; only reports are kept |
 
 At 25 Hz, a match is about 143,000 frames and 3.1 million player positions, an estimated 25–50 MB in Parquet, so the 100-match benchmark comes to roughly 2.5–5 GB. `DATASHEET.md` documents each set following *Datasheets for Datasets* (Gebru et al., 2021).
@@ -966,11 +989,11 @@ Every average sits inside the real 5th–95th range except running at 15–20 km
 
 | Gate | Smoke set (18 short matches) | Calibration set (10 full matches) |
 | --- | --- | --- |
-| 1. Realism | Fail; short matches are too short to judge per-match rates | Fail: median pass length (3 of 10 matches inside the real 5th–95th), throw-ins (6), corners (7), completion and possessions (8 each) against 9 needed; players' peak speeds (KS 0.36) and distances (KS 0.12). Pass lengths (KS 0.07) and shot distances (KS 0.10) match |
-| 2. Physics | Fail: 2,949 close pairs in 478,000 frames | Fail: 9,274 times two players were closer than 0.5 m, and 55 hard decelerations, in 1.44 million frames; twice the close pairs of the engine before stage 6 |
+| 1. Realism | Fail; short matches are too short to judge per-match rates | Fail: median pass length (3 of 10 matches inside the real 5th–95th), throw-ins (6), corners (7), completion and possessions (8 each) against 9 needed; players' peak speeds (KS 0.36) and distances (KS 0.12). Pass lengths (KS 0.08) and shot distances (KS 0.08) match |
+| 2. Physics | Fail: 3,126 close pairs in 478,000 frames | Fail: 9,315 times two players were closer than 0.5 m, and 54 hard decelerations, in 1.44 million frames; twice the close pairs of the engine before stage 6 |
 | 3. Consistency | Pass | Pass |
-| 4. Behaviour | Fail: 0.81 runs in behind per 30 minutes against at least 1.21 | Fail: 0.93 against at least 1.21 |
-| 5. Discriminator | Fail: ROC AUC 0.99 | Fail: ROC AUC 0.991, from 0.999 before stage 6. Its tells are now spacing (nearest opponent 8.4 m against 6.3), speed in view (90th percentile 3.7 m/s against 4.1) and acceleration (2.44 m/s² against 2.19) |
+| 4. Behaviour | Fail: 0.81 runs in behind per 30 minutes against at least 1.21 | Fail: 0.95 against at least 1.21 |
+| 5. Discriminator | Fail: ROC AUC 0.99 | Fail: ROC AUC 0.99, from 0.999 before stage 6. Its tells are now spacing (nearest opponent 8.4 m against 6.3), speed in view (90th percentile 3.7 m/s against 4.1) and acceleration (2.43 m/s² against 2.19) |
 | 6. Detectability | Pass: 17 of 17 planted moments found, no null moment credited | No planted moments |
 | 7. Novelty | Pass | Pass |
 | 8. Diversity | Pass | Pass |
@@ -1003,17 +1026,16 @@ The detectors' main limits:
 - **Oracle labels.** Both sets label the moments players make on their own: engine intents (decoy runs, overlaps, runs in behind) confirmed by the detectors' signal definitions, without counterfactual truth. They are sparse, none or one per unscripted calibration match.
 - Neither the benchmark nor the matchday has been generated yet.
 
-**Still open.**
+**What is left.** Only one piece is needed for the agents: generating OffBall-Bench and the matchday, once, when the agents run on a real model. The video renderer is deferred beyond this submission (10.9, 27).
+
+**Reported limits.** These stay targets, published here and in `DATASHEET.md`, but none blocks a release (12.10):
 
 - Players standing too close (gate 2), now twice as often since stage 6, probably because braking is scaled down with acceleration.
 - Runs in behind (gate 4).
-- Team spacing, which the shape settings haven't fixed, and peak speeds that now sit above the real distribution (gate 5 and gate 1).
+- Team spacing, which the shape settings haven't fixed, and peak speeds that now sit above the real distribution (gates 5 and 1).
 - Median pass length, possessions and running at 15–20 km/h, at the edge of the real range.
-- Higher success rates for the decoy run, cover shadow and set-piece screen.
-- Generating OffBall-Bench and the matchday.
-- Counterfactual truth for oracle labels.
-- The video renderer.
-- Regenerating the showcase (`m07`) on the calibrated engine, which waits for the showcase alignment (11.9).
+- Success rates for the decoy run, cover shadow and set-piece screen; benchmark scripts simply retry or move a moment.
+- Oracle labels without counterfactual truth.
 
 ---
 
@@ -1053,7 +1075,7 @@ Eleven agents in three crews, hosted in Microsoft Foundry Agent Service, coordin
 | Data | Tuner | Forms calibration hypotheses and steers the optimizer | Gate reports, fidelity charts | Hypotheses, search spaces | `compare_distributions`, `launch_calibration_job` | A hypothesis that doesn't improve the gates is logged as rejected; parameters only change when every gate passes |
 | Data | Validator | Runs the nine gates and explains failures | Generated files, gate results | Plain-language gate report on the data-quality dashboard | `run_gates`, `compare_distributions`; Azure MCP Server to inventory generated files and their content hashes in Storage | Report marked incomplete; CI still fails on the raw gate results |
 | Broadcast | Scout | Picks which candidate moments deserve airtime, given score, time, recent airtime, active modes and producer settings | Candidate moments, match state | Ranked moments | `list_candidates`, `query_match_state` | Asked once more; if it still fails, the moment doesn't air |
-| Broadcast | Tactician | Proves cause with counterfactual re-runs and ghosting, and re-runs a viewer's changed decision (10.10) | Moment, observed state, a changed decision | Counterfactual result and ghost tracks | `list_options`, `run_counterfactual`, `get_ghosts`, `compute_metric` | If a re-run times out, the explanation airs without a counterfactual, and the replay follows later or not at all |
+| Broadcast | Tactician | Proves cause with counterfactual re-runs and ghosting, re-runs a viewer's changed decision (10.10), and proposes and tests plans on the tactics board (10.11) | Moment, observed state, a changed decision, a viewer's set-up | Counterfactual result, ghost tracks, ranked plans | `list_options`, `run_counterfactual`, `get_ghosts`, `run_setup`, `compute_metric` | If a re-run times out, the explanation airs without a counterfactual, and the replay follows later or not at all |
 | Broadcast | Explainer | Writes why the moment matters as structured claims, each with evidence | Moment, evidence, counterfactual, season context | Draft of claims with evidence IDs | `get_evidence`, `compute_metric`, `search_moments` | Rewrites after a Fact-checker rejection; after 2 rejections, nothing airs |
 | Broadcast | Fact-checker | Verifies every claim independently: recomputes every number, checks every statement against the moment's signals, and re-verifies aired claims after corrections | Draft, evidence | A verdict per claim | `get_evidence`, `compute_metric`, `recheck_overlay` | If it times out, the moment is held back; nothing unverified airs |
 | Broadcast | Persona | Re-voices and filters the verified claims per mode, club, player, metric and language; writes speech markup and audio descriptions | Verified claims, viewer settings | Overlay entries and speech | `glossary_lookup`, `translate` | Asked once more; if it still fails, that mode shows nothing for the moment |
@@ -1177,6 +1199,7 @@ Two MCP servers. Our own serves match data and OffBall actions; Azure MCP Server
 | `run_kql` | Runs a parameterised KQL query on the Fabric Eventhouse | Yes, from an allow-list |
 | `list_options` | The options open to a player at a moment, from the observed state, ranked by modelled value (10.10) | Yes |
 | `run_counterfactual`, `get_ghosts` | Counterfactual re-runs, including a viewer's changed decision, and ghost tracks | Rate-limited |
+| `run_setup` | Checks a viewer's set-up and plays it forward with a plan of actions, returning the outcome distribution and ghost tracks (10.11) | Rate-limited |
 | `run_sandboxed_analysis` | Runs analysis code in a Container Apps session pool; off unless a pool is deployed (18.9) | No |
 | `schedule_overlay`, `retract_overlay`, `request_approval`, `render_clip` | Producer actions | No |
 | `run_simulator`, `run_gates`, `compare_distributions`, `launch_calibration_job` | Data crew actions | No |
@@ -1248,7 +1271,7 @@ Each agent reads and writes published contracts (`contracts/agents/` and the add
 | Agent | Runs when | Reads | Writes | Tier | Time, p95 | Tokens in / out | If it fails |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Scout | A candidate turns speculative or confirmed | `candidate`, match state | `moment` | Fast | 300 ms | 1,500 / 200 | Asked once more; then the moment doesn't air |
-| Tactician | A picked moment wants a counterfactual, or a viewer changes a decision | `moment`, the observed state, a changed decision | `counterfactual`, `decision-result` | Reasoning, for choosing options and wording the verdict; the numbers come from the workers | 15 s | 3,000 / 300 | Asked once more; then the moment airs without a what-if |
+| Tactician | A picked moment wants a counterfactual, a viewer changes a decision, or a viewer asks the tactics board for plans | `moment`, the observed state, a changed decision or a set-up | `counterfactual`, `decision-result` | Reasoning, for choosing options and wording the verdict; the numbers come from the workers | 15 s | 3,000 / 300 | Asked once more; then the moment airs without a what-if |
 | Explainer | The Scout picks a moment | A moment card (14.12), evidence, the counterfactual if it's ready, season context | `draft` | Reasoning | 1,000 ms after confirmation | 6,000 / 800 | Rewrites after a rejection, at most twice; then nothing airs |
 | Fact-checker | A draft arrives, or evidence behind an aired claim is corrected | `draft` | `verdict` | Reasoning; it recomputes numbers with `compute_metric` | 600 ms | 5,000 / 400 | Asked once more; then the moment is held back |
 | Persona | A draft passes | Verified claims, the modes and languages in demand | A `variant` per mode and language | Fast | 500 ms, in parallel | 2,000 / 600 per variant | Asked once more; then that mode shows nothing for the moment |
@@ -1903,7 +1926,7 @@ Every cloud environment is deployed from CI using workload identity federation, 
 
 - Every generated caption, answer and export is labelled as AI-generated, and the app states that all match data is synthetic.
 - Confidence and intervals are shown in the analyst view.
-- Change one decision results are labelled as simulations of a synthetic match from the observed state, never as predictions or coaching advice.
+- Change one decision results are labelled as simulations of a synthetic match from the observed state, never as predictions or coaching advice. Tactics-board plans are labelled as what works in OffBall's synthetic world, never as advice for real teams (10.11).
 - No betting, odds or fantasy features.
 - No voice imitates a real commentator or person.
 - Per-role fairness checks: off-ball credit is calibrated separately for defenders, midfielders and attackers, so no position is systematically under-credited.
@@ -2114,7 +2137,7 @@ Targets are starting values, confirmed after the first full benchmark run.
 | Models | Run classification | Macro-F1 0.80 or more | Oracle intents, test split |
 | Models | Pass difficulty and xG | Brier score at least 10% better than their baselines | True probabilities |
 | Models | Space value calibration | Expected calibration error 0.02 or less | Realized outcomes |
-| Data | Quality gates | All nine pass on every shipped set; discriminator AUC 0.65 or less | Gate report in CI |
+| Data | Quality gates | The five release gates pass on every shipped set; realism, physics, behaviour and the discriminator (AUC target 0.65 or less) are reported against their thresholds (12.10) | Gate report in CI |
 | Agents | Crew against single agent | The crew beats the single-agent baseline on recall, invented moments and unverified claims | OffBall-Bench, run as Foundry evaluations |
 | Agents | Pundit accuracy | 90% or more on a 300-question set built from ground truth | Question set |
 | Agents | Prompt-injection resistance | Attack success 2% or less | Foundry AI red teaming agent |
@@ -2247,10 +2270,10 @@ The roadmap is ordered by dependency, not by date. Every milestone ends with som
 | M2 Interpretation core | Space control, physical metrics, run detection, pass difficulty, xG, auto-eventing from tracking, candidate moments; the first 8 moment types and the null run; gates 1, 6 and 7; analyst charts in Vega-Lite; Fabric Eventstream and Eventhouse with the first KQL views | Candidate recall measured on the smoke set; analyst panel shows real metrics; KQL views update live | M1 |
 | M3 Broadcast crew | OffBall MCP server and the two hosted Azure MCP Server instances; Scout, Explainer, Fact-checker, Persona, Producer and Engineer, scaffolded with `azd ai agent init` and run as Foundry hosted agents on Agent Framework; Toolboxes per role; Foundry tracing, evaluations and the rubric evaluator in CI; Fabric Real-Time Dashboards, and Activator alerts through a User Data Function; the original four modes; three languages; corrections and retractions; producer console | Verified captions within 3 s; a traced rejection and retry; a correction retracts a graphic; the Engineer mitigates an injected latency fault | M2 |
 | M4 Emergent world | Emergent engine, oracle and counterfactual truth; Match director, Tuner and Validator; gates 4, 5 and 8; the full moment library; the season; OffBall-Bench and its evaluation endpoint | All nine gates pass; benchmark published with baselines | M2 |
-| M5 Advanced intelligence | Space value, off-ball scoring opportunity, off-ball credit, run classifier, ghosting; the Tactician and counterfactual replays; Change one decision | Counterfactual credit error within target; ghost replay on screen within 15 s; a viewer's changed decision re-runs within 15 s | M3, M4 |
+| M5 Advanced intelligence | Space value, off-ball scoring opportunity, off-ball credit, run classifier, ghosting; the Tactician and counterfactual replays; Change one decision; the tactics board | Counterfactual credit error within target; ghost replay on screen within 15 s; a viewer's changed decision re-runs within 15 s | M3, M4 |
 | M6 Full experience | 3D views with Babylon.js at tiers A and B, adaptive tier switching, tier D clips; Learn and Audio-described modes; ten languages and voice; second screen; Space Centre; Pundit with KQL over the Fabric Eventhouse, and the data agent on a paid capacity; recaps, share cards and vertical clips; first run, the Personalize drawer, every system state and the full motion system | Every mode and view works across the device matrix within its frame-time budget | M3, M5 |
 | M7 Production and partners | Public API and MCP; native A2A endpoints in Foundry; Content Safety; ASSERT adversarial tests; OBS and CasparCG templates; load, fault-injection and red-team runs; SLO dashboards; human studies | All section 18 targets met; partner template runs in OBS | M3 |
-| M8 Synthetic video and vision | Video renderer on serverless GPU; annotations; vision tracker; auto-eventing from video; video set published | Video auto-eventing scored against truth; video set public | M4, M6 |
+| M8 Synthetic video and vision (deferred, 27) | Video renderer on serverless GPU; annotations; vision tracker; auto-eventing from video; video set published | Video auto-eventing scored against truth; video set public | M4, M6 |
 | M9 Learning loop | Agent Optimizer on the dev split, run nightly by a Foundry Routine; procedural memory for the Engineer, Producer and Tuner; the release gate; the optional reinforcement-learning track for the Scout | A released agent version beats the first one on the held-out test split with no safety, latency or cost regression | M3, M4 |
 
 The submission package (README, description, testing notes, video) is refreshed at the end of each milestone, so it always matches what the app does.
@@ -2301,7 +2324,7 @@ As checked on 25 October 2026. The frontend is complete against its stand-ins, a
 | --- | --- | --- |
 | Frontend (`web/`) | Every screen, mode, view, rendering tier, state and language; the partner template; the motion system. Type-check, token lint and build pass, and all 146 unit and browser tests pass. It runs on stand-ins (11.3). | The small changes in `INTEGRATION.md` section 9 and 11.3, which wait for the backend |
 | Contracts | 21 schemas exported from Pydantic models, in sync with the code | The seven new contracts and version 2.1 (11.3) |
-| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and counterfactual truth, calibrated against real data in eight stages (12.12); the fast engine, which plays the 380-match season backdrop in about 70 seconds; the director; plans with expected signals for all 18 moment types; oracle labels; the OffBall-Bench and matchday scripts; the writer with content hashes; `DATASHEET.md`. The league, the showcase (`m07`) and the 18-match smoke set, which plants every type, are generated. | Generating OffBall-Bench and the matchday; counterfactual truth for oracle labels; higher success rates for the decoy run, cover shadow and set-piece screen; the video renderer; regenerating `m07` on the calibrated engine, which waits for the showcase alignment (11.9) |
+| Generator | The league builder; the emergent engine with checkpoints, retries, oracle intents, true probabilities and counterfactual truth, calibrated against real data in eight stages (12.12); the fast engine, which plays the 380-match season backdrop in about 70 seconds; the director; plans with expected signals for all 18 moment types; oracle labels; the OffBall-Bench and matchday scripts; the writer with content hashes; `DATASHEET.md`. The league, the showcase (`m07`) and the 18-match smoke set, which plants every type, are generated; the showcase matches the frontend's moment, roster and direction, checked by a parity test (11.9). | Generating OffBall-Bench and the matchday, once the agents run on a real model. Reported limits rather than work: the four gates in 12.12, counterfactual truth for oracle labels, and the hard moments' success rates. The video renderer is deferred (10.9) |
 | Calibration | `offball fit` fits targets from 380 Wyscout matches and SkillCorner's A-League aggregates and broadcast tracking, keeping only numbers; a salted-hash name blocklist; realism and tracking metrics; eight Optuna stages with logged hypotheses; `offball gates` runs all nine gates, gate 5 against SkillCorner's broadcast tracking through a camera mask. On 16 full matches every average but one sits inside the real 5th–95th range, and acceleration through the camera matches real tracking (12.12). On the calibration set gates 3, 7, 8 and 9 pass; on the smoke set gate 6 passes too. | Gates 1, 2, 4 and 5 still fail: players standing too close, runs in behind, team spacing (a classifier still tells our tracking from real at ROC AUC 0.99), peak speeds and median pass length |
 | Interpretation | Pitch control (fast and Spearman), 18 named metrics with evidence IDs, run detection, and detectors for all 18 moment types, batch and live. On the smoke set they find all 17 planted moments and credit neither null one; on `m07` they find both planted decoy runs and flag neither null run. | Space value, xG, pass difficulty, run classification, credit, ghosting, auto-eventing and vision; a learned scorer to rank candidates, since in open play the detectors also flag many genuine but minor moments; the cover-shadow detector reports one lane per pass |
 | Agents | The broadcast workflow in Agent Framework: Scout, Explainer, Fact-checker with up to two rewrites, a Persona script for each of the six modes, a Fact-checker read of every script, Producer and publish. Ask OffBall: the Pundit, then the Fact-checker. English instructions and structured output for each; model clients for a Foundry endpoint; the workflow tested with a stand-in model | Running on a real model, which waits for the Foundry endpoint; the Tactician, Engineer, recaps, the data crew, per-agent evaluations and the learning loop |
@@ -2323,7 +2346,7 @@ As checked on 25 October 2026. The frontend is complete against its stand-ins, a
 9. **The emergent world (M4, M5).** `fit.py`, the gate runner, the remaining moment types and detectors, the models in section 13, and OffBall-Bench.
 10. **Production and learning (M7, M9).** Production, load and fault-injection tests, partner and public endpoints, and the learning loop.
 
-Step 1's repository is created and pushed; making it public and its CI checks remain. Step 9 is mostly built: the fit, the gates, the calibrated engine, all 18 moment types and their detectors, the fast engine and the benchmark scripts (12.12); the models in section 13 and generating OffBall-Bench remain. Steps 3 and 4 are built and tested, apart from the Event Hubs and Web PubSub transports, and step 7's broadcast crew and MCP server are built and wait for a model endpoint. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
+Step 1's repository is created and pushed; making it public and its CI checks remain. Step 2 is done: the showcase matches the frontend (11.9). Step 9 is mostly built: the fit, the gates, the calibrated engine, all 18 moment types and their detectors, the fast engine and the benchmark scripts (12.12); the models in section 13 and generating OffBall-Bench remain. Steps 3 and 4 are built and tested, apart from the Event Hubs and Web PubSub transports, and step 7's broadcast crew and MCP server are built and wait for a model endpoint. Steps 7 and 8 need the Foundry previews confirmed first (open question 13).
 
 ---
 
@@ -2354,7 +2377,7 @@ Step 1's repository is created and pushed; making it public and its CI checks re
 | The Fabric trial has no data agent, our tenant may not allow trials, and Eventstream reads Event Hubs only with a key | Medium | The Pundit uses KQL through `run_kql` on the trial, with a paid F capacity only if the data agent is wanted; the team's business account starts the trial in the same tenant as Azure, and an admin turns trials on if they're off; one listen-only key for Eventstream, or a push to its custom endpoint with Entra ID (18.9, 18.12) |
 | The video fails to land in two minutes | Medium | Built around one goal; scripted capture with Playwright so revisions are cheap; storyboard reviewed at each milestone |
 | The project isn't under version control, and rule 4.4 needs a public GitHub repository created after 29 Sep 2026 | High | Create the repository before any other backend work, push everything and keep its history (23.4) |
-| The generated showcase and the frontend's showcase disagree on time, direction, names and numbers | High | Direct the generator to the frontend's moment, and fail CI if they drift apart (11.9) |
+| The generated showcase and the frontend's showcase disagree on time, direction, names and numbers | High | Done: the generated showcase follows the frontend's moment, and a parity check fails the build if they drift apart (11.9) |
 | Calibration targets are placeholder norms, and tuned matches still fall outside them | High | Write `fit.py` against the real sources and tune again; gate 1 blocks any set that fails (12.6, 12.10) |
 | Live JSON frames use about twice the data budget | Medium | Frames in batches now; a binary frame in contract 2.1 (11.6) |
 | Judges need the producer console unrestricted, but producer actions change what others see | Medium | Producer tokens scoped to the live run the judge started (11.7) |
@@ -2370,7 +2393,7 @@ Step 1's repository is created and pushed; making it public and its CI checks re
 - [ ] New public GitHub repository, created after 29 Sep 2026, with no code from earlier projects
 - [ ] `LICENSE`, `ATTRIBUTION.md`, `DATASHEET.md`, `TRANSPARENCY.md` and `SECURITY.md` present; calibration sources, 3D assets and fonts credited; no raw calibration data committed
 - [ ] No real player or club names, badges, kits, league marks or imitated voices in the repo, app or video
-- [ ] All nine quality gates pass on the showcase, smoke and benchmark sets
+- [ ] All nine quality gates run on the showcase, smoke and benchmark sets; the five release gates pass, and the other four are reported with their gaps in `DATASHEET.md` (12.10)
 - [ ] Visual regression and frame-time budgets pass on every tier
 - [ ] Demo video under 2 minutes, at a public YouTube or Vimeo URL, recorded from the deployed app, with no copyrighted music
 - [ ] Project description covers what we built, Microsoft and Azure technologies, what it does and the problem it solves
@@ -2402,10 +2425,11 @@ Step 1's repository is created and pushed; making it public and its CI checks re
 13. Which Foundry previews are available to our tenant and region today: hosted agents (and have they reached general availability), Agent Optimizer, procedural memory, Toolboxes, Routines, the rubric evaluator and incoming A2A?
 14. Is Foundry's managed post-training available to us, for which models, and at what cost for the Scout's reinforcement-learning track?
 15. Does Web PubSub offer per-message compression to browser clients, and when does the binary frame in contract 2.1 replace JSON frames to meet the 0.5 MB a minute budget (11.6)?
-16. Do we confirm directing the generator to the frontend's showcase (11.9), rather than changing the finished frontend to fit the generated match?
+16. Resolved: the generated showcase follows the frontend, and the frontend is unchanged (11.9).
 17. Does our business tenant let us start a Fabric trial (the setting that lets users try Fabric's paid features), and does the trial capacity (F4, or F64 if it can be raised) carry Eventstream, Eventhouse, Activator and its User Data Function for 10 live matches through judging? And do we keep the listen-only Event Hubs key, or have the live service push to an Eventstream custom endpoint with its managed identity (18.9, 18.12)?
 18. In a broadcaster's own deployment, do producers sign in with Microsoft Entra ID in our tenant, or with their own organisation's accounts (11.7)?
 19. Which models in our regions meet each agent's pass bar at the lowest cost, and with what quota (14.13)?
+20. How many re-runs per plan, and how many workers, keep the tactics board within its 10 s budget at the fair-use limits (10.11, 18.3)?
 
 ---
 
@@ -2418,6 +2442,7 @@ Directions that follow from this plan but sit outside it:
 - **More football.** Calibration for women's, youth and lower-league football as open data allows.
 - **A broadcast pilot.** Running the producer console and partner templates alongside a real production's graphics workflow.
 - **On-device intelligence.** Running the Persona and Pundit on device for offline viewing.
+- **Synthetic broadcast video and vision auto-eventing.** The video renderer, the annotated video set and the vision pipeline (10.9, M8), deferred so this submission's effort goes to the agents and the live experience.
 
 ---
 

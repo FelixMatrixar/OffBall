@@ -24,9 +24,9 @@ def test_moment_card(goal_card) -> None:
 
 
 def test_compute_metric_is_exact() -> None:
-    r = T.compute_metric("m07", "displacement_m", {"player_id": "ash-05", "period": 2, "t_start_ms": 1239560,
-                                                   "t_end_ms": 1243560})
-    assert r["unit"] == "m" and r["value"] == 15.1 and r["evidence_ids"]
+    r = T.compute_metric("m07", "displacement_m", {"player_id": "ash-05", "period": 2, "t_start_ms": 1081000,
+                                                   "t_end_ms": 1085000})
+    assert r["unit"] == "m" and r["value"] == 14.7 and r["evidence_ids"]
 
 
 def test_viewer_clock_blocks_the_future(goal_card) -> None:
@@ -34,13 +34,13 @@ def test_viewer_clock_blocks_the_future(goal_card) -> None:
     try:
         assert all(c["t_end_ms"] < goal_card["t_start_ms"] for c in T.list_candidates("m07", period=2))
         with pytest.raises(ValueError, match="hasn't happened yet"):
-            T.events_between("m07", 2, 1_240_000, 1_245_000)
+            T.events_between("m07", 2, 1_082_000, 1_087_000)
     finally:
         T.VIEWER_CLOCK.reset(token)
 
 
 def test_evidence_resolves() -> None:
-    ev = T.get_evidence("m07", ["m07-e1335", "m07-f2-31000", "nonsense"])
-    assert ev["m07-e1335"]["type"] == "shot"
-    assert 20 <= len(ev["m07-f2-31000"]["players"]) <= 22  # Kestrel Bay are down to ten by then
+    ev = T.get_evidence("m07", ["m07-e0948", "m07-f2-27100", "nonsense"])
+    assert ev["m07-e0948"]["type"] == "shot"
+    assert len(ev["m07-f2-27100"]["players"]) == 22
     assert "error" in ev["nonsense"]

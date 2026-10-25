@@ -18,7 +18,7 @@ import numpy as np
 
 from offball.core import player_id
 from offball.generator.colour import kits_distinguishable, oklch_to_hex
-from offball.generator.names import FAMILIES, NameGenerator
+from offball.generator.names import FAMILIES, NameGenerator, is_blocked
 
 CLUB_NAMES: tuple[tuple[str, str, str], ...] = (
     ("kes", "Kestrel Bay", "KES"),
@@ -121,7 +121,37 @@ FORMATIONS: dict[str, tuple[Slot, ...]] = {
         Slot("ST", 1.0, 0.4, 2, 9),
         Slot("ST", 0.95, 0.6, 2, 11),
     ),
+    # Kestrel Bay's 4-3-3 with an attacking 10, and Ashmoor's 4-2-3-1 with wide midfielders and a central
+    # midfielder beside the holder.
+    "4-1-2-3": (
+        Slot("GK", 0, 0.5, -1, 1),
+        Slot("RB", 0.06, 0.08, 0, 2),
+        Slot("CB", 0.0, 0.36, 0, 4),
+        Slot("CB", 0.0, 0.64, 0, 5),
+        Slot("LB", 0.06, 0.92, 0, 3),
+        Slot("DM", 0.3, 0.5, 1, 6),
+        Slot("CM", 0.5, 0.36, 1, 8),
+        Slot("AM", 0.64, 0.64, 1, 10),
+        Slot("RW", 0.95, 0.1, 2, 7),
+        Slot("ST", 1.0, 0.5, 2, 9),
+        Slot("LW", 0.95, 0.9, 2, 11),
+    ),
+    "4-4-1-1": (
+        Slot("GK", 0, 0.5, -1, 1),
+        Slot("RB", 0.06, 0.08, 0, 2),
+        Slot("CB", 0.0, 0.36, 0, 5),
+        Slot("CB", 0.0, 0.64, 0, 4),
+        Slot("LB", 0.06, 0.92, 0, 3),
+        Slot("DM", 0.3, 0.38, 1, 6),
+        Slot("CM", 0.32, 0.62, 1, 8),
+        Slot("RM", 0.55, 0.1, 1, 11),
+        Slot("AM", 0.72, 0.5, 2, 10),
+        Slot("LM", 0.55, 0.9, 1, 7),
+        Slot("ST", 1.0, 0.5, 2, 9),
+    ),
 }
+# The shapes other clubs draw from, in a fixed order so the league stays the same.
+RANDOM_FORMATIONS = ("4-3-3", "4-2-3-1", "4-4-2", "3-4-3", "3-5-2")
 
 # Role -> (top speed m/s, acceleration m/s^2) means.
 PHYSICAL = {
@@ -366,10 +396,41 @@ FIXED_PLAYERS: dict[tuple[str, int], dict] = {
     ("kes", 9): dict(first="Joren", last="Velmar", decoy_tendency=0.88, run_timing=0.8, top_speed=9.3),
     ("kes", 7): dict(first="Piet", last="Quillan"),
     ("kes", 10): dict(first="Tobin", last="Arkwell", run_timing=0.82, finishing=0.78),
-    ("kes", 8): dict(first="Rowan", last="Delacott", passing=0.84, vision=0.84),
+    ("kes", 8): dict(first="Rowan", last="Delacorte", passing=0.84, vision=0.84),
     ("ash", 5): dict(first="Lars", last="Hendricx", discipline=0.22),
     ("ash", 10): dict(first="Sander", last="Moravec"),
 }
+
+
+# Kestrel Bay's and Ashmoor's shapes and starting XIs. Both are pinned after the league is built, so every other
+# club's draws stay the same.
+SHOWCASE_FORMATIONS = {"kes": "4-1-2-3", "ash": "4-4-1-1"}
+SHOWCASE_NAMES: dict[str, dict[int, tuple[str, str]]] = {
+    "kes": {1: ("Edric", "Thorncastle"), 2: ("Dorian", "Ferrow"), 3: ("Kasimir", "Ambrose"), 4: ("Soren", "Brannagh"),
+            5: ("Lowen", "Marrow"), 6: ("Orrin", "Castellane"), 7: ("Piet", "Quillan"), 8: ("Rowan", "Delacorte"),
+            9: ("Joren", "Velmar"), 10: ("Tobin", "Arkwell"), 11: ("Nevin", "Penhallow")},
+    "ash": {1: ("Bram", "Aldwyn"), 2: ("Caspar", "Fennimore"), 3: ("Hollis", "Strand"), 4: ("Garrick", "Tallow"),
+            5: ("Lars", "Hendricx"), 6: ("Valen", "Pryor"), 7: ("Alden", "Kettering"), 8: ("Ivor", "Rowntree"),
+            9: ("Emrys", "Wyndham"), 10: ("Sander", "Moravec"), 11: ("Florin", "Danvers")},
+}
+
+
+def _pin_showcase(clubs: list[Club], names: NameGenerator) -> None:
+    for club in clubs:
+        shape = SHOWCASE_FORMATIONS.get(club.club_id)
+        if shape is not None:
+            club.style.formation = shape
+            roles = {s.number: s.role for s in FORMATIONS[shape]}
+            for p in club.players:
+                p.role = roles.get(p.number, p.role)
+        for p in club.players:
+            pinned = SHOWCASE_NAMES.get(club.club_id, {}).get(p.number)
+            if pinned is None:
+                continue
+            first, last = pinned
+            if is_blocked(f"{first} {last}", last, names.blocklist):
+                raise ValueError(f"{first} {last} is on the real-name blocklist (gate 7)")
+            p.first_name, p.surname = first, last
 
 
 def _clip(x: float, lo: float = 0.05, hi: float = 0.98) -> float:
@@ -524,7 +585,7 @@ def build_league(seed: int = 2026) -> League:
     rng = np.random.default_rng(seed)
     names = NameGenerator(np.random.default_rng(seed + 1))
     archetypes = list(ARCHETYPES)
-    formations = list(FORMATIONS)
+    formations = list(RANDOM_FORMATIONS)
     used_hues: list[float] = []
     clubs: list[Club] = []
     for idx, (cid, name, short) in enumerate(CLUB_NAMES):
@@ -559,6 +620,7 @@ def build_league(seed: int = 2026) -> League:
         club.players = _squad(club, rng, names, family_bias=idx % len(FAMILIES))
         clubs.append(club)
 
+    _pin_showcase(clubs, names)
     rounds = _round_robin([c.club_id for c in clubs], rng)
     # Put Kestrel Bay v Ashmoor (at Kestrel Bay) in the showcase round.
     showcase = next(r for r, rnd in enumerate(rounds) if ("kes", "ash") in rnd)

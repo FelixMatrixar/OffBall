@@ -92,6 +92,10 @@ class MomentPlan:
         self.timing = timing or {}
         self.state = "wait"
         self.t0 = sim.t
+        if spec.latest_minute is not None:
+            # Wait no later than the script allows.
+            played = (sim.period - 1) * sim.half_s + sim.t
+            self.max_wait_s = max(0.0, min(self.max_wait_s, spec.latest_minute * 60.0 - played))
         self.t_start = 0.0
         self.result = PlanResult()
         self.creator = self.dragged = self.receiver = self.passer = -1
@@ -412,7 +416,8 @@ class DecoyRun(MomentPlan):
                 self._measure(sim)
                 self.pass_event = sim.flight_plan.get("event")
                 if self.spec.outcome in ("goal", "shot"):
-                    sim.directives[r] = {"action": "shoot_on_receive"}
+                    sure = "goal" if self.spec.sure and self.spec.outcome == "goal" else None
+                    sim.directives[r] = {"action": "shoot_on_receive", "outcome": sure}
             elif sim.possession != t:
                 return self._end(sim, False, "lost the ball before the pass")
             elif elapsed > 8.0:

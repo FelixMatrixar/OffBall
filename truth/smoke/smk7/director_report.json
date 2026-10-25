@@ -1,6 +1,6 @@
 {
   "match_id": "smk7",
-  "seconds": 47.5,
+  "seconds": 119.0,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,13 +11,18 @@
       "key": "k01",
       "type": "underlap",
       "ok": true,
-      "attempts": 6,
+      "attempts": 13,
       "reasons": [
-        "the half-space never turned",
-        "the underlap pass didn't arrive (incomplete)",
+        "lost the ball before the underlap pass",
         "preconditions never arose",
+        "preconditions never arose",
+        "the underlap pass didn't arrive (incomplete)",
+        "the underlap pass didn't arrive (incomplete)",
+        "the underlap was never found (best lane 0.08)",
+        "the underlap pass didn't arrive (incomplete)",
         "the half-space never turned",
-        "the half-space never turned"
+        "the underlap was never found (best lane 0.35)",
+        "the underlap pass didn't arrive (incomplete)"
       ]
     }
   ],

@@ -67,7 +67,7 @@ def test_live_finds_the_decoy_run(feed) -> None:
     assert len(confirmed) == 1
     c = confirmed[0]
     assert (c.type, c.creator_id, c.dragged_ids, c.receiver_id) == ("decoy_run", "kes-09", ["ash-05"], "kes-10")
-    assert abs(c.t_start_ms - 1_239_560) <= 200
+    assert abs(c.t_start_ms - 1_081_360) <= 200
 
 
 def test_gaps_are_filled(m07) -> None:

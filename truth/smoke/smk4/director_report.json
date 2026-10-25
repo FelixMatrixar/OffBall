@@ -1,6 +1,6 @@
 {
   "match_id": "smk4",
-  "seconds": 126.1,
+  "seconds": 99.8,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,17 +11,13 @@
       "key": "k01",
       "type": "overlap",
       "ok": true,
-      "attempts": 29,
+      "attempts": 7,
       "reasons": [
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
-        "preconditions never arose",
         "the overlap pass didn't arrive (incomplete)",
+        "preconditions never arose",
         "preconditions never arose",
         "the overlap pass didn't arrive (out)",
-        "the overlap pass didn't arrive (incomplete)",
+        "preconditions never arose",
         "preconditions never arose"
       ]
     }

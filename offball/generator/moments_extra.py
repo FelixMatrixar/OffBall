@@ -716,7 +716,7 @@ class BlindSideRun(_PassMoment):
         s = self.result.signals
         s["start_outside_view_cone"] = 1.0 if self.cone_angle > VIEW_CONE else 0.0
         s["separation_growth_m"] = round(self.growth if self.growth is not None else 0.0, 2)
-        if (self.growth or 0.0) < 3.0:
+        if (self.growth or 0.0) < 3.3:  # clear of the 3 m signal, so the data shows it as well
             return False, "he didn't get away from the defender"
         if self.spec.outcome in ("chance", "shot", "goal"):
             ok, why = self._received()

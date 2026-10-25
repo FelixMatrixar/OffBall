@@ -372,8 +372,8 @@ def gate_discriminator(matches: list[Match], max_auc: float = 0.65) -> Gate:
         return Gate(5, "Discriminator", "not run",
                     "Needs SkillCorner's tracking files in calibration/raw/ (about 90 MB a match, in Git LFS).")
     dirs = [m.dir for m in matches if (m.dir / "tracking_10hz.parquet").exists()]
-    if not dirs:
-        return Gate(5, "Discriminator", "not run", "No 10 Hz tracking in the set.")
+    if len(dirs) < 2:
+        return Gate(5, "Discriminator", "not run", "Needs at least two matches with 10 Hz tracking, to hold one out.")
     result = discriminator.evaluate(dirs)
     tells = ", ".join(f"{k} (real {v['real']:g}, ours {v['generated']:g})"
                       for k, v in list(result["telltales"].items())[:3])

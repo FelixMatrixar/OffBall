@@ -78,7 +78,7 @@ def on_ball(sim: Simulator, i: int) -> None:
 
     if directive is not None:
         if directive.get("action") == "shoot":
-            sim.shoot(i)
+            sim.shoot(i, outcome=directive.get("outcome"))
             return
         if directive.get("action") == "pass":
             j = directive["to"]

@@ -1,6 +1,6 @@
 {
   "match_id": "smk6",
-  "seconds": 34.0,
+  "seconds": 47.6,
   "segment_retries": 0,
   "score": {
     "kes": 0,
@@ -11,9 +11,13 @@
       "key": "k01",
       "type": "timed_run_in_behind",
       "ok": true,
-      "attempts": 2,
+      "attempts": 6,
       "reasons": [
-        "the pass in behind didn't arrive (incomplete)"
+        "the pass in behind didn't arrive (out)",
+        "the pass in behind didn't arrive (incomplete)",
+        "the pass in behind didn't arrive (out)",
+        "the pass in behind didn't arrive (out)",
+        "the pass in behind didn't arrive (out)"
       ]
     }
   ],
