@@ -2,7 +2,8 @@
 
 Each flag has a normal value. A change is logged with who made it and why, shows in the producer console, and
 reverts by itself after 10 minutes unless the producer keeps it; the producer can also undo it at once. Locally the
-flags live in memory; in Azure the same interface sits on an App Configuration store that holds nothing else.
+flags live in memory; on the VM the same interface sits on a Valkey hash that holds nothing else, with each change
+announced on a channel (PRD 11.8).
 """
 
 from __future__ import annotations

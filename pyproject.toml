@@ -25,17 +25,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Everything needed to run against Azure: Foundry-hosted agents, Event Hubs, Cosmos DB, Web PubSub,
-# App Configuration, Blob Storage and Application Insights.
+# Microsoft Foundry, the only Azure service OffBall uses (PRD 18.9): agents in Foundry Agent Service, and
+# Microsoft Entra sign-in for the VM and CI (PRD 18.11).
 azure = [
   "agent-framework-foundry>=1.15",
   "azure-identity>=1.19",
-  "azure-eventhub>=5.12",
-  "azure-cosmos>=4.7",
-  "azure-messaging-webpubsubservice>=1.2",
-  "azure-appconfiguration>=1.7",
-  "azure-storage-blob>=12.23",
-  "azure-monitor-opentelemetry>=1.6",
+]
+# What the VM adds (PRD 18.9): traces over OTLP to the Aspire Dashboard.
+vm = [
+  "opentelemetry-exporter-otlp-proto-grpc>=1.39",
 ]
 
 [project.scripts]

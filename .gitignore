@@ -40,10 +40,10 @@ calibration/raw/
 datasets/calib/
 truth/calib/
 
-# The season backdrop lives in Blob Storage, regenerated from its seed (PRD 12.11)
+# The season backdrop is published as a GitHub release and kept on the VM, regenerated from its seed (PRD 12.11)
 datasets/season/
 
-# OffBall-Bench and the showcase matchday live in Blob Storage, regenerated from their seeds (PRD 12.11)
+# OffBall-Bench and the showcase matchday are published as GitHub releases and kept on the VM, regenerated from their seeds (PRD 12.11)
 datasets/bench/
 truth/bench/
 datasets/matchday/

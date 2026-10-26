@@ -30,10 +30,10 @@ Fast-engine matches (the season backdrop) have `match.json` and `events.jsonl` o
 | Showcase | 1 | Kestrel Bay v Ashmoor, the demo match | Committed |
 | Smoke | 18 short | Every one of the 18 moment types planted at least once, one moment a match | Committed |
 | Calibration runs | 10+ full | Unscripted, for the realism and discriminator gates | Regenerated (`offball match --set calib`) |
-| Showcase matchday | 10 full | One round played together: the showcase match, and nine that each plant one moment around the hour; oracle labels | Blob Storage (`offball matchday`) |
+| Showcase matchday | 10 full | One round played together: the showcase match, and nine that each plant one moment around the hour; oracle labels | GitHub release and the VM (`offball matchday`) |
 | Golden render tests | 8 stretches | About 30 s around one planted moment each, from the showcase and smoke sets: the feed as input, and what the pipeline's output must show (PRD 19.5) | Committed (`offball golden build`) |
-| OffBall-Bench | 100 full | 70 with 3–6 planted moments, 20 with only null moments, 10 unscripted; 40 dev, 60 test | Blob Storage (`offball bench`) |
-| Season backdrop | 380, events only | The whole season from the fast engine, with its table | Blob Storage (`offball season`) |
+| OffBall-Bench | 100 full | 70 with 3–6 planted moments, 20 with only null moments, 10 unscripted; 40 dev, 60 test | GitHub release and the VM (`offball bench`) |
+| Season backdrop | 380, events only | The whole season from the fast engine, with its table | GitHub release and the VM (`offball season`) |
 
 **Is anything real in it?** No. Every club, player, name, badge and kit is generated, and names are checked against a salted-hash blocklist of real names from the calibration sources (gate 7). No row of real data is copied: the generator's settings are fitted to real matches and only those numbers are kept (`calibration/targets.json`, `calibration/params.json`, `calibration/fast_engine.json`).
 
@@ -73,4 +73,4 @@ The pass difficulty and xG models (`offball/models/`) learn from observed outcom
 
 ## Distribution and maintenance
 
-The small sets are in this repository; the large ones are regenerated from their seeds and published to Azure Blob Storage, with OneLake shortcuts. Dev answer keys are public; test answer keys are held by the evaluation endpoint. The generator version is in every `match.json`; a change to the generator that changes files changes the version.
+The small sets are in this repository; the large ones are regenerated from their seeds and published as GitHub release assets, with a copy on the OffBall VM (PRD 12.11). Dev answer keys are public; test answer keys are held privately on the VM and scored there with `offball eval bench` (ADR 0005). The generator version is in every `match.json`; a change to the generator that changes files changes the version.

@@ -148,7 +148,7 @@ export const en: MatchStrings = {
     none: 'No phone paired yet',
     renew: 'New code',
     openHere: 'Open the companion here',
-    note: 'Pairing works between tabs on this device today. Pairing across devices joins a Web PubSub group once the live service runs.',
+    note: 'Pairing works between tabs on this device today. Pairing across devices joins a group on the live service once it runs.',
   },
 
   ask: {

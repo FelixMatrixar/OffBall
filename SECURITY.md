@@ -18,5 +18,5 @@ Say what you found, how to reproduce it, and what it lets someone do. We aim to 
 - No accounts and no stored viewer data. Questions are processed in memory and never written to logs or traces.
 - Producer actions need the producer token of the live run they act on. Tokens are random, kept only with their run, and expire with it.
 - Agents can read only observed match data through fixed tools. Nothing they can reach holds the answer keys.
-- In Azure, every service signs in with a managed identity, and keys are turned off wherever Azure allows it (PRD 18.5, 18.11).
+- The VM and CI sign in to Microsoft Foundry with Microsoft Entra app registrations, not keys. The OpenRouter key lives only in Foundry's connection, and the VM's few credentials only in its root-only secrets directory (PRD 18.5, 18.11, 18.14).
 - No secrets live in the repository. Local model settings go in `.env`, which git ignores.

@@ -44,7 +44,7 @@ TOOLSETS: dict[str, list[Callable[..., Any]]] = {
     "producer": [],
     "pundit": [T.match_facts, T.list_candidates, T.moment_card, T.list_metrics, T.compute_metric, T.events_between,
                T.positions_at, T.player_summary, T.get_evidence, T.glossary],
-    # The Engineer reads telemetry the code hands it; in Azure it also gets Azure MCP Server (PRD 14.8).
+    # The Engineer reads telemetry the code hands it; on the VM it also gets Azure MCP Server, for Foundry (PRD 14.8).
     "engineer": [],
 }
 TIERS: dict[str, Tier] = {"scout": "fast", "explainer": "reasoning", "factchecker": "reasoning", "persona": "fast",

@@ -1,7 +1,7 @@
 """The Engineer (PRD 14.1, 14.11 `engineer` workflow): watches the crew's health and applies pre-approved mitigations.
 
-Code gathers what the Engineer reads (locally, the crew's own telemetry; in Azure, Azure MCP Server adds Log
-Analytics, metrics and the degrade-flag store) and applies what it decides. The Engineer may only change degrade
+Code gathers what the Engineer reads (the crew's own telemetry; on the VM, Azure MCP Server adds the Foundry
+resource's metrics, deployments and health, PRD 14.8) and applies what it decides. The Engineer may only change degrade
 flags, through the flag store, which logs every change and reverts it after 10 minutes unless the producer keeps it.
 Its incident note goes to the match state, so the producer console shows it with an undo.
 """

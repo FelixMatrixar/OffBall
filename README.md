@@ -41,8 +41,8 @@ http://localhost:5173/partner/index.html?feed=sse:http%3A%2F%2Flocalhost%3A8000%
 
 Every caption, graphic and answer comes from a model; there are no templates to fall back on. Without a model the match still streams (players, clock and score) and the panels still show computed numbers, but nothing an agent would write airs.
 
-1. In Microsoft Foundry, create a resource and deploy two models: a fast one for the Scout, Persona, Producer and Engineer, and a reasoning one for the Explainer, Fact-checker and Pundit.
-2. Copy `.env.example` to `.env` (git ignores it) and set the endpoint, key and deployment names.
+1. Get an OpenRouter key. The agents use two of its models (PRD 14.13): a fast one for the Scout, Persona, Producer and Engineer, and a reasoning one for the Explainer, Fact-checker and Pundit.
+2. Copy `.env.example` to `.env` (git ignores it) and set `OPENROUTER_API_KEY`, plus the two model IDs if you want others than the defaults. A model deployed in a Foundry resource works too: set its endpoint instead, as `.env.example` shows.
 3. Restart `offball serve all`, and run `uv run offball eval agents` to score each agent on its own task set.
 
 ## Commands
@@ -68,7 +68,7 @@ CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, and publ
 | `OFFBALL_MAX_MOMENTS` | Moments the crew works on at once in a live run (default 2) |
 | `TOKENS_PER_MATCH` | The match's token budget: past 80% only priority-0 moments air, at 100% none (default 2,000,000) |
 | `OFFBALL_ENGINEER_EVERY_S` | How often the Engineer checks the crew's health in a live run (default 60) |
-| `OFFBALL_TRACE=console` | Prints traces of every agent call; `APPLICATIONINSIGHTS_CONNECTION_STRING` sends them to Application Insights instead |
+| `OFFBALL_TRACE=console` | Prints traces of every agent call; `OTEL_EXPORTER_OTLP_ENDPOINT` sends them to the Aspire Dashboard instead (needs the `vm` extra) |
 | `FAULTS` | Dev only: injects faults, such as `latency:explainer:4000` |
 
 ## Layout

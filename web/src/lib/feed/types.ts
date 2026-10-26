@@ -124,7 +124,7 @@ export interface TrackedFrame {
   players: Record<string, [number, number, number]>;
 }
 
-/** Frames travel to viewers next to the partner messages (PRD 16.2: "Web PubSub: frames + overlays"). */
+/** Frames travel to viewers next to the partner messages (PRD 16.2: "Relay, Server-Sent Events: frames + overlays"). */
 export interface FrameMessage {
   type: 'frame';
   match_id: string;

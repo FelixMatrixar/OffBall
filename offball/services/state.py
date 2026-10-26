@@ -2,7 +2,7 @@
 
 Agents never pass free text to each other. Each hand-off is a typed message appended here as an Envelope and
 announced to subscribers, so every hop is replayable. Locally the store lives in memory and mirrors to JSONL;
-in Azure the same interface is backed by Cosmos DB (partitioned by match) and Web PubSub.
+on the VM the same interface is backed by PostgreSQL (keyed by match) and the relay (PRD 11.6, 11.8).
 """
 
 from __future__ import annotations

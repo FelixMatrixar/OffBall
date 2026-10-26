@@ -51,7 +51,7 @@ export function PairDialog({ open, onClose, code, expiresAt, guests, onRenew }: 
         </div>
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
-        Pairing works between tabs on this device today. Pairing across devices joins a Web PubSub group once the live service runs.
+        Pairing works between tabs on this device today. Pairing across devices joins a group on the live service once it runs.
       </p>
     </Dialog>
   );

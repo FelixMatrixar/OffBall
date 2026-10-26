@@ -3,8 +3,9 @@
 A moment's run is one span; each agent call inside it is a child span carrying the agent, its tier, the match and
 the candidate; each hand-off appended to the match state and each graphic sent is an event on the span it happened
 in, with the envelope's `seq` or the overlay's ID and revision. Prompts, answers and a fan's question text are never
-written to a span (PRD 18.6). Traces go to Application Insights when APPLICATIONINSIGHTS_CONNECTION_STRING is set,
-to the console with OFFBALL_TRACE=console, and nowhere otherwise.
+written to a span (PRD 18.6). Traces go over OTLP to the Aspire Dashboard on the VM (PRD 18.8), or any other
+OpenTelemetry collector, when OTEL_EXPORTER_OTLP_ENDPOINT is set; to the console with OFFBALL_TRACE=console; and
+nowhere otherwise.
 """
 
 from __future__ import annotations
@@ -35,15 +36,12 @@ def event(name: str, **attrs: str | int) -> None:
 
 def setup_tracing() -> str:
     """Send traces where the environment says. Returns where they go."""
-    from agent_framework.observability import configure_otel_providers, enable_instrumentation
+    from agent_framework.observability import configure_otel_providers
 
-    conn = os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", "").strip()
-    if conn:
-        from azure.monitor.opentelemetry import configure_azure_monitor  # the `azure` extra
-
-        configure_azure_monitor(connection_string=conn)
-        enable_instrumentation(enable_sensitive_data=False)
-        return "application-insights"
+    if os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT", "").strip():
+        # The framework reads the endpoint, and any OTEL_EXPORTER_OTLP_* settings, from the environment.
+        configure_otel_providers(service_name="offball", enable_sensitive_data=False)
+        return "otlp"
     if os.environ.get("OFFBALL_TRACE", "").strip().lower() == "console":
         configure_otel_providers(service_name="offball", enable_console_exporters=True, enable_sensitive_data=False)
         return "console"

@@ -1,5 +1,5 @@
 // Second-screen pairing (PRD 15.5): a 6-character code or QR code, valid for 2 hours, that identifies nobody.
-// Pairing runs between tabs on one device over BroadcastChannel; across devices it needs the Web PubSub group.
+// Pairing runs between tabs on one device over BroadcastChannel; across devices it needs the relay's pairing group.
 import { useEffect, useRef, useState } from 'react';
 import type { Lang, Mode } from './prefs';
 
