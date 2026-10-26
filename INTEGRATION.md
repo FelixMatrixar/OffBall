@@ -1,6 +1,6 @@
 # OffBall integration guide: connecting a backend and AI to the frontend
 
-The OffBall frontend (`web/`) is finished: every screen, mode, view, state and language. It runs today on built-in stand-ins that produce the same messages and answers a backend will. No backend exists yet.
+The OffBall frontend (`web/`) is finished: every screen, mode, view, state and language. It runs on built-in stand-ins that produce the same messages and answers a backend will. The backend in `offball/` now drives the stream, Ask OffBall, the panel numbers and the producer console (sections 6 and 9 say which calls are built); everything else still comes from the stand-ins, which stay the fallback.
 
 This guide is the specification a future backend or AI pipeline must meet to drive that frontend. It says what the frontend reads, in what format, and what the AI must write for each screen. It also shows how to test output against the finished UI without changing it and without running a server.
 
@@ -213,7 +213,16 @@ Every text is a map with all ten languages, or at least English. Arabic is shown
 
 ## 6. The calls the frontend will make
 
-The frontend makes none of these calls yet. Each section gives the stand-in it replaces, a proposed endpoint, and the shapes. The shapes are the TypeScript types the frontend already uses, so a backend that returns them needs no UI change. Name the paths however suits the backend, but keep the shapes.
+Each section gives the stand-in it replaces, the endpoint, and the shapes. The shapes are the TypeScript types the frontend already uses, so a backend that returns them needs no UI change, and `contracts/` publishes them (`answer`, `decision-point`, `decision-result`, `recap`, `round-moments`, `alert`). The frontend reaches the API through `web/src/lib/api.ts`, at `?api=`, `VITE_API_BASE`, or the server behind an `sse:` feed from an OffBall API.
+
+| Call | Backend | Frontend |
+| --- | --- | --- |
+| 6.1 Ask OffBall and suggestions | Built | Built: `AskPanel.tsx` streams it, falling back to `pundit.ts` |
+| 6.2 Change one decision | Not built | Stand-in |
+| 6.3 Producer actions, the trace, degrade flags | Built | Built for approvals and the trace; flags show in the API only |
+| 6.4 Recaps and clips | Not built | Stand-in |
+| 6.5 Panel numbers and charts | Built | Built, except the momentum ribbon |
+| 6.6 to 6.9 Space Centre, pairing, evaluation, voice | Not built | Stand-ins |
 
 ### 6.1 Ask OffBall
 
@@ -252,7 +261,7 @@ interface Answer {
 - A claim that couldn't be checked goes in with `verified: false`, and the panel says so plainly.
 - An out-of-scope question gets `state: "declined"` with an `alternative`, the nearest useful thing.
 - A chart always comes with `summary`, `columns` and `rows`: the frontend shows them as its text equivalent and table view.
-- The panel says answers are in English until the Pundit answers in the viewer's language. Once answers honour `lang`, that note comes out of `AskPanel.tsx`.
+- The Pundit answers in English, Spanish or French as `lang` asks; for other languages the panel still says answers are in English.
 - Suggested questions can stay on the device, or come from `GET /api/matches/{match_id}/suggestions?period=&t_ms=` as three strings.
 
 ### 6.2 Change one decision
@@ -308,10 +317,10 @@ interface DecisionResult {
 {"overlay_id": "m07-o0247", "decision": "approve", "by": "producer", "note": ""}
 ```
 
-`decision` is `approve`, `hold`, `skip` or `retract`. The backend answers by sending the result on the stream to everyone: an `overlay.upsert` with `rev + 1` and the new `approval`, or an `overlay.retract`. The console then sees its own decision come back like every other screen. Producer calls need a signed-in producer and are never public.
+`decision` is `approve`, `hold`, `skip` or `retract`. The backend answers by sending the result on the stream to everyone: an `overlay.upsert` with `rev + 1` and the new `approval`, or an `overlay.retract`. The console then sees its own decision come back like every other screen. Producer calls are never public: they need the `X-Producer-Token` header with the token `POST /api/live-runs` returned to whoever started the run (PRD 11.7). The frontend takes it from `?producer=`, sends its approvals with it, and adds it to the stream URL so the stream also carries the graphics waiting for approval.
 
-- **The trace:** `GET /api/matches/{match_id}/overlays/{overlay_id}/trace` returns the steps behind one graphic. The console draws them as rows of `{agent, start, end, kind}`, with times in seconds after the moment ends and `kind` one of `ok`, `rejected`, `async` or `fallback`. The stand-in is `traceFor()` in `web/src/screens/ProducerConsole.tsx`.
-- **System health:** the console has places for health notes and degrade-flag changes with an undo. They are static today and would come on a producer-only stream.
+- **The trace:** `GET /api/matches/{match_id}/overlays/{overlay_id}/trace` returns the steps behind one graphic. Its `rows` are what the console draws, `{agent, start, end, kind}`, with times in seconds after the moment was found and `kind` one of `ok`, `rejected`, `async` or `fallback`. On a live run the console reads it; otherwise `traceFor()` in `web/src/screens/ProducerConsole.tsx` stands in.
+- **System health:** `GET /api/flags` lists the degrade flags and their latest changes, and `POST /api/matches/{match_id}/flags/{flag}/undo` (or `/keep`) is the producer's undo. The console's health panel still shows its static design; the Engineer's incident notes are `incident` envelopes in the match state.
 - **Alerts:** a data alert becomes a `pending` overlay in the queue, as `store.queue()` shows.
 
 ### 6.4 Recaps and clips
@@ -328,7 +337,8 @@ interface DecisionResult {
 - **Stand-in:** fixed numbers in the real shapes.
   - `web/src/lib/content.ts`: `LEADERS` (Space Created with 90% intervals) and `focusStats` (a player's tallies before and after the move, a season line, runs by type).
   - `web/src/lib/stats.ts`: `MOMENTUM`, `CONTROL_INDEX`, `SHOTS`, `SHAPE`, `PASS_NETWORK`, `occupancy` (heat map), `runMap` and `distanceSeries`.
-- **Proposed call:** `GET /api/matches/{match_id}/stats/{name}?player_id=&until_ms=`, returning exactly those shapes.
+- **Call:** `GET /api/matches/{match_id}/stats/{name}?period=&t_ms=&player_id=&from_ms=`, returning exactly those shapes, computed from the match up to `period` and `t_ms`. The names are `leaders`, `momentum`, `control_index`, `shots`, `shape` and `pass_network`, and per player `focus` (which also takes the moment's `from_ms`), `occupancy`, `run_map` and `distance_series`. `shots` answers 404 until the xG model is in place.
+- **In the frontend:** `web/src/lib/served.ts` fetches each one up to the end of the showcase moment, and the stand-ins in `content.ts` and `stats.ts` return the computed value once it arrives (`focusStats` keeps its scripted season line, which the backend doesn't write). The momentum ribbon stays on the stand-in: the backend computes field tilt, not the ribbon's space value. Chart text equivalents are worded from the computed numbers, so they never claim a trend the data doesn't show.
 
 ### 6.6 Space Centre
 
@@ -407,21 +417,21 @@ Places where the frontend's formats differ from what a backend might assume. Sen
 
 ---
 
-## 9. What the frontend still needs when a backend arrives
+## 9. What the frontend needs for the backend
 
-None of this is built, on purpose: the UI is finished against its stand-ins. When a backend exists, these are the frontend changes to make, all small and contained:
+The frontend changes for the backend, all small and contained. With no backend set, every one falls back to the stand-in, so the demo never changes.
 
-| Change | Where |
-| --- | --- |
-| One module for calls, with each stand-in module calling it and falling back to its stand-in when the call fails, so components stay unchanged | New `web/src/lib/api.ts`; `pundit.ts`, `decisions.ts`, `recap.ts`, `content.ts`, `stats.ts` |
-| An API address setting, next to `VITE_FEED_URL` | `VITE_API_BASE` |
-| A Web PubSub connection that fetches its access URL first and refreshes it on reconnect, naming the viewer's language so the backend writes only the languages someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` |
-| Producer actions sent to the backend instead of other tabs, with the producer token of the live run being produced (PRD 11.7) | `publish()` in `web/src/lib/feed/store.ts` |
-| The producer console and phone companion reading the same `?feed=` as the match view. The broadcast output stays a static reference design; the partner template is its live version. | `web/src/screens/ProducerConsole.tsx`, `PhoneCompanion.tsx` |
-| Loading the match, roster, clubs, kits and moment window from the backend, so any match can be shown | `web/src/lib/match.ts` and the code that reads it |
-| Pairing over a Web PubSub group instead of between tabs | `web/src/lib/pairing.ts` |
-| Playing synthesised speech when a line has it | `web/src/lib/audio.ts` |
-| Removing the "answers are in English" note once answers come in every language | `web/src/components/ask/AskPanel.tsx` |
+| Change | Where | Status |
+| --- | --- | --- |
+| One module for calls, each stand-in falling back to itself when a call fails, so components stay unchanged | `web/src/lib/api.ts` and `served.ts`; `content.ts`, `stats.ts`, `AskPanel.tsx` | Built for Ask OffBall and the panel numbers; `decisions.ts` and `recap.ts` still to do |
+| An API address setting, next to `VITE_FEED_URL` | `VITE_API_BASE`, or `?api=` | Built |
+| A Web PubSub connection that fetches its access URL first and refreshes it on reconnect, naming the viewer's language so the backend writes only the languages someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` | Not built: waits for Web PubSub |
+| Producer actions sent to the backend instead of other tabs, with the producer token of the live run being produced (PRD 11.7) | `decide()` and `retract()` in `web/src/lib/feed/store.ts` | Built |
+| The producer console and phone companion reading the same `?feed=` as the match view. The broadcast output stays a static reference design; the partner template is its live version. | `web/src/screens/ProducerConsole.tsx`, `PhoneCompanion.tsx` | Built for the console; the phone companion still to do |
+| Loading the match, roster, clubs, kits and moment window from the backend, so any match can be shown | `web/src/lib/match.ts` and the code that reads it | Not built |
+| Pairing over a Web PubSub group instead of between tabs | `web/src/lib/pairing.ts` | Not built: waits for Web PubSub |
+| Playing synthesised speech when a line has it | `web/src/lib/audio.ts` | Not built |
+| Removing the "answers are in English" note for languages the Pundit answers in | `web/src/components/ask/AskPanel.tsx` | Built for English, Spanish and French |
 
 The default with no settings stays the built-in replay, so the demo always works (PRD 21.2). Every failure a backend can cause already has a designed state in the frontend (PRD 15.11, `#/states`). Map backend errors to these instead of new messages:
 
