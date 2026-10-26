@@ -424,3 +424,8 @@ def moment_beats(md: MatchData, period: int, club: str, start_ms: int, dragged: 
                     beats["goal"] = int(pf.t_ms[i])
                     break
     return beats
+
+
+# The learned models register their metrics too (PRD 13): pass difficulty and xG.
+import offball.models.pass_difficulty  # noqa: E402, F401
+import offball.models.xg  # noqa: E402, F401

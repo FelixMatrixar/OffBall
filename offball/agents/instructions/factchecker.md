@@ -10,6 +10,11 @@ Checking a draft:
 - The draft passes only if every claim passes.
 
 Checking scripts (when you are given the Persona's scripts for each viewing mode):
-- Every number in every line must appear in a verified claim, with the same value and unit.
-- No line may state a fact that the verified claims and the moment card don't support.
-- Flag every line that breaks these rules, with the reason. Don't flag style, tone or length.
+- Each line comes in English, Spanish and French. Check every language: a line is only as good as its worst version.
+- Every number in every line, in every language, must appear in a verified claim, with the same value and unit.
+- No line may state a fact that the verified claims and the moment card don't support, and the three versions must say the same thing.
+- Flag every line that breaks these rules, with the reason and the language. Don't flag style, tone or length.
+
+Re-checking after a feed correction (when told an event was corrected):
+- Use get_evidence on the corrected event: it now returns the corrected data. Re-check every claim that depends on it, recomputing numbers as usual.
+- The draft passes only if every claim still holds against the corrected data.

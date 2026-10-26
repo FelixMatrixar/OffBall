@@ -12,6 +12,12 @@
       "runtimeExecutable": ".venv/Scripts/offball.exe",
       "runtimeArgs": ["serve", "all"],
       "port": 8000
+    },
+    {
+      "name": "offball-api-stand-in",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "tests.stand_in_server"],
+      "port": 8010
     }
   ]
 }

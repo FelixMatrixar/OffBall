@@ -17,12 +17,15 @@
     offball golden list|build|run        Golden render tests: list or build the cases, or run the pipeline on them
     offball golden check <case> --stream out.jsonl
                                          Check a pipeline's output stream against a case's expectations
+    offball eval agents [--only factchecker scout persona]
+                                         Evaluate each agent on its own task set (needs a model)
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -167,6 +170,15 @@ def cmd_season(args: argparse.Namespace) -> None:
           f"top of the table: {leader[0]} on {leader[1][6]} points")
 
 
+def _tracing() -> None:
+    """Traces of every agent hop, where the environment says (offball.services.telemetry)."""
+    from offball.services.telemetry import setup_tracing
+
+    where = setup_tracing()
+    if where != "off":
+        print(f"Traces go to {where}")
+
+
 def cmd_serve(args: argparse.Namespace) -> None:
     import asyncio
     import logging
@@ -174,6 +186,8 @@ def cmd_serve(args: argparse.Namespace) -> None:
     import uvicorn
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    os.environ.setdefault("OFFBALL_WARM", "m07")  # the showcase's moments are ready before the first question
+    _tracing()
 
     async def run() -> None:
         servers = []
@@ -203,6 +217,7 @@ def cmd_replay(args: argparse.Namespace) -> None:
     from offball.services.replay import build_replay
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    _tracing()
     dirs = REGISTRY.match_dirs()
     if args.match_id not in dirs:
         sys.exit(f"Unknown match {args.match_id}; known: {', '.join(dirs)}")
@@ -248,6 +263,7 @@ def cmd_golden(args: argparse.Namespace) -> None:
         from offball.agents.llm import model_configured
 
         logging.basicConfig(level=logging.WARNING)
+        _tracing()
         if not model_configured():
             print("No model is configured, so the crew is off and the pipeline airs nothing. See .env.example.")
         crew = Crew.from_env() if model_configured() else None
@@ -260,6 +276,30 @@ def cmd_golden(args: argparse.Namespace) -> None:
                                    newline="\n")
     print(f"{sum(r.passed for r in reports)} of {len(reports)} case(s) pass")
     if not all(r.passed for r in reports):
+        sys.exit(1)
+
+
+def cmd_eval(args: argparse.Namespace) -> None:
+    import asyncio
+    import logging
+
+    from offball.agents.crew import Crew
+    from offball.agents.llm import ModelSettings, model_configured
+    from offball.eval import agents
+
+    logging.basicConfig(level=logging.WARNING)
+    if not model_configured():
+        sys.exit("Evaluating the agents needs a model. See .env.example.")
+    _tracing()
+    settings = ModelSettings.from_env()
+    results = asyncio.run(agents.run_all(Crew.from_env(), args.only or None, args.smoke or None))
+    for r in results:
+        print(r.text())
+    out = ROOT / "calibration" / "reports" / "agents.md"
+    out.write_text(agents.report(results, f"{settings.fast} (fast), {settings.reasoning} (reasoning)"),
+                   encoding="utf-8", newline="\n")
+    print(f"Report -> {out}")
+    if not all(r.passed for r in results):
         sys.exit(1)
 
 
@@ -338,6 +378,11 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("season", help="Play the 380-match season backdrop with the fast engine (events only)")
     p.add_argument("--seed", type=int, default=2026)
     p.set_defaults(fn=cmd_season)
+    p = sub.add_parser("eval", help="Evaluate each agent on its own task set against a real model (PRD 14.15)")
+    p.add_argument("what", choices=["agents"])
+    p.add_argument("--only", nargs="*", choices=["factchecker", "scout", "persona"])
+    p.add_argument("--smoke", nargs="*", help="Smoke matches for the Scout and Fact-checker sets (default: all)")
+    p.set_defaults(fn=cmd_eval)
     sub.add_parser("fit").set_defaults(fn=cmd_fit)
     sub.add_parser("blocklist").set_defaults(fn=cmd_blocklist)
     p = sub.add_parser("gates")

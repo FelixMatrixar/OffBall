@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "RoundMoment": {
+      "additionalProperties": false,
+      "description": "One match on the Space Centre's whip-around (`MatchdayGame` in web/src/lib/content.ts), with positions in\nmetres rather than the stand-in's drawing units (INTEGRATION.md note 4).",
+      "properties": {
+        "match_id": {
+          "title": "Match Id",
+          "type": "string"
+        },
+        "home": {
+          "title": "Home",
+          "type": "string"
+        },
+        "away": {
+          "title": "Away",
+          "type": "string"
+        },
+        "hs": {
+          "title": "Hs",
+          "type": "integer"
+        },
+        "as": {
+          "title": "As",
+          "type": "integer"
+        },
+        "base": {
+          "description": "Match clock in seconds when the moment opened",
+          "title": "Base",
+          "type": "integer"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "description": "Space value, which ranks the round's moments",
+          "title": "Value",
+          "type": "number"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "gap": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Gap",
+          "type": "array"
+        },
+        "arrow": {
+          "description": "The run: from x, from y, to x, to y, in metres",
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Arrow",
+          "type": "array"
+        }
+      },
+      "required": [
+        "match_id",
+        "home",
+        "away",
+        "hs",
+        "as",
+        "base",
+        "type",
+        "value",
+        "text",
+        "gap",
+        "arrow"
+      ],
+      "title": "RoundMoment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "`round.moments` on a round's stream: the moments ranked across the round's matches (PRD 11.6).",
+  "properties": {
+    "type": {
+      "const": "round.moments",
+      "default": "round.moments",
+      "title": "Type",
+      "type": "string"
+    },
+    "round_id": {
+      "title": "Round Id",
+      "type": "string"
+    },
+    "moments": {
+      "items": {
+        "$ref": "#/$defs/RoundMoment"
+      },
+      "title": "Moments",
+      "type": "array"
+    },
+    "sent_at": {
+      "title": "Sent At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "round_id",
+    "moments",
+    "sent_at"
+  ],
+  "title": "RoundMoments",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/round-moments.schema.json"
+}

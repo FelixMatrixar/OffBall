@@ -1,0 +1,244 @@
+{
+  "$defs": {
+    "ScorePath": {
+      "additionalProperties": false,
+      "description": "No goals before `minute` beyond `max_goals` per club; used to keep a script's story intact.",
+      "properties": {
+        "minute": {
+          "title": "Minute",
+          "type": "number"
+        },
+        "max_goals": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Max Goals",
+          "type": "object"
+        }
+      },
+      "required": [
+        "minute",
+        "max_goals"
+      ],
+      "title": "ScorePath",
+      "type": "object"
+    },
+    "StoryMoment": {
+      "additionalProperties": false,
+      "description": "A moment requested as an intent with soft constraints; the engine must still make it happen.",
+      "properties": {
+        "key": {
+          "description": "Short label, unique in the script, e.g. k03",
+          "title": "Key",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "decoy_run",
+            "overlap",
+            "underlap",
+            "third_man_run",
+            "blind_side_run",
+            "timed_run_in_behind",
+            "false_9_drop",
+            "pinning",
+            "rotation",
+            "set_piece_screen",
+            "switch_of_play",
+            "press_broken",
+            "fatigue_gap",
+            "space_lost",
+            "rest_defence_exposed",
+            "cover_shadow",
+            "null_run",
+            "null_overlap"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "team": {
+          "description": "club_id of the team that creates the moment (attacks)",
+          "title": "Team",
+          "type": "string"
+        },
+        "minute": {
+          "description": "Earliest match minute for the moment",
+          "maximum": 95,
+          "minimum": 0,
+          "title": "Minute",
+          "type": "number"
+        },
+        "window_minutes": {
+          "default": 4.0,
+          "exclusiveMinimum": 0,
+          "maximum": 20,
+          "title": "Window Minutes",
+          "type": "number"
+        },
+        "creator_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Creator Id"
+        },
+        "dragged_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dragged Id"
+        },
+        "receiver_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receiver Id"
+        },
+        "outcome": {
+          "default": "chance",
+          "enum": [
+            "goal",
+            "shot",
+            "chance",
+            "none"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        },
+        "latest_minute": {
+          "anyOf": [
+            {
+              "maximum": 95,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The moment must start by this minute",
+          "title": "Latest Minute"
+        },
+        "sure": {
+          "default": false,
+          "description": "Its final shot ends as `outcome` asks, rather than as drawn",
+          "title": "Sure",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "key",
+        "type",
+        "team",
+        "minute"
+      ],
+      "title": "StoryMoment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "match_id": {
+      "title": "Match Id",
+      "type": "string"
+    },
+    "home": {
+      "title": "Home",
+      "type": "string"
+    },
+    "away": {
+      "title": "Away",
+      "type": "string"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "brief": {
+      "default": "",
+      "title": "Brief",
+      "type": "string"
+    },
+    "round": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Round"
+    },
+    "moments": {
+      "items": {
+        "$ref": "#/$defs/StoryMoment"
+      },
+      "maxItems": 8,
+      "title": "Moments",
+      "type": "array"
+    },
+    "score_path": {
+      "items": {
+        "$ref": "#/$defs/ScorePath"
+      },
+      "title": "Score Path",
+      "type": "array"
+    },
+    "half_minutes": {
+      "default": 45.0,
+      "exclusiveMinimum": 0,
+      "maximum": 45.0,
+      "title": "Half Minutes",
+      "type": "number"
+    },
+    "home_attacks_right_first": {
+      "default": true,
+      "description": "The home side attacks towards x = 105 in the first half",
+      "title": "Home Attacks Right First",
+      "type": "boolean"
+    },
+    "subs_after_minute": {
+      "default": 0.0,
+      "description": "No substitutions before this minute",
+      "maximum": 95,
+      "minimum": 0,
+      "title": "Subs After Minute",
+      "type": "number"
+    }
+  },
+  "required": [
+    "match_id",
+    "home",
+    "away",
+    "seed"
+  ],
+  "title": "MatchScript",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/match-script.schema.json"
+}

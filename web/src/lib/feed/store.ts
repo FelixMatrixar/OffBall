@@ -1,5 +1,6 @@
 // The client's view of one match feed: frames, rev-aware overlays, retractions, status and clock sync.
 // Producer decisions travel as contract messages on a cross-tab bus, so they reach every open view (PRD 10.6).
+import type { ProducerDecision, ProducerRemote } from '../api';
 import { LANG_IDS, type Mode } from '../prefs';
 import { EVENT_PASS, MATCH_ID } from '../match';
 import { showcaseFeed, tOf } from './emitter';
@@ -39,6 +40,8 @@ const CORRECTION_HOLD_MS = 3000;
 /** Live viewers watch 1.5 s behind the newest data, so network jitter never shows (PRD 16.2). */
 export const LIVE_BUFFER_MS = 1500;
 const DECISIONS_KEY = (match: string) => `offball.decisions.${match}`;
+/** The approvals a producer can send to the backend (INTEGRATION.md 6.3). */
+const REMOTE_DECISIONS: Partial<Record<Approval, ProducerDecision>> = { approved: 'approve', held: 'hold', skipped: 'skip' };
 
 /** What travels between tabs: contract messages, plus a reset when the producer clears their decisions. */
 type BusEnvelope = { kind: 'msg'; msg: ClientMessage } | { kind: 'reset' };
@@ -60,6 +63,8 @@ export class FeedStore {
   dropped = 0;
   /** Live mode: late overlays are dropped against where the display should be. */
   live = false;
+  /** A live run's producer link: decisions go to the backend, and come back on the stream for every screen. */
+  remote: ProducerRemote | null = null;
   version = 0;
   readonly log: LogLine[] = [];
   readonly decisions: { at: string; overlay_id: string; action: string; by: string }[] = [];
@@ -279,12 +284,29 @@ export class FeedStore {
     const o = this.overlays.get(overlay_id);
     if (!o) return;
     this.record(overlay_id, approval);
+    const decision = REMOTE_DECISIONS[approval];
+    if (this.remote && decision) {
+      this.sendRemote(overlay_id, decision);
+      return;
+    }
     this.publish({ type: 'overlay.upsert', match_id: this.matchId, overlay: { ...o, rev: o.rev + 1, approval }, sent_at: iso() } satisfies OverlayUpsert);
   }
 
   retract(overlay_id: string, reason: OverlayRetract['reason'] = 'producer', extra: Partial<OverlayRetract> = {}): void {
     this.record(overlay_id, `retract (${reason})`);
+    if (this.remote && reason === 'producer') {
+      this.sendRemote(overlay_id, 'retract');
+      return;
+    }
     this.publish({ type: 'overlay.retract', match_id: this.matchId, overlay_id, reason, sent_at: iso(), ...extra });
+  }
+
+  /** Sends a decision to the backend; its result arrives on the stream like everyone else's. */
+  private sendRemote(overlay_id: string, decision: ProducerDecision) {
+    this.remote?.(overlay_id, decision).catch((e: unknown) => {
+      this.addLog(this.overlays.get(overlay_id)?.t_start_ms ?? 0, `decision not sent · ${overlay_id} · ${e instanceof Error ? e.message : 'no backend'}`);
+      this.bump();
+    });
   }
 
   /** Adds a graphic to the queue, waiting for approval. */

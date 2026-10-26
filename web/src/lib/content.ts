@@ -1,5 +1,6 @@
 import { PLAYERS, player } from './match';
 import type { Mode } from './prefs';
+import { served } from './served';
 
 /** Glyphs for the mode cards. Labels and descriptions come from the language packs. */
 export const MODE_GLYPHS: Record<Mode, string> = { casual: '1', learn: '?', analyst: '%', player: '9', audio: '♪', broadcaster: '▶' };
@@ -19,6 +20,9 @@ export const LEADERS: readonly Leader[] = [
   { id: 'kes-10', v: 35, lo: 26, hi: 45 },
   { id: 'ash-05', v: 31, lo: 22, hi: 40 },
 ];
+
+/** Space Created as the backend computed it, or the stand-in above. */
+export const leaders = (): readonly Leader[] => served('leaders', LEADERS);
 
 export const leaderName = (id: string) => {
   const p = player(id);
@@ -108,8 +112,17 @@ const SCRIPTED: Record<string, FocusStats> = {
   },
 };
 
-/** Player focus numbers. Scripted for the five storied players, derived from the shirt number for the rest. */
+/**
+ * Player focus numbers: computed by the backend when there is one (keeping the season line, which it doesn't
+ * write), else scripted for the five storied players and derived from the shirt number for the rest.
+ */
 export function focusStats(id: string): FocusStats {
+  const own = ownFocusStats(id);
+  const computed = served<Partial<FocusStats> | null>(`focus:${id}`, null);
+  return computed ? { ...own, ...computed } : own;
+}
+
+function ownFocusStats(id: string): FocusStats {
   if (SCRIPTED[id]) return SCRIPTED[id];
   const p = player(id);
   const n = p.num;

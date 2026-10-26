@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "Alternative": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "question"
+      ],
+      "title": "Alternative",
+      "type": "object"
+    },
+    "AnswerChart": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "spec": {
+          "additionalProperties": true,
+          "description": "A Vega-Lite spec without colours; the frontend themes it (VIS-7)",
+          "title": "Spec",
+          "type": "object"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "spec",
+        "summary",
+        "columns",
+        "rows"
+      ],
+      "title": "AnswerChart",
+      "type": "object"
+    },
+    "AnswerClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "verified": {
+          "title": "Verified",
+          "type": "boolean"
+        },
+        "evidence": {
+          "description": "Event and frame IDs, or metric names with their values",
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "verified",
+        "evidence"
+      ],
+      "title": "AnswerClaim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "`Answer` in web/src/lib/pundit.ts: Ask OffBall's reply (INTEGRATION.md 6.1).",
+  "properties": {
+    "question": {
+      "title": "Question",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "ok",
+        "partial",
+        "declined",
+        "unknown"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/AnswerClaim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "chart": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AnswerChart"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tools": {
+      "description": "The tools the Pundit called, in order",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tools",
+      "type": "array"
+    },
+    "alternative": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Alternative"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "For a declined or unknown question"
+    },
+    "corrected": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A corrected event changed the answer",
+      "title": "Corrected"
+    }
+  },
+  "required": [
+    "question",
+    "state",
+    "claims",
+    "tools"
+  ],
+  "title": "Answer",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/answer.schema.json"
+}

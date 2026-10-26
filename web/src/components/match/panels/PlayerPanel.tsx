@@ -4,6 +4,7 @@ import type { FrameState } from '../../../lib/feed';
 import { useI18n } from '../../../lib/i18n';
 import { CLUBS, player } from '../../../lib/match';
 import type { Metric } from '../../../lib/prefs';
+import { useServed } from '../../../lib/served';
 import { distanceSeries } from '../../../lib/stats';
 import { ChartFrame, HeatMap, RunMap, Sparkline, heatTable, runTable } from '../../charts';
 import { Button, Card, Segmented, Tile } from '../../ui';
@@ -18,6 +19,7 @@ const ROLE: Record<string, string> = { GK: 'Goalkeeper', RB: 'Right-back', LB: '
 export function PlayerPanel({ fav, fs, speeds, metric, onChange }: { fav: string; fs: FrameState; speeds: readonly number[]; metric: Metric; onChange: () => void }) {
   const { num } = useI18n();
   const [view, setView] = useState<'runs' | 'heat'>('runs');
+  useServed();
   const p = player(fav);
   const s = focusStats(fav);
   const t = fs.t;

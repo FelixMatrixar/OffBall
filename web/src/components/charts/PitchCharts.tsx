@@ -1,7 +1,7 @@
 // Pitch-anchored charts use OffBall's own pitch renderer (PRD 16.4): pass network, shot map, heat map and run map.
 import type { CSSProperties, ReactNode } from 'react';
 import { player, type XY } from '../../lib/match';
-import { PASS_NETWORK, SHOTS, occupancy, runMap, type RunLine, type Shot } from '../../lib/stats';
+import { occupancy, passNetwork, runMap, shots as servedShots, type RunLine, type Shot } from '../../lib/stats';
 import { PitchMarkings } from '../pitch/Pitch';
 import { arrowHead, project } from '../pitch/geometry';
 
@@ -19,10 +19,11 @@ function MiniPitch({ label, children, half = false }: { label: string; children:
 
 /** Kestrel Bay's pass network: who passes to whom, and where they stand on average. */
 export function PassNetwork() {
-  const nodes = new Map(PASS_NETWORK.nodes.map((n) => [n.id, n]));
+  const network = passNetwork();
+  const nodes = new Map(network.nodes.map((n) => [n.id, n]));
   return (
     <MiniPitch label="Kestrel Bay pass network: average positions, with thicker lines for more passes. The full table is in the table view.">
-      {PASS_NETWORK.edges.map((e) => {
+      {network.edges.map((e) => {
         const a = nodes.get(e.from);
         const b = nodes.get(e.to);
         if (!a || !b) return null;
@@ -30,7 +31,7 @@ export function PassNetwork() {
         const [x2, y2] = P([b.x, b.y]);
         return <line key={`${e.from}-${e.to}`} className="anim-fade" x1={x1} y1={y1} x2={x2} y2={y2} style={{ stroke: 'var(--kes)', strokeWidth: 1 + e.n * 0.45, opacity: 0.25 + e.n / 30, strokeLinecap: 'round' }} />;
       })}
-      {PASS_NETWORK.nodes.map((n, i) => {
+      {network.nodes.map((n, i) => {
         const [x, y] = P([n.x, n.y]);
         const r = 9 + n.touches / 6;
         return (
@@ -48,7 +49,7 @@ export function PassNetwork() {
 
 export const passNetworkTable = () => ({
   columns: ['From', 'To', 'Passes'],
-  rows: PASS_NETWORK.edges.map((e) => [`No. ${player(e.from).num}`, `No. ${player(e.to).num}`, e.n]),
+  rows: passNetwork().edges.map((e) => [`No. ${player(e.from).num}`, `No. ${player(e.to).num}`, e.n]),
 });
 
 /** The shot map's window: the last 34 m, goal at the top, the full width, in vertical pitch units. */
@@ -99,7 +100,7 @@ function placeMinuteLabels(rings: readonly { x: number; y: number; r: number; te
  * solid blue rings and Ashmoor as dashed orange ones, and a filled ring is a goal. Spoiler-safe recaps hide outcomes,
  * so every ring is drawn open. Bigger chances are drawn first, so a small ring is never hidden under a big one.
  */
-export function ShotMap({ shots = SHOTS, hideOutcomes = false }: { shots?: readonly Shot[]; hideOutcomes?: boolean }) {
+export function ShotMap({ shots = servedShots(), hideOutcomes = false }: { shots?: readonly Shot[]; hideOutcomes?: boolean }) {
   const label = hideOutcomes
     ? `Shot map: ${shots.length} shots sized by expected goals, Kestrel Bay in blue and Ashmoor in orange, both attacking the goal at the top. Outcomes are hidden.`
     : `Shot map: ${shots.length} shots sized by expected goals, Kestrel Bay in blue and Ashmoor in orange, both attacking the goal at the top; a filled circle is a goal.`;
@@ -174,7 +175,7 @@ export function ShotMap({ shots = SHOTS, hideOutcomes = false }: { shots?: reado
   );
 }
 
-export const shotTable = (shots: readonly Shot[] = SHOTS, hideOutcomes = false) => ({
+export const shotTable = (shots: readonly Shot[] = servedShots(), hideOutcomes = false) => ({
   columns: ['Minute', 'Team', 'Player', 'xG', 'Outcome'],
   rows: shots.map((s) => [s.minute, s.team === 'kes' ? 'Kestrel Bay' : 'Ashmoor', `No. ${player(s.playerId).num}`, s.xg.toFixed(2), hideOutcomes ? 'hidden' : s.outcome]),
 });

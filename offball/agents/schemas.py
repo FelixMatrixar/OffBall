@@ -13,6 +13,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 Mode = Literal["casual", "learn", "analyst", "player", "audio", "broadcaster"]
 MODES: tuple[Mode, ...] = ("casual", "learn", "analyst", "player", "audio", "broadcaster")
+# The languages the Persona writes (PRD 23.1, M3). Each is written directly, not translated from English (14.12).
+LANGS: tuple[str, ...] = ("en", "es", "fr")
 Beat = Literal["run_start", "defender_follows", "gap_opens", "pass_into_gap", "shot", "goal", "after"]
 # The Producer can also time a graphic from "now": the live clock plus the viewers' buffer.
 ScheduleBeat = Literal["run_start", "defender_follows", "gap_opens", "pass_into_gap", "shot", "goal", "after", "now"]
@@ -59,10 +61,18 @@ class VerdictOut(Strict):
     checks: list[ClaimCheck]
 
 
+class Localized(Strict):
+    """The same words in each language the Persona writes."""
+
+    en: str = Field(description="English")
+    es: str = Field(description="Spanish, written directly in Spanish with the Spanish glossary")
+    fr: str = Field(description="French, written directly in French with the French glossary")
+
+
 class Line(Strict):
     beat: Beat = Field(description="The beat of the play this line belongs to")
-    text: str = Field(description="What viewers read, and in audio mode what they hear")
-    a11y_text: str = Field(description="What a screen reader announces: describe the picture, don't repeat the line")
+    text: Localized = Field(description="What viewers read, and in audio mode what they hear")
+    a11y_text: Localized = Field(description="What a screen reader announces: describe the picture, don't repeat the line")
     player_id: str | None = Field(description="Player focus only: the player this line follows; otherwise null")
     claim_ids: list[str] = Field(description="The verified claims this line relies on")
 
@@ -70,19 +80,22 @@ class Line(Strict):
 class ModeScript(Strict):
     mode: Mode
     lines: list[Line] = Field(min_length=1, max_length=12)
-    runner_tag: str = Field(description="Two to four words shown over the runner")
-    defender_tag: str = Field(description="Two to four words shown over the defender who was pulled away")
-    receiver_tag: str = Field(description="Two to four words shown over the player who received in the space")
-    ring_label: str = Field(description="Two to four words on the ring where space opens")
-    stat_title: str = Field(description="Broadcaster stat card title, in capitals; empty for other modes")
+    runner_tag: Localized = Field(description="Two to four words shown over the runner")
+    defender_tag: Localized = Field(description="Two to four words shown over the defender who was pulled away")
+    receiver_tag: Localized = Field(description="Two to four words shown over the player who received in the space")
+    ring_label: Localized = Field(description="Two to four words on the ring where space opens")
+    stat_title: Localized = Field(description="Broadcaster stat card title, in capitals; empty for other modes")
     stat_claim_id: str | None = Field(description="Broadcaster: the verified number claim the stat card shows")
-    glossary_terms: list[str] = Field(description="Glossary terms this script uses")
+    glossary_terms: list[str] = Field(description="Glossary keys this script uses, such as decoy_run")
+
+
+BLANK = Localized(en="", es="", fr="")
 
 
 class LineFlag(Strict):
     mode: Mode
     line_index: int = Field(description="Index of the line in that mode's script, from 0")
-    reason: str
+    reason: str = Field(description="What is wrong, and in which language")
 
 
 class ScriptCheck(Strict):
@@ -111,6 +124,19 @@ class PlannedOverlay(Strict):
 class Schedule(Strict):
     overlays: list[PlannedOverlay] = Field(min_length=1, max_length=60)
     note: str = Field(description="One sentence for the producer's trace")
+
+
+Flag = Literal["explainer.model_tier", "persona.live_languages", "producer.density", "tactician.enabled",
+               "voice.enabled"]
+
+
+class EngineerDecision(Strict):
+    action: Literal["none", "set_flag"] = Field(description="set_flag applies one playbook mitigation; none if healthy")
+    flag: Flag | None = Field(description="For set_flag: the degrade flag to change")
+    value: str | None = Field(description="For set_flag: the flag's new value, one the playbook allows")
+    severity: Literal["info", "warning", "critical"]
+    summary: str = Field(description="One or two sentences for the producer: what you saw and what you did")
+    evidence: list[str] = Field(description="The readings you relied on, such as 'explainer p95 4210 ms, budget 1000'")
 
 
 class AnswerClaim(Strict):

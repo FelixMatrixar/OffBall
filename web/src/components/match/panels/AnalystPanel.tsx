@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { LEADERS, leaderName } from '../../../lib/content';
+import { leaderName, leaders } from '../../../lib/content';
 import { momentT, type FeedStore, type FrameState } from '../../../lib/feed';
 import { useI18n } from '../../../lib/i18n';
 import { CF_ID, PLAYERS, RUN_FROM, distance, frameRef } from '../../../lib/match';
 import type { Metric } from '../../../lib/prefs';
-import { CONTROL_INDEX, SHAPE } from '../../../lib/stats';
+import { isServed, useServed } from '../../../lib/served';
+import { controlIndex, passNetwork, shape } from '../../../lib/stats';
 import { ChartFrame, HeatMap, Leaderboard, PassNetwork, ShotMap, VegaChart, controlIndexSpec, heatTable, passNetworkTable, shapeSpec, shotTable } from '../../charts';
 import { Card, CountUp, PendingChip, Segmented, Skeleton, Spinner, Tile, VerifiedChip } from '../../ui';
 import { byMetric, type StatItem } from './shared';
@@ -33,6 +34,10 @@ export function AnalystPanel({ fs, metric, store, passCorrected }: Props) {
   const { num, pack } = useI18n();
   const [chart, setChart] = useState<ChartId>('control');
   const [heatId, setHeatId] = useState('kes-09');
+  useServed();
+  const CONTROL_INDEX = controlIndex();
+  const SHAPE = shape();
+  const LEADERS = leaders();
   const t = fs.t;
   const k9 = fs.pos['kes-09'];
   const items: StatItem[] = byMetric(
@@ -137,7 +142,7 @@ export function AnalystPanel({ fs, metric, store, passCorrected }: Props) {
             <ChartFrame
               title="Control index"
               name="control-index"
-              summary={`Control versus chaos: Kestrel Bay’s index is ${CONTROL_INDEX[63].kes} and Ashmoor’s ${CONTROL_INDEX[63].ash} at 63 minutes. Kestrel have been rising since the 55th minute.`}
+              summary={`Control versus chaos: Kestrel Bay’s index is ${CONTROL_INDEX[63].kes} and Ashmoor’s ${CONTROL_INDEX[63].ash} at 63 minutes. ${isServed('control_index') ? controlTrend(CONTROL_INDEX) : 'Kestrel have been rising since the 55th minute.'}`}
               columns={['Minute', 'Kestrel Bay', 'Ashmoor']}
               rows={CONTROL_INDEX.filter((d) => d.minute % 5 === 0).map((d) => [d.minute, d.kes, d.ash])}
             >
@@ -145,12 +150,22 @@ export function AnalystPanel({ fs, metric, store, passCorrected }: Props) {
             </ChartFrame>
           )}
           {chart === 'network' && (
-            <ChartFrame title="Kestrel Bay pass network" name="pass-network" summary="Most passes run through No. 6 and No. 8 in midfield; No. 9 is the least-connected player, because his job is to run, not to receive." {...passNetworkTable()}>
+            <ChartFrame
+              title="Kestrel Bay pass network"
+              name="pass-network"
+              summary={isServed('pass_network') ? networkSummary() : 'Most passes run through No. 6 and No. 8 in midfield; No. 9 is the least-connected player, because his job is to run, not to receive.'}
+              {...passNetworkTable()}
+            >
               <PassNetwork />
             </ChartFrame>
           )}
           {chart === 'shots' && (
-            <ChartFrame title="Shot map" name="shot-map" summary="Kestrel Bay: 5 shots, 0.74 xG, one goal (0.31 xG, 63′). Ashmoor: 3 shots, 0.47 xG, their best chance a 0.34 xG save at 27′." {...shotTable()}>
+            <ChartFrame
+              title="Shot map"
+              name="shot-map"
+              summary={isServed('shots') ? shotSummary() : 'Kestrel Bay: 5 shots, 0.74 xG, one goal (0.31 xG, 63′). Ashmoor: 3 shots, 0.47 xG, their best chance a 0.34 xG save at 27′.'}
+              {...shotTable()}
+            >
               <ShotMap />
             </ChartFrame>
           )}
@@ -189,13 +204,50 @@ export function AnalystPanel({ fs, metric, store, passCorrected }: Props) {
         <ChartFrame
           title="Space Created · this match"
           name="space-created"
-          summary={`${leaderName(LEADERS[0].id)} leads with ${LEADERS[0].v} m² (90% interval ${LEADERS[0].lo}–${LEADERS[0].hi}). Defenders earn credit too, for cover and runners passed on.`}
+          summary={
+            LEADERS.length
+              ? `${leaderName(LEADERS[0].id)} leads with ${LEADERS[0].v} m² (90% interval ${LEADERS[0].lo}–${LEADERS[0].hi}).${isServed('leaders') ? '' : ' Defenders earn credit too, for cover and runners passed on.'}`
+              : 'No space created yet.'
+          }
           columns={['Player', 'Space created (m²)', '90% interval low', '90% interval high']}
           rows={LEADERS.map((l) => [leaderName(l.id), l.v, l.lo, l.hi])}
         >
-          <Leaderboard rows={LEADERS} max={140} />
+          <Leaderboard rows={LEADERS} max={Math.max(140, ...LEADERS.map((l) => l.hi))} />
         </ChartFrame>
       </Card>
     </>
   );
+}
+
+// Text equivalents for computed charts (VIS-6), said from the numbers themselves so they never claim a trend the data
+// doesn't show. The stand-in's own sentences stay with the stand-in's numbers.
+
+function controlTrend(series: readonly { minute: number; kes: number; ash: number }[]): string {
+  const mean = (from: number, to: number) => {
+    const xs = series.filter((d) => d.minute >= from && d.minute <= to).map((d) => d.kes);
+    return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+  };
+  const before = mean(45, 54);
+  const since = mean(55, 63);
+  if (Math.abs(since - before) < 3) return 'Kestrel Bay’s control has held steady since the 55th minute.';
+  return `Kestrel Bay’s control has ${since > before ? 'risen' : 'fallen'} since the 55th minute, from an average of ${Math.round(before)} to ${Math.round(since)}.`;
+}
+
+function networkSummary(): string {
+  const { nodes, edges } = passNetwork();
+  if (!nodes.length) return 'No completed passes yet.';
+  const byTouches = [...nodes].sort((a, b) => b.touches - a.touches);
+  const links = new Map<string, number>();
+  for (const e of edges) {
+    links.set(e.from, (links.get(e.from) ?? 0) + e.n);
+    links.set(e.to, (links.get(e.to) ?? 0) + e.n);
+  }
+  const least = [...nodes].sort((a, b) => (links.get(a.id) ?? 0) - (links.get(b.id) ?? 0))[0];
+  return `Most of the ball goes through No. ${byTouches[0].num} and No. ${byTouches[1]?.num ?? byTouches[0].num}; No. ${least.num} is the least connected.`;
+}
+
+function shotSummary(): string {
+  const all = shotTable().rows;
+  if (!all.length) return 'No shots yet.';
+  return `${all.length} shots so far; the table lists each with its xG and outcome.`;
 }

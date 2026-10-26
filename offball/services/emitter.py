@@ -1,7 +1,8 @@
 """The feed emitter (PRD 12.5 layer 5): replays a generated match as a live feed, faults included.
 
 It sends status changes, 25 Hz frames and ball events in match-time order at 1x to 60x, with the faults a
-real feed has: about 1% of events late, about 1% of messages sent twice, and optional frame drops.
+real feed has: about 1% of events late, about 1% of messages sent twice, optional frame drops, and optional
+corrections: an event sent again later with a field changed, as a feed's data team does (PRD 10.6).
 """
 
 from __future__ import annotations
@@ -22,6 +23,16 @@ from offball.core import SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
+class Correction:
+    """One event sent again `after_ms` later with `field` set to `value`, under the same event ID."""
+
+    event_id: str
+    field: str
+    value: str | float | int | None
+    after_ms: int = 3000
+
+
+@dataclass(frozen=True)
 class EmitterConfig:
     speed: float = 1.0
     period: int | None = None  # start in this period; None plays from the first
@@ -32,6 +43,7 @@ class EmitterConfig:
     late_by_ms: tuple[int, int] = (400, 1500)
     duplicate_rate: float = 0.01
     frame_drop_rate: float = 0.0
+    corrections: tuple[Correction, ...] = ()
     seed: int = 7
 
 
@@ -133,6 +145,10 @@ class FeedEmitter:
                 if c.faults and rng.random() < c.late_rate:
                     due += rng.randint(*c.late_by_ms)
                 add(due, "event", e.model_dump(mode="json"))
+                for fix in c.corrections:
+                    if fix.event_id == e.event_id:
+                        add(due + fix.after_ms, "correction", {**e.model_dump(mode="json"), fix.field: fix.value},
+                            corrects=e.event_id)
                 if e.type == "shot" and e.outcome == "goal" and e.team_id in score:
                     score[e.team_id] += 1
                     add(due + 1, "status", {"status": "in_play", "period": period, "t_ms": e.t_ms, "score": dict(score)})

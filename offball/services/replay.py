@@ -14,6 +14,7 @@ from pathlib import Path
 import jsonschema
 
 from offball.agents.broadcast import Outcome, run_moment
+from offball.agents.corrections import handle_correction
 from offball.agents.crew import Crew
 from offball.mcp import tools as T
 from offball.services.emitter import EmitterConfig, FeedEmitter
@@ -69,9 +70,15 @@ async def build_replay(match_dir: Path, config: EmitterConfig, crew: Crew | None
     outcomes: list[Outcome] = []
     feed = list(emitter.messages())
     settings = {"min_gap_s": 20, "approval": "auto", "live": False, **(settings or {})}
+    handled = 0  # correction envelopes already sent to the crew
     try:
         for item in feed:
             live.ingest(dict(item.msg, sent_at=iso_now()))
+            corrections = state.of_kind("correction")
+            if crew and len(corrections) > handled:
+                for env in corrections[handled:]:
+                    outcomes.extend(await handle_correction(crew, state, match_id, env.payload["event_id"], settings))
+                handled = len(corrections)
             if live.detection_due():
                 for cand in live.detect_now():
                     state.append("candidate", cand, produced_by="interpret")

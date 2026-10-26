@@ -2,7 +2,7 @@
 
 The Pundit answers with the match tools; each tool call is reported as it happens, so the panel can show the
 work. The Fact-checker then checks every claim independently, and a claim it can't confirm goes out marked
-unverified. Answers are in English.
+unverified. Answers are in English, Spanish or French, as the viewer asks; any other language gets English.
 """
 
 from __future__ import annotations
@@ -12,14 +12,19 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from agent_framework import FunctionInvocationContext, function_middleware
+from opentelemetry import trace
 
 from offball.agents.crew import AgentFailed, Crew, as_json
 from offball.agents.schemas import AnswerOut, VerdictOut
 from offball.mcp import tools as T
+from offball.services.telemetry import TRACER
+
+LANGUAGE_NAMES = {"en": "English", "es": "Spanish", "fr": "French"}
 
 
 async def answer(crew: Crew, match_id: str, question: str, period: int | None = None, t_ms: int | None = None,
-                 mode: str = "casual", fav: str | None = None) -> AsyncIterator[tuple[str, dict[str, Any]]]:
+                 mode: str = "casual", fav: str | None = None,
+                 lang: str = "en") -> AsyncIterator[tuple[str, dict[str, Any]]]:
     """Yield ("tool", {"name"}) for each tool call, then ("answer", Answer) in the frontend's shape."""
     events: asyncio.Queue[tuple[str, dict[str, Any]] | None] = asyncio.Queue()
     used: list[str] = []
@@ -33,9 +38,13 @@ async def answer(crew: Crew, match_id: str, question: str, period: int | None = 
 
     async def work() -> None:
         token = T.VIEWER_CLOCK.set((period, t_ms) if period is not None and t_ms is not None else None)
+        # The span names the match, mode and language, never the question (PRD 18.6).
+        span = TRACER.start_span("ask", attributes={"offball.match_id": match_id, "offball.mode": mode,
+                                                    "offball.lang": lang})
         try:
-            await events.put(("answer", await _answer(crew, match_id, question, period, t_ms, mode, fav, used,
-                                                       [report])))
+            with trace.use_span(span, end_on_exit=True):
+                await events.put(("answer", await _answer(crew, match_id, question, period, t_ms, mode, fav, lang,
+                                                           used, [report])))
         except AgentFailed as exc:
             await events.put(("error", {"detail": f"The Pundit couldn't answer: {exc}"}))
         finally:
@@ -49,10 +58,12 @@ async def answer(crew: Crew, match_id: str, question: str, period: int | None = 
 
 
 async def _answer(crew: Crew, match_id: str, question: str, period: int | None, t_ms: int | None, mode: str,
-                  fav: str | None, used: list[str], middleware: list) -> dict[str, Any]:
+                  fav: str | None, lang: str, used: list[str], middleware: list) -> dict[str, Any]:
     where = f"period {period}, t_ms {t_ms}" if period is not None and t_ms is not None else "the end of the match"
+    language = LANGUAGE_NAMES.get(lang, "English")
     prompt = (f"Match {match_id}. The viewer is watching in {mode} mode, at {where}."
               + (f" Their favourite player is {fav}." if fav else "")
+              + f" Answer in {language}."
               + f"\n\nTheir question: {question}")
     out = await crew.ask("pundit", prompt, AnswerOut, middleware=middleware)
     claims = [{"text": c.text, "verified": c.verified, "evidence": c.evidence} for c in out.claims]

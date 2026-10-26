@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { apiBase, askPundit, fetchSuggestions } from '../../lib/api';
 import { useFeedStore } from '../../lib/feed';
 import { LANGS, useI18n } from '../../lib/i18n';
+import { BASE_MS, MATCH_ID, PERIOD, stepAt } from '../../lib/match';
 import { answer, suggestions, type Answer } from '../../lib/pundit';
 import { usePrefs } from '../../lib/prefs';
 import { ChartFrame, VegaChart } from '../charts';
@@ -72,9 +74,13 @@ function AnswerView({ a, onAsk }: { a: Answer; onAsk: (q: string) => void }) {
   );
 }
 
+/** The languages the Pundit answers in; anything else is answered in English. */
+const PUNDIT_LANGS = ['en', 'es', 'fr'];
+
 /**
  * Ask OffBall (PRD 10.4): questions by text or voice, answered with cited claims and, often, a chart rendered in the
- * viewer's theme. Answers come from the match data on the device until the Pundit agent is connected.
+ * viewer's theme. With a backend, the Pundit agent answers and each tool it calls shows as it runs; without one, or
+ * when it can't answer, the answer comes from the match data on the device.
  */
 export function AskPanel({ t }: { t: number }) {
   const { prefs } = usePrefs();
@@ -85,30 +91,69 @@ export function AskPanel({ t }: { t: number }) {
   const [input, setInput] = useState('');
   const [listening, setListening] = useState(false);
   const [consentOpen, setConsentOpen] = useState(false);
+  const [served, setServed] = useState<{ step: number; chips: string[] } | null>(null);
   const recog = useRef<SpeechRecognitionLike | null>(null);
   const timer = useRef<number>();
+  const asking = useRef<AbortController | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputId = useId();
   const passCorrected = [...store.overlays.values()].some((o) => o.labels.includes('correction'));
   const canListen = !!Recognition();
+  const backend = apiBase() !== '';
+  const step = stepAt(t);
 
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(timer.current);
+      asking.current?.abort();
+    },
+    [],
+  );
   useEffect(() => {
     // Block body: scrollIntoView can return a promise, which must not become the effect's clean-up.
     endRef.current?.scrollIntoView({ block: 'nearest' });
   }, [log, pending]);
+  useEffect(() => {
+    if (!backend) return;
+    const ctl = new AbortController();
+    fetchSuggestions(MATCH_ID, PERIOD, Math.round(BASE_MS + t * 1000), ctl.signal)
+      .then((chips) => chips.length && setServed({ step, chips: chips.slice(0, 3) }))
+      .catch(() => setServed(null));
+    return () => ctl.abort();
+    // Suggestions follow the play's steps, not every tick of the clock, so `t` is left out on purpose.
+  }, [backend, step]);
 
-  const ask = (q: string) => {
-    const question = q.trim();
-    if (!question || pending) return;
+  /** The on-device answer, timed as if its tools were running. */
+  const answerOnDevice = (question: string) => {
     const a = answer(question, { t, fav: prefs.fav, passCorrected });
     setPending({ q: question, tools: a.tools });
-    setInput('');
-    // The Pundit's tool calls take a moment; the typing indicator names them as they run.
     timer.current = window.setTimeout(() => {
       setLog((l) => [...l.slice(-5), a]);
       setPending(null);
     }, 700 + a.tools.length * 350);
+  };
+
+  const ask = (q: string) => {
+    const question = q.trim();
+    if (!question || pending) return;
+    setInput('');
+    if (!backend) {
+      answerOnDevice(question);
+      return;
+    }
+    setPending({ q: question, tools: [] });
+    const ctl = new AbortController();
+    asking.current = ctl;
+    const ctx = { matchId: MATCH_ID, period: PERIOD, t_ms: Math.round(BASE_MS + t * 1000), mode: prefs.mode, lang, fav: prefs.fav };
+    askPundit(question, ctx, (name) => setPending((p) => (p ? { ...p, tools: [...p.tools, name] } : p)), ctl.signal)
+      .then((a) => {
+        setLog((l) => [...l.slice(-5), a]);
+        setPending(null);
+      })
+      .catch(() => {
+        // No model, no backend or no answer: the device answers instead, so the panel never comes back empty.
+        if (!ctl.signal.aborted) answerOnDevice(question);
+      });
   };
 
   const onSubmit = (e: FormEvent) => {
@@ -157,7 +202,7 @@ export function AskPanel({ t }: { t: number }) {
     window.setTimeout(listen, 0);
   };
 
-  const chips = suggestions(t);
+  const chips = served && served.step === step ? served.chips : suggestions(t);
   return (
     <section aria-label="Ask OffBall" className="ask">
       <div className="ask-log" aria-live="polite">
@@ -195,7 +240,7 @@ export function AskPanel({ t }: { t: number }) {
           </button>
         ))}
       </div>
-      {lang !== 'en' && <p className="muted" style={{ fontSize: 12 }}>Answers are in English until the Pundit agent answers in your language.</p>}
+      {lang !== 'en' && !(backend && PUNDIT_LANGS.includes(lang)) && <p className="muted" style={{ fontSize: 12 }}>Answers are in English until the Pundit agent answers in your language.</p>}
       <form className="ask-form" onSubmit={onSubmit}>
         <label htmlFor={inputId} className="sr-only">
           Ask about this match

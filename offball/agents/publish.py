@@ -8,11 +8,12 @@ back to the Producer with the reasons.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
-from offball.agents.schemas import DraftOut, ModeScript, PlannedOverlay, Schedule
+from offball.agents.schemas import LANGS, DraftOut, Localized, ModeScript, PlannedOverlay, Schedule
 from offball.contracts import LAYER_OF, Anchors, Overlay, Speech
-from offball.core import overlay_id
+from offball.core import moment_overlay_id
 from offball.services.state import MatchState
 
 MIN_HOLD_MS = 2500
@@ -42,6 +43,8 @@ def _player(card: dict, anchor: str) -> str | None:
 
 
 def _anchors(card: dict, p: PlannedOverlay) -> tuple[Anchors, dict[str, Any]]:
+    """Where a planned graphic sits on the pitch. KeyError names an anchor this moment doesn't have, such as the run of
+    a moment that had none, so the Producer hears about it rather than the moment failing."""
     a = card["anchors"]
     if p.anchor in ("runner", "defender", "receiver", "passer"):
         pid = _player(card, p.anchor)
@@ -50,9 +53,13 @@ def _anchors(card: dict, p: PlannedOverlay) -> tuple[Anchors, dict[str, Any]]:
         return Anchors(player_id=pid), {}
     if p.anchor == "run":
         r = a["run"]
+        if not r.get("from_xy") or not r.get("to_xy"):
+            raise KeyError("run")
         return Anchors(player_id=r["player_id"], from_xy=tuple(r["from_xy"]), to_xy=tuple(r["to_xy"])), {"lead_s": 0.8}
     if p.anchor == "defender_move":
         d = a["defender"]
+        if not d.get("from_xy"):
+            raise KeyError("defender_move")
         return Anchors(player_id=d["player_id"], from_xy=tuple(d["from_xy"])), {"style": "displacement"}
     if p.anchor == "gap":
         g = a["gap"]
@@ -64,14 +71,22 @@ def _anchors(card: dict, p: PlannedOverlay) -> tuple[Anchors, dict[str, Any]]:
     return Anchors(), {}
 
 
-def _speech(oid: str, text: str, pan: float | None) -> dict[str, Speech]:
-    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    return {"en": Speech(ssml_ref=f"{oid}.en.ssml", voice="narrator-1",
-                         ssml=f'<speak version="1.0" xml:lang="en">{escaped}</speak>', pan=pan)}
+def _localized(words: Localized) -> dict[str, str]:
+    """A text map for the overlay contract: each language the Persona wrote, leaving out empty ones."""
+    return {lang: getattr(words, lang).strip() for lang in LANGS if getattr(words, lang).strip()}
 
 
-def build_overlays(state: MatchState, card: dict, scripts: dict[str, ModeScript], schedule: Schedule,
-                   draft: DraftOut, live_clock: tuple[int, int] | None) -> list[Overlay]:
+def _speech(oid: str, text: dict[str, str], pan: float | None) -> dict[str, Speech]:
+    out = {}
+    for lang, words in text.items():
+        escaped = words.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        out[lang] = Speech(ssml_ref=f"{oid}.{lang}.ssml", voice="narrator-1",
+                           ssml=f'<speak version="1.0" xml:lang="{lang}">{escaped}</speak>', pan=pan)
+    return out
+
+
+def build_overlays(card: dict, scripts: dict[str, ModeScript], schedule: Schedule, draft: DraftOut,
+                   live_clock: tuple[int, int] | None) -> list[Overlay]:
     beats = _beat_times(card, live_clock)
     claims = {c.claim_id: c for c in draft.claims}
     beat_evidence = {b["key"]: b["evidence_ids"] for b in card["beats"]}
@@ -79,7 +94,7 @@ def build_overlays(state: MatchState, card: dict, scripts: dict[str, ModeScript]
     pan_gap = max(-1.0, min(1.0, (card["anchors"]["gap"]["centre_xy"][0] - 52.5) / 52.5))
     problems: list[str] = []
     out: list[Overlay] = []
-    n0 = len(state.overlays)
+    seen: dict[tuple[str, str], int] = {}
     for k, p in enumerate(schedule.overlays):
         where = f"overlay {k} ({p.mode} {p.kind})"
         script = scripts.get(p.mode)
@@ -100,19 +115,25 @@ def build_overlays(state: MatchState, card: dict, scripts: dict[str, ModeScript]
         except KeyError as exc:
             problems.append(f"{where}: the moment card has no anchor {exc}")
             continue
-        text, a11y, claim_ids, line_player = "", "", [], None
+        except ValueError as exc:  # an anchor the card has, but with positions a graphic can't use
+            problems.append(f"{where}: the {p.anchor} anchor can't be drawn: {str(exc)[:120]}")
+            continue
+        text: dict[str, str] = {}
+        a11y: dict[str, str] = {}
+        claim_ids, line_player = [], None
         if p.text_ref == "line":
             if p.line_index is None or not 0 <= p.line_index < len(script.lines):
                 problems.append(f"{where}: line_index {p.line_index} isn't a line of the {p.mode} script")
                 continue
             line = script.lines[p.line_index]
-            text, a11y, claim_ids, line_player = line.text, line.a11y_text, line.claim_ids, line.player_id
+            text, a11y = _localized(line.text), _localized(line.a11y_text)
+            claim_ids, line_player = line.claim_ids, line.player_id
         elif p.text_ref != "none":
-            text = getattr(script, p.text_ref)
-            if not text:
+            text = _localized(getattr(script, p.text_ref))
+            if not text.get("en"):
                 problems.append(f"{where}: the {p.mode} script has no {p.text_ref}")
                 continue
-        if p.kind == "caption" and not text:
+        if p.kind == "caption" and not text.get("en"):
             problems.append(f"{where}: a caption needs a line")
             continue
         if p.mode == "player" and p.kind == "caption" and line_player:
@@ -129,18 +150,19 @@ def build_overlays(state: MatchState, card: dict, scripts: dict[str, ModeScript]
             data = {"live": "speed", "threshold_kmh": 25.2}
         if not a11y:
             same_beat = [ln for ln in script.lines if ln.beat == p.start_beat]
-            a11y = same_beat[0].a11y_text if same_beat else text
+            a11y = _localized(same_beat[0].a11y_text) if same_beat else dict(text)
         evidence = sorted({e for cid in claim_ids if cid in claims for e in claims[cid].evidence_ids}
                           | set(beat_evidence.get(p.start_beat, [])))
-        oid = overlay_id(card["match_id"], n0 + len(out) + 1)
+        seen[(p.mode, p.kind)] = seen.get((p.mode, p.kind), 0) + 1
+        oid = moment_overlay_id(card["candidate_id"], p.mode, p.kind, seen[(p.mode, p.kind)])
         speak = p.kind == "caption" or (p.mode == "audio" and p.kind == "gap_ring")
         pan = pan_gap if p.mode == "audio" and p.anchor == "gap" else None
         try:
             out.append(Overlay(
                 overlay_id=oid, match_id=card["match_id"], period=period, t_start_ms=t0, t_end_ms=t1, kind=p.kind,
                 layer=LAYER_OF[p.kind], priority=p.priority, mode=p.mode, anchors=anchors,
-                text={"en": text} if text else {}, speech=_speech(oid, text or a11y, pan) if speak else {},
-                a11y_text={"en": a11y} if a11y else {}, data=data or None, evidence_ids=evidence,
+                text=text, speech=_speech(oid, text or a11y, pan) if speak else {},
+                a11y_text=a11y, data=data or None, evidence_ids=evidence,
                 confidence=draft.confidence, approval=p.approval, detected_moment_id=card["candidate_id"]))
         except ValueError as exc:
             problems.append(f"{where}: {exc}")
@@ -149,3 +171,20 @@ def build_overlays(state: MatchState, card: dict, scripts: dict[str, ModeScript]
     if not out:
         raise PublishError("the schedule has no graphics")
     return out
+
+
+def publish_correction(state: MatchState, candidate_id: str, overlays: list[Overlay], event_id: str) -> list[str]:
+    """Replace a moment's graphics after a feed correction (INTEGRATION.md 4.3): every replacement goes out first,
+    under a new ID with the "correction" label, then each old graphic is retracted, naming the corrected event and
+    its replacement. Returns the replacements' IDs."""
+    old = [o for o in state.live_overlays() if o.detected_moment_id == candidate_id]
+    replaced: dict[str, str] = {}
+    for o in overlays:
+        k = 1 + sum(oid.startswith(f"{o.overlay_id}-r") for oid in state.overlays)
+        new = o.model_copy(update={"overlay_id": f"{o.overlay_id}-r{k}", "rev": 1, "labels": [*o.labels, "correction"]})
+        state.upsert_overlay(new)
+        replaced[o.overlay_id] = new.overlay_id
+    for o in old:
+        base = re.sub(r"-r\d+$", "", o.overlay_id)
+        state.retract_overlay(o.overlay_id, "correction", corrects_event_id=event_id, replacement_id=replaced.get(base))
+    return list(replaced.values())

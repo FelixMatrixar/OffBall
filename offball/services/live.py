@@ -193,6 +193,10 @@ class LiveMatch:
         self._event_keys.insert(k, key)
         self.events.insert(k, e)
         self._data_cache = None
+        if corrects:
+            # The crew re-checks whatever is on air that cites the corrected event (PRD 14.11).
+            self.state.append("correction", {"event_id": corrects, "replacement_id": e.event_id,
+                                             "period": self._clock[0], "t_ms": self._clock[1]}, produced_by="ingest")
 
     def _status(self, s: dict) -> None:
         self.state.status = s["status"]

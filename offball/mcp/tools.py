@@ -7,6 +7,7 @@ functions back the MCP server and the agents' in-process tools, so both transpor
 
 from __future__ import annotations
 
+import hashlib
 import json
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -23,7 +24,11 @@ from offball.models.match_data import MatchData
 
 ROOT = Path(__file__).resolve().parents[2]
 DATASETS = ROOT / "datasets"
-GLOSSARY = ROOT / "offball" / "agents" / "locales" / "en.json"
+CANDIDATE_CACHE = ROOT / "replays" / "cache" / "candidates"  # git ignores replays/
+DETECTORS = [ROOT / "offball" / "models" / name for name in ("candidates.py", "candidates_extra.py", "runs.py",
+                                                              "pitch_control.py", "metrics.py", "match_data.py")]
+LOCALES = ROOT / "offball" / "agents" / "locales"
+LOCALE_CODES = ("en", "es", "pt", "fr", "ar", "hi", "id", "zh", "ja", "sw")
 
 
 class LiveView(Protocol):
@@ -80,8 +85,30 @@ class Registry:
         if match_id in self._live:
             return self._live[match_id].candidates()
         if match_id not in self._done_candidates:
-            self._done_candidates[match_id] = detect(self.data(match_id))
+            self._done_candidates[match_id] = self._cached_candidates(match_id)
         return self._done_candidates[match_id]
+
+    def _cached_candidates(self, match_id: str) -> list[Candidate]:
+        """A finished match's candidates, from the disk cache when the match files and the detectors are unchanged.
+        Detecting a whole match takes minutes, which a fan's first question shouldn't wait for."""
+        match_dir = self.match_dirs().get(match_id)
+        manifest = match_dir / "manifest.json" if match_dir else None
+        if manifest is None or not manifest.exists():
+            return detect(self.data(match_id))
+        digest = hashlib.sha256(manifest.read_bytes())
+        for src in DETECTORS:
+            digest.update(src.read_bytes())
+        key = digest.hexdigest()
+        path = CANDIDATE_CACHE / f"{match_id}.json"
+        if path.exists():
+            cached = json.loads(path.read_text(encoding="utf-8"))
+            if cached.get("key") == key:
+                return [Candidate.model_validate(c) for c in cached["candidates"]]
+        found = detect(self.data(match_id))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"key": key, "candidates": [c.model_dump(mode="json") for c in found]},
+                                   separators=(",", ":")), encoding="utf-8", newline="\n")
+        return found
 
 
 REGISTRY = Registry()
@@ -352,9 +379,13 @@ def player_summary(match_id: str, player_id: str, period: int | None = None, t_m
     }
 
 
-def glossary() -> dict[str, str]:
-    """The football terms OffBall uses in English, so every agent names ideas the same way."""
-    return json.loads(GLOSSARY.read_text(encoding="utf-8"))["glossary"]
+def glossary(lang: str = "en") -> dict[str, str]:
+    """The football terms OffBall uses in one language (en, es, pt, fr, ar, hi, id, zh, ja or sw), keyed the same in
+    every language, so every agent names ideas the same way."""
+    path = LOCALES / f"{lang}.json"
+    if lang not in LOCALE_CODES or not path.exists():
+        raise ValueError(f"No glossary for {lang!r}; languages: {', '.join(LOCALE_CODES)}")
+    return json.loads(path.read_text(encoding="utf-8"))["glossary"]
 
 
 READ_TOOLS = [list_matches, match_facts, list_metrics, compute_metric, list_candidates, moment_card, events_between,

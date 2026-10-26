@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "DecisionCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "gapOpens": {
+          "description": "Re-runs in which the gap opened",
+          "title": "Gapopens",
+          "type": "integer"
+        },
+        "shots": {
+          "title": "Shots",
+          "type": "integer"
+        },
+        "goals": {
+          "title": "Goals",
+          "type": "integer"
+        },
+        "space": {
+          "description": "Space in m²: median and the 90% interval",
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Space",
+          "type": "array"
+        },
+        "xg": {
+          "description": "The best chance's xG, median",
+          "title": "Xg",
+          "type": "number"
+        },
+        "offside": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Offside"
+        }
+      },
+      "required": [
+        "gapOpens",
+        "shots",
+        "goals",
+        "space",
+        "xg"
+      ],
+      "title": "DecisionCounts",
+      "type": "object"
+    },
+    "PlannedPass": {
+      "additionalProperties": false,
+      "properties": {
+        "to": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "To",
+          "type": "array"
+        },
+        "difficulty": {
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Difficulty",
+          "type": "number"
+        }
+      },
+      "required": [
+        "to",
+        "difficulty"
+      ],
+      "title": "PlannedPass",
+      "type": "object"
+    },
+    "Ring": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "At",
+          "type": "array"
+        },
+        "open": {
+          "title": "Open",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "at",
+        "open"
+      ],
+      "title": "Ring",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The result of re-running a changed decision (INTEGRATION.md 6.2).",
+  "properties": {
+    "option_id": {
+      "title": "Option Id",
+      "type": "string"
+    },
+    "counterfactual_id": {
+      "title": "Counterfactual Id",
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/$defs/DecisionCounts"
+    },
+    "tracks": {
+      "additionalProperties": {
+        "items": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        "type": "array"
+      },
+      "description": "Per player the change moved: [t_ms, x, y]",
+      "title": "Tracks",
+      "type": "object"
+    },
+    "ball": {
+      "anyOf": [
+        {
+          "items": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ball"
+    },
+    "pass": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlannedPass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A pass that wasn't played"
+    },
+    "ring": {
+      "$ref": "#/$defs/Ring"
+    },
+    "analyst": {
+      "description": "The verdict with its numbers, for Analyst mode",
+      "title": "Analyst",
+      "type": "string"
+    }
+  },
+  "required": [
+    "option_id",
+    "counterfactual_id",
+    "result",
+    "tracks",
+    "ring",
+    "analyst"
+  ],
+  "title": "DecisionResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/decision-result.schema.json"
+}

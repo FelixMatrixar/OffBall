@@ -1,13 +1,13 @@
 // Vega-Lite specs for panel and report charts (PRD 16.4). The same specs could come from the Pundit or the Producer;
 // the client applies the theme (VIS-7).
-import { BENCH, BENCH_RUNS, CONTROL_INDEX, FIDELITY, RELIABILITY, SHAPE } from '../../lib/stats';
+import { BENCH, BENCH_RUNS, FIDELITY, RELIABILITY, controlIndex, shape } from '../../lib/stats';
 import type { VegaLiteSpec } from './VegaChart';
 
 const SCHEMA = 'https://vega.github.io/schema/vega-lite/v6.json';
 
 /** Control versus chaos over the match (PRD 9.2). */
 export function controlIndexSpec(upTo: number): VegaLiteSpec {
-  const values = CONTROL_INDEX.filter((d) => d.minute <= upTo).flatMap((d) => [
+  const values = controlIndex().filter((d) => d.minute <= upTo).flatMap((d) => [
     { minute: d.minute, team: 'Kestrel Bay', control: d.kes },
     { minute: d.minute, team: 'Ashmoor', control: d.ash },
   ]);
@@ -33,7 +33,7 @@ export function controlIndexSpec(upTo: number): VegaLiteSpec {
 /** Line heights, width and compactness over time (PRD 16.4 shape and pressure). */
 export function shapeSpec(): VegaLiteSpec {
   const labels: Record<string, string> = { ashLine: 'Ashmoor line height', ashWidth: 'Ashmoor width', ashCompact: 'Ashmoor compactness', kesPress: 'Kestrel press height' };
-  const values = SHAPE.flatMap((d) => Object.entries(labels).map(([k, label]) => ({ minute: d.minute, measure: label, metres: d[k as keyof typeof d] })));
+  const values = shape().flatMap((d) => Object.entries(labels).map(([k, label]) => ({ minute: d.minute, measure: label, metres: d[k as keyof typeof d] })));
   return {
     $schema: SCHEMA,
     data: { values },

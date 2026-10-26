@@ -1,0 +1,349 @@
+{
+  "$defs": {
+    "DiagramPass": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "From",
+          "type": "array"
+        },
+        "to": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "To",
+          "type": "array"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "title": "DiagramPass",
+      "type": "object"
+    },
+    "DiagramPlayer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "at": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "At",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "at"
+      ],
+      "title": "DiagramPlayer",
+      "type": "object"
+    },
+    "DiagramRun": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "from": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "From",
+          "type": "array"
+        },
+        "to": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "To",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "from",
+        "to"
+      ],
+      "title": "DiagramRun",
+      "type": "object"
+    },
+    "MomentDiagram": {
+      "additionalProperties": false,
+      "description": "`MomentDiagram` in web/src/lib/recap.ts, in metres.",
+      "properties": {
+        "players": {
+          "items": {
+            "$ref": "#/$defs/DiagramPlayer"
+          },
+          "title": "Players",
+          "type": "array"
+        },
+        "run": {
+          "$ref": "#/$defs/DiagramRun"
+        },
+        "ring": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Ring",
+          "type": "array"
+        },
+        "pass": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DiagramPass"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ball": {
+          "description": "Pitch position in metres: [x, y]",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Ball",
+          "type": "array"
+        }
+      },
+      "required": [
+        "players",
+        "run",
+        "ring",
+        "ball"
+      ],
+      "title": "MomentDiagram",
+      "type": "object"
+    },
+    "RecapMoment": {
+      "additionalProperties": false,
+      "description": "`RecapMoment` in web/src/lib/recap.ts: one moment, told with its result and spoiler-safe.",
+      "properties": {
+        "id": {
+          "description": "The detected moment's ID",
+          "title": "Id",
+          "type": "string"
+        },
+        "minute": {
+          "title": "Minute",
+          "type": "integer"
+        },
+        "half": {
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Half",
+          "type": "integer"
+        },
+        "team": {
+          "title": "Team",
+          "type": "string"
+        },
+        "creator": {
+          "title": "Creator",
+          "type": "string"
+        },
+        "finisher": {
+          "title": "Finisher",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "safeTitle": {
+          "title": "Safetitle",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "safeText": {
+          "title": "Safetext",
+          "type": "string"
+        },
+        "space": {
+          "description": "Space Created in m², with its 90% interval",
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Space",
+          "type": "array"
+        },
+        "threat": {
+          "title": "Threat",
+          "type": "number"
+        },
+        "outcome": {
+          "enum": [
+            "goal",
+            "saved",
+            "off target",
+            "blocked"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "replay": {
+          "title": "Replay",
+          "type": "boolean"
+        },
+        "diagram": {
+          "$ref": "#/$defs/MomentDiagram"
+        }
+      },
+      "required": [
+        "id",
+        "minute",
+        "half",
+        "team",
+        "creator",
+        "finisher",
+        "title",
+        "safeTitle",
+        "text",
+        "safeText",
+        "space",
+        "threat",
+        "outcome",
+        "replay",
+        "diagram"
+      ],
+      "title": "RecapMoment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "`RecapPackage` in web/src/lib/recap.ts (INTEGRATION.md 6.4), with its moments.",
+  "properties": {
+    "kind": {
+      "enum": [
+        "halftime",
+        "fulltime"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "moments": {
+      "description": "Moment IDs, in the order the recap tells them",
+      "items": {
+        "type": "string"
+      },
+      "title": "Moments",
+      "type": "array"
+    },
+    "spoilerSafe": {
+      "title": "Spoilersafe",
+      "type": "boolean"
+    },
+    "publishedAt": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "When the producer published it; null for the automatic package",
+      "title": "Publishedat"
+    },
+    "stories": {
+      "description": "The moments themselves",
+      "items": {
+        "$ref": "#/$defs/RecapMoment"
+      },
+      "title": "Stories",
+      "type": "array"
+    }
+  },
+  "required": [
+    "kind",
+    "moments",
+    "spoilerSafe",
+    "publishedAt"
+  ],
+  "title": "RecapPackage",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/recap.schema.json"
+}

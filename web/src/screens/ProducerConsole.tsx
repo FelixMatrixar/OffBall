@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AgentTrace, type TraceRow } from '../components/charts';
 import { QueueChip, Stage2D, broadcastQueue, decideAll, kindLabel, queueState } from '../components/match';
 import { RecapBuilder } from '../components/recap';
 import { Button, Card, Chip, Logo, PulseDot, Switch } from '../components/ui';
-import { useFeedStore, useMatchClock, type Overlay } from '../lib/feed';
+import { apiBase, getJson } from '../lib/api';
+import { sourceFromLocation, useFeedSource, useFeedStore, useMatchClock, type Overlay } from '../lib/feed';
 import { useNow } from '../lib/hooks';
 import { useI18n } from '../lib/i18n';
 import { BASE_MS, MATCH_ID, PERIOD, clockLabel } from '../lib/match';
@@ -57,6 +58,21 @@ function traceFor(o: Overlay): { rows: TraceRow[]; note?: string } {
   };
 }
 
+/** On a live run, the crew's real trace for a graphic from the backend (INTEGRATION.md 6.3); null until it arrives. */
+function useServedTrace(o: Overlay | undefined, live: boolean): { rows: TraceRow[]; note?: string } | null {
+  const [got, setGot] = useState<{ id: string; rows: TraceRow[] } | null>(null);
+  const id = o?.overlay_id;
+  useEffect(() => {
+    if (!id || !live || !apiBase()) return;
+    const ctl = new AbortController();
+    getJson<{ rows: TraceRow[] }>(`/api/matches/${MATCH_ID}/overlays/${encodeURIComponent(id)}/trace`, ctl.signal)
+      .then((t) => t.rows.length && setGot({ id, rows: t.rows }))
+      .catch(() => setGot(null));
+    return () => ctl.abort();
+  }, [id, live]);
+  return got && got.id === id ? { rows: got.rows, note: 'The crew’s steps for this graphic, from the live run’s envelopes.' } : null;
+}
+
 /** The fatigue-gap graphic the Activator alert suggests (PRD 17.4). */
 const fatigueGraphic = (): Overlay => ({
   schema_version: '2.0',
@@ -87,8 +103,11 @@ const fatigueGraphic = (): Overlay => ({
 export function ProducerConsole() {
   const { prefs } = usePrefs();
   const i18n = useI18n();
+  // The same feed as the match view (`?feed=`), so a producer can run a live match from here (INTEGRATION.md 9).
+  const spec = useMemo(() => sourceFromLocation(), []);
+  const source = useFeedSource(spec);
   const store = useFeedStore();
-  const clock = useMatchClock(store, false);
+  const clock = useMatchClock(store, !!source?.live);
   const now = useNow(1000);
   const [openedAt] = useState(() => Date.now());
   const [auto, setAuto] = useState(false);
@@ -98,7 +117,8 @@ export function ProducerConsole() {
   const [steps, setSteps] = useState<{ at: number; text: string }[]>([]);
   const queue = broadcastQueue(store);
   const current = queue.find((o) => o.overlay_id === selected) ?? queue.find((o) => o.kind === 'gap_ring') ?? queue[0];
-  const trace = current ? traceFor(current) : null;
+  const served = useServedTrace(current, !!source?.live);
+  const trace = served ?? (current ? traceFor(current) : null);
   const fatigueQueued = store.overlays.has(`${MATCH_ID}-o0090`);
 
   // Automatic mode: anything pending at or above the threshold is approved (PRD 15.6).

@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import json
+import os
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -20,6 +21,7 @@ from pydantic import BaseModel
 
 from offball.contracts import Candidate, Envelope, Overlay
 from offball.models.match_data import MatchData
+from offball.services.telemetry import event
 
 
 def now_ms() -> int:
@@ -28,6 +30,22 @@ def now_ms() -> int:
 
 def iso_now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()) + f".{now_ms() % 1000:03d}Z"
+
+
+@dataclass
+class TokenMeter:
+    """Every model token a match has spent (PRD 14.10). At 80% of the budget only top-priority moments air, and
+    at 100% no new moment starts (14.5)."""
+
+    budget: int = field(default_factory=lambda: int(os.environ.get("TOKENS_PER_MATCH", "2000000")))
+    used: int = 0
+
+    def add(self, tokens: int) -> None:
+        self.used += max(0, tokens)
+
+    @property
+    def share(self) -> float:
+        return self.used / self.budget if self.budget > 0 else 0.0
 
 
 @dataclass
@@ -42,6 +60,7 @@ class MatchState:
     retracted: set[str] = field(default_factory=set)
     envelopes: list[Envelope] = field(default_factory=list)
     partner_log: list[dict] = field(default_factory=list)
+    tokens: TokenMeter = field(default_factory=TokenMeter)
     mirror_dir: Path | None = None
     _subscribers: list[asyncio.Queue] = field(default_factory=list)
     _listeners: list[Callable[[Envelope], None]] = field(default_factory=list)
@@ -52,6 +71,7 @@ class MatchState:
         env = Envelope(seq=len(self.envelopes) + 1, match_id=self.match_id, kind=kind, produced_by=produced_by,
                        wall_ms=now_ms(), payload=body, trace_id=trace_id)
         self.envelopes.append(env)
+        event("handoff", seq=env.seq, kind=kind, by=produced_by)
         if kind == "candidate":
             self.candidates[body["candidate_id"]] = Candidate.model_validate(body)
         self._mirror("envelopes.jsonl", env.model_dump(mode="json"))
@@ -68,11 +88,22 @@ class MatchState:
     # ------------------------------------------------------------------ overlays and the partner feed
     def upsert_overlay(self, overlay: Overlay) -> dict:
         self.overlays[overlay.overlay_id] = overlay
+        event("overlay", overlay_id=overlay.overlay_id, rev=overlay.rev, mode=overlay.mode, kind=overlay.kind)
         msg = {"type": "overlay.upsert", "match_id": self.match_id, "overlay": overlay.model_dump(mode="json"),
                "sent_at": iso_now()}
         self._mirror("overlays.jsonl", overlay.model_dump(mode="json"))
         self.publish(msg)
         return msg
+
+    def publish_revision(self, overlay: Overlay) -> dict | None:
+        """Send a graphic once (BE-7): nothing when the same content already went out under its ID, or the next
+        revision when it changed. A step that runs again therefore never airs a duplicate."""
+        old = self.overlays.get(overlay.overlay_id)
+        if old is not None:
+            if old.model_dump(exclude={"rev"}) == overlay.model_dump(exclude={"rev"}):
+                return None
+            overlay = overlay.model_copy(update={"rev": old.rev + 1})
+        return self.upsert_overlay(overlay)
 
     def retract_overlay(self, overlay_id: str, reason: str, corrects_event_id: str | None = None,
                         replacement_id: str | None = None) -> dict:

@@ -1,5 +1,6 @@
 // Where the feed comes from (PRD 15.7, 21.2). Replay is the default: the showcase with precomputed agent output.
 // A live feed arrives over Server-Sent Events or WebSocket; JSONL files replay a recorded feed.
+import { producerRemote, producerStream } from '../api';
 import { loadBuffer, saveBuffer } from './offline';
 import { T_LOOP, showcaseFeed } from './emitter';
 import type { FeedStore } from './store';
@@ -33,6 +34,27 @@ export function sourceFromLocation(): SourceSpec {
   if (raw.startsWith('ws://') || raw.startsWith('wss://')) return { kind: 'ws', url: raw };
   if (raw.startsWith('jsonl:')) return { kind: 'jsonl', url: raw.slice(6) };
   return { kind: 'replay' };
+}
+
+/**
+ * On a live feed from an OffBall API with the run's producer token (`?producer=`), the producer's approve, hold, skip
+ * and retract go to the backend, which sends the result to every screen on the stream (INTEGRATION.md 6.3).
+ */
+function withProducer(store: FeedStore, handle: SourceHandle): SourceHandle {
+  store.remote = producerRemote();
+  return {
+    ...handle,
+    get live() {
+      return handle.live;
+    },
+    get buffered() {
+      return handle.buffered;
+    },
+    stop: () => {
+      store.remote = null;
+      handle.stop();
+    },
+  };
 }
 
 function ingestText(store: FeedStore, text: string) {
@@ -93,9 +115,9 @@ export function startSource(store: FeedStore, spec: SourceSpec): SourceHandle {
     case 'live-sim':
       return startLiveSim(store, spec.stall);
     case 'sse':
-      return startSse(store, spec.url ?? '');
+      return withProducer(store, startSse(store, producerStream(spec.url ?? '')));
     case 'ws':
-      return startWs(store, spec.url ?? '');
+      return withProducer(store, startWs(store, spec.url ?? ''));
     case 'jsonl':
       return startJsonl(store, spec.url ?? '');
     default:

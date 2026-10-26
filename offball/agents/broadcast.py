@@ -13,13 +13,16 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, TypeVar
 
 from agent_framework import Executor, WorkflowBuilder, WorkflowContext, handler
+from pydantic import BaseModel
 
 from offball.agents.crew import AgentFailed, Crew, as_json
-from offball.agents.publish import PublishError, build_overlays
+from offball.agents.publish import PublishError, build_overlays, publish_correction
 from offball.agents.schemas import (
+    BLANK,
+    LANGS,
     MODES,
     DraftOut,
     Mode,
@@ -31,10 +34,14 @@ from offball.agents.schemas import (
 )
 from offball.contracts import Claim, ClaimVerdict, Draft, MomentPick, Verdict
 from offball.mcp import tools as T
+from offball.services import telemetry
 from offball.services.state import MatchState
+from offball.services.telemetry import TRACER
 
 log = logging.getLogger("offball.broadcast")
 MAX_DRAFTS = 3  # the first draft and at most two rewrites (PRD 14.5)
+TOKEN_WARN = 0.8  # past this share of the match's token budget, only priority-0 moments air (PRD 14.10)
+M = TypeVar("M", bound=BaseModel)
 
 
 @dataclass
@@ -76,7 +83,8 @@ class ModeReady:
 @dataclass
 class Outcome:
     candidate_id: str
-    status: Literal["published", "skipped", "dropped", "failed"]
+    # "kept", "corrected" and "retracted" end a re-check after a feed correction (offball.agents.corrections).
+    status: Literal["published", "skipped", "dropped", "failed", "kept", "corrected", "retracted"]
     overlay_ids: list[str]
     note: str
 
@@ -106,18 +114,35 @@ class Step(Executor):
     def record(self, kind: str, payload, agent: str) -> None:
         self.state.append(kind, payload, produced_by=agent)
 
+    async def ask(self, name: str, prompt: str, schema: type[M]) -> M:
+        """One agent call, with its tokens on the match's meter."""
+        return await self.crew.ask(name, prompt, schema, meter=self.state.tokens)
+
 
 class ScoutStep(Step):
     @handler
     async def decide(self, job: MomentJob, ctx: WorkflowContext[MomentJob, Outcome]) -> None:
+        if job.settings.get("correction"):  # it already aired: a correction re-enters at the Explainer (PRD 14.11)
+            await ctx.send_message(job)
+            return
+        spent = self.state.tokens.share
+        if spent >= 1.0:  # PRD 14.5: no new moments once the match's token budget is spent
+            await ctx.yield_output(Outcome(job.candidate_id, "skipped", [], "the match's token budget is spent"))
+            return
         aired = [e.payload for e in self.state.of_kind("moment") if e.payload.get("airtime")]
         prompt = (f"Moment card:\n{as_json(job.card)}\n\nRecently aired moments:\n{as_json(aired[-5:])}\n\n"
                   f"Producer settings:\n{as_json(job.settings)}")
+        if spent >= TOKEN_WARN:
+            prompt += (f"\n\nThe match has used {spent:.0%} of its token budget: air this moment only if it is "
+                       "priority 0.")
         try:
-            d = await self.crew.ask("scout", prompt, ScoutDecision)
+            d = await self.ask("scout", prompt, ScoutDecision)
         except AgentFailed as exc:
             await ctx.yield_output(Outcome(job.candidate_id, "failed", [], str(exc)))
             return
+        if d.airtime and spent >= TOKEN_WARN and d.priority > 0:
+            d = d.model_copy(update={"airtime": False,
+                                     "reason": f"{d.reason} Held back: the token budget is {spent:.0%} spent."})
         rank = len(aired) + 1 if d.airtime else 0
         self.record("moment", MomentPick(candidate_id=job.candidate_id, airtime=d.airtime, rank=rank,
                                          priority=d.priority, reason=d.reason,
@@ -131,7 +156,7 @@ class ScoutStep(Step):
 class ExplainStep(Step):
     async def _draft(self, job: MomentJob, prompt: str, attempt: int, ctx: WorkflowContext) -> None:
         try:
-            draft = await self.crew.ask("explainer", prompt, DraftOut)
+            draft = await self.ask("explainer", prompt, DraftOut)
         except AgentFailed as exc:
             await ctx.yield_output(Outcome(job.candidate_id, "failed", [], str(exc)))
             return
@@ -141,6 +166,10 @@ class ExplainStep(Step):
     @handler
     async def first(self, job: MomentJob, ctx: WorkflowContext[DraftReady, Outcome]) -> None:
         prompt = (f"Explain this moment in match {job.match_id}.\n\nMoment card:\n{as_json(job.card)}")
+        if fix := job.settings.get("correction"):
+            prompt += (f"\n\nThis moment already aired, but a feed correction changed event {fix['event_id']}, and the "
+                       f"Fact-checker found the aired draft no longer holds:\n{as_json(fix['verdict'])}\n"
+                       "Explain it again from the corrected data.")
         await self._draft(job, prompt, 1, ctx)
 
     @handler
@@ -158,7 +187,7 @@ class FactCheckStep(Step):
         prompt = (f"Check this draft about a moment in match {job.match_id}.\n\nMoment card:\n{as_json(job.card)}\n\n"
                   f"Draft:\n{as_json(d.draft)}")
         try:
-            v = await self.crew.ask("factchecker", prompt, VerdictOut)
+            v = await self.ask("factchecker", prompt, VerdictOut)
         except AgentFailed as exc:
             await ctx.yield_output(Outcome(job.candidate_id, "failed", [], str(exc)))
             return
@@ -190,16 +219,17 @@ class PersonaStep(Step):
     @handler
     async def voice(self, v: Verified, ctx: WorkflowContext[ModeReady]) -> None:
         prompt = (f"Viewing mode: {self.mode}\n\nVerified claims:\n{as_json(v.draft)}\n\n"
-                  f"Moment card:\n{as_json(v.job.card)}")
+                  f"Moment card:\n{as_json(v.job.card)}\n\n"
+                  f"Glossary by language:\n{as_json({lang: T.glossary(lang) for lang in LANGS})}")
         try:
-            script = await self.crew.ask("persona", prompt, ModeScript)
+            script = await self.ask("persona", prompt, ModeScript)
         except AgentFailed as exc:
             log.warning("No %s script for %s: %s", self.mode, v.job.candidate_id, exc)
             # An empty script, built without validation (a real script needs a line), so the Producer leaves
             # this mode out and the other modes still air (PRD 14.1).
-            script = ModeScript.model_construct(mode=self.mode, lines=[], runner_tag="", defender_tag="",
-                                                receiver_tag="", ring_label="", stat_title="", stat_claim_id=None,
-                                                glossary_terms=[])
+            script = ModeScript.model_construct(mode=self.mode, lines=[], runner_tag=BLANK, defender_tag=BLANK,
+                                                receiver_tag=BLANK, ring_label=BLANK, stat_title=BLANK,
+                                                stat_claim_id=None, glossary_terms=[])
         script.mode = self.mode
         self.record("script", {"candidate_id": v.job.candidate_id, **script.model_dump(mode="json")}, "persona")
         await ctx.send_message(ModeReady(v, script))
@@ -217,7 +247,7 @@ class ProduceStep(Step):
             await ctx.yield_output(Outcome(job.candidate_id, "failed", [], "no mode has a script"))
             return
         try:
-            check = await self.crew.ask(
+            check = await self.ask(
                 "factchecker",
                 f"Check these scripts against the verified claims.\n\nVerified claims:\n{as_json(v.draft)}\n\n"
                 f"Moment card:\n{as_json(job.card)}\n\nScripts by mode:\n"
@@ -244,19 +274,23 @@ class ProduceStep(Step):
             if problems:
                 prompt = f"{base}\n\nYour previous schedule couldn't be published:\n{problems}\nFix it."
             try:
-                schedule = await self.crew.ask("producer", prompt, Schedule)
+                schedule = await self.ask("producer", prompt, Schedule)
             except AgentFailed as exc:
                 await ctx.yield_output(Outcome(job.candidate_id, "failed", [], str(exc)))
                 return
             try:
-                overlays = build_overlays(self.state, job.card, scripts, schedule, v.draft, live_clock)
+                overlays = build_overlays(job.card, scripts, schedule, v.draft, live_clock)
             except PublishError as exc:
                 problems = str(exc)
                 log.warning("Schedule for %s rejected (attempt %d): %s", job.candidate_id, attempt, problems)
                 continue
             self.record("schedule", {"candidate_id": job.candidate_id, **schedule.model_dump(mode="json")}, "producer")
+            if fix := job.settings.get("correction"):
+                ids = publish_correction(self.state, job.candidate_id, overlays, fix["event_id"])
+                await ctx.yield_output(Outcome(job.candidate_id, "corrected", ids, schedule.note))
+                return
             for o in overlays:
-                self.state.upsert_overlay(o)
+                self.state.publish_revision(o)
             await ctx.yield_output(Outcome(job.candidate_id, "published", [o.overlay_id for o in overlays],
                                            schedule.note))
             return
@@ -284,12 +318,20 @@ def build_workflow(crew: Crew, state: MatchState):
 
 async def run_moment(crew: Crew, state: MatchState, match_id: str, candidate_id: str,
                      settings: dict | None = None) -> Outcome:
-    """Take one candidate moment through the crew. Returns what happened to it."""
+    """Take one candidate moment through the crew. Returns what happened to it. The whole run is one trace span,
+    with every agent call, hand-off and graphic inside it (PRD 14.3)."""
     job = MomentJob(match_id, candidate_id, T.moment_card(match_id, candidate_id),
                     settings or {"min_gap_s": 20, "approval": "auto"})
-    result = await build_workflow(crew, state).run(job)
-    outcomes = [o for o in result.get_outputs() if isinstance(o, Outcome)]
-    outcome = outcomes[-1] if outcomes else Outcome(candidate_id, "failed", [], "the workflow ended without an outcome")
-    state.append("outcome", {"candidate_id": candidate_id, "status": outcome.status,
-                             "overlay_ids": outcome.overlay_ids, "note": outcome.note}, produced_by="broadcast")
+    token = telemetry.MOMENT.set({"match_id": match_id, "candidate_id": candidate_id})
+    try:
+        with TRACER.start_as_current_span("moment", attributes=telemetry.attributes()) as span:
+            result = await build_workflow(crew, state).run(job)
+            outcomes = [o for o in result.get_outputs() if isinstance(o, Outcome)]
+            outcome = outcomes[-1] if outcomes else Outcome(candidate_id, "failed", [],
+                                                            "the workflow ended without an outcome")
+            span.set_attribute("offball.outcome", outcome.status)
+            state.append("outcome", {"candidate_id": candidate_id, "status": outcome.status,
+                                     "overlay_ids": outcome.overlay_ids, "note": outcome.note}, produced_by="broadcast")
+    finally:
+        telemetry.MOMENT.reset(token)
     return outcome

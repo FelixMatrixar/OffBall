@@ -33,6 +33,16 @@ from offball.contracts.feed import (
     OverlayUpsert,
     StatusPayload,
 )
+from offball.contracts.frontend import (
+    Alert,
+    Answer,
+    DecisionPoint,
+    DecisionResult,
+    FrameMessage,
+    RecapMoment,
+    RecapPackage,
+    RoundMoments,
+)
 from offball.contracts.match import Event, Kit, LineupEntry, MatchInfo, PeriodInfo, TeamSheet, TrackedFrame
 from offball.contracts.overlay import LAYER_OF, MODES, Anchors, Mode, Overlay, Speech
 from offball.contracts.truth import (
@@ -67,13 +77,29 @@ PUBLISHED: dict[str, type[BaseModel]] = {
     "agents/approval.schema.json": ApprovalDecision,
     "agents/incident.schema.json": Incident,
     "agents/envelope.schema.json": Envelope,
+    # Shapes the frontend already reads (PRD 11.3).
+    "frame-message.schema.json": FrameMessage,
+    "answer.schema.json": Answer,
+    "decision-point.schema.json": DecisionPoint,
+    "decision-result.schema.json": DecisionResult,
+    "recap.schema.json": RecapPackage,
+    "alert.schema.json": Alert,
+    "round-moments.schema.json": RoundMoments,
 }
+
+
+def published() -> dict[str, type[BaseModel]]:
+    """Every published contract, with the Match director's script from the generator, which is imported late so the
+    contracts never depend on the generator at import time."""
+    from offball.generator.script import MatchScript
+
+    return {**PUBLISHED, "match-script.schema.json": MatchScript}
 
 
 def export_schemas(out_dir: Path) -> list[Path]:
     """Write every published JSON Schema under out_dir. Returns the files written."""
     written = []
-    for name, model in PUBLISHED.items():
+    for name, model in published().items():
         path = out_dir / name
         path.parent.mkdir(parents=True, exist_ok=True)
         schema = model.model_json_schema()
@@ -92,7 +118,9 @@ __all__ = [
     "PUBLISHED",
     "XY",
     "XYZ",
+    "Alert",
     "Anchors",
+    "Answer",
     "AnswerKeyMoment",
     "ApprovalDecision",
     "Candidate",
@@ -102,12 +130,15 @@ __all__ = [
     "Contract",
     "CounterfactualResult",
     "CounterfactualTruth",
+    "DecisionPoint",
+    "DecisionResult",
     "DetectableType",
     "Draft",
     "Envelope",
     "Event",
     "FeedMessage",
     "FlagChange",
+    "FrameMessage",
     "Incident",
     "Intent",
     "Interval",
@@ -121,6 +152,9 @@ __all__ = [
     "OverlayRetract",
     "OverlayUpsert",
     "PeriodInfo",
+    "RecapMoment",
+    "RecapPackage",
+    "RoundMoments",
     "Signal",
     "Speech",
     "StatusPayload",
@@ -131,4 +165,5 @@ __all__ = [
     "Verdict",
     "Versioned",
     "export_schemas",
+    "published",
 ]

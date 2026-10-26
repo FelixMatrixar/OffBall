@@ -75,6 +75,14 @@ def overlay_id(match_id: str, n: int) -> str:
     return f"{match_id}-o{n:04d}"
 
 
+def moment_overlay_id(candidate_id: str, mode: str, kind: str, n: int) -> str:
+    """A graphic's ID from its moment, mode, kind and place among that mode's graphics of that kind, so a step that
+    runs again writes the same IDs (BE-7): `m07-d0220`, casual, caption 2 -> `m07-o0220-casual-caption-2`."""
+    match, sep, num = candidate_id.rpartition("-d")
+    stem = f"{match}-o{num}" if sep and num.isdigit() else f"{candidate_id}-o"
+    return f"{stem}-{mode}-{kind}-{n}"
+
+
 def counterfactual_id(match_id: str, n: int) -> str:
     return f"{match_id}-c{n:04d}"
 

@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "DecisionOption": {
+      "additionalProperties": false,
+      "properties": {
+        "option_id": {
+          "title": "Option Id",
+          "type": "string"
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True for what the player really did",
+          "title": "Actual"
+        },
+        "value": {
+          "description": "The option's modelled value, which ranks it",
+          "title": "Value",
+          "type": "number"
+        },
+        "words": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": "Per locale: label, detail, and for a changed decision world, plain and ring",
+          "title": "Words",
+          "type": "object"
+        }
+      },
+      "required": [
+        "option_id",
+        "value",
+        "words"
+      ],
+      "title": "DecisionOption",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A decision in a moment that a viewer can change (INTEGRATION.md 6.2; `DecisionChoice` in the language packs).",
+  "properties": {
+    "point_id": {
+      "title": "Point Id",
+      "type": "string"
+    },
+    "player_id": {
+      "title": "Player Id",
+      "type": "string"
+    },
+    "period": {
+      "title": "Period",
+      "type": "integer"
+    },
+    "t_ms": {
+      "title": "T Ms",
+      "type": "integer"
+    },
+    "words": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "description": "Per locale: what and question",
+      "title": "Words",
+      "type": "object"
+    },
+    "options": {
+      "description": "Ranked by modelled value, from the observed state only",
+      "items": {
+        "$ref": "#/$defs/DecisionOption"
+      },
+      "title": "Options",
+      "type": "array"
+    }
+  },
+  "required": [
+    "point_id",
+    "player_id",
+    "period",
+    "t_ms",
+    "words",
+    "options"
+  ],
+  "title": "DecisionPoint",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offball.dev/contracts/decision-point.schema.json"
+}

@@ -2,6 +2,7 @@
 // The evaluation charts (fidelity, reliability, benchmark) are sample data until the evaluation pipeline publishes.
 import { PLAYERS, player, type Team, type XY } from './match';
 import { focusStats } from './content';
+import { served } from './served';
 
 /** Deterministic noise in [0, 1). */
 export const rnd = (i: number, k = 0) => {
@@ -80,6 +81,9 @@ export const SHAPE = Array.from({ length: 13 }, (_, i) => {
 
 /** Where a player spent the match, as minutes per cell on a coarse grid (the heat map). */
 export function occupancy(id: string, cols = 21, rows = 14): number[] {
+  // The backend computes the default 21 × 14 grid.
+  const computed = cols === 21 && rows === 14 ? served<number[] | null>(`occupancy:${id}`, null) : null;
+  if (computed) return computed;
   const p = player(id);
   const [, x0, y0] = p.keys[0];
   const ax = p.team === 'kes' ? x0 * 0.78 + 4 : 105 - (105 - x0) * 0.78 - 4;
@@ -107,6 +111,8 @@ export interface RunLine {
 
 /** A player's off-ball runs this match, by type (the run map). The last decoy run is this moment's. */
 export function runMap(id: string): RunLine[] {
+  const computed = served<RunLine[] | null>(`run_map:${id}`, null);
+  if (computed) return computed;
   const p = player(id);
   const [, x0, y0] = p.keys[0];
   const dir = p.team === 'kes' ? 1 : -1;
@@ -128,10 +134,20 @@ export function runMap(id: string): RunLine[] {
 
 /** Distance per 5 minutes, in metres (the physical sparkline). */
 export function distanceSeries(id: string): { minute: number; metres: number }[] {
+  const computed = served<{ minute: number; metres: number }[] | null>(`distance_series:${id}`, null);
+  if (computed) return computed;
   const p = player(id);
   const base = p.role === 'GK' ? 300 : 640;
   return Array.from({ length: 13 }, (_, i) => ({ minute: i * 5, metres: Math.round(base + Math.sin(i / 2 + p.num) * 60 + rnd(i, p.num) * 70 - (i > 8 ? 30 : 0)) }));
 }
+
+// ---------- The same series as the backend computes them, when it does (INTEGRATION.md 6.5) ----------
+
+export const controlIndex = () => served('control_index', CONTROL_INDEX);
+export const shape = () => served('shape', SHAPE);
+export const passNetwork = () => served('pass_network', PASS_NETWORK);
+/** Shots arrive only once the backend's xG model is in place; until then the stand-in's stay. */
+export const shots = (): readonly Shot[] => served('shots', SHOTS);
 
 // ---------- Evaluation (sample data) ----------
 
