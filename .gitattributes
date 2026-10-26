@@ -2,3 +2,5 @@
 # the hash written when it was generated (PRD 12.10, gate 9), so git never converts its line endings.
 datasets/** -text
 truth/** -text
+# The frontend's committed feed is compared byte for byte with the emitter's LF output (contracts.spec.ts).
+web/public/feeds/*.jsonl text eol=lf

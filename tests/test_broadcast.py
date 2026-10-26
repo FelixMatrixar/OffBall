@@ -48,3 +48,14 @@ async def test_a_rejected_draft_is_rewritten(scripted) -> None:
     assert model.calls.count("DraftOut") == 2
     verdicts = [e.payload["passed"] for e in state.envelopes if e.kind == "verdict"]
     assert verdicts == [False, True]
+
+
+async def test_a_failed_persona_drops_only_its_mode(scripted) -> None:
+    model = scripted(failing_mode="audio")
+    state = MatchState("m07")
+    outcome = await run_moment(Crew.with_clients({"fast": model, "reasoning": model}), state, "m07", _goal_id(),
+                               {"live": False})
+    assert outcome.status == "published", outcome.note
+    assert {o.mode for o in state.overlays.values()} == {"casual", "learn", "analyst", "player", "broadcaster"}
+    audio = [e.payload for e in state.envelopes if e.kind == "script" and e.payload["mode"] == "audio"]
+    assert audio and audio[0]["lines"] == []

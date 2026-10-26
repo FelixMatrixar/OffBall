@@ -49,10 +49,11 @@ def _json_after(text: str, marker: str) -> Any:
 class ScriptedModel(BaseChatClient):
     """Answers each structured request with a fixed, valid answer, and records what it was asked."""
 
-    def __init__(self, reject_first_draft: bool = False) -> None:
+    def __init__(self, reject_first_draft: bool = False, failing_mode: str | None = None) -> None:
         super().__init__()
         self.calls: list[str] = []
         self.reject_first_draft = reject_first_draft
+        self.failing_mode = failing_mode  # the Persona's call for this mode always fails, as a model outage would
         self._verdicts = 0
 
     def _answer(self, schema: type, prompt: str) -> Any:
@@ -76,6 +77,8 @@ class ScriptedModel(BaseChatClient):
                                                  for c in ("c1", "c2")])
         if schema is ModeScript:
             mode = prompt.split("Viewing mode: ", 1)[1].split()[0]
+            if mode == self.failing_mode:
+                raise RuntimeError(f"the {mode} Persona's model is down")
             player = "kes-09" if mode == "player" else None
             return ModeScript(mode=mode, lines=[
                 Line(beat="run_start", text="Watch No. 9 run.", a11y_text="No. 9 runs wide.", player_id=player,

@@ -195,8 +195,11 @@ class PersonaStep(Step):
             script = await self.crew.ask("persona", prompt, ModeScript)
         except AgentFailed as exc:
             log.warning("No %s script for %s: %s", self.mode, v.job.candidate_id, exc)
-            script = ModeScript(mode=self.mode, lines=[], runner_tag="", defender_tag="", receiver_tag="",
-                                ring_label="", stat_title="", stat_claim_id=None, glossary_terms=[])
+            # An empty script, built without validation (a real script needs a line), so the Producer leaves
+            # this mode out and the other modes still air (PRD 14.1).
+            script = ModeScript.model_construct(mode=self.mode, lines=[], runner_tag="", defender_tag="",
+                                                receiver_tag="", ring_label="", stat_title="", stat_claim_id=None,
+                                                glossary_terms=[])
         script.mode = self.mode
         self.record("script", {"candidate_id": v.job.candidate_id, **script.model_dump(mode="json")}, "persona")
         await ctx.send_message(ModeReady(v, script))
