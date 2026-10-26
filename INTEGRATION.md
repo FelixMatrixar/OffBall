@@ -102,7 +102,7 @@ The frontend (`web/src/lib/feed/sources.ts`) and the partner template (`web/publ
 
 The match view reads several messages per event or frame, one per line, but the partner template reads one message per event or frame, so send one at a time to reach both. A malformed line is skipped, never fatal.
 
-In production the stream goes through Azure Web PubSub (PRD 11), one group per match. Send to the group as JSON with no subprotocol, so each WebSocket frame the browser receives is one message.
+In production the stream goes through the live service's relay on the backend VM (PRD 11.6), as Server-Sent Events only (ADR 0005); the web app itself is on Vercel, and browsers connect to the VM directly. A client asks `GET /api/negotiate` for a URL to one group (a match, a round or a pairing code) and reads that group at `GET /api/stream`, one message per event. Partners can read a match at `GET /api/matches/{id}/stream` without negotiating. Anything a client sends, such as a producer's decision or a phone's pairing message, is an API call. The WebSocket transport above stays in the frontend for other sources, but the backend doesn't serve one.
 
 ### 4.2 Message types
 
@@ -348,7 +348,7 @@ interface DecisionResult {
 ### 6.7 Second-screen pairing
 
 - **Stand-in:** `useHostCode`, `usePairHost` and `usePairGuest` in `web/src/lib/pairing.ts`, which pair tabs on one device. The messages are `hello`, `state` and `bye`. `state` carries `SharedState`: `t`, `playing`, `mode`, `lang`, `fav` and `at`.
-- **Proposed:** a Web PubSub group per pairing code, which phones and screens join and send to (PRD 15.5). Keep the three messages unchanged. Codes last 2 hours and identify nobody.
+- **Proposed:** a relay group per pairing code. Phones and screens get its URL from `GET /api/negotiate?pair=`, read it as Server-Sent Events, and send to it with `POST /api/pair/{code}` (PRD 11.6, 11.7, 15.5). Keep the three messages unchanged. Codes last 2 hours and identify nobody.
 
 ### 6.8 Evaluation results
 
@@ -425,11 +425,11 @@ The frontend changes for the backend, all small and contained. With no backend s
 | --- | --- | --- |
 | One module for calls, each stand-in falling back to itself when a call fails, so components stay unchanged | `web/src/lib/api.ts` and `served.ts`; `content.ts`, `stats.ts`, `AskPanel.tsx` | Built for Ask OffBall and the panel numbers; `decisions.ts` and `recap.ts` still to do |
 | An API address setting, next to `VITE_FEED_URL` | `VITE_API_BASE`, or `?api=` | Built |
-| A Web PubSub connection that fetches its access URL first and refreshes it on reconnect, naming the viewer's language so the backend writes only the languages someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` | Not built: waits for Web PubSub |
+| A relay connection that fetches its connection URL first and refreshes it on reconnect, naming the viewer's language so the backend writes only the languages someone is watching (PRD 11.6) | A `negotiate:` kind in `web/src/lib/feed/sources.ts` | Not built: waits for the relay's `GET /api/negotiate` and `GET /api/stream` |
 | Producer actions sent to the backend instead of other tabs, with the producer token of the live run being produced (PRD 11.7) | `decide()` and `retract()` in `web/src/lib/feed/store.ts` | Built |
 | The producer console and phone companion reading the same `?feed=` as the match view. The broadcast output stays a static reference design; the partner template is its live version. | `web/src/screens/ProducerConsole.tsx`, `PhoneCompanion.tsx` | Built for the console; the phone companion still to do |
 | Loading the match, roster, clubs, kits and moment window from the backend, so any match can be shown | `web/src/lib/match.ts` and the code that reads it | Not built |
-| Pairing over a Web PubSub group instead of between tabs | `web/src/lib/pairing.ts` | Not built: waits for Web PubSub |
+| Pairing across devices over a relay group: read its Server-Sent Events, and send `hello`, `state` and `bye` with `POST /api/pair/{code}`. Tab-to-tab pairing stays as the fallback (PRD 11.6, 11.7) | `web/src/lib/pairing.ts` | Not built: waits for `GET /api/negotiate?pair=` and `POST /api/pair/{code}` |
 | Playing synthesised speech when a line has it | `web/src/lib/audio.ts` | Not built |
 | Removing the "answers are in English" note for languages the Pundit answers in | `web/src/components/ask/AskPanel.tsx` | Built for English, Spanish and French |
 
