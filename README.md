@@ -29,6 +29,8 @@ http://localhost:5173/#/match?feed=sse:http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fmat
 
 With an `sse:` feed from this API, the frontend also uses the API for the rest: the Analyst and Player focus panels show numbers computed from the match, Ask OffBall goes to the Pundit, and the producer console reads the same feed. Anything the API can't answer falls back to the frontend's built-in content. Set `?api=` or `VITE_API_BASE` to point at an API on its own.
 
+To play whole matches, open the match player, `http://localhost:5173/#/matches?api=http://localhost:8000`: pick a match, then play or scrub all 90 minutes, jump to any of the 300-odd moments the models found, see the graphics the crew made for it (or ask the crew for them), and replay what-ifs in the match engine with the Tactician's verdict. `uv run offball graphics m07` builds a match's graphics ahead of time (INTEGRATION.md 6.10).
+
 To produce a live run, start it with `POST /api/live-runs` (for example `{"match_id": "m07", "period": 2, "from_ms": 1066000, "to_ms": 1093000}`), then open `#/producer` with the same `?feed=` and `&producer=` set to the token it returns: approvals, holds, skips and retractions then go to the backend and reach every screen on the stream.
 
 The partner graphics template reads the same stream:
@@ -51,6 +53,7 @@ Every caption, graphic and answer comes from a model; there are no templates to 
 | --- | --- |
 | `uv run offball serve all` | API and MCP server (`serve api` or `serve mcp` for one) |
 | `uv run offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000` | Runs a window of a match through the live pipeline and the crew, and writes the stream to `replays/m07.jsonl`, checked against `contracts/` |
+| `uv run offball graphics m07` | Takes every moment of a whole match through the crew, at a graphic a minute within a token budget, for the match player; picks up where it stopped |
 | `uv run offball golden run` | Puts the eight golden render cases through the pipeline and checks what it sends the frontend (PRD 19.5); `golden check <case> --stream out.jsonl` checks any stream |
 | `uv run offball eval agents` | Scores each agent on its own task set against the model in `.env` (PRD 14.15), and writes `calibration/reports/agents.md` |
 | `uv run offball gates smoke` | Runs the nine quality gates on the smoke set and writes the report |

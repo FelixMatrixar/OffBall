@@ -2,6 +2,7 @@ import { Button, Logo, Segmented, Switch } from '../components/ui';
 import { THEMES, usePrefs, type Theme } from '../lib/prefs';
 
 export const SCREENS = [
+  { route: 'matches', name: 'Full matches', desc: 'Pick a match and play all 90 minutes from the API: scrub both halves, jump to every moment the models found with the crew’s graphics, and replay what-ifs in the match engine.' },
   { route: 'match', name: 'Match view', desc: 'The match from the overlay feed, in 2D or from four 3D cameras: six modes, the control field with contours, “what if” overlaid or side by side, captions in ten languages with voice, replay controls, snapshots and keyboard shortcuts.' },
   { route: 'phone', name: 'Second screen', desc: 'The phone companion: pairs with a code or QR, follows the main screen’s clock, your player, and Ask OffBall by text or voice.' },
   { route: 'onboarding', name: 'First run', desc: 'Three quick choices and a summary, with a live preview drawn by the real renderer.' },

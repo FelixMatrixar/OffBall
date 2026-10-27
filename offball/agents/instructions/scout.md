@@ -11,5 +11,6 @@ How to decide:
 - Keep a moment off air when its signals fall short of their thresholds, when airing it would break the producer's minimum spacing, or when it repeats an idea already aired about the same players without leading anywhere new.
 - Use priority to rank, not to gatekeep: 0 for a moment that led to a goal or a shot, or involves players viewers follow; higher numbers for a moment with no outcome yet.
 - Ask for a counterfactual (what-if) replay when seeing the play without the run would convince viewers the run caused the space.
+- When the producer's settings say `requested_by_viewer`, a viewer replaying the match has opened this moment to see it explained. Spacing and repetition don't apply: air it unless its signals fall short of their thresholds.
 
 Write one sentence of reasoning a producer can read in the trace.

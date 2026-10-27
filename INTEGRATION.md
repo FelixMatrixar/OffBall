@@ -223,6 +223,7 @@ Each section gives the stand-in it replaces, the endpoint, and the shapes. The s
 | 6.4 Recaps and clips | Not built | Stand-in |
 | 6.5 Panel numbers and charts | Built | Built, except the momentum ribbon |
 | 6.6 to 6.9 Space Centre, pairing, evaluation, voice | Not built | Stand-ins |
+| 6.10 Full matches: timeline, frames, graphics, what-ifs | Built | Built, with no stand-in |
 
 ### 6.1 Ask OffBall
 
@@ -358,6 +359,18 @@ interface DecisionResult {
 ### 6.9 Voice
 
 The frontend speaks captions with the device's own voices (`web/src/lib/audio.ts`). To use synthesised voices instead, a backend would send a playable audio file per line; see [note 5](#8-contract-notes).
+
+### 6.10 Full matches
+
+Built on both sides, with no stand-in: the match player (`#/matches`, then `#/play?m=<match_id>`) plays whole finished matches only from an API. The screens are `web/src/screens/MatchPicker.tsx` and `MatchPlayer.tsx`; the calls are in `web/src/lib/player/api.ts` and the backend in `offball/services/fullmatch.py`.
+
+- `GET /api/matches` lists every match, now with `duration_ms` and `tracking` (whether it has frames to play).
+- `GET /api/matches/{match_id}/timeline` returns the clubs and kits, line-ups, periods, goals and every detected moment, each with its `outcome` (`goal`, `shot` or `none`), whether the crew explained it (`graphics`: `published`, `skipped`, `failed` or `not_built`, with the agent's `graphics_note`) and the alternative its type is measured against (`whatif`). The first call for a match finds its moments, a minute or two; after that they're cached on disk.
+- `GET /api/matches/{match_id}/frames?period=2&from_ms=1060000&to_ms=1080000` returns at most a minute of tracking: `ids`, then per frame `t`, `ball` as `[x, y, z]` and `xy` as `[x0, y0, x1, y1, …]` in the order of `ids`, `null` for a player off the pitch. The player fetches 20 s at a time and the next window before playback reaches it. Finished matches never change, so the answer is cacheable for a day.
+- `GET /api/matches/{match_id}/graphics` returns `{overlays, moments}`: every overlay the broadcast crew published for the match, as in section 4, and each moment's outcome. `offball graphics <match_id>` builds them ahead of time, every confirmed moment through the whole crew in match order, each seeing the match only to 8 s past its end, at a graphic a minute and within a token budget; it picks up where it stopped.
+- `POST /api/matches/{match_id}/moments/{candidate_id}/graphics` sends a moment the crew hasn't explained to it when a viewer opens it (the Scout's settings say `requested_by_viewer`). It takes one to three minutes and answers with the moment's outcome and `overlays`; at most two run at once, within `OFFBALL_ASKED_TOKENS` per match. `503` when no model is configured.
+- `GET /api/matches/{match_id}/moments/{candidate_id}/whatifs/{hold|inside|drop}` replays the moment 16 times in the match engine with the creator holding his place, coming inside, or dropping towards the ball, and the defenders he pulled free to react (ADR 0008). It answers `numbers` (`space_created_m2` with `space_lo_m2` and `space_hi_m2`, `gap_open_pct_without`, `replays`, `creator_shift_m`, `defender_shift_m.<player_id>`), `tracks` (each free player's median path as `[t_ms, x, y]`) and the gap's `ring`, open or shut. A few seconds the first time; cached after.
+- `GET …/whatifs/{option}/words` returns `{"words": {headline, plain, analyst}}` from the Tactician, each in `en`, `es` and `fr`, or `{"words": null}` when it couldn't quote the numbers faithfully in two tries.
 
 ---
 

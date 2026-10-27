@@ -150,3 +150,15 @@ class AnswerOut(Strict):
     claims: list[AnswerClaim]
     alternative_label: str | None = Field(description="For a declined or unknown question: a better question, short")
     alternative_question: str | None
+
+
+class NumberUsed(Strict):
+    name: str = Field(description="The number's name exactly as given, such as space_created_m2")
+    value: float = Field(description="The value written, as given")
+
+
+class TacticianOut(Strict):
+    headline: Localized = Field(description="Three to six words: the verdict")
+    plain: Localized = Field(description="One or two plain sentences for a casual viewer, at most one number")
+    analyst: Localized = Field(description="One or two precise sentences with the numbers, units and interval")
+    numbers: list[NumberUsed] = Field(description="Every number written in any field, with its name and value")

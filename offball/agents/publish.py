@@ -3,7 +3,8 @@
 This step decides nothing. It resolves the beats and anchors the Producer chose into match times and pitch
 positions from the moment card, takes the words from the Persona's scripts, and checks the result against the
 overlay contract and the house rules (every graphic holds at least 2.5 s). A schedule that breaks them comes
-back to the Producer with the reasons.
+back to the Producer with the reasons. Graphics planned for a mode with no script are left out: that mode stays
+silent.
 """
 
 from __future__ import annotations
@@ -99,7 +100,8 @@ def build_overlays(card: dict, scripts: dict[str, ModeScript], schedule: Schedul
         where = f"overlay {k} ({p.mode} {p.kind})"
         script = scripts.get(p.mode)
         if script is None:
-            problems.append(f"{where}: there is no {p.mode} script to take words from")
+            # A mode whose Persona gave nothing, or whose every line the Fact-checker struck, airs nothing: its
+            # graphics would have no words. That's the mode staying silent, not a broken schedule.
             continue
         missing = [b for b in (p.start_beat, p.end_beat) if b not in beats]
         if missing:

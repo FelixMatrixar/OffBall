@@ -8,6 +8,8 @@ import { EvalView } from './screens/EvalView';
 import { RecapView } from './screens/RecapView';
 import { ComponentGallery } from './screens/ComponentGallery';
 import { Home, SCREENS } from './screens/Home';
+import { MatchPicker } from './screens/MatchPicker';
+import { MatchPlayer } from './screens/MatchPlayer';
 import { MatchView } from './screens/MatchView';
 import { MotionGallery } from './screens/MotionGallery';
 import { Onboarding } from './screens/Onboarding';
@@ -19,6 +21,8 @@ import { VisualLanguage } from './screens/VisualLanguage';
 
 const ROUTES: Record<string, ComponentType> = {
   match: MatchView,
+  matches: MatchPicker,
+  play: MatchPlayer,
   phone: PhoneCompanion,
   onboarding: Onboarding,
   'space-centre': SpaceCentre,

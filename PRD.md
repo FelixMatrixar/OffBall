@@ -2381,13 +2381,13 @@ As checked on 27 October 2026. The frontend is complete, and the synthetic data 
 | M2 Interpretation core | About 90% | xG beating its baseline, and auto-eventing reaching its targets |
 | M3 Broadcast crew | About 70% | Verified captions within 3 s: on GPT-6 Luna a moment's first graphic takes about 124 s, and each call is far over its budget (14.10); registering the agents in Foundry; Azure MCP Server on the VM; Foundry evaluations in CI. The Foundry project and its OpenRouter connection exist, the agents run on a real model and pass their evaluations, and the Engineer mitigates their latency live |
 | M4 Emergent world | About 70% | The Tuner and Validator agents; generating OffBall-Bench, and `offball eval bench` to score it |
-| M5 Advanced intelligence | About 45% | Off-ball credit within its target, which neither the observed-tracking estimate nor the counterfactual workers' replays reach yet (ADR 0008); the Tactician and the workers' service; the backend for Change one decision and the tactics board. Space value, off-ball scoring opportunity, off-ball credit and the run classifier are built and scored (`calibration/reports/models.md`); the counterfactual workers replay moments in the engine from the observed state, with ghost paths and intervals; and the frontend for Change one decision and the tactics board is built |
-| M6 Full experience | About 70% | Synthesised speech, the phone companion across devices, recaps from the backend, loading any match |
+| M5 Advanced intelligence | About 55% | Off-ball credit within its target, which neither the observed-tracking estimate nor the counterfactual workers' replays reach yet (ADR 0008); the workers' own service; the showcase's Change one decision and the tactics board on the backend. The Tactician puts the workers' what-ifs into words for the match player (INTEGRATION.md 6.10). Space value, off-ball scoring opportunity, off-ball credit and the run classifier are built and scored (`calibration/reports/models.md`); the counterfactual workers replay moments in the engine from the observed state, with ghost paths and intervals; and the frontend for Change one decision and the tactics board is built |
+| M6 Full experience | About 80% | Synthesised speech, the phone companion across devices, recaps from the backend. The match player plays any finished match from the API: both halves to play and scrub, every detected moment to jump to with the crew's graphics, built ahead or on request, and what-ifs replayed in the match engine |
 | M7 Production and partners | About 25% | A public API and MCP endpoint, A2A, Content Safety, the red-team, load and fault-injection runs, SLO dashboards and the two human studies |
 | M8 Synthetic video and vision | Deferred (27) | All of it |
 | M9 Learning loop | About 5% | The optimizer, procedural memory and the release gate |
 
-Across M0 to M7 and M9, that is about 62%; before the trims, the same estimate was about 47%.
+Across M0 to M7 and M9, that is about 64%; before the trims, the same estimate was about 47%.
 
 | Area | Built | Not built yet |
 | --- | --- | --- |

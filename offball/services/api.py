@@ -16,7 +16,7 @@ import secrets
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -26,6 +26,7 @@ from offball.agents.llm import ModelNotConfigured, model_configured
 from offball.agents.pundit import answer as pundit_answer
 from offball.core import number_of
 from offball.mcp import tools as T
+from offball.services import fullmatch as F
 from offball.services import stats as S
 from offball.services.bus import ValkeyBus, bus_url
 from offball.services.emitter import Correction, EmitterConfig
@@ -109,6 +110,91 @@ def match(match_id: str) -> dict[str, Any]:
 def candidates(match_id: str) -> list[dict[str, Any]]:
     _match_dir(match_id)
     return T.list_candidates(match_id)
+
+
+_timeline_locks: dict[str, asyncio.Lock] = {}
+_whatif_slots = asyncio.Semaphore(int(os.environ.get("OFFBALL_WHATIFS_AT_ONCE", "1")))
+FINISHED = "public, max-age=86400"  # a finished match's frames never change
+
+
+def _finished(match_id: str) -> None:
+    _match_dir(match_id)
+    if T.REGISTRY.is_live(match_id):
+        raise HTTPException(409, f"{match_id} is being played live; the match player plays finished matches")
+
+
+@app.get("/api/matches/{match_id}/timeline")
+async def timeline(match_id: str) -> dict[str, Any]:
+    """What the match player needs before the first frame: clubs, kits, line-ups, periods, goals and every detected
+    moment, with whether the crew has explained it (INTEGRATION.md 6.10). The first call finds the moments, which
+    takes a minute or two; after that they are cached on disk."""
+    _finished(match_id)
+    async with _timeline_locks.setdefault(match_id, asyncio.Lock()):
+        return await asyncio.to_thread(F.timeline, match_id)
+
+
+@app.get("/api/matches/{match_id}/frames")
+async def match_frames(match_id: str, response: Response, period: int, from_ms: int = Query(ge=0),
+                       to_ms: int = Query(gt=0)) -> dict[str, Any]:
+    """Tracked frames for a window of at most a minute, for the match player to play and seek through."""
+    _finished(match_id)
+    if to_ms <= from_ms:
+        raise HTTPException(422, "to_ms must be after from_ms")
+    try:
+        value = await asyncio.to_thread(F.frames, match_id, period, from_ms, to_ms)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    response.headers["Cache-Control"] = FINISHED
+    return value
+
+
+@app.get("/api/matches/{match_id}/graphics")
+def graphics(match_id: str) -> dict[str, Any]:
+    """The graphics the broadcast crew made for the match's moments, and what happened to each moment it saw."""
+    _finished(match_id)
+    data = F.load_graphics(match_id)
+    return {"overlays": [o for o in data["overlays"] if o.get("approval") in ("auto", "approved")],
+            "moments": data["moments"]}
+
+
+def _moment(match_id: str, candidate_id: str):
+    _finished(match_id)
+    try:
+        return T.candidate(match_id, candidate_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.post("/api/matches/{match_id}/moments/{candidate_id}/graphics")
+async def explain_moment(match_id: str, candidate_id: str) -> dict[str, Any]:
+    """Send a moment the crew hasn't explained to it now, as a viewer opens it: one to three minutes, within the match's
+    token budget for viewers' requests. The answer is the moment's outcome and its graphics."""
+    _moment(match_id, candidate_id)
+    return await F.ASKED.explain(crew(), match_id, candidate_id)
+
+
+@app.get("/api/matches/{match_id}/moments/{candidate_id}/whatifs/{option}")
+async def whatif(match_id: str, candidate_id: str, option: str) -> dict[str, Any]:
+    """Replay a moment with its creator making an alternative (hold, inside or drop): what his decision caused,
+    with the paths of the players who were free to react. A few seconds the first time; cached after."""
+    _moment(match_id, candidate_id)
+    if option not in F.CF.ALTERNATIVES:
+        raise HTTPException(404, f"The alternatives are {', '.join(F.CF.ALTERNATIVES)}")
+    async with _whatif_slots:
+        return await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+
+
+@app.get("/api/matches/{match_id}/moments/{candidate_id}/whatifs/{option}/words")
+async def whatif_words(match_id: str, candidate_id: str, option: str) -> dict[str, Any]:
+    """The Tactician's words for a what-if, in English, Spanish and French; `words` is null when it couldn't give
+    faithful ones."""
+    _moment(match_id, candidate_id)
+    if option not in F.CF.ALTERNATIVES:
+        raise HTTPException(404, f"The alternatives are {', '.join(F.CF.ALTERNATIVES)}")
+    agents = crew()
+    async with _whatif_slots:
+        await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+    return {"words": await F.whatif_words(agents, match_id, candidate_id, option)}
 
 
 def _stat(match_id: str, name: str, player_id: str | None, until: tuple[int, int] | None,

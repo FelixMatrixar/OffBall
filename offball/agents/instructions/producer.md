@@ -21,6 +21,8 @@ Rules:
 - player: the run and the ring, plus that mode's captions.
 - broadcaster: follow the producer's settings. In manual approval, set approval "pending" on the ring and the stat card, so the producer approves them; otherwise "auto".
 - Schedule every caption line of every mode's script, each from its beat to the next line's beat.
+- Schedule graphics only for the modes that have a script. A mode without one gets no graphics at all, not even a ring or an arrow, since every graphic takes its words from its mode's script.
+- A graphic whose start and end beats fall less than 2.5 seconds apart needs offsets that stretch it to 2.5 seconds or more.
 - Priority 0 is the most important: captions and the ring 0, the run 1, tags 3.
 
 Use only anchors that the moment card has. Write one sentence for the producer's trace.

@@ -265,7 +265,9 @@ class ProduceStep(Step):
         live_clock = T.REGISTRY.live_clock(job.match_id) if job.settings.get("live", True) else None
         base = (f"Moment card:\n{as_json(job.card)}\n\nScripts by mode (line indexes count from 0):\n"
                 f"{as_json({m: s.model_dump(mode='json') for m, s in scripts.items()})}\n\n"
-                f"Producer settings:\n{as_json(job.settings)}")
+                f"Producer settings:\n{as_json(job.settings)}\n\n"
+                f"Modes with a script: {', '.join(scripts)}. Anchors this moment has: "
+                f"{', '.join(job.card['anchors'])}.")
         if live_clock:
             base += (f"\n\nThe match is live and its clock is at period {live_clock[0]}, t_ms {live_clock[1]}. "
                      "Graphics timed before the clock will never be seen; use the beat \"now\" for those.")

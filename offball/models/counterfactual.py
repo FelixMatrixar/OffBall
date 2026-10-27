@@ -59,6 +59,8 @@ GAP_GAIN = 0.40  # zone control gained that counts as the gap opening, as the ge
 # What the creator does instead, by moment type; anything else holds its place in the shape.
 COME_INSIDE = {"switch_of_play"}
 DROP_TO_BALL = {"press_broken", "pinning"}
+# The alternatives a viewer can try in a what-if: hold his place, come inside, or drop towards the ball.
+ALTERNATIVES = ("hold", "inside", "drop")
 
 
 @cache
@@ -233,6 +235,8 @@ class Replay:
     value: float
     control_gain: float
     track: list[tuple[int, float, float]] = field(default_factory=list)
+    # The other free players' paths, by slot: the defenders who were free to react.
+    others: dict[int, list[tuple[int, float, float]]] = field(default_factory=dict)
 
 
 def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None, free: list[int],
@@ -252,9 +256,16 @@ def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None,
     pinned = np.asarray([k for k in range(22) if k not in free and sim.active[k]])
     owner = int(sim.owner)
     track, every = [], max(1, int(round(GHOST_STEP_MS / 1000 / DT)))
+    others: dict[int, list[tuple[int, float, float]]] = {k: [] for k in free if k != i}
+
+    def keep() -> None:
+        track.append((sim.t_ms, round(float(sim.pos[i][0]), 2), round(float(sim.pos[i][1]), 2)))
+        for k, path in others.items():
+            path.append((sim.t_ms, round(float(sim.pos[k][0]), 2), round(float(sim.pos[k][1]), 2)))
+
     for f in range(1, len(observed.ball)):
         if (f - 1) % every == 0:
-            track.append((sim.t_ms, round(float(sim.pos[i][0]), 2), round(float(sim.pos[i][1]), 2)))
+            keep()
         sim.step()
         sim.pos[pinned] = observed.xy[f, pinned]
         sim.vel[pinned] = observed.vel[f, pinned]
@@ -264,24 +275,39 @@ def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None,
         sim.owner, sim.possession = owner, int(sim.team_of[owner])
     att, dfn = sim.active_of(side), sim.active_of(1 - side)
     ctrl = control_fast(sim.pos[att], sim.vel[att], sim.pos[dfn], sim.vel[dfn], cells)
-    track.append((sim.t_ms, round(float(sim.pos[i][0]), 2), round(float(sim.pos[i][1]), 2)))
-    return Replay(float(ctrl.sum()), float((ctrl * values).mean()), float(ctrl.mean()) - control_start, track)
+    keep()
+    return Replay(float(ctrl.sum()), float((ctrl * values).mean()), float(ctrl.mean()) - control_start, track,
+                  others)
+
+
+def default_alternative(moment_type: str) -> str:
+    """The alternative a moment type is measured against: what its creator would usually have done instead."""
+    return "inside" if moment_type in COME_INSIDE else "drop" if moment_type in DROP_TO_BALL else "hold"
+
+
+def alternative(md: MatchData, kind: str, creator_id: str, period: int, t_start_ms: int,
+                t_measure_ms: int) -> Decision:
+    """One alternative for the creator: hold his place in the shape, come inside off the touchline, or drop towards
+    the ball."""
+    if kind not in ALTERNATIVES:
+        raise ValueError(f"Unknown alternative {kind}; the alternatives are {', '.join(ALTERNATIVES)}")
+    pf = md.periods[period]
+    a, b = pf.index_of(t_start_ms), pf.index_of(t_measure_ms)
+    start = pf.xy[a, md.players.index(creator_id)].astype(float)
+    seconds = max((b - a) * DT, 1.0) + 1.0
+    if kind == "inside":
+        inside = HALF_WIDTH + np.sign(start[1] - HALF_WIDTH) * 4.0
+        return Decision(creator_id, "support", (float(start[0]), float(inside)), 0.7, seconds)
+    if kind == "drop":
+        mid = (start + pf.ball[a, :2].astype(float)) / 2
+        return Decision(creator_id, "support", (float(mid[0]), float(mid[1])), 0.6, seconds)
+    return Decision(creator_id, "anchor", None, 0.5, seconds)
 
 
 def instead(md: MatchData, moment_type: str, creator_id: str, period: int, t_start_ms: int,
             t_measure_ms: int) -> Decision:
     """What the creator would have done instead, for this type of moment."""
-    pf = md.periods[period]
-    a, b = pf.index_of(t_start_ms), pf.index_of(t_measure_ms)
-    start = pf.xy[a, md.players.index(creator_id)].astype(float)
-    seconds = max((b - a) * DT, 1.0) + 1.0
-    if moment_type in COME_INSIDE:
-        inside = HALF_WIDTH + np.sign(start[1] - HALF_WIDTH) * 4.0
-        return Decision(creator_id, "support", (float(start[0]), float(inside)), 0.7, seconds)
-    if moment_type in DROP_TO_BALL:
-        mid = (start + pf.ball[a, :2].astype(float)) / 2
-        return Decision(creator_id, "support", (float(mid[0]), float(mid[1])), 0.6, seconds)
-    return Decision(creator_id, "anchor", None, 0.5, seconds)
+    return alternative(md, default_alternative(moment_type), creator_id, period, t_start_ms, t_measure_ms)
 
 
 @dataclass(frozen=True)
@@ -295,6 +321,9 @@ class Counterfactual:
     t_start_ms: int  # where the replays began: the first frame on from the moment's start with a player on the ball
     ghost: list[tuple[int, float, float]]  # the creator's median path without his decision: t_ms, x, y
     without_area_m2: list[float]
+    # Every free player's median path without the decision, the creator's included: player_id -> [(t_ms, x, y)]
+    ghosts: dict[str, list[tuple[int, float, float]]] = field(default_factory=dict)
+    gap_open_rate_without: float = 0.0  # share of the replays in which the gap opened anyway
 
 
 def _interval(actual: float, without: np.ndarray, rng: np.random.Generator, n: int = 400) -> tuple[float, float]:
@@ -305,7 +334,7 @@ def _interval(actual: float, without: np.ndarray, rng: np.random.Generator, n: i
 
 def counterfactual(md: MatchData, moment_type: str, club_id: str, creator_id: str, dragged_ids: list[str],
                    period: int, t_start_ms: int, t_measure_ms: int, zone: list, replays: int = RERUNS,
-                   rng_seed: int = 0) -> Counterfactual:
+                   rng_seed: int = 0, instead_kind: str | None = None) -> Counterfactual:
     """What the creator's decision caused in the zone by t_measure_ms: what happened, against replays in which he
     makes the alternative and the defenders he pulled are free to do otherwise. Everyone else replays as
     tracked: freeing more of the engine's players replaced real defending with the engine's, which doesn't
@@ -324,21 +353,33 @@ def counterfactual(md: MatchData, moment_type: str, club_id: str, creator_id: st
     control_start = float(zone_control_at(md, club_id, period, a, cells).mean())
     who = base.slot_of(creator_id)
     free = [who, *(k for k in map(base.slot_of, dragged_ids) if k >= 0)]
-    decision = instead(md, moment_type, creator_id, period, t0, int(pf.t_ms[b]))
+    kind = instead_kind or default_alternative(moment_type)
+    decision = alternative(md, kind, creator_id, period, t0, int(pf.t_ms[b]))
     runs = [replay(snapshot, base, who, decision, free, observed, cells, values, side, control_start,
                    rng_seed * 1000 + k) for k in range(replays)]
     area, value = float(actual_ctrl.sum()), float((actual_ctrl * values).mean())
     wo_area = np.asarray([r.area_m2 for r in runs])
     wo_val = np.asarray([r.value for r in runs])
     rng = np.random.default_rng(rng_seed)
-    ghost = []
-    for n in range(min(len(r.track) for r in runs)):
-        pts = np.asarray([r.track[n][1:] for r in runs])
-        ghost.append((runs[0].track[n][0], round(float(np.median(pts[:, 0])), 1), round(float(np.median(pts[:, 1])), 1)))
+    def median_path(paths: list[list[tuple[int, float, float]]]) -> list[tuple[int, float, float]]:
+        out = []
+        for n in range(min(len(p) for p in paths)):
+            pts = np.asarray([p[n][1:] for p in paths])
+            out.append((paths[0][n][0], round(float(np.median(pts[:, 0])), 1), round(float(np.median(pts[:, 1])), 1)))
+        return out
+
+    ghost = median_path([r.track for r in runs])
+    ghosts = {creator_id: ghost}
+    for pid in dragged_ids:
+        k = base.slot_of(pid)
+        if k in runs[0].others:
+            ghosts[pid] = median_path([r.others[k] for r in runs])
+    opened = float(np.mean([r.control_gain >= GAP_GAIN for r in runs]))
     return Counterfactual(
         space_created_m2=round(area - float(np.median(wo_area)), 1),
         space_interval_m2=tuple(round(v, 1) for v in _interval(area, wo_area, rng)),
         threat_created=round(value - float(np.median(wo_val)), 4),
         threat_interval=tuple(round(v, 4) for v in _interval(value, wo_val, rng)),
-        gap_opens_without=bool(np.mean([r.control_gain >= GAP_GAIN for r in runs]) > 0.5),
-        replays=replays, t_start_ms=t0, ghost=ghost, without_area_m2=[round(v, 1) for v in wo_area])
+        gap_opens_without=opened > 0.5,
+        replays=replays, t_start_ms=t0, ghost=ghost, without_area_m2=[round(v, 1) for v in wo_area],
+        ghosts=ghosts, gap_open_rate_without=round(opened, 3))

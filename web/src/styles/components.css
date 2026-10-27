@@ -1367,3 +1367,67 @@
 .embed-s { width: 320px; height: 250px; }
 .embed-m { width: 640px; height: 480px; }
 .embed-l { width: 960px; height: 640px; }
+
+/* ---------- Full matches: the picker and the match player ---------- */
+.match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.match-card { gap: 8px; }
+.player-head { gap: 10px 16px; }
+.player-score { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: clamp(22px, 3vw, 30px); flex-wrap: wrap; }
+.player-club { display: inline-flex; align-items: center; gap: 8px; }
+.player-club::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--kes); box-shadow: 0 0 0 2px var(--halo); }
+.player-club[data-team='ash']::before { background: var(--ash); }
+.player-clock { font-size: 20px; font-variant-numeric: tabular-nums; }
+.player-caption { min-height: 76px; }
+.player-transport .btn-icon { font-size: 15px; font-variant-numeric: tabular-nums; }
+.player-side { max-width: 460px; }
+.player-tag {
+  position: absolute; transform: translate(-50%, calc(-100% - 18px)); padding: 3px 8px; border-radius: 6px;
+  background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 0 0 1px var(--line); pointer-events: none; opacity: 0;
+}
+
+.scrubber { position: relative; padding-top: 14px; }
+.scrubber-bar { position: relative; height: 44px; cursor: pointer; touch-action: none; border-radius: 8px; outline-offset: 4px; }
+.scrubber-half { position: absolute; bottom: 0; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.scrubber-fill { height: 100%; background: var(--text); opacity: 0.55; transform-origin: left; }
+.scrubber-ticks { position: absolute; left: 0; right: 0; bottom: 10px; width: 100%; height: 32px; pointer-events: none; }
+.scrubber-ticks .tick { stroke: var(--muted); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: 0.55; }
+.scrubber-ticks .tick-built { stroke: var(--space); opacity: 0.9; }
+.scrubber-ticks .tick-on { stroke: var(--text); stroke-width: 3; opacity: 1; }
+.scrubber-goal { position: absolute; top: -12px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--ball); box-shadow: 0 0 0 2px var(--ball-edge); pointer-events: none; }
+.scrubber-head { position: absolute; bottom: -3px; width: 4px; height: 46px; margin-left: -2px; border-radius: 2px; background: var(--space); pointer-events: none; }
+.scrubber-hover { position: absolute; top: -26px; transform: translateX(-50%); padding: 2px 6px; border-radius: 4px; background: var(--surface); box-shadow: 0 0 0 1px var(--line); font-size: 12px; pointer-events: none; }
+.scrubber-moments { position: absolute; top: 0; left: 0; right: 0; height: 0; }
+.scrubber-pin { position: absolute; top: 2px; width: 18px; height: 14px; margin-left: -9px; border: 0; background: transparent; cursor: pointer; }
+
+.moment-list { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.moment-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 560px; overflow-y: auto; overscroll-behavior: contain; }
+.moment-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px;
+  background: transparent; color: var(--text); text-align: start; cursor: pointer; font: inherit;
+  transition: background-color var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard);
+}
+.moment-item:hover { background: var(--surface-2); }
+.moment-item[aria-current='true'] { background: var(--surface-2); box-shadow: inset 0 0 0 2px var(--space); }
+.moment-clock { flex: none; width: 56px; font-size: 13px; color: var(--muted); }
+.moment-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.moment-type { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+.moment-who { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.moment-outcome { font-size: 11px; padding: 1px 7px; }
+.moment-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--muted); }
+.moment-dot-on { background: var(--space); box-shadow: none; }
+.moment-empty { padding: 12px; font-size: 14px; }
+.moment-panel { display: flex; flex-direction: column; gap: 14px; }
+.moment-block { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.whatif-usual { font-weight: 400; }
+/* Long labels in any language wrap rather than push the page sideways on a phone. */
+.btn-wrap { white-space: normal; height: auto; padding-block: 6px; text-align: start; max-width: 100%; }
+.whatif-numbers { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-start; }
+.whatif-numbers > div { display: flex; flex-direction: column; gap: 2px; }
+.whatif-big { font-size: 34px; line-height: 1.05; color: var(--space-ink); }
+.whatif-list { margin: 0; padding-inline-start: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 1.4; }
+.whatif-words { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); }
+@media (max-width: 1100px) {
+  .player-side { max-width: none; }
+  .moment-items { max-height: 420px; }
+}

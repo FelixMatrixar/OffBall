@@ -287,6 +287,16 @@ export interface Scene2D {
   still?: boolean;
   /** How much larger than normal to draw players: above 1 on small pitches, so shirt numbers stay readable. */
   dotScale?: number;
+  /**
+   * Which colour a player wears: the first club's (kes) or the second's (ash). The showcase reads it from the player's
+   * ID; a whole match of other clubs passes its own.
+   */
+  teamOf?: (id: string) => Team;
+  /**
+   * The showcase's scripted beats: the pass lands at 5.6 s and the goal at T_GOAL. Off for a whole match, where a pass
+   * has arrived only when the ball has, and goals have no burst.
+   */
+  scripted?: boolean;
 }
 
 interface Glyph {
@@ -467,6 +477,8 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
   const k = begin(ctx, s.o, view);
   const { theme: T, motion: M, reduced } = s;
   const P = (p: XY) => project(s.o, p[0], p[1]);
+  const scripted = s.scripted ?? true;
+  const colourOf = (id: string) => ((s.teamOf ? s.teamOf(id) : id.startsWith('ash') ? 'ash' : 'kes') === 'ash' ? T.ash : T.kes);
   let animating = false;
   const live = new Set<string>();
 
@@ -575,7 +587,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
         ctx.ellipse(cx, cy, ex * scale, ey * scale, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * drawn);
         ctx.stroke();
         // In one-overlay-at-a-time modes the pass into the gap is part of the ring.
-        if (d.with_pass === true && s.t >= 4.2 && s.t < 6.4) {
+        if (scripted && d.with_pass === true && s.t >= 4.2 && s.t < 6.4) {
           const from = P(PASS_FROM);
           const ball = P(s.ball);
           ctx.strokeStyle = T.text;
@@ -599,8 +611,8 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
         if (d.style === 'displacement') {
           // How far a defender was pulled: dashed in his team's colour from where he started.
           const from = P(o.anchors.from_xy ?? s.pos[pid]);
-          ctx.strokeStyle = T.ash;
-          ctx.fillStyle = T.ash;
+          ctx.strokeStyle = colourOf(pid);
+          ctx.fillStyle = colourOf(pid);
           ctx.lineWidth = 3;
           ctx.setLineDash([6, 6]);
           line(ctx, from, P(s.pos[pid]));
@@ -610,7 +622,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
           break;
         }
         // Solid from the start of the run to the runner, dashed for the path ahead, the head ~0.8 s ahead.
-        const colour = pid.startsWith('ash') ? T.ash : T.kes;
+        const colour = colourOf(pid);
         const a = P(o.anchors.from_xy ?? s.pos[pid]);
         const r = P(s.pos[pid]);
         const h = P(s.ahead(pid, Number(d.lead_s ?? 0.8)));
@@ -649,7 +661,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
           break;
         }
         // Solid behind the ball, dashed ahead; weight carries difficulty; the head pops on arrival.
-        const arrived = Math.hypot(s.ball[0] - to[0], s.ball[1] - to[1]) < 1.2 || s.t >= 5.6;
+        const arrived = Math.hypot(s.ball[0] - to[0], s.ball[1] - to[1]) < 1.2 || (scripted && s.t >= 5.6);
         const a = P(from);
         const c = P(to);
         const b = arrived ? c : P(s.ball);
@@ -683,7 +695,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
         if (!pid || !path) break;
         // Where a player would have been: a dashed outline over a faint fill, never solid (PRD 15.2).
         const [gx, gy] = P(along(path, s.t));
-        const colour = pid.startsWith('ash') ? T.ash : T.kes;
+        const colour = colourOf(pid);
         const { scale, alpha } = popIn(id);
         // A changed decision's path (PRD 15.12), dashed as anything planned or counterfactual: the way ahead while
         // previewing, with a head where it ends, or the way already gone as the changed world plays out.
@@ -850,7 +862,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
   }
 
   // Fourteen particles from the ball, once per goal; they end invisible, and reduced motion drops them.
-  if (s.goal && s.t >= T_GOAL && !reduced && !s.still) {
+  if (scripted && s.goal && s.t >= T_GOAL && !reduced && !s.still) {
     const [gx, gy] = P(GOAL_AT);
     const started = enter('goal-burst', M.dur.hero + 3 * M.dur.stagger);
     const elapsed = started * (M.dur.hero + 3 * M.dur.stagger);

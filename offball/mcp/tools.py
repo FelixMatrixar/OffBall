@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -55,6 +56,9 @@ class Registry:
         out: dict[str, Path] = {}
         for root in self.roots:
             for info in sorted(root.glob("*/*/match.json")):
+                # The season's events-only copy of a match never hides the matchday copy with its tracking.
+                if info.parent.name in out and not (info.parent / "tracking.parquet").exists():
+                    continue
                 out[info.parent.name] = info.parent
         return out
 
@@ -74,7 +78,12 @@ class Registry:
             dirs = self.match_dirs()
             if match_id not in dirs:
                 raise ValueError(f"Unknown match {match_id}")
+            # A whole match's tracking is about 80 MB: keep the few most recently used in memory.
+            while len(self._done) >= int(os.environ.get("OFFBALL_MATCHES_IN_MEMORY", "4")):
+                self._done.pop(next(iter(self._done)))
             self._done[match_id] = MatchData.load(dirs[match_id])
+        else:
+            self._done[match_id] = self._done.pop(match_id)
         return self._done[match_id]
 
     def live_clock(self, match_id: str) -> tuple[int, int] | None:
@@ -182,7 +191,9 @@ def list_matches() -> list[dict[str, Any]]:
     for match_id, path in REGISTRY.match_dirs().items():
         info = json.loads((path / "match.json").read_text(encoding="utf-8"))
         out.append({"match_id": match_id, "home": info["home"]["name"], "away": info["away"]["name"],
-                    "round": info.get("round"), "live": REGISTRY.is_live(match_id), "set": path.parent.name})
+                    "round": info.get("round"), "live": REGISTRY.is_live(match_id), "set": path.parent.name,
+                    "duration_ms": sum(p["duration_ms"] for p in info.get("periods", [])),
+                    "tracking": (path / "tracking.parquet").exists()})
     return out
 
 

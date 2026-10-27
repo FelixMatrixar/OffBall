@@ -29,10 +29,12 @@ from offball.agents.schemas import (
     Line,
     Localized,
     ModeScript,
+    NumberUsed,
     PlannedOverlay,
     Schedule,
     ScoutDecision,
     ScriptCheck,
+    TacticianOut,
     VerdictOut,
 )
 
@@ -88,6 +90,7 @@ class ScriptedModel(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient
                  slow: dict[str, float] | None = None, reject_rechecks: bool = False) -> None:
         super().__init__()
         self.calls: list[str] = []
+        self.prompts: dict[str, list[str]] = {}  # every prompt, by schema name
         self.reject_first_draft = reject_first_draft
         self.reject_rechecks = reject_rechecks  # a re-check after a feed correction finds the aired draft wrong
         self.failing_mode = failing_mode  # the Persona's call for this mode always fails, as a model outage would
@@ -97,6 +100,7 @@ class ScriptedModel(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient
 
     def _answer(self, schema: type, prompt: str) -> Any:
         self.calls.append(schema.__name__)
+        self.prompts.setdefault(schema.__name__, []).append(prompt)
         if schema is ScoutDecision:
             return ScoutDecision(airtime=True, priority=self.scout_priority, want_counterfactual=True,
                                  reason="A goal came from it.")
@@ -174,6 +178,15 @@ class ScriptedModel(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient
                 "No. 9 pulled No. 5 out of the centre."
             return AnswerOut(state="ok", claims=[AnswerClaim(text=text, verified=True, evidence=["m07-e0948"])],
                              alternative_label=None, alternative_question=None)
+        if schema is TacticianOut:
+            seen = _json_after(prompt, "Numbers from the replays") or {}
+            space = seen.get("space_created_m2", 0.0)
+            words = Localized(en=f"In the replays the run made {space} m² of space.",
+                              es=f"En las repeticiones, el desmarque creó {space} m² de espacio.",
+                              fr=f"Dans les rejeux, l’appel a créé {space} m² d’espace.")
+            return TacticianOut(headline=Localized(en="The run made the gap", es="El desmarque abrió el hueco",
+                                                   fr="L’appel a ouvert l’espace"),
+                                plain=words, analyst=words, numbers=[NumberUsed(name="space_created_m2", value=space)])
         if schema is EngineerDecision:
             # The playbook's first rule: an Explainer well over budget on the reasoning tier moves to the fast one.
             seen = _json_after(prompt, "Telemetry and flags") or {}

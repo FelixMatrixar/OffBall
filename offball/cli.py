@@ -14,6 +14,7 @@
     offball serve api|mcp|all            Run the API (port 8000), the MCP server (port 8001), or both
     offball replay m07 --period 2 --from-ms 1225000 --to-ms 1252000
                                          Build a replay stream through the live pipeline and the crew
+    offball graphics m07 [--limit 10]    Take every moment of a whole match through the crew, for the match player
     offball golden list|build|run        Golden render tests: list or build the cases, or run the pipeline on them
     offball golden check <case> --stream out.jsonl
                                          Check a pipeline's output stream against a case's expectations
@@ -213,6 +214,35 @@ def cmd_serve(args: argparse.Namespace) -> None:
         await asyncio.gather(*(s.serve() for s in servers))
 
     asyncio.run(run())
+
+
+def cmd_graphics(args: argparse.Namespace) -> None:
+    import asyncio
+    import logging
+
+    from offball.agents.crew import Crew
+    from offball.agents.llm import model_configured
+    from offball.mcp.tools import REGISTRY
+    from offball.services.fullmatch import build_graphics
+
+    logging.basicConfig(level=logging.WARNING, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    _tracing()
+    if args.match_id not in REGISTRY.match_dirs():
+        sys.exit(f"Unknown match {args.match_id}")
+    if not model_configured():
+        sys.exit("Graphics come only from the crew, and no model is configured. See .env.example.")
+    started = time.monotonic()
+    done = [0]
+
+    def progress(cid: str, kept: dict) -> None:
+        done[0] += 1
+        print(f"{done[0]:4d}  {cid}  {kept['status']:9}  {len(kept['overlay_ids']):3d} graphics  "
+              f"{kept['tokens'] / 1e6:6.2f}M tokens  {time.monotonic() - started:6.0f} s  {kept['note'][:70]}",
+              flush=True)
+
+    state = asyncio.run(build_graphics(Crew.from_env(), args.match_id, args.concurrency, args.limit, args.redo,
+                                       args.tokens, args.min_gap, progress))
+    print(f"{done[0]} moments, {state.tokens.used / 1e6:.2f}M tokens, {time.monotonic() - started:.0f} s")
 
 
 def cmd_replay(args: argparse.Namespace) -> None:
@@ -426,6 +456,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--to-ms", type=int)
     p.add_argument("--out")
     p.set_defaults(fn=cmd_replay)
+    p = sub.add_parser("graphics", help="Take every moment of a whole match through the crew")
+    p.add_argument("match_id")
+    p.add_argument("--concurrency", type=int, default=4, help="Moments in the crew at once")
+    p.add_argument("--limit", type=int, help="Stop after this many moments")
+    p.add_argument("--redo", action="store_true", help="Explain moments again even if a build already did")
+    p.add_argument("--tokens", type=int, default=20_000_000, help="The build's token budget")
+    p.add_argument("--min-gap", type=int, help="The Scout's minimum spacing between graphics, in seconds (60)")
+    p.set_defaults(fn=cmd_graphics)
     p = sub.add_parser("golden", help="Golden render tests: build the cases, run the pipeline on them, check a stream")
     p.add_argument("action", choices=["list", "build", "run", "check"])
     p.add_argument("cases", nargs="*", help="Case names; all of them when left out")
