@@ -42,7 +42,8 @@ async def explain(crew: Crew, card: dict[str, Any], option: str, numbers: dict[s
     glossary = {lang: T.glossary(lang).get(card["type"], "") for lang in LANGS}
     base = (f"Moment card:\n{as_json(card)}\n\nIn the replays the player {ALTERNATIVE_WORDS[option]}.\n\n"
             f"Numbers from the replays:\n{as_json(numbers)}\n\nThe moment type in each language's glossary:\n"
-            f"{as_json(glossary)}")
+            f"{as_json(glossary)}\n\nIn `numbers`, name each number you wrote by one of these exact names: "
+            f"{', '.join(numbers)}.")
     prompt = base
     for _ in (1, 2):
         try:
@@ -53,5 +54,6 @@ async def explain(crew: Crew, card: dict[str, Any], option: str, numbers: dict[s
         if not problems:
             return out
         log.warning("The Tactician misquoted %s: %s", card["candidate_id"], "; ".join(problems))
-        prompt = f"{base}\n\nYour previous answer misquoted numbers:\n" + "\n".join(problems) + "\nWrite it again."
+        prompt = (f"{base}\n\nYour previous answer misquoted numbers:\n" + "\n".join(problems)
+                  + f"\nThe only names allowed are {', '.join(numbers)}. Write it again.")
     return None

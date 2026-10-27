@@ -36,7 +36,7 @@ export function MomentPanel({ matchId, moment: m, alternatives, label, clubOf, w
   const [failed, setFailed] = useState(false);
   const [words, setWords] = useState<Words>({ state: 'idle' });
   const explained = m.graphics === 'published' || m.graphics === 'corrected';
-  const ordered = [m.whatif, ...alternatives.filter((a) => a !== m.whatif)];
+  const ordered = m.whatif ? [m.whatif, ...alternatives.filter((a) => a !== m.whatif)] : [];
   const wordLang: 'en' | 'es' | 'fr' = lang === 'es' || lang === 'fr' ? lang : 'en';
 
   const ask = () => {
@@ -123,95 +123,97 @@ export function MomentPanel({ matchId, moment: m, alternatives, label, clubOf, w
         )}
       </div>
 
-      <div className="moment-block">
-        <h3 className="card-h3" style={{ margin: 0 }}>
-          {fill(w.whatIfQuestion, { player: label(m.creator_id) })}
-        </h3>
-        <div className="cluster" role="group" aria-label={w.whatIf} style={{ gap: 8 }}>
-          {ordered.map((a) => (
-            <Button key={a} variant={option === a ? 'primary' : 'secondary'} className="btn-sm btn-wrap" aria-pressed={option === a} onClick={() => setOption(a)}>
-              {w.alternative[a]}
-              {a === m.whatif && <span className="muted whatif-usual"> · {w.usual}</span>}
-            </Button>
-          ))}
-        </div>
-        {option && !result && !failed && (
-          <p className="cluster muted" role="status" style={{ margin: 0, fontSize: 14, gap: 8 }}>
-            <Spinner /> {w.replaying}
-          </p>
-        )}
-        {failed && (
-          <p role="alert" className="muted" style={{ margin: 0, fontSize: 14 }}>
-            {w.whatIfFailed}
-          </p>
-        )}
-        {result && (
-          <div className="stack anim-rise" style={{ gap: 10 }}>
-            <div className="whatif-numbers">
-              <div>
-                <span className="card-label">{w.spaceCreated}</span>
-                <span className="display tabular whatif-big">
-                  {fmtNum(lang, n.space_created_m2 ?? 0, 1)} m²
-                </span>
-                <span className="muted" style={{ fontSize: 13 }}>
-                  {fill(w.interval, { lo: fmtNum(lang, n.space_lo_m2 ?? 0, 1), hi: fmtNum(lang, n.space_hi_m2 ?? 0, 1) })}
-                </span>
+      {m.whatif && (
+        <div className="moment-block">
+          <h3 className="card-h3" style={{ margin: 0 }}>
+            {fill(w.whatIfQuestion, { player: label(m.creator_id) })}
+          </h3>
+          <div className="cluster" role="group" aria-label={w.whatIf} style={{ gap: 8 }}>
+            {ordered.map((a) => (
+              <Button key={a} variant={option === a ? 'primary' : 'secondary'} className="btn-sm btn-wrap" aria-pressed={option === a} onClick={() => setOption(a)}>
+                {w.alternative[a]}
+                {a === m.whatif && <span className="muted whatif-usual"> · {w.usual}</span>}
+              </Button>
+            ))}
+          </div>
+          {option && !result && !failed && (
+            <p className="cluster muted" role="status" style={{ margin: 0, fontSize: 14, gap: 8 }}>
+              <Spinner /> {w.replaying}
+            </p>
+          )}
+          {failed && (
+            <p role="alert" className="muted" style={{ margin: 0, fontSize: 14 }}>
+              {w.whatIfFailed}
+            </p>
+          )}
+          {result && (
+            <div className="stack anim-rise" style={{ gap: 10 }}>
+              <div className="whatif-numbers">
+                <div>
+                  <span className="card-label">{w.spaceCreated}</span>
+                  <span className="display tabular whatif-big">
+                    {fmtNum(lang, n.space_created_m2 ?? 0, 1)} m²
+                  </span>
+                  <span className="muted" style={{ fontSize: 13 }}>
+                    {fill(w.interval, { lo: fmtNum(lang, n.space_lo_m2 ?? 0, 1), hi: fmtNum(lang, n.space_hi_m2 ?? 0, 1) })}
+                  </span>
+                </div>
+                <ul className="whatif-list">
+                  <li>{fill(w.gapOpened, { pct: fmtNum(lang, n.gap_open_pct_without ?? 0) })}</li>
+                  {shifts.map(([k, v]) => (
+                    <li key={k}>{fill(w.shift, { player: label(pid(k)), m: fmtNum(lang, v, 1) })}</li>
+                  ))}
+                </ul>
               </div>
-              <ul className="whatif-list">
-                <li>{fill(w.gapOpened, { pct: fmtNum(lang, n.gap_open_pct_without ?? 0) })}</li>
-                {shifts.map(([k, v]) => (
-                  <li key={k}>{fill(w.shift, { player: label(pid(k)), m: fmtNum(lang, v, 1) })}</li>
-                ))}
-              </ul>
-            </div>
-            {words.state === 'loading' && (
-              <p className="cluster muted" role="status" style={{ margin: 0, fontSize: 14, gap: 8 }}>
-                <Spinner /> {w.writing}
-              </p>
-            )}
-            {words.state === 'ok' && (
-              <div className="whatif-words" lang={wordLang}>
-                <p className="display" style={{ margin: 0, fontSize: 20 }}>
-                  {words.words.headline[wordLang]}
+              {words.state === 'loading' && (
+                <p className="cluster muted" role="status" style={{ margin: 0, fontSize: 14, gap: 8 }}>
+                  <Spinner /> {w.writing}
                 </p>
-                <p style={{ margin: 0, lineHeight: 1.5 }}>{(mode === 'analyst' || mode === 'broadcaster' ? words.words.analyst : words.words.plain)[wordLang]}</p>
-                <Chip tone="muted">{w.aiGenerated}</Chip>
-              </div>
-            )}
-            {words.state === 'none' && (
-              <p className="muted" style={{ margin: 0, fontSize: 13 }}>
-                {w.noWords}
-              </p>
-            )}
-            <div className="cluster" style={{ gap: 8 }}>
-              {shown?.counterfactual_id === result.counterfactual_id ? (
-                <>
-                  <Button variant="primary" className="btn-sm btn-wrap" onClick={onJump}>
+              )}
+              {words.state === 'ok' && (
+                <div className="whatif-words" lang={wordLang}>
+                  <p className="display" style={{ margin: 0, fontSize: 20 }}>
+                    {words.words.headline[wordLang]}
+                  </p>
+                  <p style={{ margin: 0, lineHeight: 1.5 }}>{(mode === 'analyst' || mode === 'broadcaster' ? words.words.analyst : words.words.plain)[wordLang]}</p>
+                  <Chip tone="muted">{w.aiGenerated}</Chip>
+                </div>
+              )}
+              {words.state === 'none' && (
+                <p className="muted" style={{ margin: 0, fontSize: 13 }}>
+                  {w.noWords}
+                </p>
+              )}
+              <div className="cluster" style={{ gap: 8 }}>
+                {shown?.counterfactual_id === result.counterfactual_id ? (
+                  <>
+                    <Button variant="primary" className="btn-sm btn-wrap" onClick={onJump}>
+                      {w.showGhosts}
+                    </Button>
+                    <Button variant="ghost" className="btn-sm btn-wrap" onClick={() => onShow(null)}>
+                      {w.hideGhosts}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="primary"
+                    className="btn-sm btn-wrap"
+                    onClick={() => {
+                      onShow(result);
+                      onJump();
+                    }}
+                  >
                     {w.showGhosts}
                   </Button>
-                  <Button variant="ghost" className="btn-sm btn-wrap" onClick={() => onShow(null)}>
-                    {w.hideGhosts}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="primary"
-                  className="btn-sm btn-wrap"
-                  onClick={() => {
-                    onShow(result);
-                    onJump();
-                  }}
-                >
-                  {w.showGhosts}
-                </Button>
-              )}
+                )}
+              </div>
+              <p className="muted" style={{ margin: 0, fontSize: 12 }}>
+                {w.ghostNote} {clubOf(m.creator_id)} · {result.counterfactual_id}
+              </p>
             </div>
-            <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-              {w.ghostNote} {clubOf(m.creator_id)} · {result.counterfactual_id}
-            </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

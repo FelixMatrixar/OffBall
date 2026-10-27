@@ -92,7 +92,8 @@ def build_overlays(card: dict, scripts: dict[str, ModeScript], schedule: Schedul
     claims = {c.claim_id: c for c in draft.claims}
     beat_evidence = {b["key"]: b["evidence_ids"] for b in card["beats"]}
     period = card["period"]
-    pan_gap = max(-1.0, min(1.0, (card["anchors"]["gap"]["centre_xy"][0] - 52.5) / 52.5))
+    gap = card["anchors"].get("gap")
+    pan_gap = max(-1.0, min(1.0, (gap["centre_xy"][0] - 52.5) / 52.5)) if gap else None
     problems: list[str] = []
     out: list[Overlay] = []
     seen: dict[tuple[str, str], int] = {}

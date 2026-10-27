@@ -117,3 +117,16 @@ async def test_a_viewer_can_ask_the_crew_to_explain_a_moment(goal, scripted, tmp
 
 def json_of_scout_prompt(model) -> str:
     return " ".join(model.prompts.get("ScoutDecision", []))
+
+
+def test_a_moment_with_no_gap_has_a_card_but_no_whatif(goal) -> None:
+    match_id, _ = goal
+    gapless = next(c for c in F.T.REGISTRY.candidates(match_id) if not c.gap_zone)
+    card = F.T.moment_card(match_id, gapless.candidate_id)
+    assert "gap" not in card["anchors"]
+    listed = next(m for m in F.timeline(match_id)["moments"] if m["candidate_id"] == gapless.candidate_id)
+    assert listed["whatif"] is None
+    with pytest.raises(ValueError):
+        F.whatif(match_id, gapless.candidate_id, "hold")
+    client = TestClient(api.app)
+    assert client.get(f"/api/matches/{match_id}/moments/{gapless.candidate_id}/whatifs/hold").status_code == 404

@@ -181,7 +181,10 @@ async def whatif(match_id: str, candidate_id: str, option: str) -> dict[str, Any
     if option not in F.CF.ALTERNATIVES:
         raise HTTPException(404, f"The alternatives are {', '.join(F.CF.ALTERNATIVES)}")
     async with _whatif_slots:
-        return await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+        try:
+            return await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc)) from exc
 
 
 @app.get("/api/matches/{match_id}/moments/{candidate_id}/whatifs/{option}/words")
@@ -193,7 +196,10 @@ async def whatif_words(match_id: str, candidate_id: str, option: str) -> dict[st
         raise HTTPException(404, f"The alternatives are {', '.join(F.CF.ALTERNATIVES)}")
     agents = crew()
     async with _whatif_slots:
-        await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+        try:
+            await asyncio.to_thread(F.whatif, match_id, candidate_id, option)
+        except ValueError as exc:
+            raise HTTPException(404, str(exc)) from exc
     return {"words": await F.whatif_words(agents, match_id, candidate_id, option)}
 
 

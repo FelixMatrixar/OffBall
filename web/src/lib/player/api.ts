@@ -64,8 +64,8 @@ export interface Moment {
   outcome: 'goal' | 'shot' | 'none';
   graphics: GraphicsStatus;
   graphics_note: string;
-  /** The alternative this type of moment is usually measured against. */
-  whatif: Alternative;
+  /** The alternative this type of moment is usually measured against; null when it has no gap to replay. */
+  whatif: Alternative | null;
 }
 
 export interface Timeline {

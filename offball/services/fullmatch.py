@@ -83,7 +83,8 @@ def timeline(match_id: str) -> dict[str, Any]:
                         "creator_id": c.creator_id, "dragged_ids": c.dragged_ids, "receiver_id": c.receiver_id,
                         "strength": c.strength, "outcome": _outcome(md, c),
                         "graphics": b.get("status", "not_built"), "graphics_note": b.get("note", ""),
-                        "whatif": CF.default_alternative(c.type)})
+                        # A what-if measures the gap the moment opened; a moment with no gap has none.
+                        "whatif": CF.default_alternative(c.type) if c.gap_zone else None})
     return {"match_id": match_id, "home": club(info.home), "away": club(info.away),
             "periods": [p.model_dump(mode="json") for p in info.periods], "frame_rate": info.frame_rate,
             "players": players, "goals": goals, "moments": moments,
@@ -251,6 +252,8 @@ def whatif(match_id: str, candidate_id: str, option: str) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
     md = T.REGISTRY.data(match_id)
     c = T.candidate(match_id, candidate_id)
+    if not c.gap_zone:
+        raise ValueError(f"{candidate_id} is a {c.type.replace('_', ' ')}, with no gap to replay")
     started = time.monotonic()
     t_m = max(CR.measure_instant(md, c.team_id, c.period, c.t_start_ms, c.t_end_ms, c.receiver_id),
               min(c.t_start_ms + MIN_WHATIF_MS, c.t_end_ms))

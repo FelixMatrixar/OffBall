@@ -289,9 +289,11 @@ def moment_card(match_id: str, candidate_id: str) -> dict[str, Any]:
     # from the anchors it is given, and publish rejects one without coordinates).
     if c.run_from and c.run_to:
         anchors["run"] = {"player_id": c.creator_id, "from_xy": list(c.run_from), "to_xy": list(c.run_to)}
-    anchors["gap"] = {"centre_xy": [round((min(xs) + max(xs)) / 2, 1), round((min(ys) + max(ys)) / 2, 1)],
-                      "rx_m": round((max(xs) - min(xs)) / 2, 1), "ry_m": round((max(ys) - min(ys)) / 2, 1),
-                      "polygon": [list(p) for p in zone]}
+    # Space lost and a fatigue gap name no zone of their own: no ring to draw.
+    if zone:
+        anchors["gap"] = {"centre_xy": [round((min(xs) + max(xs)) / 2, 1), round((min(ys) + max(ys)) / 2, 1)],
+                          "rx_m": round((max(xs) - min(xs)) / 2, 1), "ry_m": round((max(ys) - min(ys)) / 2, 1),
+                          "polygon": [list(p) for p in zone]}
     if c.dragged_ids:
         follow_t = next((b["t_ms"] for b in beats if b["key"] == "defender_follows"), c.t_end_ms)
         anchors["defender"] = {"player_id": c.dragged_ids[0], "from_xy": _position(md, period, c.t_start_ms, c.dragged_ids[0]),
