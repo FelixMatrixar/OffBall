@@ -292,13 +292,18 @@ def cmd_eval(args: argparse.Namespace) -> None:
         sys.exit("Evaluating the agents needs a model. See .env.example.")
     _tracing()
     settings = ModelSettings.from_env()
-    results = asyncio.run(agents.run_all(Crew.from_env(), args.only or None, args.smoke or None))
+    crew = Crew.from_env()
+    results = asyncio.run(agents.run_all(crew, args.only or None, args.smoke or None))
+    timing = crew.telemetry.summary(window_s=24 * 3600)
     for r in results:
         print(r.text())
+    for agent, t in sorted(timing.items()):
+        print(f"{agent}: {t['calls']} calls, p95 {t['p95_ms']:,} ms (budget {t['budget_ms']:,} ms)")
     out = ROOT / "calibration" / "reports" / "agents.md"
-    models = ", ".join(f"{settings.deployment(t)}" + (f" at {e} effort" if (e := settings.effort(t)) else "") + f" ({t})"
+    models = ", ".join(f"{settings.deployment(t)}" + (f" at {e} effort" if (e := settings.effort(t)) else "")
+                       + (f", up to {n:,} tokens" if (n := settings.max_tokens(t)) else "") + f" ({t})"
                        for t in ("fast", "reasoning"))
-    out.write_text(agents.report(results, models), encoding="utf-8", newline="\n")
+    out.write_text(agents.report(results, models, timing), encoding="utf-8", newline="\n")
     print(f"Report -> {out}")
     if not all(r.passed for r in results):
         sys.exit(1)

@@ -42,7 +42,7 @@ http://localhost:5173/partner/index.html?feed=sse:http%3A%2F%2Flocalhost%3A8000%
 Every caption, graphic and answer comes from a model; there are no templates to fall back on. Without a model the match still streams (players, clock and score) and the panels still show computed numbers, but nothing an agent would write airs.
 
 1. Get an OpenRouter key. The agents use two of its models (PRD 14.13): a fast one for the Scout, Persona, Producer and Engineer, and a reasoning one for the Explainer, Fact-checker and Pundit.
-2. Copy `.env.example` to `.env` (git ignores it) and set `OPENROUTER_API_KEY`, plus the model IDs and reasoning efforts if you want others than the defaults (GPT-6 Luna, at low effort for the fast tier and high for the reasoning tier). A model deployed in a Foundry resource works too: set its endpoint instead, as `.env.example` shows.
+2. Copy `.env.example` to `.env` (git ignores it) and set `OPENROUTER_API_KEY`, plus the model IDs, reasoning efforts and output caps if you want others than the defaults (GPT-6 Luna, at low effort and up to 4,000 tokens a call for the fast tier, and high effort and up to 16,000 for the reasoning tier). A model deployed in a Foundry resource works too: set its endpoint instead, as `.env.example` shows.
 3. Restart `offball serve all`, and run `uv run offball eval agents` to score each agent on its own task set.
 
 ## Commands

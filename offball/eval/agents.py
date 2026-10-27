@@ -46,45 +46,50 @@ class EvalResult:
         return f"{self.agent}: {'pass' if self.passed else 'FAIL'} ({nums}){notes}"
 
 
-def _num(pid: str) -> str:
-    return f"No. {int(pid.rsplit('-', 1)[1])}"
+def _who(player: dict) -> str:
+    """A player as the card names them: club and shirt number, since both sides can have the same number."""
+    return f"{player['club']}'s No. {player['number']}"
 
 
 def right_draft(match_id: str, candidate_id: str) -> DraftOut | None:
-    """A draft whose every claim comes straight from the tools: the defender's displacement, the runner's run, and
-    who ran and who followed."""
+    """A draft whose every claim comes straight from the tools: the defender's displacement, the creator's run
+    length, and the card's own relation, that the creator dragged the defender. A card says "dragged", not that
+    the defender followed a run: a moment can be a pin, a screen or a drop as well as a run."""
     card = T.moment_card(match_id, candidate_id)
     if not card.get("creator") or not card.get("dragged"):
         return None
     md = T.REGISTRY.data(match_id)
-    runner, defender = card["creator"]["player_id"], card["dragged"][0]["player_id"]
+    creator, dragged = card["creator"], card["dragged"][0]
     window = {"period": card["period"], "t_start_ms": card["t_start_ms"], "t_end_ms": card["t_end_ms"]}
     claims = []
-    for k, (metric, pid, what) in enumerate((("displacement_m", defender, "was pulled"),
-                                             ("run_length_m", runner, "ran"))):
+    for k, (metric, player, what) in enumerate((("displacement_m", dragged, "was pulled"),
+                                                ("run_length_m", creator, "ran"))):
+        pid = player["player_id"]
         r = metrics.compute(md, metric, player_id=pid, **window)
-        claims.append(ClaimOut(claim_id=f"c{k + 1}", kind="number", text=f"{_num(pid)} {what} {r.value} {r.unit}.",
+        claims.append(ClaimOut(claim_id=f"c{k + 1}", kind="number", text=f"{_who(player)} {what} {r.value} {r.unit}.",
                                metric=metric, params_json=json.dumps({"player_id": pid, **window}), value=r.value,
                                unit=r.unit, subject_ids=[pid], evidence_ids=r.evidence_ids))
-    claims.append(ClaimOut(claim_id="c3", kind="statement",
-                           text=f"{_num(defender)} followed {_num(runner)}'s run.", metric=None, params_json=None,
-                           value=None, unit=None, subject_ids=[defender, runner], evidence_ids=card["evidence_ids"]))
-    return DraftOut(headline=f"{_num(runner)}'s run pulled {_num(defender)} away.", claims=claims, confidence=0.9)
+    claims.append(ClaimOut(claim_id="c3", kind="statement", text=f"{_who(creator)} dragged {_who(dragged)}.",
+                           metric=None, params_json=None, value=None, unit=None,
+                           subject_ids=[creator["player_id"], dragged["player_id"]], evidence_ids=card["evidence_ids"]))
+    return DraftOut(headline=f"{_who(creator)} dragged {_who(dragged)} away.", claims=claims, confidence=0.9)
 
 
-def planted(draft: DraftOut, md_players: list[str]) -> list[tuple[str, DraftOut]]:
+def planted(draft: DraftOut, card: dict, md_players: list[str]) -> list[tuple[str, DraftOut]]:
     """Copies of a right draft with one mistake each: (what was planted, the draft)."""
     out = []
     c1, c2, c3 = draft.claims
     wrong = round((c1.value or 0) * 1.4 + 2, 1)
     out.append(("a wrong number", draft.model_copy(update={"claims": [
         c1.model_copy(update={"value": wrong, "text": c1.text.replace(str(c1.value), str(wrong))}), c2, c3]})))
-    runner, defender = c3.subject_ids[1], c3.subject_ids[0]
-    other = next(p for p in md_players if p.split("-")[0] == runner.split("-")[0] and p != runner)
+    creator, dragged = card["creator"], card["dragged"][0]
+    other_id = next(p for p in md_players if p.split("-")[0] == creator["club_id"] and p != creator["player_id"])
+    other = {**creator, "player_id": other_id, "number": int(other_id.rsplit("-", 1)[1])}
     out.append(("a wrong player", draft.model_copy(update={"claims": [c1, c2, c3.model_copy(update={
-        "text": f"{_num(defender)} followed {_num(other)}'s run.", "subject_ids": [defender, other]})]})))
+        "text": f"{_who(other)} dragged {_who(dragged)}.", "subject_ids": [other_id, dragged["player_id"]]})]})))
     out.append(("a reversed relation", draft.model_copy(update={"claims": [c1, c2, c3.model_copy(update={
-        "text": f"{_num(runner)} followed {_num(defender)}'s run."})]})))
+        "text": f"{_who(dragged)} dragged {_who(creator)}.",
+        "subject_ids": [dragged["player_id"], creator["player_id"]]})]})))
     return out
 
 
@@ -108,8 +113,13 @@ async def factchecker(crew: Crew, moments: list[tuple[str, str]]) -> EvalResult:
         card = T.moment_card(match_id, cid)
         try:
             right_total += 1
-            right += _passed(await _verdict(crew, match_id, card, draft), len(draft.claims))
-            for what, bad in planted(draft, T.REGISTRY.data(match_id).players):
+            verdict = await _verdict(crew, match_id, card, draft)
+            if _passed(verdict, len(draft.claims)):
+                right += 1
+            else:
+                failed = "; ".join(f"{c.claim_id}: {c.reason}" for c in verdict.checks if not c.ok)
+                notes.append(f"{cid}: rejected a right draft ({failed or f'{len(verdict.checks)} checks, passed {verdict.passed}'})")
+            for what, bad in planted(draft, card, T.REGISTRY.data(match_id).players):
                 planted_total += 1
                 if _passed(await _verdict(crew, match_id, card, bad), len(bad.claims)):
                     notes.append(f"{cid}: missed {what}")
@@ -157,6 +167,8 @@ async def scout(crew: Crew, tasks: list[tuple[str, str, bool]]) -> EvalResult:
         if should:
             planted_total += 1
             aired_planted += bool(d and d.airtime)
+            if d and not d.airtime:
+                notes.append(f"{cid}: kept a planted {card.get('type')} off air ({d.reason})")
         else:
             nulls += 1
             invented += bool(d and d.airtime)
@@ -225,12 +237,17 @@ async def run_all(crew: Crew, only: list[str] | None = None, smoke: list[str] | 
     return out
 
 
-def report(results: list[EvalResult], model: str) -> str:
+def report(results: list[EvalResult], model: str, timing: dict[str, dict[str, Any]] | None = None) -> str:
     lines = ["# Agent evaluations", "", f"Model: {model}. Pass bars are PRD 14.15's starting values.", "",
              "| Agent | Result | Numbers |", "| --- | --- | --- |"]
     for r in results:
         lines.append(f"| {r.agent} | {'pass' if r.passed else 'fail'} | "
                      f"{', '.join(f'{k} {v}' for k, v in r.numbers.items())} |")
+    if timing:
+        lines += ["", "Time per call, against each agent's p95 budget (PRD 14.10):", "",
+                  "| Agent | Calls | Failed | p95 | Budget |", "| --- | --- | --- | --- | --- |"]
+        for agent, t in sorted(timing.items()):
+            lines.append(f"| {agent} | {t['calls']} | {t['failures']} | {t['p95_ms']:,} ms | {t['budget_ms']:,} ms |")
     for r in results:
         if r.notes:
             lines += ["", f"## {r.agent}", ""] + [f"- {n}" for n in r.notes[:30]]

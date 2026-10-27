@@ -13,7 +13,7 @@ def test_planted_mistakes_change_one_thing_each() -> None:
     match_id, cid = E.showcase_moment()
     draft = E.right_draft(match_id, cid)
     assert draft is not None and [c.kind for c in draft.claims] == ["number", "number", "statement"]
-    variants = E.planted(draft, T.REGISTRY.data(match_id).players)
+    variants = E.planted(draft, T.moment_card(match_id, cid), T.REGISTRY.data(match_id).players)
     assert [what for what, _ in variants] == ["a wrong number", "a wrong player", "a reversed relation"]
     for _, bad in variants:
         assert sum(a != b for a, b in zip(draft.claims, bad.claims, strict=True)) == 1

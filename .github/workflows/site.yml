@@ -56,4 +56,6 @@ jobs:
               --file "web/dist/${f%%:*}" --name "${f%%:*}" --content-type "${f#*:}" --content-cache-control "no-cache" \
               --overwrite --only-show-errors > /dev/null
           done
-          echo "Uploaded to https://$(az storage account show --name "$ACCOUNT" --query primaryEndpoints.web --output tsv | sed 's|https://||; s|/$||')" >> "$GITHUB_STEP_SUMMARY"
+          echo "Uploaded web/dist to the static website of $ACCOUNT, built for ${VITE_API_BASE:-no API}." >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}

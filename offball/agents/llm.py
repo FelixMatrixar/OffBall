@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from agent_framework_openai import OpenAIChatClient, OpenAIChatCompletionClient
 from dotenv import load_dotenv
@@ -33,6 +33,10 @@ DEFAULT_MODELS: dict[Provider, tuple[str, str]] = {
 # high gives the Explainer, Fact-checker and Pundit room to think (PRD 14.10, 14.13). OFFBALL_EFFORT_FAST and
 # OFFBALL_EFFORT_REASONING override them. A Foundry deployment keeps its own default.
 DEFAULT_EFFORTS: tuple[str, str] = ("low", "high")
+# The most output tokens one call may produce, thinking included. OpenRouter holds back credit for that many before
+# each call, and no runaway answer can cost more. The visible answers are 200 to 1,200 tokens (PRD 14.10), so the
+# rest is room to reason. OFFBALL_MAX_TOKENS_FAST and OFFBALL_MAX_TOKENS_REASONING override them.
+DEFAULT_MAX_TOKENS: tuple[int, int] = (4_000, 16_000)
 
 
 class ModelNotConfigured(RuntimeError):
@@ -41,6 +45,14 @@ class ModelNotConfigured(RuntimeError):
 
 def _env(name: str) -> str:
     return os.environ.get(name, "").strip()
+
+
+def _int_env(name: str, default: int) -> int:
+    raw = _env(name)
+    try:
+        return int(raw) if raw else default
+    except ValueError:
+        raise ValueError(f"{name} must be a whole number of tokens, not {raw!r}") from None
 
 
 @dataclass(frozen=True)
@@ -53,6 +65,8 @@ class ModelSettings:
     reasoning: str
     fast_effort: str | None = None
     reasoning_effort: str | None = None
+    fast_max_tokens: int | None = None
+    reasoning_max_tokens: int | None = None
 
     @classmethod
     def from_env(cls) -> ModelSettings:
@@ -82,6 +96,8 @@ class ModelSettings:
             reasoning=_env("OFFBALL_MODEL_REASONING") or reasoning,
             fast_effort=efforts[0],
             reasoning_effort=efforts[1],
+            fast_max_tokens=_int_env("OFFBALL_MAX_TOKENS_FAST", DEFAULT_MAX_TOKENS[0]),
+            reasoning_max_tokens=_int_env("OFFBALL_MAX_TOKENS_REASONING", DEFAULT_MAX_TOKENS[1]),
         )
 
     def deployment(self, tier: Tier) -> str:
@@ -90,6 +106,19 @@ class ModelSettings:
     def effort(self, tier: Tier) -> str | None:
         """The reasoning effort to ask for on this tier, or None for the model's own default."""
         return self.fast_effort if tier == "fast" else self.reasoning_effort
+
+    def max_tokens(self, tier: Tier) -> int | None:
+        """The most output tokens one call on this tier may produce, or None for the model's own limit."""
+        return self.fast_max_tokens if tier == "fast" else self.reasoning_max_tokens
+
+    def call_options(self, tier: Tier) -> dict[str, Any]:
+        """What every call on this tier asks for: its output cap, and its reasoning effort where one is set."""
+        options: dict[str, Any] = {}
+        if cap := self.max_tokens(tier):
+            options["max_tokens"] = cap
+        if effort := self.effort(tier):
+            options["reasoning_effort"] = effort
+        return options
 
 
 def model_configured() -> bool:

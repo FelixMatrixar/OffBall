@@ -1,4 +1,4 @@
-"""The model settings (PRD 14.13): GPT-6 Luna on both tiers, with the reasoning effort each tier asks for."""
+"""The model settings (PRD 14.13): GPT-6 Luna on both tiers, with each tier's reasoning effort and output cap."""
 
 from __future__ import annotations
 
@@ -10,38 +10,52 @@ from offball.agents import llm
 from offball.agents.crew import Crew
 from offball.agents.schemas import ScoutDecision
 
+SETTINGS = ("OFFBALL_MODEL_FAST", "OFFBALL_MODEL_REASONING", "OFFBALL_EFFORT_FAST", "OFFBALL_EFFORT_REASONING",
+            "OFFBALL_MAX_TOKENS_FAST", "OFFBALL_MAX_TOKENS_REASONING", "AZURE_OPENAI_ENDPOINT")
+
 
 @pytest.fixture
 def openrouter(monkeypatch):
     monkeypatch.setattr(llm, "load_dotenv", lambda *a, **k: None)
-    for name in ("OFFBALL_MODEL_FAST", "OFFBALL_MODEL_REASONING", "OFFBALL_EFFORT_FAST", "OFFBALL_EFFORT_REASONING",
-                 "AZURE_OPENAI_ENDPOINT"):
+    for name in SETTINGS:
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     return monkeypatch
 
 
-def test_both_tiers_default_to_luna_with_low_and_high_effort(openrouter) -> None:
+def test_both_tiers_default_to_luna_with_their_effort_and_cap(openrouter) -> None:
     s = llm.ModelSettings.from_env()
     assert (s.deployment("fast"), s.deployment("reasoning")) == ("openai/gpt-6-luna", "openai/gpt-6-luna")
-    assert (s.effort("fast"), s.effort("reasoning")) == ("low", "high")
+    assert s.call_options("fast") == {"max_tokens": 4000, "reasoning_effort": "low"}
+    assert s.call_options("reasoning") == {"max_tokens": 16000, "reasoning_effort": "high"}
 
 
-def test_the_environment_overrides_the_model_and_effort(openrouter) -> None:
+def test_the_environment_overrides_the_model_effort_and_cap(openrouter) -> None:
     openrouter.setenv("OFFBALL_MODEL_REASONING", "openai/gpt-6-sol")
     openrouter.setenv("OFFBALL_EFFORT_FAST", "minimal")
+    openrouter.setenv("OFFBALL_MAX_TOKENS_REASONING", "24000")
     s = llm.ModelSettings.from_env()
     assert s.deployment("reasoning") == "openai/gpt-6-sol"
-    assert (s.effort("fast"), s.effort("reasoning")) == ("minimal", "high")
+    assert s.call_options("fast") == {"max_tokens": 4000, "reasoning_effort": "minimal"}
+    assert s.call_options("reasoning") == {"max_tokens": 24000, "reasoning_effort": "high"}
 
 
-def test_a_foundry_deployment_keeps_its_own_effort(monkeypatch) -> None:
+def test_a_cap_must_be_a_number(openrouter) -> None:
+    openrouter.setenv("OFFBALL_MAX_TOKENS_FAST", "lots")
+    with pytest.raises(ValueError, match="OFFBALL_MAX_TOKENS_FAST"):
+        llm.ModelSettings.from_env()
+
+
+def test_a_foundry_deployment_keeps_its_own_effort_but_is_capped(monkeypatch) -> None:
     monkeypatch.setattr(llm, "load_dotenv", lambda *a, **k: None)
+    for name in SETTINGS:
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com/")
     monkeypatch.setenv("OFFBALL_EFFORT_REASONING", "high")
     s = llm.ModelSettings.from_env()
-    assert s.effort("fast") is None and s.effort("reasoning") is None
+    assert s.call_options("fast") == {"max_tokens": 4000}
+    assert s.call_options("reasoning") == {"max_tokens": 16000}
 
 
 class _Recorder:
@@ -55,7 +69,7 @@ class _Recorder:
         return None
 
 
-async def test_the_effort_reaches_openrouters_request() -> None:
+async def test_the_cap_and_effort_reach_openrouters_request() -> None:
     import json
 
     import httpx
@@ -76,15 +90,17 @@ async def test_the_effort_reaches_openrouters_request() -> None:
     http = httpx.AsyncClient(transport=httpx.MockTransport(reply))
     client = OpenAIChatCompletionClient(model="openai/gpt-6-luna", async_client=AsyncOpenAI(
         base_url="https://openrouter.test/api/v1", api_key="k", http_client=http))
-    crew = Crew(efforts={"reasoning": "high"})
+    crew = Crew(tier_options={"reasoning": {"max_tokens": 16000, "reasoning_effort": "high"}})
     await crew._run("explainer", Agent(client, "Answer.", name="explainer"), "reasoning", "hi", ScoutDecision, None)
-    assert sent[0]["model"] == "openai/gpt-6-luna" and sent[0]["reasoning_effort"] == "high"
+    assert sent[0]["model"] == "openai/gpt-6-luna"
+    assert (sent[0]["max_completion_tokens"], sent[0]["reasoning_effort"]) == (16000, "high")
 
 
-async def test_each_call_asks_for_its_tiers_effort() -> None:
-    crew = Crew(efforts={"reasoning": "high"})
+async def test_each_call_asks_for_its_own_tiers_options() -> None:
+    crew = Crew(tier_options={"fast": {"max_tokens": 4000}, "reasoning": {"max_tokens": 16000,
+                                                                         "reasoning_effort": "high"}})
     agent = _Recorder()
     await crew._run("explainer", agent, "reasoning", "text", ScoutDecision, None)  # type: ignore[arg-type]
     await crew._run("scout", agent, "fast", "text", ScoutDecision, None)  # type: ignore[arg-type]
-    assert agent.options[0] == {"response_format": ScoutDecision, "reasoning_effort": "high"}
-    assert agent.options[1] == {"response_format": ScoutDecision}
+    assert agent.options[0] == {"response_format": ScoutDecision, "max_tokens": 16000, "reasoning_effort": "high"}
+    assert agent.options[1] == {"response_format": ScoutDecision, "max_tokens": 4000}

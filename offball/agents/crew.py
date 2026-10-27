@@ -134,8 +134,8 @@ class Crew:
     flags: FlagStore = field(default_factory=lambda: FLAG_STORE)
     telemetry: Telemetry = field(default_factory=Telemetry)
     faults: dict[str, tuple[str, int]] = field(default_factory=lambda: parse_faults(os.environ.get("FAULTS", "")))
-    # The reasoning effort each tier asks for (PRD 14.13); a tier missing here uses the model's default.
-    efforts: dict[Tier, str] = field(default_factory=dict)
+    # What every call on a tier asks for: its output cap and reasoning effort (PRD 14.13).
+    tier_options: dict[Tier, dict[str, Any]] = field(default_factory=dict)
     _other_tier: dict[tuple[str, Tier], Agent] = field(default_factory=dict)
 
     @classmethod
@@ -143,7 +143,7 @@ class Crew:
         s = ModelSettings.from_env()
         tiers: tuple[Tier, ...] = ("fast", "reasoning")
         return cls.with_clients({t: chat_client(t, s) for t in tiers},
-                                efforts={t: e for t in tiers if (e := s.effort(t))})
+                                tier_options={t: s.call_options(t) for t in tiers})
 
     @classmethod
     def with_clients(cls, clients: dict[Tier, SupportsChatGetResponse], **kwargs: Any) -> Crew:
@@ -174,9 +174,7 @@ class Crew:
                 await asyncio.sleep(ms / 1000)
             elif kind == "error":
                 raise RuntimeError(f"injected fault for {name}")
-            options: dict[str, Any] = {"response_format": schema}
-            if effort := self.efforts.get(tier):
-                options["reasoning_effort"] = effort
+            options = {"response_format": schema, **self.tier_options.get(tier, {})}
             return await agent.run(text, options=options, middleware=middleware)
 
     async def ask(self, name: str, prompt: str, schema: type[M], middleware: Sequence[Any] | None = None,
