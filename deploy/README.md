@@ -52,7 +52,7 @@ You need the Azure CLI, an SSH key and an Azure subscription. An Azure for Stude
    az ad app federated-credential create --id <appId> --parameters infra/ci-federated-credential.json
    ```
 
-   For a fork, change the repository in `infra/ci-federated-credential.json` first.
+   The credential's subject names the repository the way GitHub's token does, with the owner's and the repository's numeric IDs: `repo:<owner>@<owner ID>/<repository>@<repository ID>:ref:refs/heads/main`. For a fork, change it in `infra/ci-federated-credential.json` first; if the IDs are wrong, the Site workflow's sign-in error prints the subject GitHub sent, and `az ad app federated-credential update --id <appId> --federated-credential-id main --parameters infra/ci-federated-credential.json` puts it right.
 3. **Create the VM, Foundry and the web app's storage.** This makes the VM, with `cloud-init.yaml` preparing it, plus its network, address and disk; Foundry with its OpenRouter connection; and a storage account for the web app. It gives the VM's managed identity Foundry's roles, so the VM holds no Azure secret, and lets `offball-ci` upload the web app:
 
    ```bash
