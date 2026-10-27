@@ -23,7 +23,7 @@ from agent_framework import Agent, MCPStreamableHTTPTool, SupportsChatGetRespons
 from opentelemetry.trace import Status, StatusCode
 from pydantic import BaseModel, ValidationError
 
-from offball.agents.llm import Tier, chat_client
+from offball.agents.llm import ModelSettings, Tier, chat_client
 from offball.mcp import tools as T
 from offball.services import telemetry
 from offball.services.flags import FLAG_STORE, FlagStore
@@ -134,11 +134,16 @@ class Crew:
     flags: FlagStore = field(default_factory=lambda: FLAG_STORE)
     telemetry: Telemetry = field(default_factory=Telemetry)
     faults: dict[str, tuple[str, int]] = field(default_factory=lambda: parse_faults(os.environ.get("FAULTS", "")))
+    # The reasoning effort each tier asks for (PRD 14.13); a tier missing here uses the model's default.
+    efforts: dict[Tier, str] = field(default_factory=dict)
     _other_tier: dict[tuple[str, Tier], Agent] = field(default_factory=dict)
 
     @classmethod
     def from_env(cls) -> Crew:
-        return cls.with_clients({"fast": chat_client("fast"), "reasoning": chat_client("reasoning")})
+        s = ModelSettings.from_env()
+        tiers: tuple[Tier, ...] = ("fast", "reasoning")
+        return cls.with_clients({t: chat_client(t, s) for t in tiers},
+                                efforts={t: e for t in tiers if (e := s.effort(t))})
 
     @classmethod
     def with_clients(cls, clients: dict[Tier, SupportsChatGetResponse], **kwargs: Any) -> Crew:
@@ -161,7 +166,7 @@ class Crew:
                                                    tools=_tools_for(name))
         return self._other_tier[(name, tier)], tier
 
-    async def _run(self, name: str, agent: Agent, text: str, schema: type[M], middleware) -> Any:
+    async def _run(self, name: str, agent: Agent, tier: Tier, text: str, schema: type[M], middleware) -> Any:
         """One call, with any injected fault first, inside the agent's time limit."""
         async with asyncio.timeout(TIME_LIMIT_S.get(name, 60)):
             kind, ms = self.faults.get(name, ("", 0))
@@ -169,7 +174,10 @@ class Crew:
                 await asyncio.sleep(ms / 1000)
             elif kind == "error":
                 raise RuntimeError(f"injected fault for {name}")
-            return await agent.run(text, options={"response_format": schema}, middleware=middleware)
+            options: dict[str, Any] = {"response_format": schema}
+            if effort := self.efforts.get(tier):
+                options["reasoning_effort"] = effort
+            return await agent.run(text, options=options, middleware=middleware)
 
     async def ask(self, name: str, prompt: str, schema: type[M], middleware: Sequence[Any] | None = None,
                   meter: TokenMeter | None = None) -> M:
@@ -193,7 +201,7 @@ class Crew:
                 f"{prompt}\n\nYour previous answer couldn't be used: {problem}\nAnswer again, following the schema.")
             started = time.monotonic()
             try:
-                response = await self._run(name, agent, text, schema, middleware)
+                response = await self._run(name, agent, tier, text, schema, middleware)
                 if meter is not None:
                     meter.add(_tokens(response))
                 value = response.value

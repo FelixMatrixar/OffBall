@@ -31,10 +31,10 @@ That builds the `offball` image and starts it with Valkey and the Aspire Dashboa
 
 You need the Azure CLI, an SSH key and an Azure subscription. An Azure for Students subscription works (see below), and so does pay-as-you-go.
 
-1. **Pick the regions.** Both must be ones your subscription allows. The VM's region, which the web app shares, must offer the VM size; an empty list, or a restriction in the last column, means try another region:
+1. **Pick the regions.** Both must be ones your subscription allows. The VM's region, which the web app shares, must offer the VM size; an empty list, or a restriction in the last column, means try another region. A restriction of type Zone blocks only those availability zones, which the VM doesn't use:
 
    ```bash
-   az vm list-skus --location koreacentral --size Standard_B2als_v2 --all --output table
+   az vm list-skus --location centralindia --size Standard_B2als_v2 --all --output table
    ```
 
    Foundry's region must offer Agent Service. Australia East does, with the most models.
@@ -56,7 +56,7 @@ You need the Azure CLI, an SSH key and an Azure subscription. An Azure for Stude
 3. **Create the VM, Foundry and the web app's storage.** This makes the VM, with `cloud-init.yaml` preparing it, plus its network, address and disk; Foundry with its OpenRouter connection; and a storage account for the web app. It gives the VM's managed identity Foundry's roles, so the VM holds no Azure secret, and lets `offball-ci` upload the web app:
 
    ```bash
-   az group create --name offball --location koreacentral
+   az group create --name offball --location centralindia
    ```
 
    ```bash
@@ -103,7 +103,7 @@ You need the Azure CLI, an SSH key and an Azure subscription. An Azure for Stude
    ssh -L 18888:127.0.0.1:18888 offball@<the VM's host name>
    ```
 
-8. **Stop paying while you don't need it.** In Korea Central the VM costs about $40 a month while it runs, with its address and disk, and about $6 while it's deallocated. The web app keeps playing its replay while the VM is off:
+8. **Stop paying while you don't need it.** In Central India the VM costs about $24 a month while it runs, with its address and disk, and about $6 while it's deallocated. The web app keeps playing its replay while the VM is off:
 
    ```bash
    az vm deallocate --resource-group offball --name offball-vm

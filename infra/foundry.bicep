@@ -25,8 +25,8 @@ param projectName string = 'offball'
 param openRouterKey string
 
 @description('OpenRouter model IDs, one per tier (PRD 14.13), the same defaults as offball/agents/llm.py.')
-param fastModel string = 'openai/gpt-5-mini'
-param reasoningModel string = 'openai/gpt-5'
+param fastModel string = 'openai/gpt-6-luna'
+param reasoningModel string = 'openai/gpt-6-luna'
 
 @description('The gateway connection\'s name. Agents name a model as "<connection>/<model ID>".')
 param connectionName string = 'openrouter'
@@ -99,22 +99,13 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
 // OpenRouter as a bring-your-own-model gateway (ADR 0004): an OpenAI-compatible Chat Completions endpoint with a
 // bearer key. Whether agents resolve a model ID that itself contains a slash is part of PRD open question 13; if
 // not, the crew keeps calling OpenRouter directly (PRD 14.13).
+// Both tiers can be the same model, which the connection then lists once.
 var models = [
-  {
-    name: fastModel
+  for m in union([fastModel], [reasoningModel]): {
+    name: m
     properties: {
       model: {
-        name: fastModel
-        version: '1'
-        format: 'OpenAI'
-      }
-    }
-  }
-  {
-    name: reasoningModel
-    properties: {
-      model: {
-        name: reasoningModel
+        name: m
         version: '1'
         format: 'OpenAI'
       }

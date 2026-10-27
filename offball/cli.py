@@ -296,8 +296,9 @@ def cmd_eval(args: argparse.Namespace) -> None:
     for r in results:
         print(r.text())
     out = ROOT / "calibration" / "reports" / "agents.md"
-    out.write_text(agents.report(results, f"{settings.fast} (fast), {settings.reasoning} (reasoning)"),
-                   encoding="utf-8", newline="\n")
+    models = ", ".join(f"{settings.deployment(t)}" + (f" at {e} effort" if (e := settings.effort(t)) else "") + f" ({t})"
+                       for t in ("fast", "reasoning"))
+    out.write_text(agents.report(results, models), encoding="utf-8", newline="\n")
     print(f"Report -> {out}")
     if not all(r.passed for r in results):
         sys.exit(1)

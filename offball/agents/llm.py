@@ -23,11 +23,16 @@ Provider = Literal["openrouter", "foundry"]
 ROOT = Path(__file__).resolve().parents[2]
 PLACEHOLDER = "YOUR-RESOURCE"
 OPENROUTER_URL = "https://openrouter.ai/api/v1"
-# Each provider's default model per tier; OFFBALL_MODEL_FAST and OFFBALL_MODEL_REASONING override them.
+# Each provider's default model per tier; OFFBALL_MODEL_FAST and OFFBALL_MODEL_REASONING override them. On
+# OpenRouter both tiers are GPT-6 Luna, and the tiers differ in how hard the model thinks.
 DEFAULT_MODELS: dict[Provider, tuple[str, str]] = {
-    "openrouter": ("openai/gpt-5-mini", "openai/gpt-5"),
+    "openrouter": ("openai/gpt-6-luna", "openai/gpt-6-luna"),
     "foundry": ("gpt-5-mini", "gpt-5"),
 }
+# Reasoning effort per tier on OpenRouter: low keeps the fast tier inside budgets of a few hundred milliseconds, and
+# high gives the Explainer, Fact-checker and Pundit room to think (PRD 14.10, 14.13). OFFBALL_EFFORT_FAST and
+# OFFBALL_EFFORT_REASONING override them. A Foundry deployment keeps its own default.
+DEFAULT_EFFORTS: tuple[str, str] = ("low", "high")
 
 
 class ModelNotConfigured(RuntimeError):
@@ -46,6 +51,8 @@ class ModelSettings:
     api_version: str | None
     fast: str
     reasoning: str
+    fast_effort: str | None = None
+    reasoning_effort: str | None = None
 
     @classmethod
     def from_env(cls) -> ModelSettings:
@@ -62,6 +69,10 @@ class ModelSettings:
                 "key, or AZURE_OPENAI_ENDPOINT to a Foundry resource's endpoint."
             )
         fast, reasoning = DEFAULT_MODELS[provider]
+        efforts = (None, None)
+        if provider == "openrouter":
+            efforts = (_env("OFFBALL_EFFORT_FAST") or DEFAULT_EFFORTS[0],
+                       _env("OFFBALL_EFFORT_REASONING") or DEFAULT_EFFORTS[1])
         return cls(
             provider=provider,
             endpoint=endpoint,
@@ -69,10 +80,16 @@ class ModelSettings:
             api_version=api_version,
             fast=_env("OFFBALL_MODEL_FAST") or fast,
             reasoning=_env("OFFBALL_MODEL_REASONING") or reasoning,
+            fast_effort=efforts[0],
+            reasoning_effort=efforts[1],
         )
 
     def deployment(self, tier: Tier) -> str:
         return self.fast if tier == "fast" else self.reasoning
+
+    def effort(self, tier: Tier) -> str | None:
+        """The reasoning effort to ask for on this tier, or None for the model's own default."""
+        return self.fast_effort if tier == "fast" else self.reasoning_effort
 
 
 def model_configured() -> bool:
