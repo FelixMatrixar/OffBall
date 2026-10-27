@@ -130,3 +130,12 @@ def test_a_moment_with_no_gap_has_a_card_but_no_whatif(goal) -> None:
         F.whatif(match_id, gapless.candidate_id, "hold")
     client = TestClient(api.app)
     assert client.get(f"/api/matches/{match_id}/moments/{gapless.candidate_id}/whatifs/hold").status_code == 404
+
+
+def test_a_clock_the_viewer_names_becomes_a_match_time() -> None:
+    assert F.T.match_time("63:05") == {"clock": "63:05", "period": 2, "t_ms": 1_085_000}
+    assert F.T.match_time("12:30") == {"clock": "12:30", "period": 1, "t_ms": 750_000}
+    assert F.T.match_time("45+2:10") == {"clock": "45+2:10", "period": 1, "t_ms": 2_830_000}
+    assert F.T.match_time("90+3") == {"clock": "90+3:00", "period": 2, "t_ms": 2_880_000}
+    with pytest.raises(ValueError):
+        F.T.match_time("63:75")

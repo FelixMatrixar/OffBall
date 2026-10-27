@@ -84,6 +84,8 @@ export interface AskContext {
   mode: string;
   lang: string;
   fav?: string;
+  /** The moment the viewer has open, which "this" refers to. */
+  moment_id?: string | null;
 }
 
 /**
@@ -97,7 +99,7 @@ export async function askPundit(question: string, ctx: AskContext, onTool: (name
     await fetch(`${base}/api/matches/${ctx.matchId}/ask`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
-      body: JSON.stringify({ question, period: ctx.period, t_ms: ctx.t_ms, mode: ctx.mode, lang: ctx.lang, fav: ctx.fav }),
+      body: JSON.stringify({ question, period: ctx.period, t_ms: ctx.t_ms, mode: ctx.mode, lang: ctx.lang, fav: ctx.fav, moment_id: ctx.moment_id }),
       signal,
     }),
   );

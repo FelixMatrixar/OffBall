@@ -98,6 +98,51 @@
       ],
       "title": "AnswerClaim",
       "type": "object"
+    },
+    "AnswerShow": {
+      "additionalProperties": false,
+      "description": "The play that shows an answer on the pitch: the app jumps there, rings the players and plays it.",
+      "properties": {
+        "period": {
+          "title": "Period",
+          "type": "integer"
+        },
+        "from_ms": {
+          "title": "From Ms",
+          "type": "integer"
+        },
+        "to_ms": {
+          "title": "To Ms",
+          "type": "integer"
+        },
+        "player_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Player Ids",
+          "type": "array"
+        },
+        "moment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Moment Id"
+        }
+      },
+      "required": [
+        "period",
+        "from_ms",
+        "to_ms",
+        "player_ids"
+      ],
+      "title": "AnswerShow",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -167,6 +212,18 @@
       "default": null,
       "description": "A corrected event changed the answer",
       "title": "Corrected"
+    },
+    "show": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AnswerShow"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The play that shows the answer on the pitch"
     }
   },
   "required": [

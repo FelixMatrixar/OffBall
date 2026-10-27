@@ -394,6 +394,27 @@ def player_summary(match_id: str, player_id: str, period: int | None = None, t_m
     }
 
 
+def match_time(clock: str) -> dict[str, Any]:
+    """A broadcast clock as viewers say it, such as "63:05", "63" or "45+2:10", as the period and t_ms every other
+    tool takes. Times from 45:00 on are the second half; "45+2:10" is first-half stoppage time."""
+    text = clock.strip().rstrip("'’").replace("′", "")
+    stoppage = "+" in text
+    base, _, extra = text.partition("+")
+    minute_part, _, second_part = (extra if stoppage else base).partition(":")
+    minutes, seconds = int(minute_part or 0), int(second_part or 0)
+    if not 0 <= seconds < 60:
+        raise ValueError(f"{clock!r} isn't a clock: seconds run from 0 to 59")
+    if stoppage:
+        half_end = int(base)
+        if half_end not in (45, 90):
+            raise ValueError(f"{clock!r}: stoppage time follows 45 or 90")
+        period, minute = (1, 45 + minutes) if half_end == 45 else (2, 45 + minutes)
+    else:
+        period, minute = (1, minutes) if minutes < 45 else (2, minutes - 45)
+    return {"clock": clock_label(period, (minute * 60 + seconds) * 1000), "period": period,
+            "t_ms": (minute * 60 + seconds) * 1000}
+
+
 def glossary(lang: str = "en") -> dict[str, str]:
     """The football terms OffBall uses in one language (en, es, pt, fr, ar, hi, id, zh, ja or sw), keyed the same in
     every language, so every agent names ideas the same way."""
@@ -404,4 +425,4 @@ def glossary(lang: str = "en") -> dict[str, str]:
 
 
 READ_TOOLS = [list_matches, match_facts, list_metrics, compute_metric, list_candidates, moment_card, events_between,
-              positions_at, get_evidence, player_summary, glossary]
+              positions_at, get_evidence, player_summary, match_time, glossary]

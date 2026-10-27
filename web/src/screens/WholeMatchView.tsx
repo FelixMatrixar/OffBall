@@ -10,6 +10,7 @@ import { BottomSheet, Button, Chip, Drawer, Logo, MenuButton, Segmented, Spinner
 import { canSpeak, speaker, unlockAudio, voiceFor } from '../lib/audio';
 import { contrast, parseColor, readToken } from '../lib/color';
 import type { ActiveOverlay } from '../lib/feed';
+import type { Answer } from '../lib/pundit';
 import type { Overlay } from '../lib/feed/types';
 import { useScreenClass } from '../lib/hooks';
 import { LANGS, fill, isRtl, useDocumentLocale, useI18n } from '../lib/i18n';
@@ -129,6 +130,9 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
   );
   const [selected, setSelected] = useState<string | null>(null);
   const [whatIf, setWhatIf] = useState<WhatIf | null>(null);
+  // An answer from Ask OffBall being shown on the pitch, and whether its play has reached its end.
+  const [answer, setAnswer] = useState<Answer | null>(null);
+  const answerPaused = useRef<Answer | null>(null);
 
   // The crew's graphics for this viewer's mode, and what is on now.
   const mine = useMemo(() => overlays.filter((o) => o.mode === mode && !o.counterfactual_id && (o.approval === 'auto' || o.approval === 'approved')), [overlays, mode]);
@@ -136,6 +140,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
   const captions: ActiveOverlay[] = onAir.filter((o) => o.kind === 'caption').map((overlay) => ({ overlay }));
   const current = captions[0];
   const stat = onAir.find((o) => o.kind === 'stat_card');
+  const ringWords: PitchWord[] = [];
   const words: PitchWord[] = [
     ...onAir
       .filter((o) => o.kind === 'gap_ring' && o.anchors.centre_xy && (o.text[lang] ?? o.text.en))
@@ -143,6 +148,12 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
         const [x, y] = o.anchors.centre_xy!;
         const ry = Number((o.data as { ry_m?: number } | null)?.ry_m ?? 6);
         return { id: o.overlay_id, text: o.text[lang] ?? o.text.en ?? '', at: [x, Math.min(67, y + ry + 1.5)] as [number, number], tone: 'space' as const };
+      })
+      // Two rings saying the same thing in the same place (two moments' graphics overlapping) read as one.
+      .filter((wd) => {
+        const twin = ringWords.some((o) => o.text === wd.text && Math.hypot(o.at![0] - wd.at[0], o.at![1] - wd.at[1]) < 8);
+        if (!twin) ringWords.push(wd);
+        return !twin;
       }),
     ...onAir.filter((o) => o.kind === 'player_tag' && o.anchors.player_id).map((o) => ({ id: o.overlay_id, text: o.text[lang] ?? o.text.en ?? '', player_id: o.anchors.player_id! })),
   ];
@@ -182,10 +193,42 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
     [clock, moments, gOf, pick],
   );
 
+  // Ask OffBall's answer, played on the pitch: from just before the play, at normal speed, with its players ringed.
+  const showAnswer = useCallback(
+    (a: Answer) => {
+      if (!a.show) return;
+      setPanel('none');
+      setAnswer(a);
+      answerPaused.current = null;
+      if (a.show.moment_id && moments.some((m) => m.candidate_id === a.show!.moment_id)) {
+        if (a.show.moment_id !== selected) setWhatIf(null);
+        setSelected(a.show.moment_id);
+      }
+      clock.setSpeed(1);
+      clock.seek(Math.max(0, mt.toMatch({ period: a.show.period, t_ms: a.show.from_ms }) - 1000), true);
+      announce(a.claims.map((c) => c.text).join(' '));
+    },
+    [clock, moments, mt, selected, announce],
+  );
+  const answerFrom = answer?.show ? mt.toMatch({ period: answer.show.period, t_ms: answer.show.from_ms }) : 0;
+  const answerTo = answer?.show ? mt.toMatch({ period: answer.show.period, t_ms: answer.show.to_ms }) : 0;
+  // The answer holds the pitch and the caption from just before its play until a while after it.
+  const answering = !!answer?.show && clock.g >= answerFrom - 4000 && clock.g <= answerTo + 8000;
+  // At the end of its play the clock pauses once, so the viewer can take the answer in.
+  useEffect(() => {
+    if (!answer?.show || answerPaused.current === answer || !clock.playing) return;
+    if (clock.g >= answerTo && clock.g < answerTo + 2000) {
+      answerPaused.current = answer;
+      clock.pause();
+    }
+  }, [answer, answerTo, clock]);
+
   // Voice: the caption spoken in the viewer's language, never over itself and never far behind (PRD 10.5).
   const voiceWanted = mode === 'audio' || prefs.voice;
   const voice = voiceFor(lang);
-  const captionText = current ? (current.overlay.text[lang] ?? current.overlay.text.en ?? '') : '';
+  const answerLang: Lang = lang === 'es' || lang === 'fr' ? lang : 'en';
+  const answerText = answering && answer ? answer.claims.map((c) => c.text).join(' ') : '';
+  const captionText = answerText || (current ? (current.overlay.text[lang] ?? current.overlay.text.en ?? '') : '');
   useEffect(() => {
     if (!voiceWanted || !clock.playing || !current) return;
     speaker.say({ id: `${current.overlay.overlay_id}:${lang}`, text: captionText, lang, t: clock.now() / 1000 }, () => clock.now() / 1000, mode === 'audio' ? 1.05 : 1);
@@ -250,7 +293,9 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
   const clockText = clockOf(pos);
   const captionMoment = current ? moments.find((m) => m.candidate_id === current.overlay.detected_moment_id) : null;
   const evidence = current?.overlay.evidence_ids ?? [];
-  const meta = current
+  const meta = answering && answer
+    ? `Ask OffBall · “${answer.question}” · ${answer.state === 'ok' ? 'fact-checked' : 'partly fact-checked'}`
+    : current
     ? mode === 'analyst'
       ? `${w.types[captionMoment?.type ?? ''] ?? ''} · Evidence: ${evidence.join(' · ')}`
       : `${w.types[captionMoment?.type ?? ''] ?? ''} · ${fill(ui.aiCaption, { n: Math.max(1, evidence.length + 1) })}`
@@ -264,6 +309,17 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
 
   const chips = (
     <>
+      {answering && answer && (
+        <span className="map-chip map-chip-space anim-pop">
+          Ask OffBall: {answer.question}
+          <button type="button" className="chip-x press" aria-label="Back to Ask OffBall" title="Back to Ask OffBall" onClick={() => setPanel('ask')}>
+            ↩
+          </button>
+          <button type="button" className="chip-x press" aria-label="Stop showing the answer" title="Stop showing the answer" onClick={() => setAnswer(null)}>
+            ×
+          </button>
+        </span>
+      )}
       <span className="map-chip">
         <span className="anim-blink" style={{ width: 6, height: 6, borderRadius: 3, background: 'var(--space)' }} />
         {w.half[pos.period]} · {clockText}
@@ -390,6 +446,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
                 levels={levels}
                 reduced={reducedMotion}
                 words={words}
+                focus={answering && answer?.show ? answer.show.player_ids : undefined}
                 label={`2D pitch, ${tl.home.name} ${score.kes}, ${tl.away.name} ${score.ash}, ${clockText}. ${captionText}`}
                 chips={chips}
                 scrim={scrim}
@@ -397,7 +454,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
               />
             </div>
 
-            <CaptionBar captions={captions} meta={meta} size={mode === 'audio' ? prefs.capSize + 2 : prefs.capSize} voice={{ on: voiceWanted, speaking: clock.playing, label: voiceLabel }} />
+            <CaptionBar captions={captions} override={answerText ? { text: answerText, lang: answerLang } : undefined} meta={meta} size={mode === 'audio' ? prefs.capSize + 2 : prefs.capSize} voice={{ on: voiceWanted, speaking: clock.playing, label: voiceLabel }} />
 
             <div className="card stack player-transport" style={{ padding: '12px 16px', gap: 12 }}>
               <div className="cluster" style={{ gap: 8 }}>
@@ -457,7 +514,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
 
       <PersonalizeDrawer open={panel === 'personalize'} onClose={() => setPanel('none')} />
       <Drawer open={panel === 'ask'} onClose={() => setPanel('none')} title={ui.ask}>
-        <AskPanel t={0} at={{ matchId: tl.match_id, period: pos.period, t_ms: Math.round(pos.t_ms) }} />
+        <AskPanel t={0} at={{ matchId: tl.match_id, period: pos.period, t_ms: Math.round(pos.t_ms), momentId: selected ?? live?.candidate_id ?? null }} onShow={showAnswer} />
       </Drawer>
       <ShortcutsDialog open={panel === 'shortcuts'} onClose={() => setPanel('none')} />
       <LiveRegion msg={msg} />

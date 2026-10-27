@@ -94,6 +94,9 @@ async def test_ask_streams_each_tool_then_the_checked_answer(client, scripted, m
     jsonschema.validate(answer, json.loads((CONTRACTS / "answer.schema.json").read_text(encoding="utf-8")))
     assert answer["state"] == "ok" and answer["tools"] == ["match_facts"]
     assert answer["claims"][0]["verified"] and answer["claims"][0]["text"].startswith("El 9")
+    # The play that shows it stops where the viewer is, and rings only players who were on the pitch.
+    assert answer["show"] == {"period": 2, "from_ms": 1_079_500, "to_ms": 1_086_000, "player_ids": ["kes-09", "ash-05"],
+                              "moment_id": None}
 
 
 async def test_suggestions_are_three_questions_about_what_was_seen(client) -> None:

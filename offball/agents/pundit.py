@@ -16,15 +16,17 @@ from opentelemetry import trace
 
 from offball.agents.crew import AgentFailed, Crew, as_json
 from offball.agents.schemas import AnswerOut, VerdictOut
+from offball.core import clock_label
 from offball.mcp import tools as T
 from offball.services.telemetry import TRACER
 
 LANGUAGE_NAMES = {"en": "English", "es": "Spanish", "fr": "French"}
+SHOW_MAX_MS = 20_000  # the longest play an answer shows on the pitch
 
 
 async def answer(crew: Crew, match_id: str, question: str, period: int | None = None, t_ms: int | None = None,
-                 mode: str = "casual", fav: str | None = None,
-                 lang: str = "en") -> AsyncIterator[tuple[str, dict[str, Any]]]:
+                 mode: str = "casual", fav: str | None = None, lang: str = "en",
+                 moment_id: str | None = None) -> AsyncIterator[tuple[str, dict[str, Any]]]:
     """Yield ("tool", {"name"}) for each tool call, then ("answer", Answer) in the frontend's shape."""
     events: asyncio.Queue[tuple[str, dict[str, Any]] | None] = asyncio.Queue()
     used: list[str] = []
@@ -44,7 +46,7 @@ async def answer(crew: Crew, match_id: str, question: str, period: int | None = 
         try:
             with trace.use_span(span, end_on_exit=True):
                 await events.put(("answer", await _answer(crew, match_id, question, period, t_ms, mode, fav, lang,
-                                                           used, [report])))
+                                                           used, [report], moment_id)))
         except AgentFailed as exc:
             await events.put(("error", {"detail": f"The Pundit couldn't answer: {exc}"}))
         finally:
@@ -57,11 +59,54 @@ async def answer(crew: Crew, match_id: str, question: str, period: int | None = 
     await task
 
 
+def _on_screen(match_id: str, moment_id: str | None) -> str:
+    """The moment the viewer has open or is watching, in a sentence for the prompt."""
+    if not moment_id:
+        return ""
+    try:
+        c = T.candidate(match_id, moment_id)
+    except ValueError:
+        return ""
+    dragged = f", pulling {', '.join(c.dragged_ids)}" if c.dragged_ids else ""
+    return (f" On screen is moment {c.candidate_id}: a {c.type.replace('_', ' ')} by {c.creator_id}{dragged}, from "
+            f"{clock_label(c.period, c.t_start_ms)} to {clock_label(c.period, c.t_end_ms)} (period {c.period}, t_ms "
+            f"{c.t_start_ms} to {c.t_end_ms}). 'This', 'that run' or 'here' mean this moment.")
+
+
+def _show(match_id: str, out: AnswerOut, clock: tuple[int, int] | None) -> dict[str, Any] | None:
+    """The play the Pundit chose to show its answer, kept to what the viewer has seen and to 20 s."""
+    if out.show_period is None or out.show_from_ms is None:
+        return None
+    md = T.REGISTRY.data(match_id)
+    if out.show_period not in md.periods:
+        return None
+    period, end = out.show_period, int(md.periods[out.show_period].t_ms[-1])
+    start = max(0, min(out.show_from_ms, end))
+    stop = out.show_to_ms if out.show_to_ms is not None and out.show_to_ms > start else start + 8000
+    stop = min(stop, start + SHOW_MAX_MS, end)
+    if clock is not None:
+        if (period, start) > clock:
+            return None  # it hasn't happened yet for this viewer
+        if period == clock[0]:
+            stop = min(stop, clock[1])
+    moment = out.show_moment_id
+    if moment and not any(c.candidate_id == moment for c in T.REGISTRY.candidates(match_id)):
+        moment = None
+    players = [p for p in dict.fromkeys(out.show_player_ids) if p in md.players][:4]
+    return {"period": period, "from_ms": start, "to_ms": max(stop, start + 1000), "player_ids": players,
+            "moment_id": moment}
+
+
 async def _answer(crew: Crew, match_id: str, question: str, period: int | None, t_ms: int | None, mode: str,
-                  fav: str | None, lang: str, used: list[str], middleware: list) -> dict[str, Any]:
-    where = f"period {period}, t_ms {t_ms}" if period is not None and t_ms is not None else "the end of the match"
+                  fav: str | None, lang: str, used: list[str], middleware: list,
+                  moment_id: str | None = None) -> dict[str, Any]:
+    if period is not None and t_ms is not None:
+        where = f"{clock_label(period, t_ms)} on the match clock (period {period}, t_ms {t_ms})"
+    else:
+        where = "the end of the match"
     language = LANGUAGE_NAMES.get(lang, "English")
     prompt = (f"Match {match_id}. The viewer is watching in {mode} mode, at {where}."
+              + _on_screen(match_id, moment_id)
               + (f" Their favourite player is {fav}." if fav else "")
               + f" Answer in {language}."
               + f"\n\nTheir question: {question}")
@@ -80,6 +125,8 @@ async def _answer(crew: Crew, match_id: str, question: str, period: int | None, 
     if state == "ok" and not all(c["verified"] for c in claims):
         state = "partial"
     result: dict[str, Any] = {"question": question, "state": state, "claims": claims, "tools": list(dict.fromkeys(used))}
+    if state in ("ok", "partial") and (show := _show(match_id, out, T.VIEWER_CLOCK.get())):
+        result["show"] = show
     if out.alternative_label and out.alternative_question:
         result["alternative"] = {"label": out.alternative_label, "question": out.alternative_question}
     return result

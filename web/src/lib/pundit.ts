@@ -33,6 +33,16 @@ export interface Answer {
   alternative?: { label: string; question: string };
   /** Shown when a corrected event changed the answer. */
   corrected?: boolean;
+  /** The play that shows the answer on the pitch: the app jumps there, rings the players and plays it. */
+  show?: AnswerShow;
+}
+
+export interface AnswerShow {
+  period: number;
+  from_ms: number;
+  to_ms: number;
+  player_ids: string[];
+  moment_id?: string | null;
 }
 
 interface Context {

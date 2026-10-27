@@ -43,6 +43,16 @@ class Alternative(Contract):
     question: str
 
 
+class AnswerShow(Contract):
+    """The play that shows an answer on the pitch: the app jumps there, rings the players and plays it."""
+
+    period: int
+    from_ms: int
+    to_ms: int
+    player_ids: list[str]
+    moment_id: str | None = None
+
+
 class Answer(Contract):
     """`Answer` in web/src/lib/pundit.ts: Ask OffBall's reply (INTEGRATION.md 6.1)."""
 
@@ -53,6 +63,7 @@ class Answer(Contract):
     tools: list[str] = Field(description="The tools the Pundit called, in order")
     alternative: Alternative | None = Field(default=None, description="For a declined or unknown question")
     corrected: bool | None = Field(default=None, description="A corrected event changed the answer")
+    show: AnswerShow | None = Field(default=None, description="The play that shows the answer on the pitch")
 
 
 class DecisionOption(Contract):

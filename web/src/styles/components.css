@@ -1432,3 +1432,5 @@
   .moment-items { max-height: 420px; }
 }
 .match-select { width: auto; max-width: 260px; }
+.chip-x { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-inline-start: 4px; border: 0; border-radius: 50%; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.chip-x:hover { background: color-mix(in srgb, currentColor 18%, transparent); }

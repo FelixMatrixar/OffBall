@@ -237,6 +237,8 @@ The request:
  "mode": "learn", "lang": "es", "fav": "kes-09"}
 ```
 
+`moment_id` (optional) names the moment the viewer has open, which "this" refers to. The Pundit reads the viewer's place as the broadcast clock and turns any clock the viewer names (63:05, 45+2:10) into match time with the `match_time` tool. Its answer can carry `show`, the play that shows it on the pitch: `{"period", "from_ms", "to_ms", "player_ids", "moment_id"}`, at most 20 s and never past the viewer's place. On a whole match the match view closes Ask OffBall, plays that stretch at normal speed with those players ringed and the answer as the caption, and pauses at its end; the answer keeps a "Show it on the pitch" button.
+
 The response events:
 
 ```text

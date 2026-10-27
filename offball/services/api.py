@@ -294,6 +294,7 @@ class AskBody(BaseModel):
     mode: str = "casual"
     lang: str = "en"
     fav: str | None = None
+    moment_id: str | None = None  # the moment the viewer has open, which "this" refers to
 
 
 @app.post("/api/matches/{match_id}/ask")
@@ -303,7 +304,7 @@ async def ask(match_id: str, body: AskBody) -> EventSourceResponse:
 
     async def events():
         async for kind, payload in pundit_answer(agents, match_id, body.question, body.period, body.t_ms, body.mode,
-                                                 body.fav, body.lang):
+                                                 body.fav, body.lang, body.moment_id):
             yield {"event": kind, "data": json.dumps(payload, ensure_ascii=False)}
 
     return EventSourceResponse(events())

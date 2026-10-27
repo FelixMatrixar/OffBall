@@ -6,7 +6,7 @@ import { BASE_MS, MATCH_ID, PERIOD, stepAt } from '../../lib/match';
 import { answer, suggestions, type Answer } from '../../lib/pundit';
 import { usePrefs } from '../../lib/prefs';
 import { ChartFrame, VegaChart } from '../charts';
-import { CheckIcon, Chip, Dialog, TypingDots } from '../ui';
+import { Button, CheckIcon, Chip, Dialog, TypingDots } from '../ui';
 
 interface SpeechRecognitionLike {
   lang: string;
@@ -25,7 +25,7 @@ const Recognition = (): (new () => SpeechRecognitionLike) | null => {
 
 const CONSENT_KEY = 'offball.voiceInputOk';
 
-function AnswerView({ a, onAsk }: { a: Answer; onAsk: (q: string) => void }) {
+function AnswerView({ a, onAsk, onShow }: { a: Answer; onAsk: (q: string) => void; onShow?: (a: Answer) => void }) {
   const verified = a.claims.filter((c) => c.verified);
   const unverified = a.claims.filter((c) => !c.verified);
   const evidence = [...new Set(verified.flatMap((c) => c.evidence))];
@@ -70,6 +70,11 @@ function AnswerView({ a, onAsk }: { a: Answer; onAsk: (q: string) => void }) {
           {a.alternative.label}
         </button>
       )}
+      {a.show && onShow && (
+        <Button variant="secondary" className="btn-sm" onClick={() => onShow(a)}>
+          ▶ Show it on the pitch
+        </Button>
+      )}
     </div>
   );
 }
@@ -86,7 +91,7 @@ const PUNDIT_LANGS = ['en', 'es', 'fr'];
  * Ask OffBall. On the showcase `t` is seconds into the moment; on a whole match `at` says where the viewer is, and the
  * answer comes only from the Pundit, since the device's own answers know the showcase alone.
  */
-export function AskPanel({ t, at }: { t: number; at?: { matchId: string; period: number; t_ms: number } }) {
+export function AskPanel({ t, at, onShow }: { t: number; at?: { matchId: string; period: number; t_ms: number; momentId?: string | null }; onShow?: (a: Answer) => void }) {
   const { prefs } = usePrefs();
   const { lang } = useI18n();
   const store = useFeedStore();
@@ -152,11 +157,13 @@ export function AskPanel({ t, at }: { t: number; at?: { matchId: string; period:
     setPending({ q: question, tools: [] });
     const ctl = new AbortController();
     asking.current = ctl;
-    const ctx = { ...where, mode: prefs.mode, lang, fav: prefs.fav };
+    const ctx = { matchId: where.matchId, period: where.period, t_ms: where.t_ms, moment_id: at?.momentId, mode: prefs.mode, lang, fav: prefs.fav };
     askPundit(question, ctx, (name) => setPending((p) => (p ? { ...p, tools: [...p.tools, name] } : p)), ctl.signal)
       .then((a) => {
         setLog((l) => [...l.slice(-5), a]);
         setPending(null);
+        // An answer with a play to show is shown at once: words alone leave the viewer looking for it.
+        if (a.show && onShow) onShow(a);
       })
       .catch(() => {
         // No model, no backend or no answer: on the showcase the device answers instead, so the panel never comes back
@@ -233,7 +240,7 @@ export function AskPanel({ t, at }: { t: number; at?: { matchId: string; period:
         {log.map((a, i) => (
           <div key={i} className="stack" style={{ gap: 8 }}>
             <p className="ask-question">{a.question}</p>
-            <AnswerView a={a} onAsk={ask} />
+            <AnswerView a={a} onAsk={ask} onShow={onShow} />
           </div>
         ))}
         {pending && (

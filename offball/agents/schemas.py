@@ -150,6 +150,13 @@ class AnswerOut(Strict):
     claims: list[AnswerClaim]
     alternative_label: str | None = Field(description="For a declined or unknown question: a better question, short")
     alternative_question: str | None
+    show_period: int | None = Field(description="The play that shows the answer on the pitch: its period, or null "
+                                                "when no single play shows it")
+    show_from_ms: int | None = Field(description="When that play starts, in ms into the period: a couple of seconds "
+                                                 "before the key action")
+    show_to_ms: int | None = Field(description="When it ends, in ms into the period: at most 15 s after it starts")
+    show_player_ids: list[str] = Field(description="The players the answer is about, to ring while it plays")
+    show_moment_id: str | None = Field(description="The detected moment the play is, if it is one")
 
 
 class NumberUsed(Strict):

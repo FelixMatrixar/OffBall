@@ -176,8 +176,11 @@ class ScriptedModel(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient
         if schema is AnswerOut:
             text = "El 9 arrastró al 5 fuera del centro." if "Answer in Spanish" in prompt else \
                 "No. 9 pulled No. 5 out of the centre."
+            # The play that shows it: the decoy run, a couple of seconds before No. 9 sets off, with both rung.
             return AnswerOut(state="ok", claims=[AnswerClaim(text=text, verified=True, evidence=["m07-e0948"])],
-                             alternative_label=None, alternative_question=None)
+                             alternative_label=None, alternative_question=None, show_period=2,
+                             show_from_ms=1_079_500, show_to_ms=1_087_000, show_player_ids=["kes-09", "ash-05", "nobody"],
+                             show_moment_id=None)
         if schema is TacticianOut:
             seen = _json_after(prompt, "Numbers from the replays") or {}
             space = seen.get("space_created_m2", 0.0)

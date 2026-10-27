@@ -14,6 +14,7 @@ import { drawContours, drawScene, newDrawState, paintField, readStyle, type Draw
 import { dodge, dotScaleFor } from '../match/Stage2D';
 
 const MAX_DPR = 2;
+const NONE: readonly string[] = [];
 
 /** A word on the pitch: over a player, who it follows every frame, or at a fixed spot such as a ring. */
 export interface PitchWord {
@@ -42,6 +43,8 @@ export interface PlayerPitchProps {
   levels: readonly number[];
   reduced: boolean;
   words: readonly PitchWord[];
+  /** Players an answer is about: ringed, with everyone else stepped back. */
+  focus?: readonly string[];
   label: string;
   scrim?: ReactNode;
   chips?: ReactNode;
@@ -55,14 +58,14 @@ export interface PlayerPitchProps {
  * crew's graphics and the players, every display frame from the frames around the clock, with the words on the pitch
  * kept in place in the DOM so they stay sharp and readable.
  */
-export function PlayerPitch({ frames, now, toPosition, sideOf, numOf, overlays, whatIf, patterns, orientation, fieldStrength, levels, reduced, words, label, scrim, chips, corner, dim, style }: PlayerPitchProps) {
+export function PlayerPitch({ frames, now, toPosition, sideOf, numOf, overlays, whatIf, patterns, orientation, fieldStrength, levels, reduced, words, focus = NONE, label, scrim, chips, corner, dim, style }: PlayerPitchProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contourRef = useRef<HTMLCanvasElement>(null);
   const fieldRef = useRef<HTMLCanvasElement>(null);
   const wordRefs = useRef(new Map<string, HTMLSpanElement>());
-  const latest = useRef({ overlays, whatIf, patterns, fieldStrength, levels, reduced, words, sideOf, numOf, toPosition, now });
-  latest.current = { overlays, whatIf, patterns, fieldStrength, levels, reduced, words, sideOf, numOf, toPosition, now };
+  const latest = useRef({ overlays, whatIf, patterns, fieldStrength, levels, reduced, words, focus, sideOf, numOf, toPosition, now });
+  latest.current = { overlays, whatIf, patterns, fieldStrength, levels, reduced, words, focus, sideOf, numOf, toPosition, now };
   const dirty = useRef(true);
 
   useEffect(() => {
@@ -143,9 +146,11 @@ export function PlayerPitch({ frames, now, toPosition, sideOf, numOf, overlays, 
       }
       const extra = L.whatIf && L.whatIf.period === period ? whatIfItems(L.whatIf) : [];
       const items: ActiveOverlay[] = [...extra, ...L.overlays].filter((ov) => ov.period === period && ov.t_start_ms <= t_ms && t_ms < ov.t_end_ms).map((overlay) => ({ overlay }));
+      const focused = new Set(L.focus);
       const players: DrawPlayer[] = Object.keys(s.pos).map((id) => {
         const team = L.sideOf(id);
-        return { id, team, num: L.numOf(id), at: pos[id], dim: false, follow: false, highlight: false, focusRing: false, pattern: L.patterns[team] };
+        const on = focused.has(id);
+        return { id, team, num: L.numOf(id), at: pos[id], dim: focused.size > 0 && !on, follow: on, highlight: false, focusRing: false, pattern: L.patterns[team] };
       });
       const scene: Scene2D = {
         o,
