@@ -86,6 +86,20 @@ def test_the_decoy_run_created_space_and_threat(goal) -> None:
     assert metrics.compute(md, "space_created_by_m2", **params).value == space.value
 
 
+def test_the_learned_credit_reads_one_row_per_moment(goal) -> None:
+    md, card = goal
+    club = card["attacking"]["club_id"]
+    t_m = CR.measure_instant(md, club, card["period"], card["t_start_ms"], card["t_end_ms"],
+                             card["receiver"]["player_id"])
+    feats = CR.features(md, card["type"], club, card["creator"]["player_id"],
+                        [d["player_id"] for d in card["dragged"]], card["period"], card["t_start_ms"], t_m,
+                        card["anchors"]["gap"]["polygon"])
+    assert len(feats) == len(CR.FEATURES) and all(np.isfinite(feats))
+    assert feats[CR.FEATURES.index("family_run")] == 1.0 and feats[0] > 0
+    if CR.learned() is not None:
+        assert CR.learned_space(feats) > 0
+
+
 def test_a_ghost_moves_with_its_team() -> None:
     md = T.REGISTRY.data("m07")
     pf = md.periods[2]

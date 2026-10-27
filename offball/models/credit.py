@@ -16,6 +16,8 @@ the true credit (PRD 19.2: within 25% on 80% of moments, rank correlation 0.8).
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cache
+from pathlib import Path
 
 import numpy as np
 
@@ -63,6 +65,62 @@ def credit(md: MatchData, club_id: str, creator_id: str, dragged_ids: list[str],
     values = epv.value_at(md, period, club_id, cells)
     # 1 m cells: summed control is square metres; the threat is the zone's mean, as the generator measures it.
     return Credit(float(gain.sum()), float((gain * values).mean()), int(pf.t_ms[b]), ghosts)
+
+
+# ------------------------------------------------------------------------------------------------ learned credit
+
+# Moment types by what the creator's decision changes, which decides how its counterfactual differs.
+FAMILIES = {"decoy_run": "run", "timed_run_in_behind": "run", "blind_side_run": "run", "third_man_run": "run",
+            "overlap": "wide", "underlap": "wide", "switch_of_play": "wide",
+            "false_9_drop": "drop", "pinning": "drop", "press_broken": "drop",
+            "rotation": "shape", "set_piece_screen": "shape", "cover_shadow": "shape", "rest_defence_exposed": "shape",
+            "fatigue_gap": "state", "space_lost": "state"}
+FAMILY_NAMES = ("run", "wide", "drop", "shape", "state")
+FEATURES = ["space_est", "threat_est", "zone_m2", "area_start", "area_measure", "control_gain", "defender_moved",
+            "creator_moved", "follow", "measure_s", *(f"family_{f}" for f in FAMILY_NAMES)]
+ARTIFACT = Path(__file__).parent / "artifacts" / "credit.joblib"
+
+
+def features(md: MatchData, moment_type: str, club_id: str, creator_id: str, dragged_ids: list[str], period: int,
+             t_start_ms: int, t_measure_ms: int, zone: list) -> list[float]:
+    """What tracking shows about a moment, in FEATURES order: the observed estimate itself, the zone's size and
+    control before and when the gap is used, how far the creator and the dragged defender moved and whether
+    together, how long the gap took, and the moment's family."""
+    c = credit(md, club_id, creator_id, dragged_ids, period, t_start_ms, t_measure_ms, zone)
+    pf = md.periods[period]
+    a, b = pf.index_of(t_start_ms), pf.index_of(t_measure_ms)
+    cells = _zone_cells(zone_from({"zone": zone}))
+    start, end = zone_control_at(md, club_id, period, a, cells), zone_control_at(md, club_id, period, b, cells)
+    creator = pf.xy[b, md.players.index(creator_id)] - pf.xy[a, md.players.index(creator_id)]
+    moved, follow = 0.0, 0.0
+    if dragged_ids:
+        col = md.players.index(dragged_ids[0])
+        path = pf.xy[a: b + 1, col].astype(float) - pf.xy[a, col].astype(float)
+        moved = float(np.nanmax(np.linalg.norm(path, axis=1))) if len(path) else 0.0
+        d = pf.xy[b, col] - pf.xy[a, col]
+        denom = float(np.linalg.norm(creator) * np.linalg.norm(d))
+        follow = float(creator @ d / denom) if denom > 1e-6 else 0.0
+    family = FAMILIES.get(moment_type, "shape")
+    return [c.space_created_m2, c.threat_created, float(len(cells)), float(start.sum()), float(end.sum()),
+            float(end.mean() - start.mean()), moved, float(np.linalg.norm(creator)), follow,
+            (b - a) * (pf.t_ms[1] - pf.t_ms[0]) / 1000 if pf.n > 1 else 0.0,
+            *(float(family == f) for f in FAMILY_NAMES)]
+
+
+@cache
+def learned():
+    """The credit model `offball.models.train` fits to true credit, or None before it has been trained."""
+    import joblib
+
+    return joblib.load(ARTIFACT) if ARTIFACT.exists() else None
+
+
+def learned_space(feats: list[float]) -> float:
+    """Space Created from the learned model: it predicts the true credit on a log scale."""
+    model = learned()
+    if model is None:
+        raise FileNotFoundError(f"No credit model at {ARTIFACT}; run `uv run python -m offball.models.train`")
+    return float(np.expm1(model.predict(np.asarray([feats]))[0]))
 
 
 _PARAMS = {"club_id": "str", "creator_id": "str", "dragged_ids": "list[str]", "period": "int", "t_start_ms": "int",

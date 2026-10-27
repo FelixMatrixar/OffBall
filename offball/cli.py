@@ -130,6 +130,15 @@ def _play_set(scripts, name: str, workers: int, attempts: int, cf_runs: int, ora
             job.result()
 
 
+def cmd_credit_set(args: argparse.Namespace) -> None:
+    from offball.generator.trainset import credit_scripts
+
+    scripts = credit_scripts(args.per_type, args.first)
+    if args.only:
+        scripts = [s for s in scripts if s.match_id in set(args.only)]
+    _play_set(scripts, "credit", args.workers, args.attempts, args.cf_runs, lambda s: False)
+
+
 def cmd_bench(args: argparse.Namespace) -> None:
     from offball.generator.bench import bench_scripts
     from offball.generator.league import build_league
@@ -367,6 +376,15 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--workers", type=int, default=13)
     p.add_argument("--cf-runs", type=int, default=8)
     p.set_defaults(fn=cmd_smoke)
+    p = sub.add_parser("credit-set", help="Play the credit training split: short directed matches, each type "
+                                          "planted several times with true counterfactual credit")
+    p.add_argument("--per-type", type=int, default=5)
+    p.add_argument("--first", type=int, default=1, help="Number (and seed) the batch from here, after earlier ones")
+    p.add_argument("--only", nargs="*", help="Play only these match ids (e.g. crd001)")
+    p.add_argument("--workers", type=int, default=14)
+    p.add_argument("--attempts", type=int, default=40)
+    p.add_argument("--cf-runs", type=int, default=8)
+    p.set_defaults(fn=cmd_credit_set)
     p = sub.add_parser("bench", help="Generate OffBall-Bench: 100 full matches with answer keys, dev/test split")
     p.add_argument("--matches", type=int, default=100)
     p.add_argument("--only", nargs="*", help="Generate only these match ids (e.g. b001 b002)")

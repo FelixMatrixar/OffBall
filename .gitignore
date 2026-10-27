@@ -39,6 +39,8 @@ calibration/raw/
 # Calibration runs: regenerated on demand, only their gate reports are kept (PRD 12.11)
 datasets/calib/
 truth/calib/
+datasets/credit/
+truth/credit/
 
 # The season backdrop is published as a GitHub release and kept on the VM, regenerated from its seed (PRD 12.11)
 datasets/season/

@@ -44,6 +44,7 @@ REPORT = ROOT / "calibration" / "reports" / "models.md"
 TEST = ("showcase", "m07")
 TARGET_GAIN = 0.10
 M5_TRAIN = "calib"
+CREDIT_TRAIN = "credit"  # directed matches planting every type, for the learned credit (offball credit-set)
 M5_TEST = (("matchday", None), ("smoke", None), ("showcase", "m07"))
 ECE_TARGET = 0.02
 F1_TARGET = 0.80
@@ -277,10 +278,10 @@ def eval_obso(train: list[MatchData], tests: list[MatchData], save: bool = True)
             "baseline_top_is_shooter": round(near_hits / max(shooters, 1), 3)}
 
 
-def planted_moments() -> list[tuple[MatchData, dict]]:
+def planted_moments(sets: tuple[str, ...] = ("smoke", "matchday", "showcase", "golden")) -> list[tuple[MatchData, dict]]:
     """Every planted moment with true counterfactual credit, a creator, dragged defenders and a gap zone, once."""
     out, cache, seen = [], {}, set()
-    for set_name in ("smoke", "matchday", "showcase", "golden"):
+    for set_name in sets:
         for key in sorted((TRUTH / set_name).glob("*/answer_key.json")):
             match_dir = DATASETS / set_name / key.parent.name
             if not (match_dir / "tracking.parquet").exists():
@@ -329,6 +330,72 @@ def eval_credit() -> dict:
                       r["gap_zone"])
         rows.append(_truth_row(r, c.space_created_m2, c.threat_created))
     return {"model": "off-ball credit", **credit_scores(rows)}
+
+
+def credit_rows(sets: tuple[str, ...]) -> tuple[np.ndarray, np.ndarray, list[dict]]:
+    """Each planted moment's features, its true Space Created, and who it was."""
+    X, y, who = [], [], []
+    for md, r in planted_moments(sets):
+        t_m = CR.measure_instant(md, r["team_id"], r["period"], r["t_start_ms"], r["t_end_ms"], r.get("receiver_id"))
+        X.append(CR.features(md, r["type"], r["team_id"], r["creator_id"], r["dragged_ids"], r["period"],
+                             r["t_start_ms"], t_m, r["gap_zone"]))
+        y.append(r["counterfactual"]["space_created_m2"])
+        who.append(r)
+    return np.asarray(X), np.asarray(y), who
+
+
+def _credit_candidates() -> dict:
+    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.linear_model import RidgeCV
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    return {
+        "ridge": make_pipeline(StandardScaler(), RidgeCV(alphas=np.logspace(-2, 3, 12))),
+        "boosted": GradientBoostingRegressor(max_depth=2, n_estimators=300, learning_rate=0.03, subsample=0.8,
+                                             min_samples_leaf=4, random_state=0),
+    }
+
+
+def _credit_fit_score(true: np.ndarray, est: np.ndarray) -> tuple[float, float]:
+    from scipy.stats import spearmanr
+
+    within = float(np.mean(np.abs(est - true) <= CREDIT_TOLERANCE * np.abs(true)))
+    return within, float(spearmanr(true, est).statistic)
+
+
+def train_credit(save: bool = True) -> dict:
+    """Fit the observed-tracking features to true credit on the credit training split, choosing the model by
+    cross-validation there, and score it on the development (smoke) moments."""
+    from sklearn.base import clone
+    from sklearn.model_selection import KFold
+
+    X, y, who = credit_rows((CREDIT_TRAIN,))
+    if not len(y):
+        raise SystemExit("The credit model trains on the credit split: run `uv run offball credit-set` first")
+    target = np.log1p(np.maximum(y, 0.0))
+    cv = {}
+    for name, model in _credit_candidates().items():
+        pred = np.empty_like(target)
+        for fit_idx, held in KFold(5, shuffle=True, random_state=0).split(X):
+            pred[held] = clone(model).fit(X[fit_idx], target[fit_idx]).predict(X[held])
+        cv[name] = _credit_fit_score(y, np.expm1(pred))
+    best = max(cv, key=lambda n: cv[n])
+    model = clone(_credit_candidates()[best]).fit(X, target)
+    Xd, yd, dev = credit_rows(("smoke",))
+    est = np.expm1(model.predict(Xd))
+    if save:
+        CR.ARTIFACT.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(model, CR.ARTIFACT)
+        CR.learned.cache_clear()
+    within, rank = _credit_fit_score(yd, est)
+    raw_within, raw_rank = _credit_fit_score(yd, Xd[:, 0])
+    return {"model": "learned credit", "train_n": len(y), "chosen": best,
+            "cv": {n: (round(w, 3), round(r, 3)) for n, (w, r) in cv.items()}, "dev_n": len(yd),
+            "dev_within": round(within, 3), "dev_rank": round(rank, 3),
+            "dev_raw": (round(raw_within, 3), round(raw_rank, 3)),
+            "dev_rows": [{"moment": r["moment_id"], "type": r["type"], "true_m2": float(t), "est_m2": round(float(e), 1)}
+                         for r, t, e in zip(dev, yd, est, strict=True)]}
 
 
 def eval_counterfactual(replays: int = CF.RERUNS) -> dict:
