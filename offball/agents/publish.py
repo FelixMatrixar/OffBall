@@ -18,6 +18,9 @@ from offball.core import moment_overlay_id
 from offball.services.state import MatchState
 
 MIN_HOLD_MS = 2500
+# Beats fall on 40 ms frames, so a hold the Producer meant as 2.5 s can land a frame or two short: that much is
+# rounding, and the graphic is held to 2.5 s rather than sent back.
+HOLD_ROUNDING_MS = 100
 LIVE_BUFFER_MS = 1500
 
 
@@ -110,6 +113,8 @@ def build_overlays(card: dict, scripts: dict[str, ModeScript], schedule: Schedul
             continue
         t0 = beats[p.start_beat] + round(p.start_offset_s * 1000)
         t1 = beats[p.end_beat] + round(p.end_offset_s * 1000)
+        if MIN_HOLD_MS - HOLD_ROUNDING_MS <= t1 - t0 < MIN_HOLD_MS:
+            t1 = t0 + MIN_HOLD_MS
         if t1 - t0 < MIN_HOLD_MS:
             problems.append(f"{where}: it holds {(t1 - t0) / 1000:.1f} s; every graphic holds at least 2.5 s")
             continue

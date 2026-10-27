@@ -101,7 +101,8 @@ export function MomentPanel({ matchId, moment: m, alternatives, label, clubOf, w
           <span className={`moment-dot${explained ? ' moment-dot-on' : ''}`} aria-hidden="true" />
           <span style={{ fontSize: 14 }}>{w.graphics[m.graphics]}</span>
         </div>
-        {m.graphics_note && !explained && (
+        {/* The Scout's one-sentence reason is for viewers; a failed step's error is for the team. */}
+        {m.graphics_note && m.graphics === 'skipped' && (
           <p className="muted" lang="en" style={{ margin: 0, fontSize: 13, lineHeight: 1.45 }}>
             {m.graphics_note}
           </p>
