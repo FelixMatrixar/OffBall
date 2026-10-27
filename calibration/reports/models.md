@@ -132,3 +132,43 @@ Confusion (rows true, columns predicted): in_behind, overlap, decoy, positioning
 | overlap | 1 | 161 | 0 | 33 |
 | decoy | 1 | 0 | 138 | 15 |
 | positioning | 9 | 9 | 5 | 3160 |
+
+## Counterfactual workers
+
+Space Created from engine replays started at the observed state (16 replays without the creator's decision against what happened; `offball.models.counterfactual`), against the generator's true credit. The smoke moments chose the design; the matchday and showcase moments were scored once. The observed-tracking estimate above is shown beside it on the same moments.
+
+| Moments | Count | Within 25% | Rank correlation | Observed-tracking estimate: within, rank |
+| --- | --- | --- | --- | --- |
+| All | 25 | 24% | 0.657 | 40%, 0.65 |
+| Development (smoke) | 15 | 20% | 0.801 | 40%, 0.765 |
+| Test (matchday, showcase) | 10 | 30% | 0.479 | 40%, 0.636 |
+| Off-ball runs | 13 | 46% | 0.779 |  |
+| Others | 12 | 0% | 0.574 |  |
+
+| Moment | Type | True m² | Replays m² | 90% interval | Observed-tracking m² |
+| --- | --- | --- | --- | --- | --- |
+| smk1-k01 | decoy_run | 20.7 | 11.6 | 11.5 to 11.6 | 34.0 |
+| smk10-k01 | press_broken | 39.0 | 2.0 | 2.0 to 2.0 | 3.0 |
+| smk11-k01 | pinning | 11.5 | 0.0 | 0.0 to 0.0 | 0.0 |
+| smk13-k01 | blind_side_run | 39.0 | 16.5 | 16.4 to 16.5 | 11.0 |
+| smk14-k01 | false_9_drop | 213.9 | 32.1 | 32.1 to 32.1 | 23.2 |
+| smk15-k01 | cover_shadow | 50.3 | 13.4 | 9.6 to 32.0 | 48.9 |
+| smk16-k01 | rotation | 47.0 | 3.7 | -7.3 to 9.9 | 38.2 |
+| smk17-k01 | set_piece_screen | 6.5 | 3.7 | 1.7 to 9.4 | 5.8 |
+| smk18-k02 | fatigue_gap | 0.7 | -18.4 | -19.6 to -18.2 | 0.4 |
+| smk2-k01 | decoy_run | 31.0 | 13.8 | 12.7 to 13.9 | 23.5 |
+| smk4-k01 | overlap | 65.2 | 87.7 | 86.2 to 89.9 | 126.6 |
+| smk6-k01 | timed_run_in_behind | 80.2 | 72.1 | 72.1 to 72.1 | 108.8 |
+| smk7-k01 | underlap | 40.6 | 45.0 | 44.9 to 45.1 | 41.8 |
+| smk8-k01 | third_man_run | 60.2 | 74.7 | 73.3 to 77.1 | 71.0 |
+| smk9-k01 | switch_of_play | 16.8 | -3.2 | -3.2 to -3.2 | -8.2 |
+| m07-k02 | decoy_run | 20.7 | 12.9 | 11.9 to 13.4 | 20.8 |
+| m07-k03 | decoy_run | 16.7 | 16.8 | 15.5 to 17.7 | 17.1 |
+| s27-02-k01 | overlap | 112.9 | 140.3 | 133.9 to 141.5 | 159.2 |
+| s27-03-k01 | press_broken | 37.7 | 3.0 | 3.0 to 3.0 | -1.4 |
+| s27-04-k01 | third_man_run | 130.6 | 136.7 | 130.9 to 156.9 | 146.6 |
+| s27-05-k01 | fatigue_gap | 2.4 | -11.3 | -22.4 to -0.4 | -14.9 |
+| s27-06-k01 | switch_of_play | 84.2 | 4.4 | 4.4 to 4.4 | -3.2 |
+| s27-07-k01 | cover_shadow | 21.8 | 9.7 | 7.1 to 13.1 | 23.2 |
+| s27-09-k01 | blind_side_run | 18.0 | 1.5 | 1.5 to 1.5 | -1.9 |
+| s27-10-k01 | rotation | 71.2 | -2.4 | -8.5 to 3.5 | 27.0 |

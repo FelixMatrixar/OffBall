@@ -28,6 +28,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from offball.contracts import Event, MatchInfo
+from offball.models import counterfactual as CF
 from offball.models import credit as CR
 from offball.models import epv as EPV
 from offball.models import obso as OBSO
@@ -276,29 +277,29 @@ def eval_obso(train: list[MatchData], tests: list[MatchData], save: bool = True)
             "baseline_top_is_shooter": round(near_hits / max(shooters, 1), 3)}
 
 
-def eval_credit() -> dict:
-    from scipy.stats import spearmanr
-
-    rows, cache, seen = [], {}, set()
+def planted_moments() -> list[tuple[MatchData, dict]]:
+    """Every planted moment with true counterfactual credit, a creator, dragged defenders and a gap zone, once."""
+    out, cache, seen = [], {}, set()
     for set_name in ("smoke", "matchday", "showcase", "golden"):
         for key in sorted((TRUTH / set_name).glob("*/answer_key.json")):
             match_dir = DATASETS / set_name / key.parent.name
             if not (match_dir / "tracking.parquet").exists():
                 continue
             for r in json.loads(key.read_text(encoding="utf-8")):
-                cf = r.get("counterfactual")
-                if r.get("is_null") or not cf or not r.get("creator_id") or not r.get("dragged_ids") or not r.get("gap_zone"):
+                if (r.get("is_null") or not r.get("counterfactual") or not r.get("creator_id")
+                        or not r.get("dragged_ids") or not r.get("gap_zone")):
                     continue
                 if r["moment_id"] in seen:  # the golden cases repeat moments from the showcase
                     continue
                 seen.add(r["moment_id"])
-                md = cache.setdefault(match_dir, MatchData.load(match_dir))
-                t_m = CR.measure_instant(md, r["team_id"], r["period"], r["t_start_ms"], r["t_end_ms"], r.get("receiver_id"))
-                c = CR.credit(md, r["team_id"], r["creator_id"], r["dragged_ids"], r["period"], r["t_start_ms"], t_m,
-                              r["gap_zone"])
-                rows.append({"moment": r["moment_id"], "type": r["type"], "true_m2": cf["space_created_m2"],
-                             "est_m2": round(c.space_created_m2, 1), "true_epv": cf["epv_gain"],
-                             "est_epv": round(c.threat_created, 4)})
+                out.append((cache.setdefault(match_dir, MatchData.load(match_dir)), r))
+    return out
+
+
+def credit_scores(rows: list[dict]) -> dict:
+    """PRD 19.2's credit scores over all moments, the off-ball runs, and the rest."""
+    from scipy.stats import spearmanr
+
     def scores(group: list[dict]) -> dict:
         true = np.asarray([r["true_m2"] for r in group])
         est = np.asarray([r["est_m2"] for r in group])
@@ -309,9 +310,41 @@ def eval_credit() -> dict:
                 "rank_epv": round(float(spearmanr([r["true_epv"] for r in group],
                                                   [r["est_epv"] for r in group]).statistic), 3) if enough else 0.0}
 
-    runs = [r for r in rows if r["type"] in OFF_BALL_RUNS]
-    return {"model": "off-ball credit", **scores(rows), "runs": scores(runs),
+    return {**scores(rows), "runs": scores([r for r in rows if r["type"] in OFF_BALL_RUNS]),
             "others": scores([r for r in rows if r["type"] not in OFF_BALL_RUNS]), "rows": rows}
+
+
+def _truth_row(r: dict, est_m2: float, est_epv: float, **extra) -> dict:
+    cf = r["counterfactual"]
+    return {"moment": r["moment_id"], "type": r["type"], "true_m2": cf["space_created_m2"], "est_m2": round(est_m2, 1),
+            "true_epv": cf["epv_gain"], "est_epv": round(est_epv, 4), **extra}
+
+
+def eval_credit() -> dict:
+    """The observed-tracking estimate (offball.models.credit) against the true credit."""
+    rows = []
+    for md, r in planted_moments():
+        t_m = CR.measure_instant(md, r["team_id"], r["period"], r["t_start_ms"], r["t_end_ms"], r.get("receiver_id"))
+        c = CR.credit(md, r["team_id"], r["creator_id"], r["dragged_ids"], r["period"], r["t_start_ms"], t_m,
+                      r["gap_zone"])
+        rows.append(_truth_row(r, c.space_created_m2, c.threat_created))
+    return {"model": "off-ball credit", **credit_scores(rows)}
+
+
+def eval_counterfactual(replays: int = CF.RERUNS) -> dict:
+    """The counterfactual workers' engine replays (offball.models.counterfactual) against the true credit."""
+    rows = []
+    for md, r in planted_moments():
+        t_m = CR.measure_instant(md, r["team_id"], r["period"], r["t_start_ms"], r["t_end_ms"], r.get("receiver_id"))
+        c = CF.counterfactual(md, r["type"], r["team_id"], r["creator_id"], r["dragged_ids"], r["period"],
+                              r["t_start_ms"], t_m, r["gap_zone"], replays=replays)
+        rows.append(_truth_row(r, c.space_created_m2, c.threat_created, interval=c.space_interval_m2,
+                               opens_true=r["counterfactual"]["gap_opens_without_run"], opens_est=c.gap_opens_without))
+    # The smoke moments chose the replay design; the matchday and showcase moments were scored once.
+    dev = [r for r in rows if r["moment"].startswith("smk")]
+    test = [r for r in rows if not r["moment"].startswith("smk")]
+    return {"model": "counterfactual workers", "replays": replays, **credit_scores(rows),
+            "dev": credit_scores(dev), "test": credit_scores(test)}
 
 
 def labelled_runs(set_name: str, match_dir: Path, md: MatchData) -> tuple[list, list[str]]:
@@ -383,11 +416,32 @@ def train_m5(save: bool = True) -> list[dict]:
     epv = train_epv(train, tests, save)
     EPV.model.cache_clear()
     return [epv, eval_obso(train, [t for t in tests if t.match_id.startswith("s27")], save), eval_credit(),
-            train_runclass(save)]
+            train_runclass(save), eval_counterfactual()]
+
+
+def counterfactual_report(cf: dict, cred: dict) -> list[str]:
+    lines = ["", "## Counterfactual workers", "",
+             f"Space Created from engine replays started at the observed state ({cf['replays']} replays without the "
+             "creator's decision against what happened; `offball.models.counterfactual`), against the generator's "
+             "true credit. The smoke moments chose the design; the matchday and showcase moments were scored once. "
+             "The observed-tracking estimate above is shown beside it on the same moments.", "",
+             "| Moments | Count | Within 25% | Rank correlation | Observed-tracking estimate: within, rank |",
+             "| --- | --- | --- | --- | --- |"]
+    est = {r["moment"]: r for r in cred["rows"]}
+    for name, s in (("All", cf), ("Development (smoke)", cf["dev"]), ("Test (matchday, showcase)", cf["test"]),
+                    ("Off-ball runs", cf["runs"]), ("Others", cf["others"])):
+        o = credit_scores([est[r["moment"]] for r in s["rows"] if r["moment"] in est]) if "rows" in s else None
+        other = f"{o['within']:.0%}, {o['rank']}" if o else ""
+        lines.append(f"| {name} | {s['n']} | {s['within']:.0%} | {s['rank']} | {other} |")
+    lines += ["", "| Moment | Type | True m² | Replays m² | 90% interval | Observed-tracking m² |",
+              "| --- | --- | --- | --- | --- | --- |"]
+    lines += [f"| {r['moment']} | {r['type']} | {r['true_m2']} | {r['est_m2']} | {r['interval'][0]} to {r['interval'][1]} | "
+              f"{est[r['moment']]['est_m2'] if r['moment'] in est else ''} |" for r in cf["rows"]]
+    return lines
 
 
 def m5_report(results: list[dict]) -> list[str]:
-    epv, obso, cred, runs = results
+    epv, obso, cred, runs, cf = results
     lines = ["", "## Space value", "",
              f"Trained on {epv['train_actions']} on-ball actions in the calibration matches; tested on {epv['n']} "
              f"actions in the matchday, smoke and showcase matches, against whether each possession ended in a goal "
@@ -431,7 +485,7 @@ def m5_report(results: list[dict]) -> list[str]:
               "| | " + " | ".join(runs["labels"]) + " |", "| --- |" + " --- |" * len(runs["labels"])]
     lines += [f"| {t} | " + " | ".join(str(v) for v in row) + " |" for t, row in zip(runs["labels"], runs["confusion"],
                                                                                     strict=True)]
-    return lines
+    return lines + counterfactual_report(cf, cred)
 
 
 def report(results: list[dict], events: dict | None = None, m5: list[dict] | None = None) -> str:
@@ -472,13 +526,15 @@ def main() -> None:
     for kind, s in events["scores"].items():
         print(f"auto-eventing {kind}: F1 {s['f1']:.3f} (precision {s['precision']:.3f}, recall {s['recall']:.3f})")
     m5 = train_m5()
-    epv, obso, cred, runs = m5
+    epv, obso, cred, runs, cf = m5
     print(f"space value: ECE {epv['ece']} (target {ECE_TARGET}) on {epv['n']} held-out actions")
     print(f"scoring opportunity: AUC {obso['auc']} against {obso['baseline_auc']}; shooter rated highest "
           f"{obso['top_is_shooter']:.1%} against {obso['baseline_top_is_shooter']:.1%}")
     print(f"off-ball credit: {cred['within']:.0%} within 25%, rank correlation {cred['rank']} on {cred['n']} moments; "
           f"off-ball runs {cred['runs']['within']:.0%} and {cred['runs']['rank']} on {cred['runs']['n']}")
     print(f"run classifier: macro-F1 {runs['macro_f1']} on {runs['n']} held-out runs {runs['per_type']}")
+    print(f"counterfactual workers: {cf['within']:.0%} within 25%, rank correlation {cf['rank']} on {cf['n']} moments; "
+          f"test moments {cf['test']['within']:.0%} and {cf['test']['rank']}")
     REPORT.write_text(report(results, events, m5), encoding="utf-8", newline="\n")
     print(f"Report -> {REPORT}")
 
