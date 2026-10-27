@@ -2,7 +2,6 @@ import { Button, Logo, Segmented, Switch } from '../components/ui';
 import { THEMES, usePrefs, type Theme } from '../lib/prefs';
 
 export const SCREENS = [
-  { route: 'matches', name: 'Full matches', desc: 'Pick a match and play all 90 minutes from the API: scrub both halves, jump to every moment the models found with the crew’s graphics, and replay what-ifs in the match engine.' },
   { route: 'match', name: 'Match view', desc: 'The match from the overlay feed, in 2D or from four 3D cameras: six modes, the control field with contours, “what if” overlaid or side by side, captions in ten languages with voice, replay controls, snapshots and keyboard shortcuts.' },
   { route: 'phone', name: 'Second screen', desc: 'The phone companion: pairs with a code or QR, follows the main screen’s clock, your player, and Ask OffBall by text or voice.' },
   { route: 'onboarding', name: 'First run', desc: 'Three quick choices and a summary, with a live preview drawn by the real renderer.' },
@@ -16,6 +15,13 @@ export const SCREENS = [
   { route: 'motion', name: 'Motion', desc: 'Principles, duration and easing tokens, and a demo of every micro-interaction.' },
   { route: 'states', name: 'System states', desc: 'Loading, stalls, corrections, unverified answers, offline and more.' },
 ] as const;
+
+/**
+ * What viewers see of the app: the first run, the match view and the evaluation. Every other screen stays built and
+ * reachable by its address, for the team and partners, but is kept out of the navigation.
+ */
+export const SHOWN_ROUTES = ['onboarding', 'match', 'eval'] as const;
+export const SHOWN = SHOWN_ROUTES.map((r) => SCREENS.find((s) => s.route === r)!);
 
 const THEME_LABEL: Record<Theme, string> = { dark: 'Dark', light: 'Light', contrast: 'High contrast' };
 
@@ -33,10 +39,10 @@ export function Home() {
         </header>
         <div className="anim-rise">
           <h1 className="display" style={{ fontSize: 'clamp(44px, 8vw, 64px)', lineHeight: 0.95 }}>
-            OffBall UI
+            OffBall
           </h1>
           <p className="muted" style={{ fontSize: 18, marginTop: 12, maxWidth: 760, lineHeight: 1.5 }}>
-            Design tokens, components and screens for making space visible. Every screen reads the same contract feed for the same synthetic showcase match: Kestrel Bay’s 63rd-minute decoy-run goal against Ashmoor.
+            Off-ball football, made visible. Watch whole matches with the runs and the space that ball-only graphics miss, explained by an AI broadcast crew, and see what would have happened if a player had chosen differently. All match data is synthetic.
           </p>
           <div className="cluster" style={{ marginTop: 14 }}>
             <Button variant="ghost" className="btn-sm" onClick={() => update({ onboarded: false })} disabled={!prefs.onboarded}>
@@ -45,7 +51,7 @@ export function Home() {
           </div>
         </div>
         <nav aria-label="Screens" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-          {SCREENS.map((s, i) => (
+          {SHOWN.map((s, i) => (
             <a key={s.route} href={`#/${s.route}`} className="screen-card anim-rise" style={{ animationDelay: `calc(var(--stagger) * ${i + 2})` }}>
               <span className="display" style={{ fontSize: 26 }}>
                 {s.name}

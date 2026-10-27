@@ -29,7 +29,7 @@ http://localhost:5173/#/match?feed=sse:http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fmat
 
 With an `sse:` feed from this API, the frontend also uses the API for the rest: the Analyst and Player focus panels show numbers computed from the match, Ask OffBall goes to the Pundit, and the producer console reads the same feed. Anything the API can't answer falls back to the frontend's built-in content. Set `?api=` or `VITE_API_BASE` to point at an API on its own.
 
-To play whole matches, open the match player, `http://localhost:5173/#/matches?api=http://localhost:8000`: pick a match, then play or scrub all 90 minutes, jump to any of the 300-odd moments the models found, see the graphics the crew made for it (or ask the crew for them), and replay what-ifs in the match engine with the Tactician's verdict. `uv run offball graphics m07` builds a match's graphics ahead of time (INTEGRATION.md 6.10).
+To play whole matches, open the match view on the API, `http://localhost:5173/#/match?api=http://localhost:8000`: pick a match in the header, then play or scrub all 90 minutes, jump to any of the 300-odd moments the models found, see the graphics the crew made for it (or ask the crew for them), and replay what-ifs in the match engine with the Tactician's verdict. `uv run offball graphics m07` builds a match's graphics ahead of time (INTEGRATION.md 6.10).
 
 To produce a live run, start it with `POST /api/live-runs` (for example `{"match_id": "m07", "period": 2, "from_ms": 1066000, "to_ms": 1093000}`), then open `#/producer` with the same `?feed=` and `&producer=` set to the token it returns: approvals, holds, skips and retractions then go to the backend and reach every screen on the stream.
 

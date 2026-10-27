@@ -7,9 +7,7 @@ import { ClipView } from './screens/ClipView';
 import { EvalView } from './screens/EvalView';
 import { RecapView } from './screens/RecapView';
 import { ComponentGallery } from './screens/ComponentGallery';
-import { Home, SCREENS } from './screens/Home';
-import { MatchPicker } from './screens/MatchPicker';
-import { MatchPlayer } from './screens/MatchPlayer';
+import { Home, SHOWN } from './screens/Home';
 import { MatchView } from './screens/MatchView';
 import { MotionGallery } from './screens/MotionGallery';
 import { Onboarding } from './screens/Onboarding';
@@ -21,8 +19,9 @@ import { VisualLanguage } from './screens/VisualLanguage';
 
 const ROUTES: Record<string, ComponentType> = {
   match: MatchView,
-  matches: MatchPicker,
-  play: MatchPlayer,
+  // The match player's old addresses open the match view, which plays whole matches now.
+  matches: MatchView,
+  play: MatchView,
   phone: PhoneCompanion,
   onboarding: Onboarding,
   'space-centre': SpaceCentre,
@@ -60,16 +59,16 @@ function useRoute(): string {
   return route;
 }
 
-/** Every screen, one step away, for reviewing the prototype: a footer in the page's flow, never over its content. */
+/** The app's screens, one step away: a footer in the page's flow, never over its content. */
 function ScreenSwitcher({ route }: { route: string }) {
   return (
     <nav className="dev-nav" aria-label="Screens">
       <a href="#/" className="btn btn-ghost btn-sm press">
-        All screens
+        Home
       </a>
       <label htmlFor="screen-switch">Go to</label>
       <select id="screen-switch" className="select select-sm" value={route} onChange={(e) => (window.location.hash = `/${e.target.value}`)}>
-        {SCREENS.map((s) => (
+        {SHOWN.map((s) => (
           <option key={s.route} value={s.route}>
             {s.name}
           </option>
@@ -108,7 +107,7 @@ export function App() {
       <ErrorBoundary key={route} label="This screen">
         <Screen />
       </ErrorBoundary>
-      {ROUTES[route] && !OUTPUTS.has(route) && <ScreenSwitcher route={route} />}
+      {SHOWN.some((s) => s.route === route) && <ScreenSwitcher route={route} />}
       {!OUTPUTS.has(route) && <UpdatePrompt />}
     </>
   );

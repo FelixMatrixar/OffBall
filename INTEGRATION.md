@@ -362,7 +362,7 @@ The frontend speaks captions with the device's own voices (`web/src/lib/audio.ts
 
 ### 6.10 Full matches
 
-Built on both sides, with no stand-in: the match player (`#/matches`, then `#/play?m=<match_id>`) plays whole finished matches only from an API. The screens are `web/src/screens/MatchPicker.tsx` and `MatchPlayer.tsx`; the calls are in `web/src/lib/player/api.ts` and the backend in `offball/services/fullmatch.py`.
+Built on both sides, with no stand-in: with an API set, the match view (`#/match`, `?m=<match_id>` to pick a match, Kestrel Bay against Ashmoor by default, and `&at=2:1080000` to start somewhere) plays whole finished matches in the showcase's look; without one, or with `?feed=` or `?t=`, it plays the scripted showcase moment. The screen is `web/src/screens/WholeMatchView.tsx`; the calls are in `web/src/lib/player/api.ts` and the backend in `offball/services/fullmatch.py`.
 
 - `GET /api/matches` lists every match, now with `duration_ms` and `tracking` (whether it has frames to play).
 - `GET /api/matches/{match_id}/timeline` returns the clubs and kits, line-ups, periods, goals and every detected moment, each with its `outcome` (`goal`, `shot` or `none`), whether the crew explained it (`graphics`: `published`, `skipped`, `failed` or `not_built`, with the agent's `graphics_note`) and the alternative its type is measured against (`whatif`). The first call for a match finds its moments, a minute or two; after that they're cached on disk.

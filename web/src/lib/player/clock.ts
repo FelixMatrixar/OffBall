@@ -60,15 +60,15 @@ export interface MatchClock {
 }
 
 /**
- * The clock for one match. `ready(g)` says whether the frames for a time are here; `want(g)` asks for them. Playback
- * stops at full time.
+ * The clock for one match. `ready(g)` says whether the frames for a time are here; `want(g)` asks for them. With
+ * `autoplay` it starts playing as soon as they are. Playback stops at full time.
  */
-export function useMatchClock(total: number, start: number, ready: (g: number) => boolean, want: (g: number) => void): MatchClock {
+export function useMatchClock(total: number, start: number, ready: (g: number) => boolean, want: (g: number) => void, autoplay = false): MatchClock {
   const gRef = useRef(start);
-  const playingRef = useRef(false);
+  const playingRef = useRef(autoplay);
   const speedRef = useRef<Speed>(1);
   const [g, setG] = useState(start);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(autoplay);
   const [speed, setSpeedState] = useState<Speed>(1);
   const [waiting, setWaiting] = useState(false);
   const readyRef = useRef(ready);

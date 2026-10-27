@@ -26,6 +26,7 @@ import {
   useDecisions,
   type StatItem,
 } from '../components/match';
+import { apiBase } from '../lib/api';
 import { RERUNS, counterfactualId } from '../lib/decisions';
 import { GROUP_LABEL, STEP_DOWN_AT, groupsIn, learnedDensity, type HiddenByMode, type OverlayGroup } from '../lib/density';
 import { composeSnapshot, type SnapshotFormat, type Snapshotter } from '../components/pitch/snapshot';
@@ -43,6 +44,7 @@ import { MODE_IDS, usePrefs, type Lang, type Mode, type View } from '../lib/pref
 import { MOMENTUM } from '../lib/stats';
 import { AVAILABLE_TIERS, TIERS, useTiers, type Tier } from '../lib/tiers';
 import { VIEW_OPTIONS } from '../components/match/PersonalizeDrawer';
+import { WholeMatchView } from './WholeMatchView';
 
 type Panel = 'none' | 'personalize' | 'ask' | 'pair' | 'shortcuts' | 'panel';
 
@@ -77,7 +79,22 @@ function PanelSkeleton() {
   );
 }
 
+/** The match the view opens on: Kestrel Bay against Ashmoor, the fixture of the showcase moment. */
+export const DEFAULT_MATCH = 'm07';
+
+/**
+ * The match view. With an OffBall API it plays whole matches (`?m=`, Kestrel Bay against Ashmoor by default); without
+ * one, or with a feed or a moment time in the address, it plays the showcase moment from its own replay.
+ */
 export function MatchView() {
+  const m = useHashQuery('m');
+  const query = new URLSearchParams(window.location.hash.split('?')[1] ?? '');
+  const showcase = ['feed', 't', 'state', 'showcase'].some((k) => query.has(k));
+  return apiBase() && !showcase ? <WholeMatchView matchId={m ?? DEFAULT_MATCH} /> : <ShowcaseMatchView />;
+}
+
+/** The showcase moment: Kestrel Bay's 63rd-minute decoy-run goal against Ashmoor, with every scripted feature. */
+function ShowcaseMatchView() {
   const { prefs, update, reducedMotion } = usePrefs();
   const i18n = useI18n();
   const { lang, ui, pack, num } = i18n;
@@ -666,7 +683,6 @@ export function MatchView() {
           <MenuButton
             label={ui.more}
             items={[
-              { key: 'centre', label: ui.spaceCentre, href: '#/space-centre' },
               { key: 'pair', label: ui.pair, onSelect: () => setPanel('pair') },
               { key: 'keys', label: `${ui.shortcuts} (?)`, onSelect: () => setPanel('shortcuts') },
               // On a phone the one-tap way back to English waits here, so the header keeps to three rows.

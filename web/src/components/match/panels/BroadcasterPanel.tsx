@@ -108,10 +108,7 @@ export function BroadcasterPanel({ store, t }: { store: FeedStore; t: number }) 
         <h3 className="card-h3" style={{ marginBottom: 6 }}>
           Engineer
         </h3>
-        <p style={{ marginBottom: 12, fontSize: 13, lineHeight: 1.5, color: 'var(--muted)' }}>Explainer p95 at 1.9 s, inside its 3 s budget. Ingest lag 140 ms. No degrade flags changed.</p>
-        <a href="#/producer" style={{ fontWeight: 600, fontSize: 14 }}>
-          Open the producer console
-        </a>
+        <p style={{ marginBottom: 0, fontSize: 13, lineHeight: 1.5, color: 'var(--muted)' }}>Explainer p95 at 1.9 s, inside its 3 s budget. Ingest lag 140 ms. No degrade flags changed.</p>
       </Card>
     </>
   );

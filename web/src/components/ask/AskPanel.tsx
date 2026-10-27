@@ -82,7 +82,11 @@ const PUNDIT_LANGS = ['en', 'es', 'fr'];
  * viewer's theme. With a backend, the Pundit agent answers and each tool it calls shows as it runs; without one, or
  * when it can't answer, the answer comes from the match data on the device.
  */
-export function AskPanel({ t }: { t: number }) {
+/**
+ * Ask OffBall. On the showcase `t` is seconds into the moment; on a whole match `at` says where the viewer is, and the
+ * answer comes only from the Pundit, since the device's own answers know the showcase alone.
+ */
+export function AskPanel({ t, at }: { t: number; at?: { matchId: string; period: number; t_ms: number } }) {
   const { prefs } = usePrefs();
   const { lang } = useI18n();
   const store = useFeedStore();
@@ -100,7 +104,10 @@ export function AskPanel({ t }: { t: number }) {
   const passCorrected = [...store.overlays.values()].some((o) => o.labels.includes('correction'));
   const canListen = !!Recognition();
   const backend = apiBase() !== '';
-  const step = stepAt(t);
+  // Suggestions follow the showcase's steps, or the whole match's half-minutes.
+  const step = at ? at.period * 1000 + Math.floor(at.t_ms / 30_000) : stepAt(t);
+  const where = at ?? { matchId: MATCH_ID, period: PERIOD, t_ms: Math.round(BASE_MS + t * 1000) };
+  const [failed, setFailed] = useState(false);
 
   useEffect(
     () => () => {
@@ -116,7 +123,7 @@ export function AskPanel({ t }: { t: number }) {
   useEffect(() => {
     if (!backend) return;
     const ctl = new AbortController();
-    fetchSuggestions(MATCH_ID, PERIOD, Math.round(BASE_MS + t * 1000), ctl.signal)
+    fetchSuggestions(where.matchId, where.period, where.t_ms, ctl.signal)
       .then((chips) => chips.length && setServed({ step, chips: chips.slice(0, 3) }))
       .catch(() => setServed(null));
     return () => ctl.abort();
@@ -137,6 +144,7 @@ export function AskPanel({ t }: { t: number }) {
     const question = q.trim();
     if (!question || pending) return;
     setInput('');
+    setFailed(false);
     if (!backend) {
       answerOnDevice(question);
       return;
@@ -144,15 +152,20 @@ export function AskPanel({ t }: { t: number }) {
     setPending({ q: question, tools: [] });
     const ctl = new AbortController();
     asking.current = ctl;
-    const ctx = { matchId: MATCH_ID, period: PERIOD, t_ms: Math.round(BASE_MS + t * 1000), mode: prefs.mode, lang, fav: prefs.fav };
+    const ctx = { ...where, mode: prefs.mode, lang, fav: prefs.fav };
     askPundit(question, ctx, (name) => setPending((p) => (p ? { ...p, tools: [...p.tools, name] } : p)), ctl.signal)
       .then((a) => {
         setLog((l) => [...l.slice(-5), a]);
         setPending(null);
       })
       .catch(() => {
-        // No model, no backend or no answer: the device answers instead, so the panel never comes back empty.
-        if (!ctl.signal.aborted) answerOnDevice(question);
+        // No model, no backend or no answer: on the showcase the device answers instead, so the panel never comes back
+        // empty. On a whole match the device knows nothing, so the panel says so.
+        if (ctl.signal.aborted) return;
+        if (at) {
+          setPending(null);
+          setFailed(true);
+        } else answerOnDevice(question);
       });
   };
 
@@ -202,7 +215,8 @@ export function AskPanel({ t }: { t: number }) {
     window.setTimeout(listen, 0);
   };
 
-  const chips = served && served.step === step ? served.chips : suggestions(t);
+  // A whole match takes only the Pundit's suggestions: the device's own are about the showcase.
+  const chips = served && served.step === step ? served.chips : at ? (served?.chips ?? []) : suggestions(t);
   return (
     <section aria-label="Ask OffBall" className="ask">
       <div className="ask-log" aria-live="polite">
@@ -230,6 +244,11 @@ export function AskPanel({ t }: { t: number }) {
               {pending.tools.join(' · ') || 'reading the question'}
             </span>
           </div>
+        )}
+        {failed && (
+          <p role="alert" className="muted" style={{ fontSize: 14, lineHeight: 1.5 }}>
+            OffBall couldn’t answer that just now. Try again, or ask about the moment on screen.
+          </p>
         )}
         <div ref={endRef} />
       </div>
