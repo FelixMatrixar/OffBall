@@ -102,7 +102,7 @@ The frontend (`web/src/lib/feed/sources.ts`) and the partner template (`web/publ
 
 The match view reads several messages per event or frame, one per line, but the partner template reads one message per event or frame, so send one at a time to reach both. A malformed line is skipped, never fatal.
 
-In production the stream goes through the live service's relay on the backend VM (PRD 11.6), as Server-Sent Events only (ADR 0005); the web app itself is on Vercel, and browsers connect to the VM directly. A client asks `GET /api/negotiate` for a URL to one group (a match, a round or a pairing code) and reads that group at `GET /api/stream`, one message per event. Partners can read a match at `GET /api/matches/{id}/stream` without negotiating. Anything a client sends, such as a producer's decision or a phone's pairing message, is an API call. The WebSocket transport above stays in the frontend for other sources, but the backend doesn't serve one.
+In production the stream goes through the live service's relay on the backend VM (PRD 11.6), as Server-Sent Events only (ADR 0005); the web app itself is a static website in Azure Blob Storage, and browsers connect to the VM directly. A client asks `GET /api/negotiate` for a URL to one group (a match, a round or a pairing code) and reads that group at `GET /api/stream`, one message per event. Partners can read a match at `GET /api/matches/{id}/stream` without negotiating. Anything a client sends, such as a producer's decision or a phone's pairing message, is an API call. The WebSocket transport above stays in the frontend for other sources, but the backend doesn't serve one.
 
 ### 4.2 Message types
 

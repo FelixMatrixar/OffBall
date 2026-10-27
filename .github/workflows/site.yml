@@ -1,0 +1,59 @@
+# The web app on the storage account's static website (PRD 18.13; ADR 0007): each push to main builds web/ and
+# uploads it. CI signs in to Azure as offball-ci with workload identity federation, so no Azure secret is stored.
+# It reads the repository's variables AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID and OFFBALL_WEB_ACCOUNT,
+# and VITE_API_BASE for the build (deploy/README.md). Until AZURE_CLIENT_ID is set, it builds and uploads nothing.
+name: Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ACCOUNT: ${{ vars.OFFBALL_WEB_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build
+        working-directory: web
+        run: npm ci && npm run build
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+          VITE_FABRIC_DASHBOARD_URL: ${{ vars.VITE_FABRIC_DASHBOARD_URL }}
+      - name: Sign in to Azure as offball-ci
+        if: vars.AZURE_CLIENT_ID != ''
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      # Hashed assets are kept for a year; everything else is checked on each visit. The two types Azure doesn't
+      # guess are set by hand.
+      - name: Upload to the static website
+        if: vars.AZURE_CLIENT_ID != ''
+        run: |
+          up() { az storage blob upload-batch --auth-mode login --account-name "$ACCOUNT" --destination "\$web" --source web/dist --overwrite --only-show-errors "$@" > /dev/null; }
+          up --content-cache-control "no-cache"
+          up --pattern 'assets/*' --content-cache-control "public, max-age=31536000, immutable"
+          for f in feeds/showcase.jsonl:application/x-ndjson manifest.webmanifest:application/manifest+json; do
+            az storage blob upload --auth-mode login --account-name "$ACCOUNT" --container-name "\$web" \
+              --file "web/dist/${f%%:*}" --name "${f%%:*}" --content-type "${f#*:}" --content-cache-control "no-cache" \
+              --overwrite --only-show-errors > /dev/null
+          done
+          echo "Uploaded to https://$(az storage account show --name "$ACCOUNT" --query primaryEndpoints.web --output tsv | sed 's|https://||; s|/$||')" >> "$GITHUB_STEP_SUMMARY"

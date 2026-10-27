@@ -5,7 +5,7 @@
 | | |
 | --- | --- |
 | Event | Microsoft Premier League Hackathon |
-| Document | Product requirements, full-potential plan, 21 October 2026; backend, AI and deployment specified 24 October 2026; hosting moved to Vercel and an Ubuntu VM, with Microsoft Foundry the only Azure service and models from OpenRouter, 26 October 2026 |
+| Document | Product requirements, full-potential plan, 21 October 2026; backend, AI and deployment specified 24 October 2026; hosting moved to Vercel and an Ubuntu VM, with Microsoft Foundry the only Azure service and models from OpenRouter, 26 October 2026; the VM, Foundry and the web app in one Azure subscription, 27 October 2026 |
 | Planning basis | Full scope at its highest potential. Work is ordered by dependency, not by date, and nothing is cut to fit a schedule. A few trims that leave the core intact are recorded in ADR 0005. |
 | Prize targets | Grand Prize; Category Prize: Best Multi-Agent System (fallback: Best Use of Microsoft Foundry Project) |
 | Technology focus | Priority 1: Microsoft Foundry, Microsoft Agent Framework and MCP (our own server, plus Azure MCP Server at runtime). Priority 2: Microsoft Fabric Real-Time Intelligence, as an optional add-on outside the milestones (ADRs 0001 and 0005). GitHub's developer tools are not part of the plan (section 17). |
@@ -168,7 +168,7 @@ Every rule that constrains the product, and how OffBall meets it. Owners are nam
 | 1 | Submit within the submission period | Every milestone leaves the project submittable (section 23); the Representative submits on the Projects page within the period | Projects page entry | Representative |
 | 3 | Eligible entrants; teams of up to 4; one Representative | Roster checked against the exclusions in 3.3 before submitting | Internal roster (not part of the submission) | Representative |
 | 4 | A new solution that answers the challenge and fits at least one category | All five stages implemented (section 9); category Best Multi-Agent System (section 14) | Description, video, repo | All |
-| 4.3 | Installs and runs consistently, and works as the video and description show | `docker compose up` locally, `deploy/up.sh` on any Ubuntu VM with the web app on Vercel, and the hosted demo; the video is recorded from the deployed build; CI runs smoke tests, visual regression and quality gates on every push | README, CI badges, hosted URL | Platform lead |
+| 4.3 | Installs and runs consistently, and works as the video and description show | `docker compose up` locally, `infra/main.bicep` and `deploy/up.sh` on Azure, with the web app on a Blob Storage static website, and the hosted demo; the video is recorded from the deployed build; CI runs smoke tests, visual regression and quality gates on every push | README, CI badges, hosted URL | Platform lead |
 | 4.3 | Runs on its intended platform | Web app for current desktop and mobile Chrome, Edge, Safari and Firefox, installable as a PWA; rendering tiers cover devices without WebGPU (16.2); platform stated in the description | Description, device test matrix | Experience lead |
 | 4.3 | New projects only, created after the registration period opened on 29 Sep 2026 | New repository created in October 2026; no code carried over from earlier projects | Git history | All |
 | 4.3 | Authorized use of third-party SDKs, APIs and data | Calibration data only under MIT and CC BY 4.0 (12.2); 3D models, textures and fonts are our own, CC0 or SIL OFL; dependencies used under their licences, and OpenRouter under its terms | `ATTRIBUTION.md`, `LICENSE`, lockfiles, SBOM | Data lead |
@@ -179,7 +179,7 @@ Every rule that constrains the product, and how OffBall meets it. Owners are nam
 | 4.5 | Multiple submissions must differ substantially | One submission only | n/a | Representative |
 | 4.6, 4.11 | Original work, solely owned; open source allowed when licences are followed and we build on it | All product code written by the team; open-source libraries used as dependencies, not resubmitted as our own | Repo, `ATTRIBUTION.md` | All |
 | 4.7 | Synthetic, football-realistic data; no footage is provided; any footage used must be licensed | All match data is synthetic. Real open data only fits aggregate parameters, and the novelty and discriminator gates show no real sequence is copied (12.10). The only video is our own synthetic broadcast render of our own 3D scene; no real footage is used. | Quality-gate report, `DATASHEET.md`, README "Data provenance" section | Data lead |
-| 4.8 | Judges get a working link, free and unrestricted until judging ends; login details if it's private | Public URL with no login, live until 10 Nov, 11:59 pm PT; replay mode served from Vercel's CDN, independent of the backend VM; static fallback build and pre-rendered clips in the repo | Testing instructions | Platform lead |
+| 4.8 | Judges get a working link, free and unrestricted until judging ends; login details if it's private | Public URL with no login, live until 10 Nov, 11:59 pm PT; replay mode served from the web app's Blob Storage static website, independent of the backend VM; static fallback build and pre-rendered clips in the repo | Testing instructions | Platform lead |
 | 4.9 | All materials in English | Description, video narration, README and testing notes in English. Other languages are a feature, and English is always available. | Submission | All |
 | 4.10 | One authorized Representative | Named at kickoff (open question 1) | Projects page | Team |
 | 4.12 | No financial or preferential support from Microsoft | No Microsoft funding, contract or special licence; Azure used on terms open to every entrant | Team confirmation | Representative |
@@ -492,7 +492,7 @@ flowchart TB
   AO -. "better agent versions, after a held-out check" .-> LIVE
 ```
 
-Hexagons are AI agents, each defined and versioned in Microsoft Foundry, using models from OpenRouter, and run by Agent Framework workflows on the backend VM; everything else is deterministic code. Agents reach match data through the OffBall MCP server, and the Engineer reaches Foundry's own health through Azure MCP Server (most of those lines are left out to keep the diagram readable). The web app is served by Vercel, and everything else in the diagram runs on the VM (section 18). The answer key, oracle labels and counterfactual truth live on a separate volume that no live-pipeline container mounts.
+Hexagons are AI agents, each defined and versioned in Microsoft Foundry, using models from OpenRouter, and run by Agent Framework workflows on the backend VM; everything else is deterministic code. Agents reach match data through the OffBall MCP server, and the Engineer reaches Foundry's own health through Azure MCP Server (most of those lines are left out to keep the diagram readable). The web app is served from a Blob Storage static website, and everything else in the diagram runs on the VM (section 18). The answer key, oracle labels and counterfactual truth live on a separate volume that no live-pipeline container mounts.
 
 ### 11.2 Components
 
@@ -512,7 +512,7 @@ Hexagons are AI agents, each defined and versioned in Microsoft Foundry, using m
 | Real-time delivery | The live service's relay, sending Server-Sent Events behind Caddy on the VM | Overlay feed and frames to browsers, second screens and partners (11.6) |
 | API | The VM | Python (FastAPI); the calls the frontend makes (11.7) |
 | Counterfactual workers | The VM | Python; run the emergent engine from the observed state for the Tactician, 32 re-runs in parallel, as many at once as the VM's cores allow |
-| Web app | Vercel | TypeScript; visualization system (section 16), PWA |
+| Web app | Blob Storage static website | TypeScript; visualization system (section 16), PWA |
 | Evaluator | CI job, and a job on the VM for the test split | Scores overlay feeds and agent outputs against held-out keys |
 
 ### 11.3 Meeting the frontend
@@ -617,7 +617,7 @@ The relay, the part of the `live` service that sends the stream, turns the pipel
 
 ### 11.7 The API
 
-One FastAPI service on the VM, at `https://{api host}/api`, which accepts browser calls from the web app's Vercel origins (18.12). The paths and shapes are the ones the frontend proposes in `INTEGRATION.md` section 6, which are the TypeScript types it already uses, so a backend that returns them needs no UI change. OpenAPI is generated from the code, and the TypeScript and Python SDKs from OpenAPI (12.8).
+One FastAPI service on the VM, at `https://{api host}/api`, which accepts browser calls from the web app's origin (18.12). The paths and shapes are the ones the frontend proposes in `INTEGRATION.md` section 6, which are the TypeScript types it already uses, so a backend that returns them needs no UI change. OpenAPI is generated from the code, and the TypeScript and Python SDKs from OpenAPI (12.8).
 
 | Call | Replaces | Access | Answers |
 | --- | --- | --- | --- |
@@ -670,7 +670,7 @@ The public MCP endpoint is the `mcp` service's own, and the `api` service serves
 | Truth volume | `truth` | Answer keys, intents and counterfactual truth (12.9) | `{set}/{match_id}/` | Versioned; mounted only by the generator and the evaluator |
 | Fabric (optional add-on, ADRs 0001 and 0005) | Eventhouse and OneLake | KQL tables from `insights`; copies of the published sets (17.4) | By match and time | 30 days in the hot cache |
 
-PostgreSQL and Valkey keep their data on the VM's disk and listen only on its internal network (18.12); the load test (18.3) shows whether 10 live matches at once need more than their defaults. Frames aren't stored anywhere new: `live` keeps each match's last minute in memory, and the event bus and the match files hold the rest. The replays, clips and posters the web app plays by default ship in its Vercel build, so they never depend on the VM (OPS-9). Nothing in any store identifies a viewer (18.6).
+PostgreSQL and Valkey keep their data on the VM's disk and listen only on its internal network (18.12); the load test (18.3) shows whether 10 live matches at once need more than their defaults. Frames aren't stored anywhere new: `live` keeps each match's last minute in memory, and the event bus and the match files hold the rest. The replays, clips and posters the web app plays by default ship in its build on the static website, so they never depend on the VM (OPS-9). Nothing in any store identifies a viewer (18.6).
 
 ### 11.9 Replays, live runs and the showcase
 
@@ -1167,7 +1167,7 @@ Persona fan-out is demand-driven: in live mode it only produces the languages so
 | Feed gap, late or duplicate message | Sequence numbers | Deduplicate, reorder within 2 s, interpolate gaps up to 0.4 s, flag longer gaps | A "feed interrupted" chip after 2 s |
 | Feed correction | Correction message | Re-verify, then retract or patch | A "Correction" tag |
 | Token budget exhausted | Per-match token meter | Low-priority moments are skipped | Fewer graphics |
-| VM outage | Uptime probes (18.16) | Replay is on Vercel and keeps playing; live mode returns when the VM does, or on a new VM within an hour (18.17) | Replay keeps working |
+| VM outage | Uptime probes (18.16) | Replay is on the static website and keeps playing; live mode returns when the VM does, or on a new VM within an hour (18.17) | Replay keeps working |
 | Latency drifting toward its budget | The Engineer, from the pipeline's health through the OffBall MCP server and Foundry's model metrics through Azure MCP Server, or a Fabric Activator alert once Fabric joins | The Engineer flips a degrade flag: a faster model for the Explainer, fewer live languages, or counterfactuals paused | Simpler graphics, still on time |
 | Client can't keep its frame rate | Frame-time monitor | Steps down a rendering tier (16.2) | Simpler visuals, never a frozen screen |
 
@@ -1780,7 +1780,7 @@ We concentrate on three hero technologies and use each one in depth, rather than
 
 GitHub's developer tools (GitHub Copilot, the GitHub CLI and the GitHub SDK) are hero technologies too, but they are not part of this plan (17.6).
 
-OffBall deploys two things to Azure: Microsoft Foundry, and the one Ubuntu VM that runs everything except the web app, which is on Vercel. The models come from OpenRouter through a Foundry connection (18.9, 14.13, ADR 0006).
+OffBall deploys everything to Azure: Microsoft Foundry, the web app on a Blob Storage static website, and the one Ubuntu VM that runs everything else. The models come from OpenRouter through a Foundry connection (18.9, 14.13, ADRs 0006 and 0007).
 
 ### 17.1 Microsoft Foundry (priority 1)
 
@@ -1852,7 +1852,7 @@ The Azure AI services OffBall uses come with the Foundry resource, so they count
 | Azure AI Content Safety, through the Foundry resource | Prompt shields, content filters and groundedness detection | Pundit unsafe to expose |
 | Microsoft Entra ID | App registrations that let the VM and CI sign in to Foundry with no key in the repository (18.11) | Keys instead of identities |
 | OpenRouter | The agents' models, through Foundry's gateway connection (14.13) | No graphics: the match streams without them (14.14) |
-| Vercel | Hosts the web app, its replays and clips from a global CDN, with a preview for every pull request | No public app |
+| Blob Storage static website | Hosts the web app, its replays and clips over HTTPS | No public app |
 | One Ubuntu VM with Docker Compose | Runs the engines, the live service, both MCP servers, the workers, the API and the crews (11.4) | Nothing live runs |
 | Valkey | The event bus, degrade flags, relay tokens and rate limits (11.5, 11.8) | No live feed |
 | PostgreSQL | Match state, agent messages and workflow checkpoints (11.8) | No shared state |
@@ -1880,8 +1880,8 @@ Every Foundry capability in this section is confirmed available in our subscript
 | Local, offline | Development, and judges who run it themselves | `docker compose up` (18.15), with the same PostgreSQL, Valkey and Aspire Dashboard images as production | An OpenRouter key or a Foundry project in `.env`, or Foundry Local; with none, the match streams with no graphics (14.14) | The showcase and smoke sets from the repo |
 | Local with cloud AI | Agent development | The same, pointed at a Foundry project | Foundry, with OpenRouter's models | As above |
 | CI | Every pull request and merge | The same Compose stack on the runner, torn down after the run | Foundry, with OpenRouter's models | The smoke set |
-| Preview | Every pull request's web app | Vercel, from the branch | None: the frontend's own stand-ins | The frontend's own |
-| Production | The hosted demo judges use (21.2), and the soak test before submission | A release tag: images by digest onto the VM, and the web app on Vercel (18.13) | Foundry, with OpenRouter's models | The showcase, matchday, benchmark and season sets |
+| Preview | Every pull request's web app, built and tested | CI, with no hosted preview (ADR 0007) | None: the frontend's own stand-ins | The frontend's own |
+| Production | The hosted demo judges use (21.2), and the soak test before submission | Images by digest onto the VM on a release tag, and the web app onto its static website from `main` (18.13) | Foundry, with OpenRouter's models | The showcase, matchday, benchmark and season sets |
 
 There is one production VM and no separate dev environment: CI's throwaway stack tests every change end to end, and production takes only release tags. CI signs in to Foundry with workload identity federation, so it stores no Azure secret, and it reaches the VM with one deploy key that can run only the deploy command (18.11). Sections 18.9 to 18.18 specify the hosting, the deployment files, identities, network, pipeline, configuration, local setup, judging operations and recovery.
 
@@ -1904,24 +1904,24 @@ There is one production VM and no separate dev environment: CI's throwaway stack
 ### 18.3 Scale
 
 - Up to 10 concurrent live matches (a full matchday), on one VM.
-- 10,000 concurrent replay viewers, served from Vercel's CDN; replay needs nothing from the VM.
+- 10,000 concurrent replay viewers, served from the static website; replay needs nothing from the VM.
 - 1,000 concurrent live viewers in total across the live matches, served by the VM's relay. At the 0.5 MB a minute budget (16.7) that is about 70 Mbit/s; with Caddy's gzip the JSON frames measure 0.34 MB a minute, about 45 Mbit/s (11.6).
 - All three proven with a load-test script against production before submission, with the results in the README.
 - The VM's size sets `LIVE_MAX_MATCHES` and the number of counterfactual workers. We first planned on 8 vCPUs, 32 GB of memory, 160 GB of SSD and a 1 Gbit/s link. The VM is 2 vCPUs and 4 GB (18.9): the stack measured about 1.2 GB with a live match, and the load test sets how many live matches it runs at once (open question 21).
 
 ### 18.4 Cost
 
-- Replay mode is precomputed and served by Vercel, so it costs nothing beyond Vercel's plan.
-- The VM is a fixed price per hour while it runs, whatever the load: about $34.50 a month with its address and disk, from the subscription's credit (18.9).
+- Replay mode is precomputed and served from the static website, which costs cents a month plus outbound transfer.
+- The VM is a fixed price per hour while it runs, whatever the load: about $40 a month in Korea Central with its address and disk, from the subscription's credit (18.9).
 - Model calls are paid from OpenRouter credit, and the key's credit limit caps them. Live runs are behind a fair-use limit and per-match token budgets enforced by Agent Framework middleware.
 - Foundry bills the rest per call (Speech, Content Safety and evaluations), from the same credit as the VM.
 - Cost per live match is measured and published in the README.
 
 ### 18.5 Security
 
-- No secrets in the repository, the web build or Vercel. The OpenRouter key lives in Foundry's gateway connection. The VM's only credentials, the passwords of its own PostgreSQL and Valkey, live in one root-only directory, written at install (18.14).
+- No secrets in the repository or the web build; CI signs in to Azure with workload identity federation, so it stores no Azure secret. The OpenRouter key lives in Foundry's gateway connection. The VM's only credentials, the passwords of its own PostgreSQL and Valkey, live in one root-only directory, written at install (18.14).
 - The VM signs in to Foundry with its managed identity, and CI with a Microsoft Entra app registration, never with keys (18.11).
-- The public endpoints are the web app on Vercel and one HTTPS port on the VM, which serves the API, the relay, the public MCP endpoint and media. Everything else on the VM listens only on its internal network, and the firewall allows nothing but SSH, HTTP and HTTPS (18.12). The API rate-limits its costly calls (11.7).
+- The public endpoints are the web app's static website and one HTTPS port on the VM, which serves the API, the relay, the public MCP endpoint and media. Everything else on the VM listens only on its internal network, and the firewall allows nothing but SSH, HTTP and HTTPS (18.12). The API rate-limits its costly calls (11.7).
 - Code, dependency, secret and container image scanning in CI, plus an SBOM; the VM installs security updates automatically.
 - The truth store is a separate volume, mounted only by the generator and the evaluator.
 - `SECURITY.md` explains how to report a vulnerability.
@@ -1932,7 +1932,7 @@ There is one production VM and no separate dev environment: CI's throwaway stack
 - Preferences and adaptive density stay in the browser.
 - Pundit questions and voice audio are processed in memory and not stored.
 - Telemetry is aggregate and contains no question text.
-- Caddy keeps no access logs and Vercel's analytics stay off, so no viewer's address is stored anywhere.
+- Caddy keeps no access logs and the web app's storage account logs no requests, so no viewer's address is stored anywhere.
 - Model calls go through OpenRouter only to providers that neither train on prompts nor keep them, set in OpenRouter's privacy settings, so a fan's question isn't kept there either.
 - Pairing codes for the second screen expire after 2 hours.
 - Foundry user memory and session memory stay off. Procedural memory holds agent procedures only, never viewer data.
@@ -1957,29 +1957,28 @@ There is one production VM and no separate dev environment: CI's throwaway stack
 
 ### 18.9 Hosting and services
 
-OffBall deploys to Vercel and to one Azure subscription, which holds Microsoft Foundry and the VM that runs everything else (ADRs 0003 and 0006). The models come from OpenRouter, through a connection in Foundry (14.13, ADR 0004).
+OffBall deploys to one Azure subscription, which holds Microsoft Foundry, the storage account whose static website serves the web app, and the VM that runs everything else (ADRs 0003, 0006 and 0007). The models come from OpenRouter, through a connection in Foundry (14.13, ADR 0004).
 
 | Where | What runs there | Plan or size |
 | --- | --- | --- |
-| Vercel | The web app (`web/`), with the replays, clips and posters it plays by default, from a global CDN; a preview for every pull request | Hobby, which includes 100 GB of transfer a month; Pro only if the load test needs more (18.3) |
-| One Ubuntu VM | Everything else, under Docker Compose: `caddy`, `live`, `api` with the crews, `mcp`, `cf-workers`, `evaluator`, `emitter`, `generator`, `azmcp`, `postgres`, `valkey` and `aspire` (11.4) | An Azure VM, Standard_B2als_v2: 2 vCPUs, 4 GB and a 32 GB SSD, with Ubuntu 24.04 LTS and a managed identity. The 8 vCPUs and 32 GB first planned wait on the load test and a pay-as-you-go subscription (18.3, open question 21) |
+| A Blob Storage static website | The web app (`web/`), with the replays, clips and posters it plays by default, over HTTPS from the VM's region | A Standard LRS storage account: cents a month for the 14 MB build, plus outbound transfer (18.3) |
+| One Ubuntu VM | Everything else, under Docker Compose: `caddy`, `live`, `api` with the crews, `mcp`, `cf-workers`, `evaluator`, `emitter`, `generator`, `azmcp`, `postgres`, `valkey` and `aspire` (11.4) | An Azure VM in Korea Central, Standard_B2als_v2: 2 vCPUs, 4 GB and a 32 GB SSD, with Ubuntu 24.04 LTS and a managed identity. The 8 vCPUs and 32 GB first planned wait on the load test and a pay-as-you-go subscription (18.3, open question 21) |
 | Microsoft Foundry | A resource and a project: the agents, the gateway connection to OpenRouter, evaluations, red teaming, and the Speech, Translator and Content Safety that come with the resource | Per call, from the subscription's credit (below) |
 
-**The subscription.** An Azure for Students subscription holds the VM and Foundry (ADR 0006): $100 of credit for 12 months, renewable while the account holder is a student, with no card. Running the VM without a break until judging ends costs about $17, and Foundry bills only per call, so the credit covers judging (rule 4.8) with room to spare. The models come from OpenRouter, outside the credit, because Azure disables the subscription when the credit runs out unless it's upgraded to pay-as-you-go. Cost Management doesn't support the offer, so the credit balance in the portal stands in for budget alerts (18.16). The offer limits regions by policy and allows about 4 vCPUs per region. Foundry model quota matters only for a judge deployment, if the evaluators need one (open question 19). The same Bicep deploys to a pay-as-you-go subscription unchanged.
+**The subscription.** An Azure for Students subscription holds the VM and Foundry (ADR 0006): $100 of credit for 12 months, renewable while the account holder is a student, with no card. Running the VM without a break until judging ends costs about $19, and Foundry bills only per call, so the credit covers judging (rule 4.8) with room to spare. The models come from OpenRouter, outside the credit, because Azure disables the subscription when the credit runs out unless it's upgraded to pay-as-you-go. Cost Management doesn't support the offer, so the credit balance in the portal stands in for budget alerts (18.16). The offer limits regions by policy, here to Korea Central, Australia East, Central India, Malaysia West and India South Central, and allows about 4 vCPUs per region. The VM and the web app run in Korea Central, the only one of them that offers the VM's size, and Foundry in Australia East, where Agent Service supports the most models. Foundry model quota matters only for a judge deployment, if the evaluators need one (open question 19). The same Bicep deploys to a pay-as-you-go subscription unchanged.
 
 **One tenant.** Foundry, the VM's managed identity, CI's app registration and, once it joins, Fabric share the subscription's Microsoft Entra tenant, so no connection has to cross tenants. A university's tenant may not let students create app registrations; only CI's evaluations need one.
 
-**What replaced each Azure service.** Every replacement runs on the VM or on Vercel, so Azure holds only Foundry and the VM.
+**What replaced each Azure service.** Every replacement runs on the VM or in the web app's storage account, so Azure holds only Foundry, the VM and that account.
 
 | Was | Now | Why it's enough |
 | --- | --- | --- |
 | Azure Container Apps | Docker Compose on the VM, with restart policies and health checks | One host carries the 10-match target (18.3), and the Python services already share one image (11.4) |
-| Azure Static Web Apps | Vercel | The same static build from a global CDN, with previews and instant rollback |
 | Azure Container Registry | GitHub Container Registry | Images by digest, beside the repository; free for a public repository |
 | Azure Event Hubs | Valkey Streams | Ordered streams per match, with consumer groups and replay, at a load one instance carries easily (11.5) |
 | Azure Cosmos DB | PostgreSQL | The same records keyed by match, with JSON columns where the shape varies (11.8) |
 | Azure Web PubSub | The live service's relay, sending Server-Sent Events behind Caddy | The same groups, tokens and messages (11.6), with clients sending through the API; the relay counts its own connections per language |
-| Azure Blob Storage | The VM's volumes, served by Caddy; the Vercel build for what the web app plays; GitHub release assets for the published sets | Replays stay on the CDN, and the published sets get versioned public downloads (11.8, 12.11) |
+| Azure Blob Storage | The VM's volumes, served by Caddy; a storage account's static website for the web app and what it plays (ADR 0007); GitHub release assets for the published sets | Replays stay on the CDN, and the published sets get versioned public downloads (11.8, 12.11) |
 | Azure App Configuration | A Valkey hash, with each change announced on a channel | Flags take effect at once, and only `set_flag` writes them (14.7) |
 | Application Insights and Azure Monitor | OpenTelemetry to the .NET Aspire Dashboard; an external uptime service for probes (18.16) | Traces of every hop in one place; Foundry's own metrics still reach the Engineer through Azure MCP Server (14.8) |
 | A managed identity per service | The VM's one managed identity, plus separate containers, users and volumes on the VM | Foundry sign-in with no secret anywhere; the truth volume is mounted only where it's used (18.11) |
@@ -1995,10 +1994,10 @@ OffBall deploys to Vercel and to one Azure subscription, which holds Microsoft F
 | --- | --- |
 | Application Insights | The Aspire Dashboard holds the traces, and Foundry's metrics reach the Engineer through Azure MCP Server. Adding it would bring back Foundry's own trace view (17.1) |
 | Foundry hosted agents | The workflows run on the VM, running agents defined in Foundry (ADR 0002); hosted agents would need an Azure Container Registry |
-| A load balancer, a CDN in front of the VM, or a web application firewall | Vercel serves everything static; the VM serves only the API, the relay and media, behind Caddy and the API's rate limits (11.7) |
+| A load balancer, a CDN in front of the VM, or a web application firewall | The static website serves the web app; the VM serves only the API, the relay and media, behind Caddy and the API's rate limits (11.7) |
 | Key Vault or another secret store | The VM's few credentials live in one root-only directory, and the OpenRouter key in Foundry's connection (18.14) |
 | Azure AI Search | `search_moments` searches the season's moment file, and KQL answers season-scale questions once Fabric joins |
-| A second VM or region | Replay is on Vercel and keeps playing through an outage; live graphics pause until the VM returns, or a new one is built within an hour (18.17) |
+| A second VM or region | Replay is on the static website and keeps playing through the VM's outage; live graphics pause until the VM returns, or a new one is built within an hour (18.17) |
 | A staging or dev environment | CI's throwaway stack tests every change end to end, and production takes only release tags (18.13) |
 | A private network | The VM's stores listen only on its internal network, and its firewall and network security group allow only SSH, HTTP and HTTPS (18.12) |
 | Load-testing and chaos services | A load-test script and our own fault injection (14.5, 18.3) |
@@ -2007,7 +2006,7 @@ OffBall deploys to Vercel and to one Azure subscription, which holds Microsoft F
 
 ### 18.10 Infrastructure as code
 
-Two parts, both in the repository. `infra/main.bicep` creates the VM and Foundry in one deployment. `infra/vm.bicep` makes the VM, with its network, address, disk and managed identity, and `deploy/cloud-init.yaml` as its user data. `infra/foundry.bicep` makes the Foundry resource and project, the gateway connection to OpenRouter (its key passed in at deploy time and kept only in the connection), and the VM identity's roles. `deploy/` holds what runs on the VM.
+Two parts, both in the repository. `infra/main.bicep` creates the VM, Foundry and the web app's storage account in one deployment. `infra/web.bicep` makes the storage account, whose static website CI uploads the web build to (ADR 0007). `infra/vm.bicep` makes the VM, with its network, address, disk and managed identity, and `deploy/cloud-init.yaml` as its user data. `infra/foundry.bicep` makes the Foundry resource and project, the gateway connection to OpenRouter (its key passed in at deploy time and kept only in the connection), and the VM identity's roles. `deploy/` holds what runs on the VM.
 
 | File | What it does |
 | --- | --- |
@@ -2021,7 +2020,7 @@ Two parts, both in the repository. `infra/main.bicep` creates the VM and Foundry
 | --- | --- |
 | Azure, once per subscription | `az deployment group create` with `infra/main.bicep`; its only required inputs are the region, an SSH public key and the OpenRouter key (open question 2) |
 | The stack, once per VM | `deploy/up.sh` with the VM's host name and the Foundry project endpoint |
-| The web app | Vercel builds `web/` with the API and feed addresses (18.14) |
+| The web app | CI builds `web/` with the API's address and uploads it to the static website (`.github/workflows/site.yml`, 18.14) |
 | Post-deploy smoke test | The replay loads, the API answers, and a 60x run of a smoke match puts a verified caption on the stream |
 
 `ENABLE_GPU` is optional and starts the renderer only on a VM with a GPU. The Fabric items in `fabric/` are deployed when Fabric joins, and the live service pushes to its Eventstream only when that connection is set (18.14); without it, Fabric is skipped and the live view reads its numbers from the `live` service (section 24).
@@ -2033,7 +2032,7 @@ The VM's managed identity and one Microsoft Entra app registration for CI, both 
 | Identity | Used by | Access |
 | --- | --- | --- |
 | The VM's managed identity | `api` (the crews and speech), `evaluator` and Azure MCP Server, on the VM | Azure AI User on the Foundry project, to run the agents and evaluations through the gateway connection; Cognitive Services User on the resource, for Speech, Translator and Content Safety; Reader and Monitoring Reader on the resource, for Azure MCP Server, whose read-only mode keeps it to reads (14.8). No role on anything else |
-| `offball-ci` | GitHub Actions | Azure AI User on the project, for the pipeline run and Foundry evaluations in CI; federated credentials for the main branch and release tags only |
+| `offball-ci` | GitHub Actions | Azure AI User on the project, for the pipeline run and Foundry evaluations in CI; Storage Blob Data Contributor on the web app's storage account, to upload the build (ADR 0007); federated credentials for the main branch and release tags only |
 | The truth volume | `generator` and `evaluator` | The only containers that mount it; it is owned by its own Unix user and has no public path |
 | The deploy key | GitHub Actions, on a release | SSH as the `deploy` user, restricted to running `deploy/deploy.sh` (18.10); a secret of the repository's production environment, which only release tags can use |
 | The Aspire Dashboard | The team | Reached only over an SSH tunnel, with its own browser token |
@@ -2041,24 +2040,24 @@ The VM's managed identity and one Microsoft Entra app registration for CI, both 
 
 ### 18.12 Network
 
-- **One public port on the VM.** Caddy listens on 443, and on 80 only to redirect and to answer Let's Encrypt. On `https://{api host}` it routes `/api/` to `api`, `/ws` to `live`'s relay, `/mcp` to the public read-only MCP endpoint, and `/media/` and `/files/` to the media and published-dataset volumes, with cache headers. The API accepts browser calls only from the web app's Vercel origins.
+- **One public port on the VM.** Caddy listens on 443, and on 80 only to redirect and to answer Let's Encrypt. On `https://{api host}` it routes `/api/` to `api`, `/ws` to `live`'s relay, `/mcp` to the public read-only MCP endpoint, and `/media/` and `/files/` to the media and published-dataset volumes, with cache headers. The API accepts browser calls only from the web app's origin.
 - **Internal only.** `live`'s internals, `cf-workers`, `evaluator`, `postgres`, `valkey`, `azmcp` and `aspire` publish no ports; the services reach each other on Compose's internal network.
 - **Firewall.** The VM allows SSH with keys only, HTTP and HTTPS, and nothing else, in both its network security group and `ufw`. The team reaches the Aspire Dashboard and PostgreSQL over SSH tunnels.
 - **Outbound.** The VM calls Foundry over HTTPS, pulls images from GitHub Container Registry, and, once Fabric joins, pushes `insights` to Fabric's Eventstream custom endpoint. If the direct OpenRouter fallback is in use (14.13), it calls OpenRouter too.
-- **Live data skips Vercel.** Browsers reach the relay and the Server-Sent Events stream on the VM directly, because requests Vercel proxies time out after 120 s.
+- **Live data skips the web host.** Browsers reach the relay and the Server-Sent Events stream on the VM directly; the static website serves only static files.
 - A CDN, a web application firewall or a private network can be added later without changing any service.
 
 ### 18.13 Build, test and release
 
 | When | What runs |
 | --- | --- |
-| Every pull request | Python: ruff, pytest, the schema check (BE-1) and the truth-import check (BE-6). Web: `npm run check`, and a Vercel preview. Data: the smoke set through gates 2, 3 and 9, and a 60x run of a smoke match through the pipeline and the crew, in a throwaway Compose stack with the models through Foundry, checked like a replay (11.9). Agents: the fast evaluation of each agent changed (14.15). Deployment: `docker compose config`, the Caddyfile validated and the Bicep for the VM and Foundry built. Security: code, dependency, secret and container image scans, and an SBOM. |
-| Merge to main | The images are built once, tagged with the commit, and pushed to GitHub Container Registry |
+| Every pull request | Python: ruff, pytest, the schema check (BE-1) and the truth-import check (BE-6). Web: `npm run check`. Data: the smoke set through gates 2, 3 and 9, and a 60x run of a smoke match through the pipeline and the crew, in a throwaway Compose stack with the models through Foundry, checked like a replay (11.9). Agents: the fast evaluation of each agent changed (14.15). Deployment: `docker compose config`, the Caddyfile validated and the Bicep for the VM, Foundry and the web app's storage built. Security: code, dependency, secret and container image scans, and an SBOM. |
+| Merge to main | The images are built once, tagged with the commit, and pushed to GitHub Container Registry; the web app is built and uploaded to its static website |
 | Nightly | The full dev split through Foundry evaluations; the optimizer and the release gate (14.9); `npm run test:perf`. Calibration runs with all nine gates on the VM before the freeze, or on a developer machine |
 | Before submission | A soak test on production: the load-test script at the targets in 18.3, with the emitter's fault modes and our own fault injection (14.5) |
-| Release tag | `deploy/deploy.sh` on the VM with the tag's image digests; the agent versions registered in Foundry; and the tag's commit pushed to the `production` branch, which Vercel builds as production |
+| Release tag | `deploy/deploy.sh` on the VM with the tag's image digests; the agent versions registered in Foundry |
 
-**Rollback.** `deploy/deploy.sh` takes the previous release's digests, Foundry keeps the previous agent version, and Vercel's instant rollback restores the previous build. Each is one command, and all three take under 5 minutes (OPS-6).
+**Rollback.** `deploy/deploy.sh` takes the previous release's digests, Foundry keeps the previous agent version, and running the Site workflow on the previous commit restores the previous web build. Each is one command, and all three take under 5 minutes (OPS-6).
 
 ### 18.14 Configuration
 
@@ -2066,8 +2065,8 @@ The VM's managed identity and one Microsoft Entra app registration for CI, both 
 | --- | --- | --- |
 | Service settings and switches | `deploy/compose.yaml`, with each machine's values in `/etc/offball/settings.env` | `STREAM_FRAME_BATCH=5`, `LIVE_MAX_MATCHES=10`, `CF_WORKERS`, `TOKENS_PER_MATCH`, `LIVE_RUNS_ENABLED`, `FAULTS` (CI and local only), `OTEL_EXPORTER_OTLP_ENDPOINT` for the Aspire Dashboard |
 | Degrade flags | A Valkey hash that holds nothing else | `explainer.model_tier`, `persona.live_languages`, `producer.density`, `tactician.enabled`, `voice.enabled`: changed by the Engineer through `set_flag` or by the producer, and reverted after 10 minutes unless kept (14.7) |
-| Web build settings | Vercel's environment variables, all public addresses | `VITE_FEED_URL` and `VITE_FABRIC_DASHBOARD_URL`, which exist; `VITE_API_BASE`, to add (`INTEGRATION.md` section 9) |
-| Secrets | Never in the repository, CI logs or Vercel | The OpenRouter key, only in Foundry's gateway connection (18.10). On the VM, in `/etc/offball/secrets/`, readable only by root and the services: the PostgreSQL and Valkey passwords that `up.sh` generates, and, if needed, the OpenRouter key for the direct fallback (14.13) and the Eventstream connection once Fabric joins. CI holds only the deploy key (18.11) |
+| Web build settings | GitHub Actions variables, all public addresses | `VITE_FEED_URL` and `VITE_FABRIC_DASHBOARD_URL`, which exist; `VITE_API_BASE`, to add (`INTEGRATION.md` section 9) |
+| Secrets | Never in the repository, CI logs or the web build | The OpenRouter key, only in Foundry's gateway connection (18.10). On the VM, in `/etc/offball/secrets/`, readable only by root and the services: the PostgreSQL and Valkey passwords that `up.sh` generates, and, if needed, the OpenRouter key for the direct fallback (14.13) and the Eventstream connection once Fabric joins. CI holds only the deploy key (18.11) |
 
 A new setting rolls out with `deploy/deploy.sh`, which restarts only the services it changes. Degrade flags take effect at once, because services listen on the flag channel.
 
@@ -2093,7 +2092,7 @@ A new setting rolls out with `deploy/deploy.sh`, which restarts only the service
 The hosted demo must stay free, unrestricted and working from submission until 10 November 2026, 11:59 pm PT (rule 4.8).
 
 - **Frozen after submission.** Production is treated as final at the end of the submission period (rule 5). Until judging ends, only operational changes reach it: restarts, and switching degrade flags and settings. No code, agent version or infrastructure change is deployed, and the learning loop runs only in CI, without releasing.
-- **Replay first.** The judges' default path is the web app and the replay, both from Vercel. They don't depend on any backend service, and with the backend down the built-in replay still plays (OPS-9).
+- **Replay first.** The judges' default path is the web app and the replay, both from the static website. They don't depend on any backend service, and with the backend down the built-in replay still plays (OPS-9).
 - **Probes.** An external uptime service's free tier checks every 5 minutes that the web app, the replay feed and the API answer; once an hour, a scheduled CI run starts a live run of a smoke match, which must put a verified caption on the stream. Any failure alerts the team.
 - **Cost.** The VM and Foundry are paid from the Azure for Students credit, and the models from OpenRouter credit with the key's credit limit set (18.9). The offer has no budget alerts, so the credit balance is checked in the portal every week, and the subscription is upgraded to pay-as-you-go before the credit could run out, so running out can't switch the demo off. The fair-use limits in 11.7 and the token meters per match cap spending.
 - **On call.** The team keeps a rota through judging, with a short runbook for each alert, written from the Engineer's playbooks.
@@ -2116,7 +2115,7 @@ Targets: the replay back within 15 minutes of any failure, and live mode within 
 | --- | --- |
 | OPS-1 | `infra/foundry.bicep` succeeds in a clean subscription with only a region and the OpenRouter key as input, and `deploy/up.sh` brings up the whole stack on a fresh Ubuntu 24.04 VM with only a host name and the Foundry endpoint. Optional parts (Fabric, GPU) are skipped cleanly when absent, and the app says what is off. |
 | OPS-2 | `docker compose up` runs the whole pipeline with no Azure subscription; graphics air once a model endpoint is set (BE-15). |
-| OPS-3 | No secrets in the repository, the web build or Vercel. CI holds only the deploy key, the OpenRouter key lives in Foundry's connection, and the VM's credentials live only in its root-only secrets directory (18.14). |
+| OPS-3 | No secrets in the repository or the web build. CI holds only the deploy key and signs in to Azure with workload identity federation, the OpenRouter key lives in Foundry's connection, and the VM's credentials live only in its root-only secrets directory (18.14). |
 | OPS-4 | The VM and Foundry are tagged and paid from a credit whose balance is watched, or covered by a budget alert on a pay-as-you-go subscription; the OpenRouter key has a credit limit, and the VM's price is fixed. |
 | OPS-5 | Every service has health and readiness endpoints and emits OpenTelemetry traces, metrics and logs. |
 | OPS-6 | Any release can be rolled back in under 5 minutes, by redeploying a known image digest, agent version and web build. |
@@ -2245,7 +2244,7 @@ All footage is screen capture of the deployed app playing the showcase match, sc
 | 1:04–1:16 | Ask OffBall by voice, answered with a chart built from the match tools over MCP; a feed correction retracts a graphic in the producer console | Fan Q&A, MCP, live corrections |
 | 1:16–1:26 | Fidelity charts, then OffBall-Bench scores from Foundry evaluations: the single-agent baseline, the first crew, and the latest crew after the optimizer | Data quality, AI accuracy and learning, with numbers |
 | 1:26–1:43 | The trace in the Aspire Dashboard: Scout, Tactician, Explainer, a Fact-checker rejection and retry; then an injected latency fault, which the Engineer diagnoses from the pipeline's health and, through Azure MCP Server, Foundry's own metrics, and mitigates with a degrade flag | Multi-agent design, MCP and recovery |
-| 1:43–1:55 | Architecture with the three hero technologies highlighted, `deploy/up.sh` and Vercel, and the repo link | Technology and openness |
+| 1:43–1:55 | Architecture with the three hero technologies highlighted, `infra/main.bicep`, `deploy/up.sh` and the static website, and the repo link | Technology and openness |
 
 ### 21.2 Judge testing (rule 4.8)
 
@@ -2263,7 +2262,7 @@ All footage is screen capture of the deployed app playing the showcase match, sc
 
 ### 22.1 Project description (draft)
 
-> **OffBall makes space visible.** Most goals are created off the ball, but live graphics only track the ball. OffBall ingests a synthetic match feed, computes who controls space and what it's worth frame by frame, and uses eleven AI agents in Microsoft Foundry, orchestrated with Microsoft Agent Framework and connected through MCP, to find the runs that create chances. The agents explain why each one matters, prove it by re-running the moment without the run, fact-check every claim, and tailor the story to casual fans, learners, analysts, player-focused fans, blind and low-vision fans and broadcasters, with captions and voice in English, Spanish and French. An Engineer agent keeps the live show healthy through Azure MCP Server. Graphics render in sync on 2D and 3D views that adapt smoothly from a 4K screen to a phone, and as a live overlay protocol a broadcaster can render. Our synthetic football world is calibrated to open data and records the truth behind every moment, so we can show how often the AI is right, and we publish it as an open benchmark, scored with Foundry evaluations. The agents learn from it too: an optimizer improves them against the benchmark, scored with Foundry evaluations, and a new version goes live only if it scores better on held-out matches. Built with Microsoft Foundry (Agent Service, evaluations, red teaming, Azure AI Speech, Azure AI Translator and Azure AI Content Safety, with models from OpenRouter through a Foundry gateway connection), Microsoft Agent Framework, and MCP and Azure MCP Server; hosted on Vercel and one Ubuntu VM.
+> **OffBall makes space visible.** Most goals are created off the ball, but live graphics only track the ball. OffBall ingests a synthetic match feed, computes who controls space and what it's worth frame by frame, and uses eleven AI agents in Microsoft Foundry, orchestrated with Microsoft Agent Framework and connected through MCP, to find the runs that create chances. The agents explain why each one matters, prove it by re-running the moment without the run, fact-check every claim, and tailor the story to casual fans, learners, analysts, player-focused fans, blind and low-vision fans and broadcasters, with captions and voice in English, Spanish and French. An Engineer agent keeps the live show healthy through Azure MCP Server. Graphics render in sync on 2D and 3D views that adapt smoothly from a 4K screen to a phone, and as a live overlay protocol a broadcaster can render. Our synthetic football world is calibrated to open data and records the truth behind every moment, so we can show how often the AI is right, and we publish it as an open benchmark, scored with Foundry evaluations. The agents learn from it too: an optimizer improves them against the benchmark, scored with Foundry evaluations, and a new version goes live only if it scores better on held-out matches. Built with Microsoft Foundry (Agent Service, evaluations, red teaming, Azure AI Speech, Azure AI Translator and Azure AI Content Safety, with models from OpenRouter through a Foundry gateway connection), Microsoft Agent Framework, and MCP and Azure MCP Server; hosted on Azure: a Blob Storage static website and one Ubuntu VM.
 
 ### 22.2 Repository contents
 
@@ -2314,7 +2313,7 @@ The roadmap is ordered by dependency, not by date. Every milestone ends with som
 
 | Milestone | Scope | Exit criteria | Depends on |
 | --- | --- | --- | --- |
-| M0 Foundations | Repo, contracts and schemas, the Foundry Bicep and the VM's `deploy/` files, CI, calibration fits, league and season builder, design tokens and themes | `deploy/up.sh` brings up an empty stack on a fresh Ubuntu VM, and the web app deploys to Vercel; schemas published; calibration report in CI | None |
+| M0 Foundations | Repo, contracts and schemas, the Foundry Bicep and the VM's `deploy/` files, CI, calibration fits, league and season builder, design tokens and themes | `deploy/up.sh` brings up an empty stack on a fresh Ubuntu VM, and the web app deploys to its static website on Azure; schemas published; calibration report in CI | None |
 | M1 Walking skeleton | Fast engine and showcase script; feed emitter, the Valkey event bus, ingest, basic interpret; overlay feed; the relay over Server-Sent Events; 2D view at tiers B and C with the match clock and interpolation; gates 2, 3 and 9 | The showcase match plays live and in replay on the hosted URL, smoothly on a laptop and a phone; release gates 3 and 9 pass, and gate 2 is reported (12.10); graphics arrive with the broadcast crew (M3) | M0 |
 | M2 Interpretation core | Space control, physical metrics, run detection, pass difficulty, xG, auto-eventing from tracking, candidate moments; the first 8 moment types and the null run; gates 1, 6 and 7; analyst charts in Vega-Lite | Candidate recall measured on the smoke set; analyst panel shows real metrics; release gates 6 and 7 pass, and gate 1 is reported (12.10) | M1 |
 | M3 Broadcast crew | OffBall MCP server and Azure MCP Server on the VM; the gateway connection to OpenRouter; Scout, Explainer, Fact-checker, Persona, Producer and Engineer, registered as versioned prompt agents in Foundry and run by Agent Framework workflows on the VM; traces in the Aspire Dashboard; Foundry evaluations and the rubric evaluator in CI; the original four modes; English, Spanish and French; corrections and retractions; producer console | Verified captions within 3 s; a traced rejection and retry; a correction retracts a graphic; the Engineer mitigates an injected latency fault | M2 |
@@ -2369,13 +2368,13 @@ A team of up to four covers five workstreams by pairing; owners are named at kic
 
 ### 23.4 Where the build stands
 
-As checked on 27 October 2026. The frontend is complete, and the synthetic data is close to it. The parts of M0 to M3 that need no Azure subscription and no VM are built and tested with a stand-in model, including the Docker image, the Valkey event bus, `deploy/` and the Bicep for the VM and Foundry, and CI passes on GitHub. The team now has an Azure for Students subscription, which will hold the VM and Foundry (ADR 0006). The agents on a real model, deploying the Bicep, running the stack on the VM and the web app on Vercel are the work that remains. ADR 0005 trimmed the milestones on 26 October, and everything below is measured against the trimmed scope in 23.1.
+As checked on 27 October 2026. The frontend is complete, and the synthetic data is close to it. The parts of M0 to M3 that need no Azure subscription and no VM are built and tested with a stand-in model, including the Docker image, the Valkey event bus, `deploy/` and the Bicep for the VM and Foundry, and CI passes on GitHub. The team now has an Azure for Students subscription, which will hold the VM and Foundry (ADR 0006). The agents on a real model, deploying the Bicep, running the stack on the VM and the web app's first upload are the work that remains. ADR 0005 trimmed the milestones on 26 October, and everything below is measured against the trimmed scope in 23.1.
 
 **Progress by milestone.** These are rough estimates, not measurements.
 
 | Milestone | Progress | What remains |
 | --- | --- | --- |
-| M0 Foundations | About 80% | Deploying `infra/main.bicep` to the student subscription, running `deploy/up.sh` on the VM it makes, the Vercel deployment, and making the repository public. The Bicep builds and lints clean; on a Docker-in-Docker stand-in for the VM, `up.sh` brings the stack up behind Caddy and passes the smoke test, a second run keeps its secrets, and `deploy.sh` refuses anything but a release by digest or a rollback |
+| M0 Foundations | About 80% | Deploying `infra/main.bicep` to the student subscription, running `deploy/up.sh` on the VM it makes, the web app's first upload to its static website, and making the repository public. The Bicep builds and lints clean; on a Docker-in-Docker stand-in for the VM, `up.sh` brings the stack up behind Caddy and passes the smoke test, a second run keeps its secrets, and `deploy.sh` refuses anything but a release by digest or a rollback |
 | M1 Walking skeleton | About 90% | The hosted URL. The Valkey event bus and the image are built, and `docker compose up` streams a live run through the bus and Caddy |
 | M2 Interpretation core | About 90% | xG beating its baseline, and auto-eventing reaching its targets |
 | M3 Broadcast crew | About 60% | The Foundry project and its OpenRouter connection; the agents on a real model and registered in Foundry; Azure MCP Server on the VM; the Aspire Dashboard; Foundry evaluations in CI |
@@ -2397,7 +2396,7 @@ Across M0 to M7 and M9, that is about 57%; before the trims, the same estimate w
 | Interpretation | Pitch control (fast and Spearman), 20 named metrics with evidence IDs, run detection, and detectors for all 18 moment types, batch and live. On the smoke set they find all 17 planted moments and credit neither null one; on `m07` they find both planted decoy runs and flag neither null run. Pass difficulty, 23% better than its baseline against the true probabilities; xG; auto-eventing from tracking (pass F1 0.86, shot F1 0.88); panel stats computed from the match. | xG beating its baseline (it needs shots with tracking); auto-eventing reaching its targets; space value, run classification, credit and vision (ghost players will come from the counterfactual workers, ADR 0005); a learned scorer to rank candidates; the cover-shadow detector reports one lane per pass |
 | Agents | The broadcast workflow in Agent Framework: Scout, Explainer, Fact-checker with up to two rewrites, a Persona script for each mode in English, Spanish and French, a Fact-checker read of every script, Producer and publish, with repeatable graphic IDs, a cap on moments in flight, a time limit per call and a token meter per match. The correction path: a feed correction re-checks what is on air, then replaces and retracts. The Engineer, with degrade flags that revert after 10 minutes and fault injection. Ask OffBall in three languages. Tracing of every agent call; `offball eval agents` for the Fact-checker's planted mistakes, Scout recall and Persona checks. All tested with a stand-in model | Running on a real model, which waits for the Foundry project and its OpenRouter connection; registering the agents in Foundry (ADR 0002); the Tactician, recaps, the data crew and the learning loop |
 | Services and MCP | The feed emitter with faults and corrections; the Valkey event bus for the feed (11.5); the live service (ingest, gap filling, rolling detection, relay); the API with the live stream (a producer view with the run's token), live runs with producer tokens, Ask OffBall, suggestions, panel stats, approvals, traces, degrade flags, and health and readiness; the OffBall MCP server with 11 read-only tools; replay builds checked against the contracts; eight golden render tests that score the pipeline's output stream (19.5). The partner template plays the live stream. One `offball` image runs the API and the MCP server together (`offball serve all`), because they share the match state in memory. | Negotiate and `POST /api/pair/{code}`, with the relay's Valkey channels and tokens; the degrade flags in Valkey; PostgreSQL; the counterfactual workers; the recap and decision endpoints; `live`, `api` and `mcp` as separate services, once the match state lives in PostgreSQL |
-| Platform and Fabric | CI for lint, tests, the bus against a real Valkey, the deployment files, the image build and the gate report, and on `main` the image pushed to GitHub Container Registry (`.github/workflows/ci.yml`). The `Dockerfile`, with every base image pinned by digest; `deploy/` with `compose.yaml` (`offball`, `valkey`, `aspire`, and `caddy` on the VM), `defaults.env`, the `Caddyfile`, `cloud-init.yaml`, `up.sh`, `deploy.sh` and `smoke.sh`; `infra/main.bicep`, which deploys `infra/vm.bicep` (the VM with its network, address, disk and managed identity, and `cloud-init.yaml` as its user data) and `infra/foundry.bicep` (the Foundry resource and project, the OpenRouter gateway connection, the VM identity's roles and an optional budget alert); decision records in `docs/adr/` | Deploying the Bicep and Vercel; CI's app registration; CI's deploy on a release tag; the probes and the soak test; PostgreSQL backups; Azure MCP Server in the stack (open question 11); Fabric is an optional add-on (ADRs 0001 and 0005) |
+| Platform and Fabric | CI for lint, tests, the bus against a real Valkey, the deployment files, the image build and the gate report, and on `main` the image pushed to GitHub Container Registry (`.github/workflows/ci.yml`). The `Dockerfile`, with every base image pinned by digest; `deploy/` with `compose.yaml` (`offball`, `valkey`, `aspire`, and `caddy` on the VM), `defaults.env`, the `Caddyfile`, `cloud-init.yaml`, `up.sh`, `deploy.sh` and `smoke.sh`; `infra/main.bicep`, which deploys `infra/web.bicep` (the storage account whose static website `.github/workflows/site.yml` uploads the web build to), `infra/vm.bicep` (the VM with its network, address, disk and managed identity, and `cloud-init.yaml` as its user data) and `infra/foundry.bicep` (the Foundry resource and project, the OpenRouter gateway connection, the VM identity's roles and an optional budget alert); decision records in `docs/adr/` | Deploying the Bicep and the web app; CI's app registration; CI's deploy on a release tag; the probes and the soak test; PostgreSQL backups; Azure MCP Server in the stack (open question 11); Fabric is an optional add-on (ADRs 0001 and 0005) |
 | Repository | The GitHub repository (github.com/FelixMatrixar/OffBall) with its full history, private for now; `.gitignore`, `.env.example` and `.gitattributes` keeping generated data byte-exact; a README; `ATTRIBUTION.md`, `DATASHEET.md`, `LICENSE` (MIT), `TRANSPARENCY.md` and `SECURITY.md` | Making the repository public (rule 4.4); the rest of 22.2 |
 | Code quality | Lint is clean, and 103 Python tests pass: the emitter, the live service, the tools, the workflow's wiring, corrections, three languages, budgets, the Engineer, tracing, the agent evaluations, the API and producer tokens, panel stats, the models, the fit, the realism metrics, the blocklist, the gates, the moment library, the fast engine, the smoke set's detectability, the showcase's parity with the frontend, the golden render checker, and the schema-sync and truth-isolation checks (BE-1, BE-6). CI runs them on every push | Tests against a real model; slow tests that direct a moment end to end. CI's first run on GitHub passed on 27 October, with all five jobs and the 32 browser tests |
 
@@ -2408,13 +2407,13 @@ Across M0 to M7 and M9, that is about 57%; before the trims, the same estimate w
 3. **Walking skeleton, backend half (M1).** The emitter and the `live` service (ingest, interpret and relay), with the broadcast crew, end to end into the finished frontend through `?feed=sse:`, then under `docker compose up` (18.15).
 4. **Replay build.** `offball replay` makes a replay that passes the frontend's contract test (11.9).
 5. **API, read side.** Matches, stats, recaps and decisions served from computed data, so the panels show real numbers (11.7).
-6. **Infrastructure.** The Foundry resource and its OpenRouter connection from the Bicep; the VM from the same Bicep (ADR 0006) with `deploy/up.sh`, the web app on Vercel, the post-deploy smoke test, and the hosted URL serving the replay; Fabric only if it is added (ADRs 0001 and 0005). This is M0 and M1 (18.9 to 18.13).
+6. **Infrastructure.** The Foundry resource and its OpenRouter connection from the Bicep; the VM from the same Bicep (ADR 0006) with `deploy/up.sh`, the web app on its static website, the post-deploy smoke test, and the hosted URL serving the replay; Fabric only if it is added (ADRs 0001 and 0005). This is M0 and M1 (18.9 to 18.13).
 7. **MCP and the broadcast crew (M3).** The OffBall MCP server; the Scout, Explainer, Fact-checker, Persona and Producer in Foundry with their evaluations (14.15); then the Engineer with Azure MCP Server.
 8. **Fan pipelines.** The Pundit (`ask`), the Tactician with the counterfactual workers (`decide`), recaps and synthesised speech.
 9. **The emergent world (M4, M5).** `fit.py`, the gate runner, the remaining moment types and detectors, the models in section 13, and OffBall-Bench.
 10. **Production and learning (M7, M9).** Production, load and fault-injection tests, partner and public endpoints, and the learning loop.
 
-Step 1's repository is created and pushed, and its CI checks pass on GitHub; making it public remains. Step 2 is done: the showcase matches the frontend (11.9). Step 9 is mostly built: the fit, the gates, the calibrated engine, all 18 moment types and their detectors, the fast engine and the benchmark scripts (12.12); the models in section 13 and generating OffBall-Bench remain. Steps 3 and 4 are built and tested, including the Valkey event bus and `docker compose up`; cross-device pairing remains. Step 5 is built for stats (recaps and decisions remain), and step 1's CI passes. Step 6's files are written and tested without the cloud: the image, `deploy/` and the Bicep for the VM and Foundry; what remains is deploying them to the student subscription, and the web app to Vercel. Step 7's crew, the Engineer, their evaluations and the MCP server are built and wait for a model endpoint, and step 8's Pundit is wired into the frontend. Steps 6 to 8 need the Foundry project and the VM, and registering the agents in Foundry needs open question 13 answered.
+Step 1's repository is created and pushed, and its CI checks pass on GitHub; making it public remains. Step 2 is done: the showcase matches the frontend (11.9). Step 9 is mostly built: the fit, the gates, the calibrated engine, all 18 moment types and their detectors, the fast engine and the benchmark scripts (12.12); the models in section 13 and generating OffBall-Bench remain. Steps 3 and 4 are built and tested, including the Valkey event bus and `docker compose up`; cross-device pairing remains. Step 5 is built for stats (recaps and decisions remain), and step 1's CI passes. Step 6's files are written and tested without the cloud: the image, `deploy/` and the Bicep for the VM and Foundry; what remains is deploying them to the student subscription, with CI uploading the web app. Step 7's crew, the Engineer, their evaluations and the MCP server are built and wait for a model endpoint, and step 8's Pundit is wired into the frontend. Steps 6 to 8 need the Foundry project and the VM, and registering the agents in Foundry needs open question 13 answered.
 
 ---
 
@@ -2426,7 +2425,7 @@ Step 1's repository is created and pushed, and its CI checks pass on GitHub; mak
 | The emergent engine doesn't look realistic enough | High | Calibration by simulation with the Tuner; behaviour and discriminator gates; the fast engine stays as a fallback for any match |
 | Judges challenge the data as real (rule 4.7) | High | Novelty and discriminator gates, fictional names, `DATASHEET.md` and a "Data provenance" README section |
 | Agents state wrong facts on screen | High | Evidence IDs on every claim, the Fact-checker loop, numbers only from tools, nothing airs after 2 failures, chaos tests |
-| Demo down or costly during judging (rule 4.8) | High | Replay from Vercel's CDN, which never depends on the VM; fair-use limits; token meters; OpenRouter's credit limit and the watched Azure credit; `infra/main.bicep` and `deploy/up.sh` onto a new VM; the local build |
+| Demo down or costly during judging (rule 4.8) | High | Replay from the static website, which never depends on the VM; fair-use limits; token meters; OpenRouter's credit limit and the watched Azure credit; `infra/main.bicep` and `deploy/up.sh` onto a new VM; the local build |
 | Visuals stutter or break on judges' devices | High | Tiered rendering with automatic step-down, frame-time budgets in CI, a device matrix, tier D clips that play anywhere |
 | Counterfactuals are wrong or unconvincing | Medium | Estimated from observed state, validated against true counterfactuals, shown as distributions with intervals |
 | Many agents add latency and cost | Medium | Speculative starts, Tactician off the critical path, demand-driven Persona fan-out, small models where evals allow, token budgets |
@@ -2454,7 +2453,7 @@ Step 1's repository is created and pushed, and its CI checks pass on GitHub; mak
 | OpenRouter doesn't work as a Foundry gateway connection | Medium | Agent Framework calls OpenRouter directly from the VM, with the key in its secrets directory; the agents' instructions stay versioned in the repository and in Foundry (14.13, open question 13) |
 | Going through Foundry and then OpenRouter adds latency to the 3 s budget | Medium | Measure each hop in CI and in the soak test; the direct OpenRouter client for the fast tier if the gateway costs too much time; speculative starts already hide most of the wait (14.4) |
 | The VM's CPU or bandwidth can't carry 10 live matches with their counterfactuals | Medium | The load test before submission sets `LIVE_MAX_MATCHES` and the worker counts; costly calls queue with a place in line (BE-12, 18.3) |
-| Vercel's Hobby plan runs out of transfer | Low | Replays are small, about 0.5 MB each; Pro if the load test shows the need (18.9) |
+| Outbound transfer for the web app and the live streams uses up the credit | Low | The build is about 14 MB and the service worker caches it; replays are about 0.5 MB each; the load test measures it (18.9) |
 
 ---
 
@@ -2483,7 +2482,7 @@ Step 1's repository is created and pushed, and its CI checks pass on GitHub; mak
 ## 26. Open questions
 
 1. Who are the team members (up to 4), who is the Representative, and who owns each workstream?
-2. Which region does the Azure for Students subscription allow (18.9) that offers Agent Service with gateway connections, Speech with the Voice Live API, Content Safety, evaluations and the VM's size, and is there quota for a judge deployment if the evaluators need one?
+2. Which region does the Azure for Students subscription allow (18.9) that offers Agent Service with gateway connections, Speech with the Voice Live API, Content Safety, evaluations and the VM's size, and is there quota for a judge deployment if the evaluators need one? Partly answered on 27 October 2026: the policy allows koreacentral, australiaeast, centralindia, malaysiawest and indiasouthcentral. The VM's size is offered only in Korea Central, which holds the VM and the web app, and Foundry goes in Australia East (18.9). Speech's Voice Live API there and the judge deployment's quota remain open.
 3. Category: Best Multi-Agent System, or Best Use of Microsoft Foundry Project?
 4. Are the ten interface languages right for the audience, and who reviews the Spanish and French glossaries?
 5. Is "OffBall" free to use as a product name?
@@ -2502,8 +2501,8 @@ Step 1's repository is created and pushed, and its CI checks pass on GitHub; mak
 18. In a broadcaster's own deployment, do producers sign in with Microsoft Entra ID in our tenant, or with their own organisation's accounts (11.7)?
 19. Which OpenRouter models meet each agent's pass bar at the lowest cost, and do Foundry's AI-assisted evaluators accept one of them as their judge, or do they need a small deployment in Foundry (14.13)?
 20. How many re-runs per plan, and how many workers on the VM's cores, keep the tactics board within its 10 s budget at the fair-use limits (10.11, 18.3)?
-21. Which VM do we run: provider or own hardware, size, location and bandwidth? Does it meet the targets in 18.3 in the load test? The plan assumes 8 vCPUs, 32 GB, 160 GB SSD and 1 Gbit/s. Partly answered on 27 October 2026: an Azure VM in the student subscription, a Standard_B2als_v2 with 2 vCPUs, 4 GB and a 32 GB SSD (ADR 0006), since the stack measured about 1.2 GB with a live match. The region, and whether it meets the targets in 18.3 in the load test, remain open.
-22. Which host names do the web app and the VM's API use: our own domain, or `*.vercel.app` for the web app and a name from the VM's provider for the API?
+21. Which VM do we run: provider or own hardware, size, location and bandwidth? Does it meet the targets in 18.3 in the load test? The plan assumes 8 vCPUs, 32 GB, 160 GB SSD and 1 Gbit/s. Partly answered on 27 October 2026: an Azure VM in the student subscription, a Standard_B2als_v2 with 2 vCPUs, 4 GB and a 32 GB SSD (ADR 0006), since the stack measured about 1.2 GB with a live match. It runs in Korea Central, the only allowed region that offers the size (open question 2). Whether it meets the targets in 18.3 in the load test remains open.
+22. Which host names do the web app and the VM's API use: our own domain, or the storage account's `*.web.core.windows.net` name for the web app and the VM's `*.cloudapp.azure.com` name for the API?
 
 ---
 
@@ -2538,7 +2537,7 @@ Directions that follow from this plan but sit outside it:
 - Microsoft Learn: [Deploy Azure MCP Server as a remote MCP server for Microsoft Foundry](https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/how-to/deploy-remote-mcp-server-microsoft-foundry), read 21 October 2026, and [Azure MCP Server tools](https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/tools), read again 26 October 2026
 - Microsoft Learn: [Bring your own AI gateway to Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/ai-gateway) and [Deploy a hosted agent](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent), read 26 October 2026
 - Microsoft Learn: [Agent Framework OpenAI providers](https://learn.microsoft.com/agent-framework/agents/providers/openai), for the OpenAI-compatible clients, read 26 October 2026
-- [OpenRouter quickstart](https://openrouter.ai/docs/quickstart) and [Vercel limits](https://vercel.com/docs/limits), read 26 October 2026
+- [OpenRouter quickstart](https://openrouter.ai/docs/quickstart) read 26 October 2026, and [static website hosting in Azure Storage](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website), read 27 October 2026
 - Azure SDK Blog (10 April 2026): [Announcing Azure MCP Server 2.0 stable release](https://devblogs.microsoft.com/azure-sdk/announcing-azure-mcp-server-2-0-stable-release)
 - Microsoft Learn: [Create Activator rules](https://learn.microsoft.com/en-us/fabric/real-time-intelligence/data-activator/activator-create-activators) and [Trigger Fabric items from Activator](https://learn.microsoft.com/en-us/fabric/real-time-intelligence/data-activator/activator-trigger-fabric-items), read 21 October 2026
 - Microsoft Foundry Blog: [What's new in Microsoft Foundry, Build 2026](https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-build-2026/) and [Foundry Agent Service at Build 2026](https://devblogs.microsoft.com/foundry/agent-service-build2026/) (2 June 2026); [Memory in Foundry Agent Service](https://devblogs.microsoft.com/foundry/memory-build2026/) (3 June 2026); [Outcome-driven learning systems: enterprise RL with OpenEnv and Foundry](https://devblogs.microsoft.com/foundry/outcome-driven-learning-systems-enterprise-rl-with-openenv-and-foundry/) (18 June 2026); [What's new in Microsoft Foundry, June 2026](https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-june-2026/) (7 July 2026)

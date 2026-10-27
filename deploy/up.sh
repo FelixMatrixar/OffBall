@@ -3,7 +3,7 @@
 # data to its folder, starts the stack and runs the smoke test. Running it again keeps the secrets it made.
 #
 #   sudo OPENROUTER_API_KEY=<key> bash deploy/up.sh --host api.example.com \
-#     [--web-origin https://offball.vercel.app]... [--image ghcr.io/<owner>/offball@sha256:<digest>] \
+#     [--web-origin https://<account>.<zone>.web.core.windows.net]... [--image ghcr.io/<owner>/offball@sha256:<digest>] \
 #     [--ci-key "ssh-ed25519 AAAA... offball-ci"]
 #
 # Without --image it builds the image from this checkout. Without an OpenRouter key, given in the environment or

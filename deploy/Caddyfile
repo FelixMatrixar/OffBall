@@ -1,5 +1,5 @@
 # The VM's one public door (PRD 18.12): TLS from Let's Encrypt for API_HOST, and the routes to the services on the
-# internal network. Browsers reach the stream here directly, never through Vercel.
+# internal network. Browsers reach the stream here directly, never through the web app's host.
 
 {$API_HOST} {
 	# gzip first: on the live stream at 1x it cuts JSON frames from 1.18 MB a minute to 0.34 MB, under the 0.5 MB

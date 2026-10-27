@@ -59,7 +59,7 @@ Every caption, graphic and answer comes from a model; there are no templates to 
 | `uv run pytest` | Python tests, including the schema and truth-isolation checks |
 | `uv run ruff check offball tests` | Lint |
 
-CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, tests the event bus against a real Valkey, checks the deployment files and builds the image, and publishes the smoke set's quality-gate report, on every push and pull request. On `main` it also pushes the image to GitHub Container Registry.
+CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, tests the event bus against a real Valkey, checks the deployment files and builds the image, and publishes the smoke set's quality-gate report, on every push and pull request. On `main` it also pushes the image to GitHub Container Registry. A second workflow (`.github/workflows/site.yml`) uploads the web app from `main` to its static website in Azure Blob Storage.
 
 ### Settings
 
@@ -84,6 +84,6 @@ CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, tests th
 | `offball/agents/` | The agents: instructions, the broadcast workflow (Microsoft Agent Framework), corrections, the Engineer and Ask OffBall |
 | `offball/eval/` | Golden render tests and the per-agent evaluations |
 | `contracts/` | JSON Schemas for every message |
-| `deploy/`, `infra/` | The VM's stack and scripts, and the Bicep for the Azure VM and Foundry (`deploy/README.md`) |
+| `deploy/`, `infra/` | The VM's stack and scripts, and the Bicep for the Azure VM, Foundry and the web app's storage account (`deploy/README.md`) |
 | `datasets/`, `truth/` | Generated matches, and their answer keys (read only by evaluation) |
 | `web/` | The frontend |
