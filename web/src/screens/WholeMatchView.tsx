@@ -403,7 +403,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
   const shownRun = game.result && game.playback ? game.result.out.runs[game.run] : null;
   const gameText = game.active
     ? game.result && shownRun && (game.decided || !game.playback)
-      ? `${OUTCOME_LABEL[shownRun.outcome]} Run ${game.run + 1} of ${game.result.out.summary.runs}: ${game.result.out.summary.shots} shots and ${game.result.out.summary.goals} goals in all.`
+      ? `${OUTCOME_LABEL[shownRun.outcome]} Run ${game.run + 1} of ${game.result.out.summary.runs}: ${game.result.out.summary.shots} ${game.result.out.summary.shots === 1 ? 'shot' : 'shots'} and ${game.result.out.summary.goals} ${game.result.out.summary.goals === 1 ? 'goal' : 'goals'} in all.`
       : game.coach.plan
         ? `${game.coach.plan.headline}. ${game.coach.plan.explanation}`
         : 'Set the scene: drag players, tap one of yours and give him an order, or ask the Coach for a plan. Then play it out.'
