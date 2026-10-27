@@ -69,9 +69,11 @@ def control_fast(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarray, 
     return 1.0 / (1.0 + np.exp(-scale * (t_def - t_att)))
 
 
-def control_spearman(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarray, def_vel: np.ndarray,
-                     ball_xy: np.ndarray, cells: np.ndarray, dt: float = 0.04, horizon: float = 10.0) -> np.ndarray:
-    """Attacking control per cell by integrating Spearman's model from the ball's arrival time."""
+def ppcf(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarray, def_vel: np.ndarray, ball_xy: np.ndarray,
+         cells: np.ndarray, dt: float = 0.04, horizon: float = 10.0) -> tuple[np.ndarray, np.ndarray]:
+    """Each player's chance of controlling a ball sent to each cell, (attackers, cells) and (defenders, cells), by
+    integrating Spearman's model from the ball's arrival time. A cell one side reaches far earlier skips the
+    integration and goes to that side's first arrival, as in Spearman's implementation."""
     t_ball = np.linalg.norm(cells - ball_xy[None, :], axis=1) / BALL_SPEED
     tti_att = _time_to_intercept(att_pos, att_vel, cells)
     tti_def = _time_to_intercept(def_pos, def_vel, cells)
@@ -79,7 +81,6 @@ def control_spearman(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarr
     n_cells = cells.shape[0]
     ppcf_att = np.zeros((att_pos.shape[0], n_cells))
     ppcf_def = np.zeros((def_pos.shape[0], n_cells))
-    # Cells one side reaches far earlier skip the integration, as in Spearman's implementation.
     tau_att = tti_att.min(axis=0)
     tau_def = tti_def.min(axis=0)
     time_to_control = 3.0 * np.log(10.0) * (np.sqrt(3.0) * TTI_SIGMA / np.pi + 1.0 / LAMBDA)
@@ -93,18 +94,26 @@ def control_spearman(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarr
         remaining = np.clip(1.0 - total, 0.0, 1.0)
         f_att = 1.0 / (1.0 + np.exp(-scale * (t[None, :] - tti_att)))
         f_def = 1.0 / (1.0 + np.exp(-scale * (t[None, :] - tti_def)))
-        d_att = remaining[None, :] * f_att * LAMBDA * dt
-        d_def = remaining[None, :] * f_def * LAMBDA * dt
-        ppcf_att += d_att
-        ppcf_def += d_def
+        ppcf_att += remaining[None, :] * f_att * LAMBDA * dt
+        ppcf_def += remaining[None, :] * f_def * LAMBDA * dt
         total = ppcf_att.sum(axis=0) + ppcf_def.sum(axis=0)
         if np.all(total > 0.99):
             break
-    att = ppcf_att.sum(axis=0)
-    out = att / np.maximum(total, 1e-9)
-    out[att_wins] = 1.0
-    out[def_wins] = 0.0
-    return out
+    # Normalise so the two sides' shares sum to one, then hand the uncontested cells to their first arrival.
+    norm = np.maximum(total, 1e-9)
+    ppcf_att, ppcf_def = ppcf_att / norm, ppcf_def / norm
+    for wins, mine, theirs, tti in ((att_wins, ppcf_att, ppcf_def, tti_att), (def_wins, ppcf_def, ppcf_att, tti_def)):
+        if wins.any() and mine.shape[0]:
+            mine[:, wins] = 0.0
+            mine[tti[:, wins].argmin(axis=0), np.nonzero(wins)[0]] = 1.0
+            theirs[:, wins] = 0.0
+    return ppcf_att, ppcf_def
+
+
+def control_spearman(att_pos: np.ndarray, att_vel: np.ndarray, def_pos: np.ndarray, def_vel: np.ndarray,
+                     ball_xy: np.ndarray, cells: np.ndarray, dt: float = 0.04, horizon: float = 10.0) -> np.ndarray:
+    """Attacking control per cell by integrating Spearman's model from the ball's arrival time."""
+    return ppcf(att_pos, att_vel, def_pos, def_vel, ball_xy, cells, dt, horizon)[0].sum(axis=0)
 
 
 def zone_mask(cells: np.ndarray, polygon: list[tuple[float, float]]) -> np.ndarray:

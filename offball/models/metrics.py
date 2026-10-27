@@ -426,6 +426,10 @@ def moment_beats(md: MatchData, period: int, club: str, start_ms: int, dragged: 
     return beats
 
 
-# The learned models register their metrics too (PRD 13): pass difficulty and xG.
+# The learned models register their metrics too (PRD 13): pass difficulty, xG, space value, off-ball scoring
+# opportunity and off-ball credit.
+import offball.models.credit  # noqa: E402, F401
+import offball.models.epv  # noqa: E402, F401
+import offball.models.obso  # noqa: E402, F401
 import offball.models.pass_difficulty  # noqa: E402, F401
 import offball.models.xg  # noqa: E402, F401
