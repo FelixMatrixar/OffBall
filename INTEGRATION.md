@@ -374,6 +374,14 @@ Built on both sides, with no stand-in: with an API set, the match view (`#/match
 - `GET /api/matches/{match_id}/moments/{candidate_id}/whatifs/{hold|inside|drop}` replays the moment 16 times in the match engine with the creator holding his place, coming inside, or dropping towards the ball, and the defenders he pulled free to react (ADR 0008). It answers `numbers` (`space_created_m2` with `space_lo_m2` and `space_hi_m2`, `gap_open_pct_without`, `replays`, `creator_shift_m`, `defender_shift_m.<player_id>`), `tracks` (each free player's median path as `[t_ms, x, y]`) and the gap's `ring`, open or shut. A few seconds the first time; cached after.
 - `GET …/whatifs/{option}/words` returns `{"words": {headline, plain, analyst}}` from the Tactician, each in `en`, `es` and `fr`, or `{"words": null}` when it couldn't quote the numbers faithfully in two tries.
 
+### 6.11 Play it out
+
+The match view's game, on a whole match: the viewer freezes the moment on screen, drags players and the ball, gives orders, asks the Coach, and the match engine plays it out (`offball/models/playground.py`, `offball/agents/coach.py`; `web/src/components/player/PlayBoard.tsx`, `PlayItOutPanel.tsx` and `usePlayItOut.ts`).
+
+- `GET /api/matches/{match_id}/playground?period=2&t_ms=1081440` returns the board at that frame: `players` (`player_id → [x, y]`), `ball_owner`, the `attacking` club and `attacks_towards_x` for each club.
+- `POST /api/matches/{match_id}/playground/play` takes `{period, t_ms, positions, ball_owner, orders, runs}` and plays the position out `runs` times (8 by default, 16 at most). An order is `{player_id, action, to_xy, target_id, at_s}`. Attackers `run`, `support` or `carry` to `to_xy`, `pass` to `target_id`, or `shoot`. Defenders `press` the carrier, `mark`, `track` or `cover` `target_id`, or `hold` `to_xy`. A pass or shot by anyone but the carrier waits for the ball, and a receiver's carry starts when it reaches him. The answer has every run at 80 ms (`frames` as `[x0, y0, …]` in the order of `ids`, and `ball`), its `outcome` (`goal`, `saved`, `blocked`, `off_target`, `offside`, `out`, `lost` or `kept`), the shot's chance (`xg`), its events, and a `summary`. Orders the engine can't play answer `422` with the reasons.
+- `POST /api/matches/{match_id}/playground/coach` takes the same board with `side` (`attack` or `defend`) and `goal` (what the viewer wants, in their words), plus, for a defence, the attacking orders it should stop. The Coach tries its plan in six engine playouts and redraws it once or twice if it fails, then answers `{"plan": {headline, explanation, orders, tested}}`, or `{"plan": null}` when it can't give one the engine plays. It takes 10 to 30 s.
+
 ---
 
 ## 7. Testing against the frontend without a backend

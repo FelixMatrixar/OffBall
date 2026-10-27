@@ -24,12 +24,14 @@ from offball.agents.schemas import (
     AnswerOut,
     ClaimCheck,
     ClaimOut,
+    CoachOut,
     DraftOut,
     EngineerDecision,
     Line,
     Localized,
     ModeScript,
     NumberUsed,
+    OrderOut,
     PlannedOverlay,
     Schedule,
     ScoutDecision,
@@ -181,6 +183,18 @@ class ScriptedModel(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient
                              alternative_label=None, alternative_question=None, show_period=2,
                              show_from_ms=1_079_500, show_to_ms=1_087_000, show_player_ids=["kes-09", "ash-05", "nobody"],
                              show_moment_id=None)
+        if schema is CoachOut:
+            # The plan a test can predict: the player on the ball shoots, or the nearest defender presses him.
+            seen = _json_after(prompt, "Position") or {}
+            players = seen.get("players", [])
+            if "defence against" in prompt:
+                who = next(pl["player_id"] for pl in players if pl["side"] == "defending" and pl["role"] != "GK")
+                order = OrderOut(player_id=who, action="press", to_x=None, to_y=None, target_id=None, at_s=0)
+            else:
+                order = OrderOut(player_id=seen["ball_with"], action="shoot", to_x=None, to_y=None, target_id=None,
+                                 at_s=0.5)
+            return CoachOut(headline="Shoot early", explanation="The player on the ball shoots before the defence sets.",
+                            orders=[order])
         if schema is TacticianOut:
             seen = _json_after(prompt, "Numbers from the replays") or {}
             space = seen.get("space_created_m2", 0.0)

@@ -5,7 +5,10 @@ import { DENSITY_WEIGHT, FIELD_WEIGHT } from '../components/match/Stage2D';
 import { MatchScrubber } from '../components/player/MatchScrubber';
 import { MomentList } from '../components/player/MomentList';
 import { MomentPanel } from '../components/player/MomentPanel';
+import { PlayBoard } from '../components/player/PlayBoard';
+import { OUTCOME_LABEL, PlayItOutPanel } from '../components/player/PlayItOutPanel';
 import { PlayerPitch, type PitchWord } from '../components/player/PlayerPitch';
+import { usePlayItOut } from '../components/player/usePlayItOut';
 import { BottomSheet, Button, Chip, Drawer, Logo, MenuButton, Segmented, Spinner } from '../components/ui';
 import { canSpeak, speaker, unlockAudio, voiceFor } from '../lib/audio';
 import { contrast, parseColor, readToken } from '../lib/color';
@@ -130,6 +133,11 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
   );
   const [selected, setSelected] = useState<string | null>(null);
   const [whatIf, setWhatIf] = useState<WhatIf | null>(null);
+  // Play it out: the viewer takes over the moment on screen, sets it up, and the match engine plays their plan.
+  const game = usePlayItOut({ matchId: tl.match_id, clubOf: clubOfId });
+  const gameRef = useRef(game);
+  gameRef.current = game;
+
   // An answer from Ask OffBall being shown on the pitch, and whether its play has reached its end.
   const [answer, setAnswer] = useState<Answer | null>(null);
   const answerPaused = useRef<Answer | null>(null);
@@ -252,6 +260,11 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || isTyping(e.target) || document.getElementById('root')?.inert) return;
       const c = clockRef.current;
       const k = e.key;
+      // The board has its own controls; Escape leaves it.
+      if (gameRef.current.active) {
+        if (k === 'Escape') gameRef.current.exit();
+        return;
+      }
       const i = SPEEDS.indexOf(c.speed);
       const act: Record<string, () => void> = {
         ' ': c.toggle,
@@ -348,7 +361,11 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
     </div>
   ) : null;
 
-  const sidePanel = (
+  const sidePanel = game.active ? (
+    <div className="stack" style={{ gap: 14 }}>
+      <PlayItOutPanel game={game} home={tl.home} away={tl.away} label={label} onExit={game.exit} />
+    </div>
+  ) : (
     <div className="stack" style={{ gap: 14 }} dir={isRtl(lang) ? 'rtl' : 'ltr'}>
       {chosen ? (
         <MomentPanel
@@ -377,7 +394,21 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
       <MomentList moments={moments} home={tl.home} away={tl.away} current={highlight} label={(id) => `${clubName(id)} · ${label(id)}`} w={w} onPick={pick} />
     </div>
   );
-  const panelTitle = chosen ? (w.types[chosen.type] ?? chosen.type) : fill(w.moments, { n: moments.length });
+  const playHere = () => {
+    clock.pause();
+    setAnswer(null);
+    game.start(pos.period, Math.round(pos.t_ms));
+    if (screen.phonePortrait) setSheetOpen(true);
+  };
+  const shownRun = game.result && game.playback ? game.result.out.runs[game.run] : null;
+  const gameText = game.active
+    ? game.result && shownRun && (game.decided || !game.playback)
+      ? `${OUTCOME_LABEL[shownRun.outcome]} Run ${game.run + 1} of ${game.result.out.summary.runs}: ${game.result.out.summary.shots} shots and ${game.result.out.summary.goals} goals in all.`
+      : game.coach.plan
+        ? `${game.coach.plan.headline}. ${game.coach.plan.explanation}`
+        : 'Set the scene: drag players, tap one of yours and give him an order, or ask the Coach for a plan. Then play it out.'
+    : '';
+  const panelTitle = game.active ? 'Play it out' : chosen ? (w.types[chosen.type] ?? chosen.type) : fill(w.moments, { n: moments.length });
   const screenKind = screen.phonePortrait ? 'portrait' : screen.phoneLandscape ? 'landscape' : screen.tablet ? 'tablet' : 'desktop';
   const clubs = { kes: { name: tl.home.name, short: tl.home.short }, ash: { name: tl.away.name, short: tl.away.short } };
 
@@ -432,6 +463,42 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
         <main className="match-main">
           <section aria-label="Match" className="match-stage">
             <div className="pitch-card anim-rise">
+              {game.active ? (
+                game.board ? (
+                  <PlayBoard
+                    positions={game.positions}
+                    ballOwner={game.ballOwner}
+                    orders={game.orders}
+                    sideOf={sideOf}
+                    numOf={numOf}
+                    commandable={game.commandable}
+                    selected={game.selected}
+                    goalX={game.goalX}
+                    offsideX={game.offsideX}
+                    playback={game.playback}
+                    editable={!game.running}
+                    patterns={{ kes: colours.home.pattern, ash: colours.away.pattern }}
+                    reduced={reducedMotion}
+                    label={`Play it out board from ${clockOf({ period: game.board.period, t_ms: game.board.t_ms })}. ${gameText}`}
+                    banner={
+                      shownRun && game.decided ? (
+                        <div className="goal-banner board-banner anim-pop" data-outcome={shownRun.outcome} aria-hidden="true">
+                          {OUTCOME_LABEL[shownRun.outcome]}
+                        </div>
+                      ) : null
+                    }
+                    chips={
+                      <span className="map-chip map-chip-space">
+                        🎮 Play it out · {game.side === 'attack' ? 'you attack' : 'you defend'}
+                      </span>
+                    }
+                    onMove={game.move}
+                    onTap={game.tap}
+                  />
+                ) : (
+                  <LoadingPitch stage={1} orientation="h" checks={ui.loading} />
+                )
+              ) : (
               <PlayerPitch
                 frames={frames}
                 now={clock.now}
@@ -452,10 +519,12 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
                 scrim={scrim}
                 dim={!!scrim}
               />
+              )}
             </div>
 
-            <CaptionBar captions={captions} override={answerText ? { text: answerText, lang: answerLang } : undefined} meta={meta} size={mode === 'audio' ? prefs.capSize + 2 : prefs.capSize} voice={{ on: voiceWanted, speaking: clock.playing, label: voiceLabel }} />
+            <CaptionBar captions={game.active ? [] : captions} override={game.active ? { text: gameText, lang: 'en' } : answerText ? { text: answerText, lang: answerLang } : undefined} meta={game.active ? 'Play it out · your plan, played by the match engine 8 times' : meta} size={mode === 'audio' ? prefs.capSize + 2 : prefs.capSize} voice={{ on: voiceWanted, speaking: clock.playing, label: voiceLabel }} />
 
+            {!game.active && (
             <div className="card stack player-transport" style={{ padding: '12px 16px', gap: 12 }}>
               <div className="cluster" style={{ gap: 8 }}>
                 <Button variant="ghost" icon aria-label={w.prevMoment} title={`${w.prevMoment} (J)`} onClick={() => step(-1)}>
@@ -474,6 +543,9 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
                   ⏭
                 </Button>
                 <span className="mono player-clock">{clockText}</span>
+                <Button variant="secondary" className="btn-sm play-it-out" onClick={playHere} title="Take over this moment: move players, give orders, and let the match engine play it out">
+                  🎮 Play it out
+                </Button>
                 <span className="spacer" />
                 <Segmented options={SPEEDS.map((s) => ({ value: String(s), label: `${s}×` }))} value={String(clock.speed)} onChange={(s) => clock.setSpeed(Number(s) as Speed)} label={w.speed} minWidth={52} />
               </div>
@@ -495,6 +567,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
                 {w.keys}
               </p>
             </div>
+            )}
             <p className="muted" style={{ fontSize: 12 }}>
               {ui.synthetic}
             </p>

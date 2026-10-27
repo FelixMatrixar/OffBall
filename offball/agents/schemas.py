@@ -169,3 +169,18 @@ class TacticianOut(Strict):
     plain: Localized = Field(description="One or two plain sentences for a casual viewer, at most one number")
     analyst: Localized = Field(description="One or two precise sentences with the numbers, units and interval")
     numbers: list[NumberUsed] = Field(description="Every number written in any field, with its name and value")
+
+
+class OrderOut(Strict):
+    player_id: str
+    action: Literal["run", "support", "carry", "pass", "shoot", "press", "mark", "track", "cover", "hold"]
+    to_x: float | None = Field(description="For run, support, carry and hold: the spot's x in metres; else null")
+    to_y: float | None = Field(description="For run, support, carry and hold: the spot's y in metres; else null")
+    target_id: str | None = Field(description="For pass, mark, track and cover: the player; else null")
+    at_s: float = Field(ge=0, le=8, description="When the order starts, in seconds from now")
+
+
+class CoachOut(Strict):
+    headline: str = Field(description="Three to six words: the plan")
+    explanation: str = Field(description="Two or three plain sentences: who does what, and why it should work")
+    orders: list[OrderOut] = Field(min_length=1, max_length=8)

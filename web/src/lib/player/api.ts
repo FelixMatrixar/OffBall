@@ -143,3 +143,72 @@ export const fetchWhatIf = (id: string, cid: string, option: Alternative, signal
   getJson<WhatIf>(`${m(id)}/moments/${encodeURIComponent(cid)}/whatifs/${option}`, signal);
 export const fetchWhatIfWords = (id: string, cid: string, option: Alternative, signal?: AbortSignal) =>
   getJson<{ words: WhatIfWords | null }>(`${m(id)}/moments/${encodeURIComponent(cid)}/whatifs/${option}/words`, signal);
+
+// ---------- Play it out: the board, the engine's playouts and the Coach ----------
+
+export type OrderAction = 'run' | 'support' | 'carry' | 'pass' | 'shoot' | 'press' | 'mark' | 'track' | 'cover' | 'hold';
+
+export interface Order {
+  player_id: string;
+  action: OrderAction;
+  to_xy?: [number, number] | null;
+  target_id?: string | null;
+  at_s: number;
+}
+
+/** Play it out's board at a frame: every player, who has the ball, and which goal each club attacks. */
+export interface Board {
+  period: number;
+  t_ms: number;
+  attacking: string;
+  ball_owner: string;
+  players: Record<string, [number, number]>;
+  attacks_towards_x: Record<string, number>;
+}
+
+export type RunOutcome = 'goal' | 'saved' | 'blocked' | 'off_target' | 'offside' | 'out' | 'lost' | 'kept';
+
+export interface PlayRun {
+  outcome: RunOutcome;
+  xg: number;
+  shooter: string | null;
+  /** Every 80 ms: [x0, y0, x1, y1, …] in the order of the playout's `ids`. */
+  frames: number[][];
+  ball: [number, number, number][];
+  events: { type: string; t_ms: number; player_id: string | null; team_id: string | null; outcome: string | null }[];
+}
+
+export interface PlayOut {
+  period: number;
+  t_ms: number;
+  step_ms: number;
+  attacking: string;
+  ball_owner: string;
+  ids: string[];
+  runs: PlayRun[];
+  summary: { runs: number; shots: number; goals: number; lost: number; xg: number };
+}
+
+export interface CoachPlan {
+  side: 'attack' | 'defend';
+  headline: string;
+  explanation: string;
+  orders: Order[];
+  ai_generated: boolean;
+  /** How the plan went when the Coach tried it in the engine before handing it over. */
+  tested?: { runs: number; shots: number; goals: number };
+}
+
+interface BoardSetup {
+  period: number;
+  t_ms: number;
+  positions: Record<string, [number, number]>;
+  ball_owner: string;
+  orders: Order[];
+}
+
+export const fetchBoard = (id: string, period: number, t_ms: number, signal?: AbortSignal) =>
+  getJson<Board>(`${m(id)}/playground?period=${period}&t_ms=${Math.round(t_ms)}`, signal);
+export const playOut = (id: string, setup: BoardSetup) => postJson<PlayOut>(`${m(id)}/playground/play`, setup);
+export const askCoach = (id: string, setup: BoardSetup & { side: 'attack' | 'defend'; goal: string }) =>
+  postJson<{ plan: CoachPlan | null }>(`${m(id)}/playground/coach`, setup);

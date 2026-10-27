@@ -43,19 +43,20 @@ TOOLSETS: dict[str, list[Callable[..., Any]]] = {
     "persona": [T.glossary],
     "producer": [],
     "tactician": [],
+    "coach": [],
     "pundit": [T.match_facts, T.list_candidates, T.moment_card, T.list_metrics, T.compute_metric, T.events_between,
                T.positions_at, T.player_summary, T.get_evidence, T.match_time, T.glossary],
     # The Engineer reads telemetry the code hands it; on the VM it also gets Azure MCP Server, for Foundry (PRD 14.8).
     "engineer": [],
 }
 TIERS: dict[str, Tier] = {"scout": "fast", "explainer": "reasoning", "factchecker": "reasoning", "persona": "fast",
-                          "producer": "fast", "tactician": "fast", "pundit": "reasoning", "engineer": "fast"}
+                          "producer": "fast", "tactician": "fast", "coach": "fast", "pundit": "reasoning", "engineer": "fast"}
 # Each agent's p95 time budget per call (PRD 14.10): what the Engineer measures latency against.
 BUDGET_MS: dict[str, int] = {"scout": 300, "explainer": 1000, "factchecker": 600, "persona": 500, "producer": 200,
-                             "tactician": 3000, "pundit": 6000, "engineer": 60000}
+                             "tactician": 3000, "coach": 5000, "pundit": 6000, "engineer": 60000}
 # The hard limit on one call, after which it counts as failed. Far above the budgets, which are p95 targets.
 TIME_LIMIT_S: dict[str, float] = {"scout": 30, "explainer": 120, "factchecker": 120, "persona": 60, "producer": 60,
-                                  "tactician": 60, "pundit": 90, "engineer": 60}
+                                  "tactician": 60, "coach": 60, "pundit": 90, "engineer": 60}
 RETRY_BACKOFF_S = 0.5
 
 

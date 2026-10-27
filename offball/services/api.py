@@ -18,14 +18,16 @@ from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
+from offball.agents import coach
 from offball.agents.crew import Crew
 from offball.agents.llm import ModelNotConfigured, model_configured
 from offball.agents.pundit import answer as pundit_answer
 from offball.core import number_of
 from offball.mcp import tools as T
+from offball.models import playground as PG
 from offball.services import fullmatch as F
 from offball.services import stats as S
 from offball.services.bus import ValkeyBus, bus_url
@@ -201,6 +203,81 @@ async def whatif_words(match_id: str, candidate_id: str, option: str) -> dict[st
         except ValueError as exc:
             raise HTTPException(404, str(exc)) from exc
     return {"words": await F.whatif_words(agents, match_id, candidate_id, option)}
+
+
+class OrderBody(BaseModel):
+    player_id: str
+    action: str
+    to_xy: list[float] | None = None
+    target_id: str | None = None
+    at_s: float = 0.0
+
+
+class BoardBody(BaseModel):
+    """A position a viewer set up on Play it out's board: the frame it started from, who they moved, the ball."""
+
+    period: int
+    t_ms: int
+    positions: dict[str, list[float]] = {}
+    ball_owner: str | None = None
+    orders: list[OrderBody] = []
+
+
+class PlayBody(BoardBody):
+    runs: int = Field(PG.RUNS, ge=1, le=16)
+
+
+class CoachBody(BoardBody):
+    side: str = "attack"  # attack or defend
+    goal: str = ""
+
+
+_play_slots = asyncio.Semaphore(int(os.environ.get("OFFBALL_PLAYOUTS_AT_ONCE", "2")))
+
+
+def _board(body: BoardBody) -> tuple[dict, list[PG.Order]]:
+    positions = {pid: (xy[0], xy[1]) for pid, xy in body.positions.items() if len(xy) == 2}
+    orders = [PG.Order(o.player_id, o.action, tuple(o.to_xy[:2]) if o.to_xy and len(o.to_xy) >= 2 else None,  # type: ignore[arg-type]
+                       o.target_id, o.at_s) for o in body.orders]
+    return positions, orders
+
+
+@app.get("/api/matches/{match_id}/playground")
+async def playground(match_id: str, period: int, t_ms: int) -> dict[str, Any]:
+    """Play it out's board at a frame: every player where he stood, the ball and who has it, and which goal each side
+    attacks."""
+    _finished(match_id)
+    try:
+        return await asyncio.to_thread(PG.position_of, T.REGISTRY.data(match_id), period, t_ms)
+    except (ValueError, KeyError, IndexError) as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.post("/api/matches/{match_id}/playground/play")
+async def play_out(match_id: str, body: PlayBody) -> dict[str, Any]:
+    """Play the viewer's position out several times in the match engine, with their orders, and return every run
+    for the board to animate, with what happened in each."""
+    _finished(match_id)
+    positions, orders = _board(body)
+    async with _play_slots:
+        try:
+            return await asyncio.to_thread(PG.play_out, T.REGISTRY.data(match_id), body.period, body.t_ms, positions,
+                                           body.ball_owner, orders, body.runs)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+
+@app.post("/api/matches/{match_id}/playground/coach")
+async def coach_plan(match_id: str, body: CoachBody) -> dict[str, Any]:
+    """The Coach's plan for the viewer's position: orders for the attack, or for the defence against the attacking
+    orders sent, with a headline and why it should work. `plan` is null when the Coach couldn't give a playable one."""
+    _finished(match_id)
+    if body.side not in ("attack", "defend"):
+        raise HTTPException(422, "side is attack or defend")
+    positions, orders = _board(body)
+    agents = crew()
+    return {"plan": await coach.plan(agents, T.REGISTRY.data(match_id), body.period, body.t_ms, positions,
+                                     body.ball_owner, body.side, body.goal, orders)}
 
 
 def _stat(match_id: str, name: str, player_id: str | None, until: tuple[int, int] | None,
