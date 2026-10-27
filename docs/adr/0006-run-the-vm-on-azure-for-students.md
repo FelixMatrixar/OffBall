@@ -23,5 +23,5 @@ Measured on 27 October under `docker compose up`, the stack idles at about 215 M
 - When the credit runs out, Azure disables the subscription unless it's upgraded to pay-as-you-go, so the team watches the credit balance in the portal in place of budget alerts.
 - The region must be one the subscription's policy allows and where Foundry offers Agent Service. `main.bicep` can put Foundry in a different region from the VM.
 - The load test (18.3) still has to show whether 2 vCPUs and 4 GB carry the 10-match target. A student subscription can't go above about 4 vCPUs; a pay-as-you-go one can.
-- Rule 4.12 asks for Azure on terms open to every entrant. Azure for Students is a public offer, but only students can take it, so the team confirms it's acceptable (PRD open question 2). The same Bicep deploys to a pay-as-you-go subscription unchanged.
+- The same Bicep deploys to a pay-as-you-go subscription unchanged.
 - The offer is for learning and non-commercial use, which the submission is.

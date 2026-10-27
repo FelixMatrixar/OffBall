@@ -2483,7 +2483,7 @@ Step 1's repository is created and pushed, and its CI checks pass on GitHub; mak
 ## 26. Open questions
 
 1. Who are the team members (up to 4), who is the Representative, and who owns each workstream?
-2. Which region does the Azure for Students subscription allow (18.9) that offers Agent Service with gateway connections, Speech with the Voice Live API, Content Safety, evaluations and the VM's size, and is there quota for a judge deployment if the evaluators need one? Rule 4.12 asks for Azure on terms open to every entrant: does the team confirm that Azure for Students, a public offer open only to students, meets it, or move to pay-as-you-go (ADR 0006)?
+2. Which region does the Azure for Students subscription allow (18.9) that offers Agent Service with gateway connections, Speech with the Voice Live API, Content Safety, evaluations and the VM's size, and is there quota for a judge deployment if the evaluators need one?
 3. Category: Best Multi-Agent System, or Best Use of Microsoft Foundry Project?
 4. Are the ten interface languages right for the audience, and who reviews the Spanish and French glossaries?
 5. Is "OffBall" free to use as a product name?
