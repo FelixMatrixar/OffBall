@@ -1,6 +1,6 @@
 # 3. Host on Vercel and one Ubuntu VM, with Foundry the only Azure service
 
-Date: 26 October 2026. Status: accepted.
+Date: 26 October 2026. Status: accepted. ADR 0006 moves the VM into Azure, beside Foundry, and gives it a managed identity in place of the app registrations.
 
 ## Context
 

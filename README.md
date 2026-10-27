@@ -84,6 +84,6 @@ CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, tests th
 | `offball/agents/` | The agents: instructions, the broadcast workflow (Microsoft Agent Framework), corrections, the Engineer and Ask OffBall |
 | `offball/eval/` | Golden render tests and the per-agent evaluations |
 | `contracts/` | JSON Schemas for every message |
-| `deploy/`, `infra/` | The VM's stack and scripts, and the Foundry Bicep (`deploy/README.md`) |
+| `deploy/`, `infra/` | The VM's stack and scripts, and the Bicep for the Azure VM and Foundry (`deploy/README.md`) |
 | `datasets/`, `truth/` | Generated matches, and their answer keys (read only by evaluation) |
 | `web/` | The frontend |

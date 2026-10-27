@@ -1,10 +1,8 @@
 #cloud-config
 # Prepares a fresh Ubuntu 24.04 VM for OffBall (PRD 18.10): Docker, the firewall, automatic security updates, SSH
-# with keys only, a `deploy` user for CI, and the folders the stack's volumes live in. Paste it as the VM's user
-# data after putting your own SSH public key below, then run deploy/up.sh (see deploy/README.md).
-
-ssh_authorized_keys:
-  - ssh-ed25519 AAAA-REPLACE-WITH-YOUR-PUBLIC-KEY you@example.com
+# with keys only, a `deploy` user for CI, and the folders the stack's volumes live in. infra/vm.bicep passes it as
+# the Azure VM's user data; on another provider, paste it as the user data. Your SSH key comes from the VM's own
+# settings (the Bicep's sshPublicKey, or the provider's SSH key). Then run deploy/up.sh (see deploy/README.md).
 
 groups:
   - docker

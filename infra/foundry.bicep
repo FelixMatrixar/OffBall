@@ -1,13 +1,13 @@
-// Microsoft Foundry, the only Azure resource OffBall deploys (PRD 18.9, 18.10; ADR 0003): a Foundry resource and
-// project, the gateway connection to OpenRouter (ADR 0004), the app registrations' roles (PRD 18.11) and a budget
-// alert (OPS-4). Everything else runs on the VM and Vercel.
+// Microsoft Foundry (PRD 18.9, 18.10; ADRs 0003, 0006): a Foundry resource and project, the gateway connection to
+// OpenRouter (ADR 0004), the roles of whatever signs in to it (PRD 18.11) and a budget alert (OPS-4). main.bicep
+// deploys it with the VM and gives the VM's managed identity its roles. On its own, for a VM outside Azure:
 //
 //   az group create --name offball --location <region>
 //   az deployment group create --resource-group offball --template-file infra/foundry.bicep \
 //     --parameters openRouterKey=<key> budgetEmails='["you@example.com"]'
 //
 // Only the region (the resource group's) and the OpenRouter key are required (OPS-1). The key is kept only in the
-// connection. The principal IDs are the object IDs of the app registrations' service principals, once they exist.
+// connection. The principal IDs are the object IDs of managed identities or app registrations' service principals.
 
 @description('Where the Foundry resource lives. Defaults to the resource group\'s region (PRD open question 2).')
 param location string = resourceGroup().location
@@ -31,10 +31,10 @@ param reasoningModel string = 'openai/gpt-5'
 @description('The gateway connection\'s name. Agents name a model as "<connection>/<model ID>".')
 param connectionName string = 'openrouter'
 
-@description('Object ID of offball-app\'s service principal: the crews, speech and evaluations on the VM. Empty skips its roles.')
+@description('Object ID of what runs the crews, speech and evaluations: the VM\'s managed identity, or offball-app\'s service principal. Empty skips its roles.')
 param appPrincipalId string = ''
 
-@description('Object ID of offball-azmcp\'s service principal: Azure MCP Server on the VM, read-only. Empty skips its roles.')
+@description('Object ID of what runs Azure MCP Server, read-only: the VM\'s managed identity, or offball-azmcp\'s service principal. Empty skips its roles.')
 param azmcpPrincipalId string = ''
 
 @description('Object ID of offball-ci\'s service principal: GitHub Actions, through workload identity federation. Empty skips its role.')
@@ -43,7 +43,7 @@ param ciPrincipalId string = ''
 @description('Monthly budget for the resource group, in the subscription\'s currency.')
 param budgetAmount int = 50
 
-@description('Who hears when spending passes 50%, 80% and 100% of the budget (PRD 18.16). Empty skips the budget.')
+@description('Who hears when spending passes 50%, 80% and 100% of the budget (PRD 18.16). Empty skips the budget, as Azure for Students needs: Cost Management doesn\'t support it, and its credit is the limit.')
 param budgetEmails array = []
 
 @description('The budget\'s first month. Must be the first day of a month.')
