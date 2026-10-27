@@ -6,3 +6,7 @@ truth/** -text
 web/public/feeds/*.jsonl text eol=lf
 # The JSON Schemas are compared byte for byte with what `offball schemas` exports, which writes LF.
 contracts/** text eol=lf
+# The VM runs these as they are checked out, so they keep LF on every machine.
+deploy/** text eol=lf
+*.sh text eol=lf
+Dockerfile text eol=lf

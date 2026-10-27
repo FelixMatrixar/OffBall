@@ -1,8 +1,10 @@
 """A live run (PRD 11.4, 11.9): the emitter feeds the live service, and the crew explains what it finds.
 
-Every confirmed moment goes to the broadcast crew, a few at a time (`OFFBALL_MAX_MOMENTS`, default 2): the
-rest wait their turn, so a busy spell can't flood the model with workflows. Without a configured model the crew
-is off: frames, clock and score still stream, and no graphics air, because only the agents may write them.
+With VALKEY_URL set, the feed travels through the match's stream on the event bus (PRD 11.5); without it, the
+emitter hands each message straight to ingest. Every confirmed moment goes to the broadcast crew, a few at a time
+(`OFFBALL_MAX_MOMENTS`, default 2): the rest wait their turn, so a busy spell can't flood the model with workflows.
+Without a configured model the crew is off: frames, clock and score still stream, and no graphics air, because
+only the agents may write them.
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from offball.agents.corrections import handle_correction
 from offball.agents.crew import Crew
 from offball.agents.engineer import check as engineer_check
 from offball.mcp import tools as T
+from offball.services.bus import ValkeyBus, bus_from_env
 from offball.services.emitter import EmitterConfig, FeedEmitter
 from offball.services.live import LiveMatch
 from offball.services.state import STORE, MatchState
@@ -38,6 +41,8 @@ class LiveRun:
     # Whoever starts a run produces it (PRD 11.7): a random token, kept only with the run, so no key to keep secret.
     producer_token: str = field(default_factory=lambda: secrets.token_urlsafe(18))
     produced: bool = False  # started by a producer through POST /api/live-runs
+    bus: ValkeyBus | None = field(default_factory=bus_from_env)
+    run_id: str = field(default_factory=lambda: secrets.token_hex(8))
 
     def __post_init__(self) -> None:
         self.emitter = FeedEmitter(self.match_dir, self.config)
@@ -99,12 +104,32 @@ class LiveRun:
             except Exception:  # the Engineer failing must never stop the show
                 log.exception("The Engineer's check failed")
 
+    async def _through_bus(self, bus: ValkeyBus) -> None:
+        """The emitter writes the feed to the match's stream, and ingest reads it back from there (PRD 11.5)."""
+        start = await bus.position(self.match_id)
+
+        async def read() -> None:
+            async for msg in bus.read(self.match_id, self.run_id, start):
+                await self._sink(msg)
+
+        reader = asyncio.create_task(read())
+        try:
+            await self.emitter.play(lambda msg: bus.append(self.match_id, self.run_id, msg), self.stop)
+            await bus.end(self.match_id, self.run_id)
+            await reader
+        finally:
+            reader.cancel()
+            await bus.close()
+
     async def run(self) -> None:
         T.REGISTRY.register_live(self.match_id, self.live)
         beat = asyncio.create_task(self._heartbeat())
         watch = asyncio.create_task(self._engineer()) if self.crew else None
         try:
-            await self.emitter.play(self._sink, self.stop)
+            if self.bus is None:
+                await self.emitter.play(self._sink, self.stop)
+            else:
+                await self._through_bus(self.bus)
             while pending := [t for t in self._moments if not t.done()]:
                 await asyncio.gather(*pending)  # corrections may add work while moments finish
         finally:

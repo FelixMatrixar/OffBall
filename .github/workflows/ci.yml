@@ -1,6 +1,7 @@
 # The checks every change runs (PRD 18.13): lint and tests for the Python side and the frontend, the schema and
-# truth checks (BE-1, BE-6, in tests/test_repo_checks.py) and the quality-gate report on the smoke set. Nothing here
-# needs Azure or a model: agent tests use a test-only stand-in model.
+# truth checks (BE-1, BE-6, in tests/test_repo_checks.py), the event bus against a real Valkey, the deployment files
+# and the quality-gate report on the smoke set. Nothing here needs Azure or a model: agent tests use a test-only
+# stand-in model. On main, the image is built once and pushed to GitHub Container Registry.
 name: CI
 
 on:
@@ -16,6 +17,12 @@ jobs:
   python:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    services:
+      valkey:
+        image: valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "valkey-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -25,9 +32,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: uv sync --frozen
+      - run: uv sync --frozen --extra vm
       - run: uv run ruff check offball tests
       - run: uv run pytest -q
+      - name: The event bus against a real Valkey (PRD 11.5)
+        run: uv run pytest -q tests/test_bus.py
+        env:
+          VALKEY_URL: valkey://localhost:6379/0
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose files, locally and with the VM's profile
+        run: |
+          docker compose config --quiet
+          API_HOST=api.example.com docker compose --profile vm config --quiet
+      - name: Caddyfile
+        run: docker run --rm -v "$PWD/deploy/Caddyfile:/etc/caddy/Caddyfile:ro" -e API_HOST=api.example.com caddy:2.11.7-alpine caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - name: Shell scripts
+        run: shellcheck deploy/*.sh
+      - name: Foundry Bicep
+        run: az bicep build --file infra/foundry.bicep --stdout > /dev/null
+      - name: The image builds
+        run: docker build -t offball:ci .
 
   web:
     runs-on: ubuntu-latest
@@ -68,3 +97,34 @@ jobs:
         with:
           name: gates-smoke
           path: calibration/reports/gates-smoke.*
+
+  # Merge to main (PRD 18.13): the image is built once, tagged with the commit, and pushed to GitHub Container
+  # Registry, where deploy/deploy.sh pulls it by digest.
+  image:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [python, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: name
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/offball" >> "$GITHUB_OUTPUT"
+      - id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.name.outputs.image }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: The image to deploy
+        run: echo "${{ steps.name.outputs.image }}@${{ steps.push.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"

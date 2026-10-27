@@ -1,0 +1,4 @@
+# Local development (PRD 18.15): `docker compose up --build` runs the VM's stack on one machine with no Azure
+# subscription. The services live in deploy/compose.yaml; your .env (see .env.example) gives the agents a model.
+include:
+  - deploy/compose.yaml

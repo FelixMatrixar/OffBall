@@ -21,7 +21,7 @@ uv sync
 uv run offball serve all
 ```
 
-That starts the API on port 8000 and the OffBall MCP server on port 8001. Then start the frontend (`npm run dev` in `web/`) and open the match view on the local pipeline:
+That starts the API on port 8000 and the OffBall MCP server on port 8001. Or, with Docker, `docker compose up --build` runs the same two with the Valkey event bus and the Aspire Dashboard, as the VM does (`deploy/README.md`). Then start the frontend (`npm run dev` in `web/`) and open the match view on the local pipeline:
 
 ```text
 http://localhost:5173/#/match?feed=sse:http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fmatches%2Fm07%2Fstream%3Fperiod%3D2%26from_ms%3D1066000%26to_ms%3D1093000
@@ -59,7 +59,7 @@ Every caption, graphic and answer comes from a model; there are no templates to 
 | `uv run pytest` | Python tests, including the schema and truth-isolation checks |
 | `uv run ruff check offball tests` | Lint |
 
-CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, and publishes the smoke set's quality-gate report, on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, tests the event bus against a real Valkey, checks the deployment files and builds the image, and publishes the smoke set's quality-gate report, on every push and pull request. On `main` it also pushes the image to GitHub Container Registry.
 
 ### Settings
 
@@ -69,6 +69,8 @@ CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, and publ
 | `TOKENS_PER_MATCH` | The match's token budget: past 80% only priority-0 moments air, at 100% none (default 2,000,000) |
 | `OFFBALL_ENGINEER_EVERY_S` | How often the Engineer checks the crew's health in a live run (default 60) |
 | `OFFBALL_TRACE=console` | Prints traces of every agent call; `OTEL_EXPORTER_OTLP_ENDPOINT` sends them to the Aspire Dashboard instead (needs the `vm` extra) |
+| `VALKEY_URL` | Sends each live run's feed through its stream on the Valkey event bus, `feed.{match_id}` (PRD 11.5; needs the `vm` extra). Without it the feed goes straight to ingest. `docker compose up` sets it |
+| `OFFBALL_WEB_ORIGINS` | The web app's origins, comma-separated, that may call the API from a browser (default `*`; `deploy/up.sh` sets it) |
 | `FAULTS` | Dev only: injects faults, such as `latency:explainer:4000` |
 
 ## Layout
@@ -77,10 +79,11 @@ CI (`.github/workflows/ci.yml`) runs the lint and tests for both sides, and publ
 | --- | --- |
 | `offball/generator/` | The league, the emergent match engine and the director |
 | `offball/models/` | Pitch control, the metric registry and the moment detectors |
-| `offball/services/` | The feed emitter, the live service, the API, panel stats, degrade flags, tracing and replay builds |
+| `offball/services/` | The feed emitter, the event bus, the live service, the API, panel stats, degrade flags, tracing and replay builds |
 | `offball/mcp/` | The OffBall MCP server and its tools |
 | `offball/agents/` | The agents: instructions, the broadcast workflow (Microsoft Agent Framework), corrections, the Engineer and Ask OffBall |
 | `offball/eval/` | Golden render tests and the per-agent evaluations |
 | `contracts/` | JSON Schemas for every message |
+| `deploy/`, `infra/` | The VM's stack and scripts, and the Foundry Bicep (`deploy/README.md`) |
 | `datasets/`, `truth/` | Generated matches, and their answer keys (read only by evaluation) |
 | `web/` | The frontend |

@@ -1,0 +1,66 @@
+#cloud-config
+# Prepares a fresh Ubuntu 24.04 VM for OffBall (PRD 18.10): Docker, the firewall, automatic security updates, SSH
+# with keys only, a `deploy` user for CI, and the folders the stack's volumes live in. Paste it as the VM's user
+# data after putting your own SSH public key below, then run deploy/up.sh (see deploy/README.md).
+
+ssh_authorized_keys:
+  - ssh-ed25519 AAAA-REPLACE-WITH-YOUR-PUBLIC-KEY you@example.com
+
+groups:
+  - docker
+
+users:
+  - default
+  # CI's deploy key lands here, restricted to deploy/deploy.sh (PRD 18.11); up.sh adds it.
+  - name: deploy
+    groups: [docker]
+    shell: /bin/bash
+    lock_passwd: true
+
+package_update: true
+package_upgrade: true
+packages:
+  - ca-certificates
+  - curl
+  - git
+  - openssl
+  - ufw
+  - unattended-upgrades
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/10-offball.conf
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+  # Container logs rotate rather than fill the disk.
+  - path: /etc/docker/daemon.json
+    content: |
+      {"log-driver": "local", "log-opts": {"max-size": "20m", "max-file": "5"}}
+
+runcmd:
+  # Docker Engine and Compose from Docker's own repository.
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  - chmod a+r /etc/apt/keyrings/docker.asc
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
+  - apt-get update
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  - systemctl enable --now docker
+  # SSH, HTTP and HTTPS only (PRD 18.12). Docker publishes only Caddy's ports beyond 127.0.0.1.
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow OpenSSH
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 443/udp
+  - ufw --force enable
+  - systemctl restart ssh
+  # The container's user (uid 10001) owns the data folders; settings and secrets live in /etc/offball.
+  - install -d -m 755 -o 10001 -g 10001 /srv/offball /srv/offball/datasets /srv/offball/media /srv/offball/files
+  - install -d -m 755 /etc/offball
+  - install -d -m 750 -g deploy /etc/offball/secrets

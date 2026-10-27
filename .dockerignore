@@ -1,0 +1,13 @@
+# The image holds the code and what it reads at run time, nothing else (PRD 11.4). Match data reaches the
+# container on a volume, and truth never does (PRD 12.9).
+*
+!offball/
+!contracts/
+!calibration/*.json
+!calibration/*.txt
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+**/__pycache__
+**/*.py[cod]

@@ -1,0 +1,92 @@
+# The VM's stack (PRD 18.9, 18.10), and the local one (PRD 18.15): `docker compose up` in the repository root runs
+# the same file. Nothing publishes a port beyond 127.0.0.1 except Caddy, which runs only with the `vm` profile;
+# on the VM the team reaches the Aspire Dashboard over an SSH tunnel (PRD 18.12).
+#
+# The `offball` service runs the API and the OffBall MCP server in one process (`offball serve all`): the live
+# runs, the crews and the MCP tools share the match state in memory until PostgreSQL holds it (PRD 11.8). The
+# `live`, `cf-workers`, `evaluator`, `emitter`, `generator`, `azmcp` and `postgres` services join as they're built.
+#
+# Settings come from defaults.env, then the machine's settings and secrets files (on the VM, /etc/offball, written
+# by up.sh; locally, the repository's .env). Images are pinned by digest (OPS-11).
+
+name: offball
+
+services:
+  offball:
+    image: ${OFFBALL_IMAGE:-offball:local}
+    build:
+      context: ..
+    command: ["offball", "serve", "all", "--host", "0.0.0.0"]
+    restart: unless-stopped
+    env_file:
+      - path: defaults.env
+      - path: ${OFFBALL_SETTINGS:-../.env}
+        required: false
+      - path: ${OFFBALL_SECRETS:-../.env}
+        required: false
+    volumes:
+      - ${OFFBALL_DATA:-../datasets}:/app/datasets:ro
+      - cache:/app/replays
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8001"
+    depends_on:
+      valkey:
+        condition: service_healthy
+      aspire:
+        condition: service_started
+
+  valkey:
+    image: valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+    # The append-only file keeps the streams through a restart (PRD 11.5). A password, when the secrets file sets
+    # one, as on the VM.
+    command: ["sh", "-c", "exec valkey-server --appendonly yes --save '' $${VALKEY_PASSWORD:+--requirepass \"$$VALKEY_PASSWORD\"}"]
+    restart: unless-stopped
+    env_file:
+      - path: ${OFFBALL_SECRETS:-../.env}
+        required: false
+    volumes:
+      - valkey:/data
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli $${VALKEY_PASSWORD:+-a \"$$VALKEY_PASSWORD\" --no-auth-warning} ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  aspire:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13.6.2@sha256:4f494c0b519ba58e56f8bb6830041f8ab071e6842c1f4dd1b474d4793dbe1593
+    # Traces, metrics and logs from every service (PRD 18.8). The browser asks for the token the dashboard prints
+    # at start: `docker compose logs aspire`.
+    restart: unless-stopped
+    environment:
+      DASHBOARD__OTLP__AUTHMODE: Unsecured  # reachable only on the internal network
+      DASHBOARD__TELEMETRYLIMITS__MAXTRACECOUNT: "20000"
+    ports:
+      - "127.0.0.1:18888:18888"
+
+  caddy:
+    profiles: ["vm"]
+    image: caddy:2.11.7-alpine@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f
+    restart: unless-stopped
+    environment:
+      API_HOST: ${API_HOST:-localhost}  # up.sh sets the real one
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${OFFBALL_MEDIA:-media}:/srv/media:ro
+      - ${OFFBALL_FILES:-files}:/srv/files:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - offball
+
+volumes:
+  cache:
+  valkey:
+  media:
+  files:
+  caddy-data:
+  caddy-config:

@@ -31,9 +31,10 @@ azure = [
   "agent-framework-foundry>=1.15",
   "azure-identity>=1.19",
 ]
-# What the VM adds (PRD 18.9): traces over OTLP to the Aspire Dashboard.
+# What the VM adds (PRD 18.9): traces over OTLP to the Aspire Dashboard, and the Valkey event bus (PRD 11.5).
 vm = [
   "opentelemetry-exporter-otlp-proto-grpc>=1.39",
+  "valkey>=6.1",
 ]
 
 [project.scripts]

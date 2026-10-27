@@ -27,6 +27,7 @@ from offball.agents.pundit import answer as pundit_answer
 from offball.core import number_of
 from offball.mcp import tools as T
 from offball.services import stats as S
+from offball.services.bus import ValkeyBus, bus_url
 from offball.services.emitter import Correction, EmitterConfig
 from offball.services.flags import FLAG_STORE
 from offball.services.runner import RUNS, current_state, start_run
@@ -50,7 +51,9 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="OffBall API", version="0.1.0", lifespan=lifespan,
               description="Off-ball match intelligence from synthetic football data. All match data is synthetic.")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# On the VM only the web app's origins may call from a browser (PRD 18.12); up.sh sets them.
+ORIGINS = [o.strip() for o in os.environ.get("OFFBALL_WEB_ORIGINS", "*").split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["*"], allow_headers=["*"])
 _crew: Crew | None = None
 
 
@@ -74,8 +77,22 @@ def _match_dir(match_id: str):
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    return {"ok": True, "model_configured": model_configured(), "live_runs": sorted(k for k, r in RUNS.items()
-                                                                                    if not r.done.is_set())}
+    return {"ok": True, "model_configured": model_configured(), "bus": "valkey" if bus_url() else "in-process",
+            "live_runs": sorted(k for k, r in RUNS.items() if not r.done.is_set())}
+
+
+@app.get("/api/ready")
+async def ready() -> dict[str, Any]:
+    """Ready to start live runs (OPS-5): the event bus answers, when there is one."""
+    if bus_url():
+        bus = ValkeyBus()
+        try:
+            await bus.ping()
+        except Exception as exc:
+            raise HTTPException(503, f"The event bus doesn't answer: {type(exc).__name__}") from exc
+        finally:
+            await bus.close()
+    return {"ready": True}
 
 
 @app.get("/api/matches")
