@@ -2,7 +2,7 @@
 import { expect, test } from '@playwright/test';
 import type { WhatIf } from '../../src/lib/player/api';
 import { clockOf, matchTime } from '../../src/lib/player/clock';
-import { GHOST_AFTER_MS, GHOST_BEFORE_MS, whatIfItems } from '../../src/lib/player/whatif';
+import { GHOST_AFTER_MS, GHOST_BEFORE_MS, whatIfEnd, whatIfItems } from '../../src/lib/player/whatif';
 
 const periods = [
   { period: 1, duration_ms: 2_760_640, attacks_left_to_right: 'ash' },
@@ -52,4 +52,8 @@ test('a what-if becomes dashed ghosts and a ring, timed around the moment', () =
   expect(items[1].anchors.player_id).toBe('kes-09');
   expect(items[1].data?.track).toEqual([[1081.44, 84.2, 23.1], [1084.2, 82.4, 24.6]]);
   expect(items[1].counterfactual_id).toBe(w.counterfactual_id);
+  // Ghosts that play on past the measurement stay on the pitch until a while after they stop.
+  const longer: WhatIf = { ...w, tracks: { 'kes-09': [[1_081_440, 84.2, 23.1], [1_085_440, 80.0, 26.0]] } };
+  expect(whatIfEnd(longer)).toBe(1_085_440 + GHOST_AFTER_MS);
+  expect(whatIfItems(longer).every((o) => o.t_end_ms === whatIfEnd(longer))).toBe(true);
 });

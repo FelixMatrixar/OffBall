@@ -55,9 +55,22 @@ def test_each_moment_type_has_its_alternative(decoy) -> None:
     args = (card["creator"]["player_id"], card["period"], card["t_start_ms"], t_m)
     assert CF.instead(md, "decoy_run", *args).intent == "anchor"
     inside = CF.instead(md, "switch_of_play", *args)
-    assert inside.intent == "support" and abs(inside.point[1] - CF.HALF_WIDTH) == pytest.approx(4.0)
+    assert inside.intent == "support" and abs(inside.point[1] - CF.HALF_WIDTH) == pytest.approx(CF.INSIDE_M)
     drop = CF.instead(md, "pinning", *args)
     assert drop.intent == "support" and drop.point is not None
+
+
+def test_a_creator_is_offered_only_the_choices_he_had(decoy) -> None:
+    md, card, _, _ = decoy
+    pid, period, t_ms = card["creator"]["player_id"], card["period"], card["t_start_ms"]
+    pf = md.periods[period]
+    at = pf.xy[pf.index_of(t_ms), md.players.index(pid)]
+    offered = CF.options(md, pid, period, t_ms)
+    assert offered[0] == "hold"
+    # The striker runs from the middle: there is no touchline for him to come inside from.
+    assert abs(at[1] - CF.HALF_WIDTH) < CF.WIDE_M and "inside" not in offered
+    assert CF.default_alternative("switch_of_play", offered) == "hold"
+    assert CF.default_alternative("decoy_run") == "hold" and CF.default_alternative("switch_of_play") == "inside"
 
 
 def test_replays_without_the_decoy_give_credit_an_interval_and_a_ghost(decoy) -> None:
@@ -68,6 +81,8 @@ def test_replays_without_the_decoy_give_credit_an_interval_and_a_ghost(decoy) ->
     assert cf.replays == 4 and len(cf.without_area_m2) == 4
     low, high = cf.space_interval_m2
     assert low <= cf.space_created_m2 <= high and cf.space_created_m2 > 0
-    assert len(cf.ghost) >= 2 and cf.ghost[0][0] == cf.t_start_ms <= cf.ghost[-1][0] <= t_m
+    # The ghost plays on past the measurement, long enough for the alternative to show on the pitch.
+    assert len(cf.ghost) >= 2 and cf.ghost[0][0] == cf.t_start_ms
+    assert cf.ghost[-1][0] >= max(t_m, cf.t_start_ms + CF.GHOST_MIN_MS) - 40
     # The same seed replays the same moment the same way.
     assert CF.counterfactual(*args, replays=4) == cf

@@ -36,7 +36,8 @@ def test_the_timeline_lists_every_moment_with_its_goals(goal) -> None:
     assert {p["period"] for p in tl["periods"]} == {1, 2}
     assert tl["home"]["club_id"] and tl["players"] and tl["goals"]
     moment = next(m for m in tl["moments"] if m["candidate_id"] == cid)
-    assert moment["outcome"] == "goal" and moment["whatif"] in F.CF.ALTERNATIVES
+    assert moment["outcome"] == "goal" and moment["whatif"] in moment["alternatives"]
+    assert all(m["alternatives"][:1] == ["hold"] for m in tl["moments"] if m["whatif"])
     starts = [(m["period"], m["t_start_ms"]) for m in tl["moments"]]
     assert starts == sorted(starts)
 
@@ -52,10 +53,17 @@ def test_a_whatif_replays_the_moment_with_another_decision(goal, tmp_path, monke
     assert n["space_lo_m2"] <= n["space_created_m2"] <= n["space_hi_m2"] and n["replays"] == 16
     assert n["space_created_m2"] > 5 and 0 <= n["gap_open_pct_without"] <= 100
     assert w["t_measure_ms"] - w["t_start_ms"] >= F.MIN_WHATIF_MS - 1000
+    # The ghosts play on long enough for the choice to show on the pitch.
+    assert all(t[-1][0] >= w["t_start_ms"] + F.CF.GHOST_MIN_MS - 40 for t in w["tracks"].values())
     # Cached: the second call reads the file.
     assert F.whatif(match_id, cid, "hold") == w
     with pytest.raises(ValueError):
         F.whatif(match_id, cid, "teleport")
+    # A choice the creator didn't have isn't replayed.
+    listed = next(m for m in F.timeline(match_id)["moments"] if m["candidate_id"] == cid)
+    for option in set(F.CF.ALTERNATIVES) - set(listed["alternatives"]):
+        with pytest.raises(ValueError):
+            F.whatif(match_id, cid, option)
 
 
 def test_the_tactician_may_quote_only_the_numbers_it_was_given() -> None:

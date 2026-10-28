@@ -6,7 +6,13 @@ import type { WhatIf } from './api';
 
 /** How long either side of a what-if its ghosts stay on the pitch. */
 export const GHOST_BEFORE_MS = 500;
-export const GHOST_AFTER_MS = 4000;
+export const GHOST_AFTER_MS = 2500;
+
+/** When a what-if's ghosts leave the pitch: a while after the last of them stops, or after the measurement. */
+export function whatIfEnd(w: WhatIf): number {
+  const last = Math.max(w.t_measure_ms, ...Object.values(w.tracks).map((t) => (t.length ? t[t.length - 1][0] : 0)));
+  return last + GHOST_AFTER_MS;
+}
 
 const blank = (o: Partial<Overlay> & Pick<Overlay, 'overlay_id' | 'kind' | 'period' | 't_start_ms' | 't_end_ms'>): Overlay => ({
   rev: 1,
@@ -28,7 +34,7 @@ const blank = (o: Partial<Overlay> & Pick<Overlay, 'overlay_id' | 'kind' | 'peri
 /** The what-if's ghosts and gap as graphics the renderer already draws: dashed paths, and a ring open or shut. */
 export function whatIfItems(w: WhatIf): Overlay[] {
   const t0 = w.t_start_ms - GHOST_BEFORE_MS;
-  const t1 = w.t_measure_ms + GHOST_AFTER_MS;
+  const t1 = whatIfEnd(w);
   const ring = blank({
     overlay_id: `${w.counterfactual_id}-ring`,
     kind: 'gap_ring',

@@ -22,7 +22,7 @@ import type { Team } from '../lib/match';
 import { fetchGraphics, fetchMatches, fetchTimeline, playerHref, type Graphics, type MatchSummary, type Moment, type Timeline, type WhatIf } from '../lib/player/api';
 import { SPEEDS, clockOf, matchTime, useMatchClock, type Speed } from '../lib/player/clock';
 import { MatchFrames } from '../lib/player/frames';
-import { GHOST_AFTER_MS, GHOST_BEFORE_MS } from '../lib/player/whatif';
+import { GHOST_BEFORE_MS, whatIfEnd } from '../lib/player/whatif';
 import { playerWords } from '../lib/player/words';
 import { MODE_IDS, usePrefs, type Lang } from '../lib/prefs';
 
@@ -316,7 +316,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
       ? `${w.types[live.type] ?? live.type} · ${w.graphics[live.graphics]}`
       : `${w.half[pos.period] ?? ''} · ${tl.home.name} v ${tl.away.name}`;
   const voiceLabel = !voiceWanted ? ui.voiceOff : !canSpeak() || !voice ? `No device voice for ${LANGS.find((l) => l.code === lang)?.en ?? lang}` : `${ui.voiceOn} · ${voice.name.split(' - ')[0]}`;
-  const showingWhatIf = !!whatIf && whatIf.period === pos.period && pos.t_ms >= whatIf.t_start_ms - GHOST_BEFORE_MS && pos.t_ms <= whatIf.t_measure_ms + GHOST_AFTER_MS;
+  const showingWhatIf = !!whatIf && whatIf.period === pos.period && pos.t_ms >= whatIf.t_start_ms - GHOST_BEFORE_MS && pos.t_ms <= whatIfEnd(whatIf);
   const whole = matches.filter((m) => m.tracking && m.duration_ms >= WHOLE_MS);
   const modeLabel = pack.modes[mode].label;
 
@@ -338,7 +338,7 @@ function WholeMatch({ tl, graphics, matches, start }: WholeMatchProps) {
         {w.half[pos.period]} · {clockText}
       </span>
       <span key={String(showingWhatIf)} className="map-chip anim-pop">
-        {showingWhatIf ? `${w.whatIf}: ${chosen ? label(chosen.creator_id) : ''} ${whatIf ? w.alternative[whatIf.option_id] : ''}` : 'Field: live space control'}
+        {showingWhatIf && whatIf && chosen ? `${fill(w.whatIfQuestion, { player: label(chosen.creator_id) }).replace(/…$/, '')} ${w.alternative[whatIf.option_id]}` : 'Field: live space control'}
       </span>
       {stat && <span className="map-chip map-chip-space anim-pop">{stat.text[lang] ?? stat.text.en}</span>}
     </>

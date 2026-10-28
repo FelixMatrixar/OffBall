@@ -36,7 +36,9 @@ export function MomentPanel({ matchId, moment: m, alternatives, label, clubOf, w
   const [failed, setFailed] = useState(false);
   const [words, setWords] = useState<Words>({ state: 'idle' });
   const explained = m.graphics === 'published' || m.graphics === 'corrected';
-  const ordered = m.whatif ? [m.whatif, ...alternatives.filter((a) => a !== m.whatif)] : [];
+  // Only the choices the creator really had: a striker in the middle has no touchline to come inside from.
+  const offered = m.alternatives ?? alternatives;
+  const ordered = m.whatif ? [m.whatif, ...offered.filter((a) => a !== m.whatif)] : [];
   const wordLang: 'en' | 'es' | 'fr' = lang === 'es' || lang === 'fr' ? lang : 'en';
 
   const ask = () => {
@@ -60,7 +62,9 @@ export function MomentPanel({ matchId, moment: m, alternatives, label, clubOf, w
       .then((r) => {
         got = true;
         setResult(r);
+        // A choice made is a choice seen: the moment plays again at once with this option's ghosts.
         onShow(r);
+        onJump();
         setWords({ state: 'loading' });
         return fetchWhatIfWords(matchId, m.candidate_id, option, ctl.signal).then((x) => setWords(x.words ? { state: 'ok', words: x.words } : { state: 'none' }));
       })

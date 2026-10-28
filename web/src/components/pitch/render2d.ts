@@ -745,12 +745,28 @@ export function drawScene(ctx: CanvasRenderingContext2D, view: { w: number; dpr:
             } else if (pts.length > 2) arrowHead(ctx, pts[pts.length - 3], pts[pts.length - 1]);
           }
         }
+        // In a what-if, a thin dashed tether from the ghost to the real player shows how far apart the choice put them.
+        const actual = d.path === 'trail' ? s.players.find((p) => p.id === pid) : undefined;
+        if (actual) {
+          const [rx, ry] = P(actual.at);
+          if (Math.hypot(rx - gx, ry - gy) > 14) {
+            ctx.strokeStyle = colour;
+            ctx.globalAlpha = base * alpha * 0.55;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 5]);
+            ctx.beginPath();
+            ctx.moveTo(gx, gy);
+            ctx.lineTo(rx, ry);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
         ctx.save();
         ctx.translate(gx, gy);
         ctx.scale(scale, scale);
         ctx.fillStyle = colour;
         ctx.strokeStyle = colour;
-        ctx.globalAlpha = base * alpha * 0.18;
+        ctx.globalAlpha = base * alpha * 0.3;
         disc(ctx, 0, 0, 13 * (s.dotScale ?? 1));
         ctx.fill();
         ctx.globalAlpha = base * alpha * 0.9;

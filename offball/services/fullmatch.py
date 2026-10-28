@@ -78,13 +78,16 @@ def timeline(match_id: str) -> dict[str, Any]:
     moments = []
     for c in _candidates(match_id):
         b = built.get(c.candidate_id, {})
+        # A what-if measures the gap the moment opened; a moment with no gap has none. Its creator gets only the
+        # alternatives that put him somewhere else.
+        offered = CF.options(md, c.creator_id, c.period, c.t_start_ms) if c.gap_zone else []
         moments.append({"candidate_id": c.candidate_id, "type": c.type, "status": c.status, "period": c.period,
                         "t_start_ms": c.t_start_ms, "t_end_ms": c.t_end_ms, "club_id": c.team_id,
                         "creator_id": c.creator_id, "dragged_ids": c.dragged_ids, "receiver_id": c.receiver_id,
                         "strength": c.strength, "outcome": _outcome(md, c),
                         "graphics": b.get("status", "not_built"), "graphics_note": b.get("note", ""),
-                        # A what-if measures the gap the moment opened; a moment with no gap has none.
-                        "whatif": CF.default_alternative(c.type) if c.gap_zone else None})
+                        "whatif": CF.default_alternative(c.type, offered) if c.gap_zone else None,
+                        "alternatives": offered})
     return {"match_id": match_id, "home": club(info.home), "away": club(info.away),
             "periods": [p.model_dump(mode="json") for p in info.periods], "frame_rate": info.frame_rate,
             "players": players, "goals": goals, "moments": moments,
@@ -247,13 +250,16 @@ def whatif(match_id: str, candidate_id: str, option: str) -> dict[str, Any]:
     players who were free to react, and where the gap is. Cached on disk."""
     if option not in CF.ALTERNATIVES:
         raise ValueError(f"Unknown alternative {option}; the alternatives are {', '.join(CF.ALTERNATIVES)}")
-    path = _whatif_path(match_id, candidate_id, option)
-    if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
     md = T.REGISTRY.data(match_id)
     c = T.candidate(match_id, candidate_id)
     if not c.gap_zone:
         raise ValueError(f"{candidate_id} is a {c.type.replace('_', ' ')}, with no gap to replay")
+    offered = CF.options(md, c.creator_id, c.period, c.t_start_ms)
+    if option not in offered:
+        raise ValueError(f"{c.creator_id} didn't have '{option}' as a choice here; he had {', '.join(offered)}")
+    path = _whatif_path(match_id, candidate_id, option)
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
     started = time.monotonic()
     t_m = max(CR.measure_instant(md, c.team_id, c.period, c.t_start_ms, c.t_end_ms, c.receiver_id),
               min(c.t_start_ms + MIN_WHATIF_MS, c.t_end_ms))
@@ -267,9 +273,11 @@ def whatif(match_id: str, candidate_id: str, option: str) -> dict[str, Any]:
         "replays": cf.replays,
     }
     for pid, track in cf.ghosts.items():
+        # The ghosts play on past the measurement; how far apart they were is read at it.
         real = pf.xy[b, md.players.index(pid)]
+        at = min(track, key=lambda p: abs(p[0] - t_m))
         name = "creator_shift_m" if pid == c.creator_id else f"defender_shift_m.{pid}"
-        numbers[name] = _dist(track[-1][1:], real)
+        numbers[name] = _dist(at[1:], real)
     xs, ys = [p[0] for p in c.gap_zone], [p[1] for p in c.gap_zone]
     out = {"match_id": match_id, "candidate_id": candidate_id, "option_id": option,
            "counterfactual_id": f"{candidate_id}-cf-{option}", "period": c.period, "t_start_ms": cf.t_start_ms,

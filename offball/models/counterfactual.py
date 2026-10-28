@@ -61,6 +61,10 @@ COME_INSIDE = {"switch_of_play"}
 DROP_TO_BALL = {"press_broken", "pinning"}
 # The alternatives a viewer can try in a what-if: hold his place, come inside, or drop towards the ball.
 ALTERNATIVES = ("hold", "inside", "drop")
+WIDE_M = 14.0  # this far from the middle a player is wide, and coming inside is a choice he has
+INSIDE_M = 8.0  # coming inside takes him to the inside channel, this far from the middle
+DROP_MIN_M = 12.0  # dropping towards the ball is a choice only this far from it: closer, it's where he already is
+GHOST_MIN_MS = 4000  # the replays play on at least this long, so the alternative has time to show on the pitch
 
 
 @cache
@@ -241,10 +245,11 @@ class Replay:
 
 def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None, free: list[int],
            observed: Observed, cells: np.ndarray, values: np.ndarray, side: int, control_start: float,
-           rng_seed: int) -> Replay:
-    """Play the engine on from the snapshot and measure the zone at the last observed frame. Only the `free` slots
-    are the engine's to move; everyone else, and the ball, replays as tracked. With a decision, slot `who` is free
-    and makes it; without one, he replays as tracked too. `who`'s path is kept for the ghost."""
+           rng_seed: int, measure: int | None = None) -> Replay:
+    """Play the engine on from the snapshot and measure the zone at observed frame `measure` (the last by default),
+    playing on to the last for the ghosts. Only the `free` slots are the engine's to move; everyone else, and the
+    ball, replays as tracked. With a decision, slot `who` is free and makes it; without one, he replays as tracked
+    too. `who`'s path is kept for the ghost."""
     sim = base.fork(snapshot)
     sim.reseed(rng_seed)
     i = who
@@ -263,7 +268,10 @@ def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None,
         for k, path in others.items():
             path.append((sim.t_ms, round(float(sim.pos[k][0]), 2), round(float(sim.pos[k][1]), 2)))
 
-    for f in range(1, len(observed.ball)):
+    last = len(observed.ball) - 1
+    measure = last if measure is None else min(max(measure, 1), last)
+    zone = (0.0, 0.0, 0.0)
+    for f in range(1, last + 1):
         if (f - 1) % every == 0:
             keep()
         sim.step()
@@ -273,16 +281,34 @@ def replay(snapshot: dict, base: Simulator, who: int, decision: Decision | None,
         sim.ball_pos, sim.ball_vel = observed.ball[f].copy(), np.zeros(3)
         sim.flight, sim.flight_plan, sim.ball_state = None, {}, "owned"
         sim.owner, sim.possession = owner, int(sim.team_of[owner])
-    att, dfn = sim.active_of(side), sim.active_of(1 - side)
-    ctrl = control_fast(sim.pos[att], sim.vel[att], sim.pos[dfn], sim.vel[dfn], cells)
+        if f == measure:
+            att, dfn = sim.active_of(side), sim.active_of(1 - side)
+            ctrl = control_fast(sim.pos[att], sim.vel[att], sim.pos[dfn], sim.vel[dfn], cells)
+            zone = (float(ctrl.sum()), float((ctrl * values).mean()), float(ctrl.mean()) - control_start)
     keep()
-    return Replay(float(ctrl.sum()), float((ctrl * values).mean()), float(ctrl.mean()) - control_start, track,
-                  others)
+    return Replay(*zone, track, others)
 
 
-def default_alternative(moment_type: str) -> str:
-    """The alternative a moment type is measured against: what its creator would usually have done instead."""
-    return "inside" if moment_type in COME_INSIDE else "drop" if moment_type in DROP_TO_BALL else "hold"
+def default_alternative(moment_type: str, offered: tuple[str, ...] | list[str] = ALTERNATIVES) -> str:
+    """The alternative a moment type is measured against: what its creator would usually have done instead, if he
+    had that choice; holding his place otherwise."""
+    kind = "inside" if moment_type in COME_INSIDE else "drop" if moment_type in DROP_TO_BALL else "hold"
+    return kind if kind in offered else "hold"
+
+
+def options(md: MatchData, creator_id: str, period: int, t_ms: int) -> list[str]:
+    """The alternatives the creator really had at a moment, each one somewhere else to be: holding his place always,
+    coming inside only from wide, and dropping towards the ball only from far enough away."""
+    pf = md.periods[period]
+    a = pf.index_of(t_ms)
+    at = pf.xy[a, md.players.index(creator_id)].astype(float)
+    ball = pf.ball[a, :2].astype(float)
+    out = ["hold"]
+    if not np.isnan(at).any() and abs(at[1] - HALF_WIDTH) >= WIDE_M:
+        out.append("inside")
+    if not np.isnan(at).any() and not np.isnan(ball).any() and float(np.linalg.norm(ball - at)) >= DROP_MIN_M:
+        out.append("drop")
+    return out
 
 
 def alternative(md: MatchData, kind: str, creator_id: str, period: int, t_start_ms: int,
@@ -296,7 +322,7 @@ def alternative(md: MatchData, kind: str, creator_id: str, period: int, t_start_
     start = pf.xy[a, md.players.index(creator_id)].astype(float)
     seconds = max((b - a) * DT, 1.0) + 1.0
     if kind == "inside":
-        inside = HALF_WIDTH + np.sign(start[1] - HALF_WIDTH) * 4.0
+        inside = HALF_WIDTH + np.sign(start[1] - HALF_WIDTH) * INSIDE_M
         return Decision(creator_id, "support", (float(start[0]), float(inside)), 0.7, seconds)
     if kind == "drop":
         mid = (start + pf.ball[a, :2].astype(float)) / 2
@@ -343,9 +369,11 @@ def counterfactual(md: MatchData, moment_type: str, club_id: str, creator_id: st
     a = start_frame(md, period, t_start_ms, t_measure_ms)
     b = max(pf.index_of(t_measure_ms), a + 1)
     t0 = int(pf.t_ms[a])
+    # The replays play on past the measurement, so the alternative has time to show on the pitch.
+    e = max(b, min(pf.index_of(t0 + GHOST_MIN_MS), len(pf.t_ms) - 1))
     base = seed(md, period, t0, rng_seed)
     snapshot = base.checkpoint()
-    observed = observe(md, base, period, a, b)
+    observed = observe(md, base, period, a, e)
     side = 0 if club_id == md.home else 1
     cells = _zone_cells(zone_from({"zone": zone}))
     values = epv.value_at(md, period, club_id, cells)
@@ -354,9 +382,9 @@ def counterfactual(md: MatchData, moment_type: str, club_id: str, creator_id: st
     who = base.slot_of(creator_id)
     free = [who, *(k for k in map(base.slot_of, dragged_ids) if k >= 0)]
     kind = instead_kind or default_alternative(moment_type)
-    decision = alternative(md, kind, creator_id, period, t0, int(pf.t_ms[b]))
+    decision = alternative(md, kind, creator_id, period, t0, int(pf.t_ms[e]))
     runs = [replay(snapshot, base, who, decision, free, observed, cells, values, side, control_start,
-                   rng_seed * 1000 + k) for k in range(replays)]
+                   rng_seed * 1000 + k, measure=b - a) for k in range(replays)]
     area, value = float(actual_ctrl.sum()), float((actual_ctrl * values).mean())
     wo_area = np.asarray([r.area_m2 for r in runs])
     wo_val = np.asarray([r.value for r in runs])

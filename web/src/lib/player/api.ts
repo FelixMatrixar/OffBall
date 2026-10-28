@@ -66,6 +66,8 @@ export interface Moment {
   graphics_note: string;
   /** The alternative this type of moment is usually measured against; null when it has no gap to replay. */
   whatif: Alternative | null;
+  /** The alternatives its creator really had, each one somewhere else to be (only from wide can he come inside). */
+  alternatives?: Alternative[];
 }
 
 export interface Timeline {
@@ -110,7 +112,7 @@ export interface WhatIf {
   t_start_ms: number;
   t_measure_ms: number;
   numbers: Record<string, number>;
-  /** Median paths of the players free to react, as [t_ms, x, y]. */
+  /** Median paths of the players free to react, as [t_ms, x, y]; they play on a little past the measurement. */
   tracks: Record<string, [number, number, number][]>;
   ring: { at: [number, number]; rx_m: number; ry_m: number; open: boolean };
 }
